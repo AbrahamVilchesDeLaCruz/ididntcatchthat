@@ -7,8 +7,30 @@ on:
       - dev
 
 jobs:
+  changes:
+    name: ci / detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      client: ${{ steps.filter.outputs.client }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+            client:
+              - 'apps/client/**'
+
   api:
     name: ci / api
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,39 +50,21 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            pnpm install --frozen-lockfile
-          else
-            echo "No package.json yet — skipping"
-          fi
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: |
-          if [ -f package.json ] && grep -q '"lint"' package.json; then
-            pnpm lint
-          else
-            echo "No lint script yet — skipping"
-          fi
+        run: pnpm lint
 
       - name: Test
-        run: |
-          if [ -f package.json ] && grep -q '"test"' package.json; then
-            pnpm test --passWithNoTests
-          else
-            echo "No test script yet — skipping"
-          fi
+        run: pnpm test --passWithNoTests
 
       - name: Build
-        run: |
-          if [ -f package.json ] && grep -q '"build"' package.json; then
-            pnpm build
-          else
-            echo "No build script yet — skipping"
-          fi
+        run: pnpm build
 
   client:
     name: ci / client
+    needs: changes
+    if: needs.changes.outputs.client == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -80,33 +84,13 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            pnpm install --frozen-lockfile
-          else
-            echo "No package.json yet — skipping"
-          fi
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: |
-          if [ -f package.json ] && grep -q '"lint"' package.json; then
-            pnpm lint
-          else
-            echo "No lint script yet — skipping"
-          fi
+        run: pnpm lint
 
       - name: Test
-        run: |
-          if [ -f package.json ] && grep -q '"test"' package.json; then
-            pnpm test --passWithNoTests
-          else
-            echo "No test script yet — skipping"
-          fi
+        run: pnpm test --passWithNoTests
 
       - name: Build
-        run: |
-          if [ -f package.json ] && grep -q '"build"' package.json; then
-            pnpm build
-          else
-            echo "No build script yet — skipping"
-          fi
+        run: pnpm build
