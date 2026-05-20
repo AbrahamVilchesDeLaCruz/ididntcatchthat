@@ -129,28 +129,28 @@ help: ## Show this help message
 
 deploy-prod: ## [VPS] Pull main + build + recreate prod containers
 	git -C $(PROD_DIR) pull origin main
-	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) up -d --build
+	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml up -d --build
 
 deploy-dev: ## [VPS] Pull dev + build + recreate dev containers
 	git -C $(DEV_DIR) pull origin dev
-	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) up -d --build
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.prod.yml up -d --build
 
 vps-ps-prod: ## [VPS] Status de containers prod
-	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) ps
+	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml ps
 
 vps-ps-dev: ## [VPS] Status de containers dev
-	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) ps
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml ps
 
 vps-logs-prod: ## [VPS] Logs prod (tail)
-	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) logs -f
+	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml logs -f
 
 vps-logs-dev: ## [VPS] Logs dev (tail)
-	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) logs -f
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml logs -f
 
 vps-restart-prod: ## [VPS] Restart prod containers
-	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) restart
+	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml restart
 
 vps-restart-dev: ## [VPS] Restart dev containers
-	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) restart
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml restart
 
 .DEFAULT_GOAL := help
