@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  api:
+    name: ci / api
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            pnpm install --frozen-lockfile
+          else
+            echo "No package.json yet — skipping"
+          fi
+
+      - name: Lint
+        run: |
+          if [ -f package.json ] && grep -q '"lint"' package.json; then
+            pnpm lint
+          else
+            echo "No lint script yet — skipping"
+          fi
+
+      - name: Test
+        run: |
+          if [ -f package.json ] && grep -q '"test"' package.json; then
+            pnpm test --passWithNoTests
+          else
+            echo "No test script yet — skipping"
+          fi
+
+      - name: Build
+        run: |
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            pnpm build
+          else
+            echo "No build script yet — skipping"
+          fi
+
+  client:
+    name: ci / client
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/client
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            pnpm install --frozen-lockfile
+          else
+            echo "No package.json yet — skipping"
+          fi
+
+      - name: Lint
+        run: |
+          if [ -f package.json ] && grep -q '"lint"' package.json; then
+            pnpm lint
+          else
+            echo "No lint script yet — skipping"
+          fi
+
+      - name: Test
+        run: |
+          if [ -f package.json ] && grep -q '"test"' package.json; then
+            pnpm test --passWithNoTests
+          else
+            echo "No test script yet — skipping"
+          fi
+
+      - name: Build
+        run: |
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            pnpm build
+          else
+            echo "No build script yet — skipping"
+          fi
