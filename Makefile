@@ -127,13 +127,15 @@ help: ## Show this help message
 
 # ─── VPS Deploy ───────────────────────────────────────────────────────────────
 
-deploy-prod: ## [VPS] Pull main + build + recreate prod containers
-	git -C $(PROD_DIR) pull origin main
+deploy-prod: ## [VPS] Sync main + build + recreate prod containers
+	git -C $(PROD_DIR) fetch origin
+	git -C $(PROD_DIR) reset --hard origin/main
 	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml up -d --build
 
-deploy-dev: ## [VPS] Pull dev + build + recreate dev containers
-	git -C $(DEV_DIR) pull origin dev
-	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.prod.yml up -d --build
+deploy-dev: ## [VPS] Sync dev + build + recreate dev containers
+	git -C $(DEV_DIR) fetch origin
+	git -C $(DEV_DIR) reset --hard origin/dev
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml up -d --build
 
 vps-ps-prod: ## [VPS] Status de containers prod
 	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml ps

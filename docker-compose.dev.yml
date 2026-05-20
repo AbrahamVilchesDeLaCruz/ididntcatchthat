@@ -2,6 +2,8 @@
 # Variables injected by Doppler (config: dev) via Makefile
 services:
   api:
+    container_name: ididntcatchthat-api-dev
+    image: ididntcatchthat-api:dev
     ports:
       - "3001:3000"
     environment:
@@ -9,6 +11,8 @@ services:
       PORT: ${PORT}
 
   client:
+    container_name: ididntcatchthat-client-dev
+    image: ididntcatchthat-client:dev
     ports:
       - "4001:80"
     environment:

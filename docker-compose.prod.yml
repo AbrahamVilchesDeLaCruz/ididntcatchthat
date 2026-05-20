@@ -2,7 +2,8 @@
 # Variables injected by Doppler (config: prd) via Makefile
 services:
   api:
-    image: ididntcatchthat-api:latest
+    container_name: ididntcatchthat-api-prod
+    image: ididntcatchthat-api:prod
     ports:
       - "3000:3000"
     environment:
@@ -11,7 +12,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
 
   client:
-    image: ididntcatchthat-client:latest
+    container_name: ididntcatchthat-client-prod
+    image: ididntcatchthat-client:prod
     ports:
       - "4000:80"
     environment:
