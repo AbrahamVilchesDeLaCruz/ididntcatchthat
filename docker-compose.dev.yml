@@ -3,13 +3,13 @@
 services:
   api:
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
 
   client:
     ports:
-      - "8080:80"
+      - "4001:80"
     environment:
       NODE_ENV: ${NODE_ENV}
