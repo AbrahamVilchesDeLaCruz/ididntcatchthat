@@ -51,7 +51,7 @@ apps/api/src/
 ## Code Rules
 
 - **TypeScript** estricto — no usar `any`
-- **Prisma** solo en `infrastructure/persistence/` — nunca en domain ni application
+- **TypeORM** solo en `infrastructure/persistence/` — nunca en domain ni application
 - Errores de dominio como clases tipadas: `throw new FlashcardNotFoundError(id)`
 - Servicios externos (ElevenLabs, Azure) solo en `infrastructure/` — interfaces en `domain/`
 - Path aliases en todos los imports — nunca rutas relativas largas
