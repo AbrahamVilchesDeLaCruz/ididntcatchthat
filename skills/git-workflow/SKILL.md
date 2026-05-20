@@ -54,8 +54,23 @@ fix
 1. git checkout dev && git pull
 2. git checkout -b feat/nombre-descriptivo
 3. trabajar + commits convencionales
-4. PR: feat/* → dev        → Squash and merge
+4. PR: feat/* → dev        → Squash and merge + eliminar rama remota
 5. PR: dev   → main        → Merge commit  (solo cuando dev está estable)
+```
+
+### Limpieza de ramas tras merge (OBLIGATORIO)
+
+Después de mergear cualquier PR efímero (`feat/*`, `fix/*`, `ci/*`, `chore/*`, etc.), eliminar la rama remota:
+
+```bash
+# gh lo hace automáticamente con --delete-branch
+gh pr merge <número> --squash --delete-branch
+
+# Si la rama remota sobrevivió, eliminarla manualmente
+git push origin --delete nombre-rama
+
+# Limpiar referencias locales obsoletas
+git fetch --prune
 ```
 
 ### Estrategia de merge — NUNCA mezclar

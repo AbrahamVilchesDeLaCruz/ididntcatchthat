@@ -1,0 +1,92 @@
+# ADR-016: Estrategia de entornos
+
+**Status**: Accepted  
+**Date**: 2026-05-20  
+**Deciders**: Abraham Vilches de la Cruz
+
+---
+
+## Context
+
+El proyecto necesita una estrategia clara para gestionar múltiples entornos (local, CI, producción) con bases de datos aisladas, variables de entorno seguras y flujos de trabajo reproducibles.
+
+---
+
+## Decision
+
+### Tres entornos
+
+| Entorno | Quién lo usa | Base de datos | Secrets |
+|---|---|---|---|
+| `dev` | Desarrollador en local | Aiven dev | Doppler `dev` |
+| `test` | GitHub Actions (CI) | PostgreSQL en Docker (runner) | Doppler `test` |
+| `prod` | VPS de producción | Aiven prod | Doppler `prod` |
+
+### Local — dev
+
+El desarrollador trabaja con hot-reload directo via pnpm. Docker solo orquesta `api` y `client` para validar builds de producción. La DB vive en Aiven dev — no hay postgres en Docker local.
+
+```bash
+# Dev diario — sin Docker
+doppler run -- pnpm --filter @ididntcatchthat/api start:dev
+doppler run -- pnpm --filter @ididntcatchthat/client dev
+
+# Validar build de producción
+make up
+```
+
+### CI — test
+
+GitHub Actions levanta un contenedor PostgreSQL efímero en el runner para cada ejecución. Las variables de entorno vienen de Doppler `test` via GitHub Actions integration. La DB se crea en caliente, se usan para tests de integración/e2e, y se destruye al terminar el job — sin riesgo de contaminar dev ni prod.
+
+```yaml
+services:
+  postgres:
+    image: postgres:17-alpine
+    env:
+      POSTGRES_DB: ididntcatchthat_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+```
+
+### Prod — VPS
+
+Todo contenedorizado via Docker Compose. Los secrets llegan a los contenedores via Doppler CLI integrado en el entrypoint o via variables inyectadas en el deploy. La DB es Aiven prod — nunca en Docker en producción.
+
+### Por qué no PostgreSQL local en Docker
+
+- Aiven tiene free tier suficiente para dev
+- Evita divergencia entre schema local y remoto
+- Un entorno menos que mantener
+- Los devs siempre trabajan contra datos reales de dev (no fixtures inventados)
+
+### Por qué PostgreSQL en Docker solo en CI
+
+- El runner de GitHub Actions es efímero — tiene sentido usar una DB efímera
+- Aísla completamente los tests — no hay riesgo de contaminar dev o prod
+- Más rápido que conectar a Aiven desde CI (latencia de red)
+- Control total sobre el estado inicial de la DB en cada run
+
+---
+
+## Alternatives Considered
+
+### PostgreSQL en Docker también en local
+Más aislado pero añade fricción al onboarding y divergencia potencial con Aiven. Descartado — Aiven dev es suficiente y más realista.
+
+### Un solo entorno de DB para CI y dev
+Riesgo de contaminación de datos entre runs de CI y trabajo de dev. Descartado.
+
+### Sin Doppler — `.env` files por entorno
+Escala mal, secrets en disco, riesgo de commitear por accidente. Descartado — ver ADR-017.
+
+---
+
+## Consequences
+
+- ✅ Entornos completamente aislados — imposible contaminar prod desde dev o CI
+- ✅ CI reproducible — DB fresca en cada run
+- ✅ Dev realista — misma DB engine (PostgreSQL) en todos los entornos
+- ✅ Sin fricción de Docker en dev diario — hot-reload directo
+- ⚠️ Requiere cuenta Aiven con 3 bases de datos (free tier cubre esto)
+- ⚠️ Requiere Doppler CLI instalado en la máquina del desarrollador

@@ -1,0 +1,18 @@
+# Prod override — VPS production
+# Variables injected by Doppler (config: prd) via Makefile
+services:
+  api:
+    image: ididntcatchthat-api:latest
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      DATABASE_URL: ${DATABASE_URL}
+
+  client:
+    image: ididntcatchthat-client:latest
+    ports:
+      - "4000:80"
+    environment:
+      NODE_ENV: ${NODE_ENV}
