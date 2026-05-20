@@ -3,6 +3,7 @@
 # Configures AI coding assistants:
 #   - opencode: .claude/skills/ symlink
 #   - GitHub Copilot: .github/copilot-instructions.md symlink → AGENTS.md
+#                     .github/skills/ symlink → skills/
 #
 # Usage:
 #   bash skills/setup.sh
@@ -47,17 +48,25 @@ ln -s "$SKILLS_SOURCE" "$TARGET"
 add_to_gitignore ".claude/skills"
 echo -e "${GREEN}  ✓ .claude/skills -> skills/${NC}"
 
-# ─── GitHub Copilot (.github/copilot-instructions.md) ────────────────────────
+# ─── GitHub Copilot (.github/copilot-instructions.md + .github/skills/) ──────
 echo -e "${YELLOW}[2/2] Setting up GitHub Copilot...${NC}"
 
 mkdir -p "$REPO_ROOT/.github"
+
+# copilot-instructions.md → AGENTS.md
 COPILOT_TARGET="$REPO_ROOT/.github/copilot-instructions.md"
-
 [ -L "$COPILOT_TARGET" ] && rm "$COPILOT_TARGET"
-
 ln -sf "../AGENTS.md" "$COPILOT_TARGET"
 add_to_gitignore ".github/copilot-instructions.md"
 echo -e "${GREEN}  ✓ .github/copilot-instructions.md -> AGENTS.md${NC}"
+
+# .github/skills/ → skills/
+COPILOT_SKILLS="$REPO_ROOT/.github/skills"
+[ -L "$COPILOT_SKILLS" ] && rm "$COPILOT_SKILLS"
+[ -d "$COPILOT_SKILLS" ] && mv "$COPILOT_SKILLS" "$REPO_ROOT/.github/skills.backup.$(date +%s)"
+ln -s "$SKILLS_SOURCE" "$COPILOT_SKILLS"
+add_to_gitignore ".github/skills"
+echo -e "${GREEN}  ✓ .github/skills -> skills/${NC}"
 
 # ─── Summary ─────────────────────────────────────────────────────────────────
 SKILL_COUNT=$(find "$SKILLS_SOURCE" -maxdepth 2 -name "SKILL.md" | wc -l | tr -d ' ')
@@ -66,7 +75,7 @@ echo ""
 echo -e "${GREEN}✅ Done — $SKILL_COUNT skills configured${NC}"
 echo ""
 echo "  • opencode:        .claude/skills/"
-echo "  • GitHub Copilot:  .github/copilot-instructions.md"
+echo "  • GitHub Copilot:  .github/copilot-instructions.md + .github/skills/"
 echo ""
 echo -e "${BLUE}Restart your AI assistant to load the skills.${NC}"
 echo -e "${BLUE}AGENTS.md is the source of truth — changes reflect automatically via symlinks.${NC}"
