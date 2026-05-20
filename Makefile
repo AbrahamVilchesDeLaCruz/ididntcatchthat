@@ -2,11 +2,21 @@
         dev dev-api dev-client \
         logs logs-api logs-client ps \
         clean purge prune clean-dangling \
+        deploy-prod deploy-dev \
+        vps-ps-prod vps-ps-dev \
+        vps-logs-prod vps-logs-dev \
+        vps-restart-prod vps-restart-dev \
         help
 
 COMPOSE      = docker compose
 COMPOSE_DEV  = doppler run --config dev  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
 COMPOSE_PROD = doppler run --config prd  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml
+
+PROD_DIR = /opt/ididntcatchthat
+DEV_DIR  = /opt/ididntcatchthat-dev
+
+COMPOSE_VPS_PROD = doppler run --config prd -- $(COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml
+COMPOSE_VPS_DEV  = doppler run --config dev -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
 
 # ─── Docker daemon guard ──────────────────────────────────────────────────────
 
@@ -114,5 +124,33 @@ prune: ## ☢️  Nuclear: removes all unused Docker resources
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+# ─── VPS Deploy ───────────────────────────────────────────────────────────────
+
+deploy-prod: ## [VPS] Pull main + build + recreate prod containers
+	git -C $(PROD_DIR) pull origin main
+	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) up -d --build
+
+deploy-dev: ## [VPS] Pull dev + build + recreate dev containers
+	git -C $(DEV_DIR) pull origin dev
+	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) up -d --build
+
+vps-ps-prod: ## [VPS] Status de containers prod
+	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) ps
+
+vps-ps-dev: ## [VPS] Status de containers dev
+	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) ps
+
+vps-logs-prod: ## [VPS] Logs prod (tail)
+	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) logs -f
+
+vps-logs-dev: ## [VPS] Logs dev (tail)
+	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) logs -f
+
+vps-restart-prod: ## [VPS] Restart prod containers
+	cd $(PROD_DIR) && $(COMPOSE_VPS_PROD) restart
+
+vps-restart-dev: ## [VPS] Restart dev containers
+	cd $(DEV_DIR) && $(COMPOSE_VPS_DEV) restart
 
 .DEFAULT_GOAL := help
