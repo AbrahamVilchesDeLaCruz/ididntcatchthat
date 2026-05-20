@@ -28,20 +28,22 @@ Load the scope `AGENTS.md` as soon as you know which app you are working in. Do 
 
 When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
-| Action                                                | Skill           |
-| ----------------------------------------------------- | --------------- |
-| After creating or modifying a skill                   | `skill-sync`    |
-| Creating new skills                                   | `skill-creator` |
-| AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`    |
+| Action                                                | Skill            |
+| ----------------------------------------------------- | ---------------- |
+| After creating or modifying a skill                   | `skill-sync`     |
+| Creating new skills                                   | `skill-creator`  |
+| AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`     |
+| Creating a branch, opening a PR, or merging code      | `git-workflow`   |
 
 ---
 
 ## Available Skills
 
-| Skill           | Description                                   | URL                                       |
-| --------------- | --------------------------------------------- | ----------------------------------------- |
-| `skill-creator` | Crea nuevas skills siguiendo el spec del repo | [SKILL.md](skills/skill-creator/SKILL.md) |
-| `skill-sync`    | Sincroniza skills a las tablas de AGENTS.md   | [SKILL.md](skills/skill-sync/SKILL.md)    |
+| Skill           | Description                                                   | URL                                          |
+| --------------- | ------------------------------------------------------------- | -------------------------------------------- |
+| `skill-creator` | Crea nuevas skills siguiendo el spec del repo                 | [SKILL.md](skills/skill-creator/SKILL.md)    |
+| `skill-sync`    | Sincroniza skills a las tablas de AGENTS.md                   | [SKILL.md](skills/skill-sync/SKILL.md)       |
+| `git-workflow`  | Branching, naming, merge strategy y PRs para este repo        | [SKILL.md](skills/git-workflow/SKILL.md)     |
 
 ---
 
