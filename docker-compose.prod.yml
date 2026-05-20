@@ -13,6 +13,6 @@ services:
   client:
     image: ididntcatchthat-client:latest
     ports:
-      - "80:80"
+      - "4000:80"
     environment:
       NODE_ENV: ${NODE_ENV}
