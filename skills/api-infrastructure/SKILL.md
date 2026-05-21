@@ -19,30 +19,91 @@ metadata:
 
 ### Controllers
 
-Método por defecto: `handler()`. Inyecta casos de uso — nunca repositorios ni domain services.
+Un controller por acción — nombre: `{Entity}{Verb}{Method}Controller`.
+Método siempre `handler()`. Inyecta un solo caso de uso.
 
 ```typescript
-// flashcards/infrastructure/controllers/flashcard.controller.ts
+// flashcards/infrastructure/controllers/create-flashcard-post.controller.ts
 @Controller('flashcards')
-export class FlashcardController {
-  constructor(
-    private readonly creator: FlashcardCreator,
-    private readonly finder: FlashcardFinder,
-  ) {}
+export class CreateFlashcardPostController {
+  constructor(private readonly creator: FlashcardCreator) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async handler(@Body() body: { front: string; back: string }): Promise<void> {
+  async handler(@Body() body: CreateFlashcardPostPayload): Promise<void> {
     await this.creator.execute(body.front, body.back);
   }
 }
 ```
 
+```typescript
+// flashcards/infrastructure/controllers/search-flashcards-get.controller.ts
+@Controller('flashcards')
+export class SearchFlashcardsGetController {
+  constructor(private readonly searcher: FlashcardSearcher) {}
+
+  @Get()
+  async handler(@Query() query: SearchFlashcardsGetQuery): Promise<FlashcardPrimitives[]> {
+    return this.searcher.execute(query.filters ?? [], ...);
+  }
+}
+```
+
+**Naming:**
+- Archivo: `{verb}-{resource}-{method}.controller.ts` — `create-flashcard-post.controller.ts`
+- Clase: `{Verb}{Resource}{Method}Controller` — `CreateFlashcardPostController`
+
+### Payloads y Queries
+
+Validación con `class-validator` — solo en infrastructure, nunca pasan a application.
+
+```typescript
+// flashcards/infrastructure/controllers/create-flashcard-post.payload.ts
+export class CreateFlashcardPostPayload {
+  @IsString()
+  @IsNotEmpty()
+  front: string;
+
+  @IsString()
+  @IsNotEmpty()
+  back: string;
+}
+```
+
+```typescript
+// flashcards/infrastructure/controllers/search-flashcards-get.query.ts
+export class SearchFlashcardsGetQuery {
+  @IsOptional()
+  filters?: CriteriaFilterItem[];
+
+  @IsOptional()
+  @IsString()
+  orderBy?: string;
+
+  @IsOptional()
+  @IsIn(['ASC', 'DESC'])
+  orderType?: string;
+
+  @IsOptional()
+  @IsNumber()
+  limit?: number;
+
+  @IsOptional()
+  @IsNumber()
+  offset?: number;
+}
+```
+
+**Naming:**
+- Payload (body POST/PATCH): `{Verb}{Resource}{Method}Payload` — `CreateFlashcardPostPayload`
+- Query (query params GET): `{Verb}{Resource}{Method}Query` — `SearchFlashcardsGetQuery`
+- Archivo junto al controller que lo usa
+
 **Reglas:**
-- Método HTTP handler siempre: `handler()` — sin nombres como `create`, `findOne`, etc.
+- Método HTTP handler siempre: `handler()`
+- Un controller = un caso de uso = una responsabilidad
 - Sin lógica — recibe HTTP, delega al use case, devuelve respuesta
-- Nombre de ruta en `kebab-case` plural: `flashcards`, `pronunciation-sessions`
-- Nombre de inyección = ROL: `creator`, `finder`, `updater`, `remover`
+- Payload/Query nunca salen del controller — el use case recibe primitivos
 
 ### TypeORM Entities
 
@@ -151,7 +212,15 @@ export class FlashcardModule {}
 
 ```
 infrastructure/
-├── controllers/      ← HTTP entrypoints
+├── controllers/
+│   ├── create-flashcard-post.controller.ts
+│   ├── create-flashcard-post.payload.ts
+│   ├── search-flashcards-get.controller.ts
+│   ├── search-flashcards-get.query.ts
+│   ├── find-flashcard-get.controller.ts
+│   ├── update-flashcard-patch.controller.ts
+│   ├── update-flashcard-patch.payload.ts
+│   └── delete-flashcard-delete.controller.ts
 ├── framework/        ← NestJS modules
 └── persistence/      ← TypeORM entities + repositories
 ```
@@ -159,17 +228,20 @@ infrastructure/
 ## Anti-patterns
 
 ```typescript
+// ❌ Un controller para todo el recurso
+export class FlashcardController { } // un controller por acción
+
+// ❌ Payload/Query pasando a application
+async execute(payload: CreateFlashcardPostPayload): Promise<void> {} // recibe primitivos
+
 // ❌ Lógica en controller
 async handler(@Body() body): Promise<void> {
-  if (!body.front) throw new BadRequestException(); // va en VO o use case
+  if (!body.front) throw new BadRequestException(); // va en VO — class-validator lo valida antes
 }
 
 // ❌ Repositorio inyectado en controller
 constructor(private readonly repository: FlashcardRepository) {}
 
-// ❌ TypeORM entity en domain o application
-import { FlashcardEntity } from '../../infrastructure/persistence/flashcard.entity';
-
-// ❌ Entity de TypeORM saliendo del repositorio
+// ❌ TypeORM entity saliendo del repositorio
 async search(id: FlashcardId): Promise<FlashcardEntity> { ... }
 ```
