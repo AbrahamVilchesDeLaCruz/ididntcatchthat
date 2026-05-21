@@ -10,6 +10,12 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 | Action | Skill |
 |---|---|
+| Crear un pod nuevo o agregar archivos a uno existente | `client-pods` |
+| Crear o modificar un Container o Component | `client-container-presentational` |
+| Agregar queries, mutations o query keys | `client-query` |
+| Crear o modificar `api/`, mapper, o types | `client-api` |
+| Crear o modificar hooks del pod o globales | `client-hooks` |
+| Escribir tests (unit, integration, E2E) | `client-testing` |
 | Creating new skills | `skill-creator` |
 | After creating or modifying a skill | `skill-sync` |
 
@@ -17,22 +23,41 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 ## Architecture
 
-Atomic Design + Container/Presentational pattern:
+Pods + Container-Presentational pattern.
+
+> Referencia completa: [docs/frontend-architecture.md](../../docs/frontend-architecture.md)
 
 ```
 apps/client/src/
-├── features/             ← features completas (flashcards, pronunciation...)
-│   └── {feature}/
-│       ├── components/   ← componentes presentacionales
-│       ├── containers/   ← componentes con lógica y queries
-│       ├── hooks/        ← hooks del feature
-│       └── api/          ← llamadas con TanStack Query
-├── components/           ← componentes atómicos compartidos
-├── store/                ← Zustand (solo client state)
-└── main.tsx
+├── common/        ← Componentes reutilizables sin dominio (Button, Input, Modal)
+├── common-app/    ← Reutilizables pero ligados al dominio (CreateFlashcardPopup)
+├── core/          ← Router, auth, API client, interceptores, providers globales
+├── layout/        ← Plantillas visuales (Sidebar, Topbar, AppShell)
+├── containers/    ← Pods organizados por dominio
+└── views/         ← Páginas que seleccionan layout + renderizan pods
 ```
 
-**Regla de oro**: los componentes presentacionales no saben nada de queries ni estado global. Reciben todo por props.
+### Estructura interna de un pod
+
+```
+containers/{feature}/
+├── api/
+│   ├── index.ts
+│   ├── {feature}.api-model.ts
+│   └── {feature}.api.ts
+├── hooks/
+│   ├── use{Feature}{Concern}.ts
+│   └── index.ts
+├── components/
+│   └── {Feature}{Part}.tsx
+├── {Feature}Container.tsx
+├── {Feature}Component.tsx
+├── {feature}.mapper.ts
+├── {feature}.types.ts
+└── index.ts
+```
+
+**Regla de oro**: Container = mundo exterior (queries, routing, Zustand). Component = mundo de la UI (useState, useEffect, sub-componentes).
 
 ---
 
@@ -45,8 +70,9 @@ apps/client/src/
 | TailwindCSS | Estilos utilitarios |
 | TanStack Query | Server state y caché |
 | Zustand | Client state (UI, sesión) |
-| Vitest | Unit e integration testing |
+| Vitest + RTL | Unit e integration testing |
 | Playwright | E2E testing |
+| MSW | Mock de API en tests |
 
 ---
 
@@ -55,8 +81,9 @@ apps/client/src/
 - **TypeScript** estricto — no usar `any`
 - **TanStack Query** para todo lo que venga del servidor — nunca `useState` + `useEffect` para fetching
 - **Zustand** solo para estado del cliente (no cache del servidor)
-- **Zod** para validar respuestas de API — contratos en `packages/contracts/`
+- **Zod** para validar respuestas de API en `core/`
 - Path aliases en todos los imports
+- Un pod NO importa de otro pod
 
 ---
 
@@ -64,10 +91,10 @@ apps/client/src/
 
 ```bash
 # Desde apps/client/
-npm run dev         # Dev server
-npm run test        # Vitest
-npm run test:e2e    # Playwright
-npm run lint        # ESLint
+pnpm dev         # Dev server
+pnpm test        # Vitest
+pnpm test:e2e    # Playwright
+pnpm lint        # ESLint
 ```
 
 ---
@@ -76,5 +103,11 @@ npm run lint        # ESLint
 
 | Skill | Description | URL |
 |---|---|---|
+| `client-pods` | Estructura de pods, naming, cuándo crear qué | [SKILL.md](../../skills/client-pods/SKILL.md) |
+| `client-container-presentational` | Contrato Container/Component, responsabilidades, prohibiciones | [SKILL.md](../../skills/client-container-presentational/SKILL.md) |
+| `client-query` | TanStack Query: queries, mutations, query keys, invalidación | [SKILL.md](../../skills/client-query/SKILL.md) |
+| `client-api` | Capa api/: api-model, api.ts, mapper, ViewModel types | [SKILL.md](../../skills/client-api/SKILL.md) |
+| `client-hooks` | Hooks del pod [State, Handlers], hooks globales, cuándo extraer | [SKILL.md](../../skills/client-hooks/SKILL.md) |
+| `client-testing` | Vitest + RTL (unit/integration), Playwright E2E, MSW | [SKILL.md](../../skills/client-testing/SKILL.md) |
 | `skill-creator` | Crea nuevas skills | [SKILL.md](../../skills/skill-creator/SKILL.md) |
 | `skill-sync` | Sincroniza skills a AGENTS.md | [SKILL.md](../../skills/skill-sync/SKILL.md) |
