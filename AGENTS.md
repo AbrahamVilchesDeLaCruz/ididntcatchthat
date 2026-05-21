@@ -28,22 +28,45 @@ Load the scope `AGENTS.md` as soon as you know which app you are working in. Do 
 
 When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
-| Action                                                | Skill            |
-| ----------------------------------------------------- | ---------------- |
-| After creating or modifying a skill                   | `skill-sync`     |
-| Creating new skills                                   | `skill-creator`  |
-| AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`     |
-| Creating a branch, opening a PR, or merging code      | `git-workflow`   |
+| Action                                                | Skill           |
+| ----------------------------------------------------- | --------------- |
+| After creating or modifying a skill                   | `skill-sync`    |
+| Creating new skills                                   | `skill-creator` |
+| AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`    |
+| Creating a branch, opening a PR, or merging code      | `git-workflow`  |
 
 ---
 
 ## Available Skills
 
-| Skill           | Description                                                   | URL                                          |
-| --------------- | ------------------------------------------------------------- | -------------------------------------------- |
-| `skill-creator` | Crea nuevas skills siguiendo el spec del repo                 | [SKILL.md](skills/skill-creator/SKILL.md)    |
-| `skill-sync`    | Sincroniza skills a las tablas de AGENTS.md                   | [SKILL.md](skills/skill-sync/SKILL.md)       |
-| `git-workflow`  | Branching, naming, merge strategy y PRs para este repo        | [SKILL.md](skills/git-workflow/SKILL.md)     |
+| Skill                | Scope  | Description                                                      | URL                                            |
+| -------------------- | ------ | ---------------------------------------------------------------- | ---------------------------------------------- |
+| `skill-creator`      | global | Crea nuevas skills siguiendo el spec del repo                    | [SKILL.md](skills/skill-creator/SKILL.md)      |
+| `skill-sync`         | global | Sincroniza skills a las tablas de AGENTS.md                      | [SKILL.md](skills/skill-sync/SKILL.md)         |
+| `git-workflow`       | global | Branching, naming, merge strategy y PRs para este repo           | [SKILL.md](skills/git-workflow/SKILL.md)       |
+| `api-domain`         | api    | AggregateRoot, Value Objects, Repository interface, DomainErrors | [SKILL.md](skills/api-domain/SKILL.md)         |
+| `api-application`    | api    | Use Cases, Domain Services, convenciones de inyección            | [SKILL.md](skills/api-application/SKILL.md)    |
+| `api-infrastructure` | api    | Controllers, TypeORM entities, repositorios, módulos NestJS      | [SKILL.md](skills/api-infrastructure/SKILL.md) |
+| `api-domain-events`  | api    | Domain Events — definición, naming, registro en aggregates       | [SKILL.md](skills/api-domain-events/SKILL.md)  |
+| `api-testing`        | api    | Pirámide de tests, Object Mother, jest-mock-extended             | [SKILL.md](skills/api-testing/SKILL.md)        |
+| `api-criteria`       | api    | Criteria — filtros, orden, paginación, flujo controller→uc→repo  | [SKILL.md](skills/api-criteria/SKILL.md)       |
+| `api-error-handler`  | api    | GlobalExceptionRegistry, filtros por módulo, HttpExceptionFilter | [SKILL.md](skills/api-error-handler/SKILL.md)  |
+| `api-rest`           | api    | Convenciones RESTful + acciones DDD con POST                     | [SKILL.md](skills/api-rest/SKILL.md)            |
+| `api-auth`           | api    | JWT, OAuth Google, guest token, guards, @CurrentUser, voters     | [SKILL.md](skills/api-auth/SKILL.md)            |
+| `api-shared`         | api    | SharedModule global, bounded context shared, env validation Joi  | [SKILL.md](skills/api-shared/SKILL.md)          |
+| `api-events`         | api    | EventBus interface, DomainEventConsumer, Handler abstract        | [SKILL.md](skills/api-events/SKILL.md)          |
+| `api-events-infra`   | api    | AmqpMessageBus, HandlersBootstrapper, retry, DLQ, idempotencia   | [SKILL.md](skills/api-events-infra/SKILL.md)    |
+| `api-di`             | api    | Tokens Symbol, registro de providers, inyección sin acoplamiento | [SKILL.md](skills/api-di/SKILL.md)              |
+| `api-migrations`     | api    | TypeORM migrations formato, seeds idempotentes                   | [SKILL.md](skills/api-migrations/SKILL.md)      |
+| `api-response`       | api    | Envelope de respuesta, paginación, commands sin body             | [SKILL.md](skills/api-response/SKILL.md)        |
+| `api-validation`     | api    | ValidationPipe global, Payload/Query con class-validator         | [SKILL.md](skills/api-validation/SKILL.md)      |
+| `api-observability`  | api    | Logger interface, pino, métricas Prometheus, OTel traces         | [SKILL.md](skills/api-observability/SKILL.md)   |
+| `client-pods`                    | client | Estructura de pods, naming, cuándo crear qué                     | [SKILL.md](skills/client-pods/SKILL.md)                    |
+| `client-container-presentational`| client | Contrato Container/Component, responsabilidades, prohibiciones   | [SKILL.md](skills/client-container-presentational/SKILL.md)|
+| `client-query`                   | client | TanStack Query: queries, mutations, query keys, invalidación     | [SKILL.md](skills/client-query/SKILL.md)                   |
+| `client-api`                     | client | Capa api/: api-model, api.ts, mapper, ViewModel types            | [SKILL.md](skills/client-api/SKILL.md)                     |
+| `client-hooks`                   | client | Hooks del pod [State, Handlers], hooks globales, cuándo extraer  | [SKILL.md](skills/client-hooks/SKILL.md)                   |
+| `client-testing`                 | client | Vitest + RTL (unit/integration), Playwright E2E, MSW             | [SKILL.md](skills/client-testing/SKILL.md)                 |
 
 ---
 
@@ -65,15 +88,15 @@ ididntcatchthat/
 
 ## Stack
 
-| Layer          | Tech                                                          |
-| -------------- | ------------------------------------------------------------- |
+| Layer          | Tech                                                               |
+| -------------- | ------------------------------------------------------------------ |
 | Frontend       | React, TypeScript, Vite, TailwindCSS, TanStack Query, Zustand, Zod |
-| Backend        | NestJS, TypeScript, TypeORM, Class Validator                        |
-| Database       | PostgreSQL (Aiven)                                            |
-| CDN            | Cloudflare (audio files)                                      |
-| Testing        | Vitest, Jest, Playwright                                      |
-| Observabilidad | OpenTelemetry, Prometheus, Grafana, Loki                      |
-| Infra          | VPS, Docker, GitHub Actions                                   |
+| Backend        | NestJS, TypeScript, TypeORM, Class Validator                       |
+| Database       | PostgreSQL (Aiven)                                                 |
+| CDN            | Cloudflare (audio files)                                           |
+| Testing        | Vitest, Jest, Playwright                                           |
+| Observabilidad | OpenTelemetry, Prometheus, Grafana, Loki                           |
+| Infra          | VPS, Docker, GitHub Actions                                        |
 
 ---
 
