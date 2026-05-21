@@ -273,4 +273,4 @@ if (user.roles.includes('admin') && flashcard.status === 'draft') { ... } // va 
 
 ## Referencias
 
-- ADR: [docs/adr/001-auth-strategy.md](../../docs/adr/001-auth-strategy.md)
+- ADR: [docs/adr/018-auth-strategy.md](../../docs/adr/018-auth-strategy.md)

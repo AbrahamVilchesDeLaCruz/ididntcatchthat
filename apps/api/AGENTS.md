@@ -19,6 +19,14 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Crear domain errors o registrar excepciones en un módulo | `api-error-handler` |
 | Diseñar o implementar endpoints REST o acciones DDD | `api-rest` |
 | Implementar auth, guards, strategies, @CurrentUser, voters | `api-auth` |
+| Crear o modificar SharedModule, shared interno, validación de env | `api-shared` |
+| Definir o implementar EventBus, DomainEventConsumer, Handler abstract | `api-events` |
+| Implementar AmqpMessageBus, HandlersBootstrapper, retry, DLQ | `api-events-infra` |
+| Definir tokens de DI, registrar providers, inyectar interfaces | `api-di` |
+| Crear migraciones TypeORM o seeds | `api-migrations` |
+| Definir formato de respuesta HTTP, envelope, paginación | `api-response` |
+| Configurar ValidationPipe, Payload, Query con class-validator | `api-validation` |
+| Configurar logging, métricas, traces, OpenTelemetry, Grafana | `api-observability` |
 | Creating new skills | `skill-creator` |
 | After creating or modifying a skill | `skill-sync` |
 
@@ -96,5 +104,13 @@ npm run test:cov    # Coverage
 | `api-error-handler`    | api    | GlobalExceptionRegistry, filtros por módulo, HttpExceptionFilter | [SKILL.md](../../skills/api-error-handler/SKILL.md)    |
 | `api-rest`             | api    | Convenciones RESTful + acciones DDD con POST                     | [SKILL.md](../../skills/api-rest/SKILL.md)             |
 | `api-auth`             | api    | JWT, OAuth Google, guest token, guards, @CurrentUser, voters     | [SKILL.md](../../skills/api-auth/SKILL.md)             |
+| `api-shared`           | api    | SharedModule global, bounded context shared, env validation Joi  | [SKILL.md](../../skills/api-shared/SKILL.md)           |
+| `api-events`           | api    | EventBus interface, DomainEventConsumer, Handler abstract        | [SKILL.md](../../skills/api-events/SKILL.md)           |
+| `api-events-infra`     | api    | AmqpMessageBus, HandlersBootstrapper, retry, DLQ, idempotencia   | [SKILL.md](../../skills/api-events-infra/SKILL.md)     |
+| `api-di`               | api    | Tokens Symbol, registro de providers, inyección sin acoplamiento | [SKILL.md](../../skills/api-di/SKILL.md)               |
+| `api-migrations`       | api    | TypeORM migrations formato, seeds idempotentes                   | [SKILL.md](../../skills/api-migrations/SKILL.md)       |
+| `api-response`         | api    | Envelope de respuesta, paginación, commands sin body             | [SKILL.md](../../skills/api-response/SKILL.md)         |
+| `api-validation`       | api    | ValidationPipe global, Payload/Query con class-validator         | [SKILL.md](../../skills/api-validation/SKILL.md)       |
+| `api-observability`    | api    | Logger interface, pino, métricas Prometheus, OTel traces         | [SKILL.md](../../skills/api-observability/SKILL.md)    |
 | `skill-creator`        | global | Crea nuevas skills                                               | [SKILL.md](../../skills/skill-creator/SKILL.md)        |
 | `skill-sync`           | global | Sincroniza skills a AGENTS.md                                    | [SKILL.md](../../skills/skill-sync/SKILL.md)           |

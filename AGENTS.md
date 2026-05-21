@@ -50,9 +50,17 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | `api-domain-events`  | api    | Domain Events — definición, naming, registro en aggregates       | [SKILL.md](skills/api-domain-events/SKILL.md)  |
 | `api-testing`        | api    | Pirámide de tests, Object Mother, jest-mock-extended             | [SKILL.md](skills/api-testing/SKILL.md)        |
 | `api-criteria`       | api    | Criteria — filtros, orden, paginación, flujo controller→uc→repo  | [SKILL.md](skills/api-criteria/SKILL.md)       |
-| `api-error-handler`    | api      | GlobalExceptionRegistry, filtros por módulo, HttpExceptionFilter | [SKILL.md](skills/api-error-handler/SKILL.md)    |
-| `api-rest`             | api      | Convenciones RESTful + acciones DDD con POST                  | [SKILL.md](skills/api-rest/SKILL.md)                |
-| `api-auth`             | api      | JWT, OAuth Google, guest token, guards, @CurrentUser, voters  | [SKILL.md](skills/api-auth/SKILL.md)                |
+| `api-error-handler`  | api    | GlobalExceptionRegistry, filtros por módulo, HttpExceptionFilter | [SKILL.md](skills/api-error-handler/SKILL.md)  |
+| `api-rest`           | api    | Convenciones RESTful + acciones DDD con POST                     | [SKILL.md](skills/api-rest/SKILL.md)            |
+| `api-auth`           | api    | JWT, OAuth Google, guest token, guards, @CurrentUser, voters     | [SKILL.md](skills/api-auth/SKILL.md)            |
+| `api-shared`         | api    | SharedModule global, bounded context shared, env validation Joi  | [SKILL.md](skills/api-shared/SKILL.md)          |
+| `api-events`         | api    | EventBus interface, DomainEventConsumer, Handler abstract        | [SKILL.md](skills/api-events/SKILL.md)          |
+| `api-events-infra`   | api    | AmqpMessageBus, HandlersBootstrapper, retry, DLQ, idempotencia   | [SKILL.md](skills/api-events-infra/SKILL.md)    |
+| `api-di`             | api    | Tokens Symbol, registro de providers, inyección sin acoplamiento | [SKILL.md](skills/api-di/SKILL.md)              |
+| `api-migrations`     | api    | TypeORM migrations formato, seeds idempotentes                   | [SKILL.md](skills/api-migrations/SKILL.md)      |
+| `api-response`       | api    | Envelope de respuesta, paginación, commands sin body             | [SKILL.md](skills/api-response/SKILL.md)        |
+| `api-validation`     | api    | ValidationPipe global, Payload/Query con class-validator         | [SKILL.md](skills/api-validation/SKILL.md)      |
+| `api-observability`  | api    | Logger interface, pino, métricas Prometheus, OTel traces         | [SKILL.md](skills/api-observability/SKILL.md)   |
 
 ---
 
