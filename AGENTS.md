@@ -61,6 +61,12 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | `api-response`       | api    | Envelope de respuesta, paginación, commands sin body             | [SKILL.md](skills/api-response/SKILL.md)        |
 | `api-validation`     | api    | ValidationPipe global, Payload/Query con class-validator         | [SKILL.md](skills/api-validation/SKILL.md)      |
 | `api-observability`  | api    | Logger interface, pino, métricas Prometheus, OTel traces         | [SKILL.md](skills/api-observability/SKILL.md)   |
+| `client-pods`                    | client | Estructura de pods, naming, cuándo crear qué                     | [SKILL.md](skills/client-pods/SKILL.md)                    |
+| `client-container-presentational`| client | Contrato Container/Component, responsabilidades, prohibiciones   | [SKILL.md](skills/client-container-presentational/SKILL.md)|
+| `client-query`                   | client | TanStack Query: queries, mutations, query keys, invalidación     | [SKILL.md](skills/client-query/SKILL.md)                   |
+| `client-api`                     | client | Capa api/: api-model, api.ts, mapper, ViewModel types            | [SKILL.md](skills/client-api/SKILL.md)                     |
+| `client-hooks`                   | client | Hooks del pod [State, Handlers], hooks globales, cuándo extraer  | [SKILL.md](skills/client-hooks/SKILL.md)                   |
+| `client-testing`                 | client | Vitest + RTL (unit/integration), Playwright E2E, MSW             | [SKILL.md](skills/client-testing/SKILL.md)                 |
 
 ---
 

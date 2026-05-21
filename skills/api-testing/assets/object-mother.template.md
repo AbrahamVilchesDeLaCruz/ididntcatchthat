@@ -2,14 +2,47 @@
 
 Reemplazá `__EntityName__` y `__module__` por los valores reales.
 
-```typescript
-import { faker } from '@faker-js/faker';
-import { __EntityName__ } from '@__module__/domain/__entity-name__';
+La jerarquía es: `MotherCreator` → Mothers de primitivos → Mothers de VOs → Mother del aggregate.
+**Faker solo vive en `MotherCreator`** — nunca importar faker directamente en un Mother de VO o aggregate.
 
-// Uso:
-//   __EntityName__Mother.random()
-//   __EntityName__Mother.random({ phrase: 'fixed value' })
-//   __EntityName__Mother.create({ id: 'uuid', phrase: 'value' })
+## MotherCreator (shared — ya existe, no recrear)
+
+```typescript
+// test/contexts/shared/domain/mother-creator.ts
+import { faker, type Faker } from '@faker-js/faker';
+
+export class MotherCreator {
+  static random(): Faker {
+    return faker;
+  }
+}
+```
+
+## Mother de VO
+
+```typescript
+// test/contexts/__module__/domain/__entity-name__-id-mother.ts
+import { UuidMother } from '../../shared/domain/uuid-mother';
+import { __EntityName__Id } from 'src/contexts/__module__/domain/__entity-name__-id';
+
+export class __EntityName__IdMother {
+  static random(): __EntityName__Id {
+    return new __EntityName__Id(UuidMother.random());
+  }
+
+  static withValue(value: string): __EntityName__Id {
+    return new __EntityName__Id(value);
+  }
+}
+```
+
+## Mother del Aggregate
+
+```typescript
+// test/contexts/__module__/domain/__entity-name__-mother.ts
+import { __EntityName__ } from 'src/contexts/__module__/domain/__entity-name__';
+import { __EntityName__IdMother } from './__entity-name__-id-mother';
+import { StringMother } from '../../shared/domain/string-mother';
 
 type __EntityName__Primitives = {
   id: string;
@@ -23,8 +56,8 @@ export class __EntityName__Mother {
   // Valores aleatorios — acepta overrides parciales
   static random(overrides?: Overrides): __EntityName__ {
     return __EntityName__.fromPrimitives({
-      id: faker.string.uuid(),
-      // añadir campos con faker aquí
+      id: __EntityName__IdMother.random().value,
+      // añadir campos usando Mothers de VO aquí
       ...overrides,
     });
   }
@@ -34,9 +67,9 @@ export class __EntityName__Mother {
     return __EntityName__.fromPrimitives(primitives);
   }
 
-  // Reconstruye desde primitivos — tests de repositorio
-  static from(primitives: __EntityName__Primitives): __EntityName__ {
-    return __EntityName__.fromPrimitives(primitives);
+  // Reconstruye desde request — tests de use case
+  static from(request: Request__EntityName__Creator): __EntityName__ {
+    return __EntityName__.fromPrimitives({ ...request });
   }
 }
 ```

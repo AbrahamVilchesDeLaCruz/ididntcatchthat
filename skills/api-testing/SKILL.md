@@ -57,11 +57,62 @@ Mothers compartidos para primitivas reutilizables:
 
 ```
 api/test/contexts/shared/domain/
-├── string-mother.ts
-├── date-mother.ts
-├── uuid-mother.ts
-└── boolean-mother.ts
+├── mother-creator.ts   ← faker vive aquí. Único punto de cambio de librería.
+├── string-mother.ts    ← llama a MotherCreator
+├── uuid-mother.ts      ← llama a MotherCreator
+├── date-mother.ts      ← llama a MotherCreator
+└── boolean-mother.ts   ← llama a MotherCreator
 ```
+
+### Jerarquía de Mothers
+
+```
+MotherCreator          ← faker vive aquí. Único punto de cambio de librería.
+      ↓
+StringMother           ← métodos semánticos que llaman a MotherCreator
+UuidMother
+NumberMother
+      ↓
+FlashcardIdMother      ← Mother del VO, llama a UuidMother
+FlashcardFrontMother   ← Mother del VO, llama a StringMother
+      ↓
+FlashcardMother        ← compone los Mothers de sus VOs
+```
+
+```typescript
+// test/contexts/shared/domain/mother-creator.ts
+import { faker, type Faker } from '@faker-js/faker';
+
+export class MotherCreator {
+  static random(): Faker {
+    return faker;
+  }
+}
+```
+
+```typescript
+// test/contexts/shared/domain/string-mother.ts
+import { MotherCreator } from './mother-creator';
+
+export class StringMother {
+  static random(): string { return MotherCreator.random().lorem.word(); }
+  static sentence(): string { return MotherCreator.random().lorem.sentence(); }
+  static ofLength(length: number): string {
+    return MotherCreator.random().string.alpha({ length });
+  }
+}
+```
+
+```typescript
+// test/contexts/shared/domain/uuid-mother.ts
+import { MotherCreator } from './mother-creator';
+
+export class UuidMother {
+  static random(): string { return MotherCreator.random().string.uuid(); }
+}
+```
+
+**Regla**: faker solo vive en `MotherCreator`. Los Mothers de tipo primitivo (`StringMother`, `UuidMother`, etc.) son el segundo y único punto de cambio si la API de la librería cambia. Los Mothers de VO y aggregate nunca importan faker directamente.
 
 ### Object Mother
 
