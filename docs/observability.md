@@ -6,13 +6,13 @@
 
 ---
 
-## Stack actual (Fase 1)
+## Stack actual
 
-| Componente | Puerto interno | Rol |
-|---|---|---|
-| Prometheus | 9090 | Scrape de `/metrics` de la API cada 15s |
-| Grafana | 3002 | UI de dashboards — consulta Prometheus y Loki |
-| Loki | 3100 | Storage de logs (levantado, sin transport aún) |
+| Componente | Puerto dev | Puerto prod | Rol |
+|---|---|---|---|
+| Prometheus | 9090 | 9091 | Scrape de `/metrics` de la API cada 15s |
+| Grafana | 3002 | 3003 | UI de dashboards — consulta Prometheus y Loki |
+| Loki | 3100 | 3101 | Storage de logs — recibe logs via pino-loki |
 
 Acceso via SSH tunnel — ver [deployment.md](deployment.md#acceso-a-observabilidad-prometheus--grafana).
 
@@ -26,8 +26,10 @@ API (prom-client en memoria)
         └── Prometheus (scrape cada 15s) → time-series DB
                 └── Grafana (PromQL) → dashboards
 
-stdout (PinoLogger JSON)
-  └── [Fase 2] pino-loki transport → Loki → Grafana (LogQL)
+API (PinoLogger)
+  └── pino.transport({ targets: [...] })
+        ├── stdout (siempre)
+        └── pino-loki → Loki → Grafana (LogQL)
 ```
 
 ---
@@ -43,14 +45,57 @@ stdout (PinoLogger JSON)
 ### API — SharedModule
 
 - `Logger` interface + `LOGGER_SERVICE` Symbol en `shared/domain/logger.ts`
-- `PinoLogger` — JSON en prod, pretty en dev
+- `PinoLogger` — JSON en prod, pretty en dev; log de arranque en `main.ts`
 
 ### Infra
 
 - Prometheus, Grafana y Loki en Docker Compose (base + overrides dev/prod)
 - Volúmenes separados por entorno: `*_dev` / `*_prod`
+- Puertos separados dev/prod — dev: `9090/3002/3100`, prod: `9091/3003/3101`
 - Grafana arranca con Prometheus y Loki preconfigurados via provisioning YAML
 - Prometheus configurado para scrape de `api:3000/metrics` cada 15s
+
+---
+
+## Fase 2 — Implementado ✅
+
+### Loki transport (pino-loki)
+
+`PinoLogger` usa `pino.transport` con targets múltiples:
+
+- **stdout** — siempre activo (pino-pretty en dev, pino/file en prod)
+- **pino-loki** — activo solo si `LOKI_URL` está definida en Doppler
+
+```typescript
+// apps/api/src/shared/infrastructure/logger/pino-logger.ts
+const level = process.env.LOG_LEVEL ?? 'info';
+
+pino.transport({
+  targets: [
+    isDev
+      ? { target: 'pino-pretty', level, options: { colorize: true } }
+      : { target: 'pino/file', level, options: { destination: 1 } },
+    ...(lokiUrl
+      ? [{
+          target: 'pino-loki',
+          level,
+          options: {
+            host: lokiUrl,
+            labels: { app: 'ididntcatchthat-api', env: process.env.NODE_ENV },
+          },
+        }]
+      : []),
+  ],
+})
+```
+
+Variables en Doppler (`dev` y `prd`):
+```
+LOKI_URL=http://loki:3100
+LOG_LEVEL=info          # opcional, default: info
+```
+
+> `loki` resuelve por Docker network interna — no usar `localhost`.
 
 ---
 
@@ -61,10 +106,10 @@ stdout (PinoLogger JSON)
 `GRAFANA_PASSWORD` gestionado por Doppler. El compose lo lee como:
 
 ```yaml
-GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
 ```
 
-⚠️ Asegurarse de que `GRAFANA_PASSWORD` esté definido en Doppler config `dev` y `prd` con un valor fuerte — el fallback `admin` es solo para desarrollo local sin Doppler.
+No hay fallback — si `GRAFANA_PASSWORD` no está definido en Doppler, el contenedor falla al arrancar (comportamiento intencionado).
 
 Sign-up deshabilitado:
 ```yaml
@@ -73,48 +118,13 @@ GF_USERS_ALLOW_SIGN_UP: "false"
 
 ### Prometheus
 
-Prometheus no tiene autenticación propia en Fase 1 — está protegido porque:
-- Sus puertos no están expuestos públicamente en prod (`docker-compose.prod.yml`)
+Prometheus no tiene autenticación propia — está protegido porque:
+- Sus puertos no están expuestos públicamente en prod
 - El acceso es solo via SSH tunnel
-
-En Fase 2, si se añade un reverse proxy interno, configurar basic auth en nginx para `/prometheus/`.
 
 ---
 
-## Fase 2 — Pendiente 🔲
-
-### Loki transport (pino → Loki)
-
-`PinoLogger` actualmente escribe solo a stdout. Para enviar logs a Loki:
-
-```bash
-pnpm --filter @ididntcatchthat/api add pino-loki
-```
-
-```typescript
-// apps/api/src/shared/infrastructure/logger/pino-logger.ts
-const transport = pino.transport({
-  targets: [
-    { target: 'pino/file', options: { destination: 1 } }, // stdout siempre
-    ...(process.env.LOKI_URL
-      ? [{
-          target: 'pino-loki',
-          options: {
-            host: process.env.LOKI_URL,
-            labels: { app: 'api', env: process.env.NODE_ENV },
-          },
-        }]
-      : []),
-  ],
-});
-```
-
-Si `LOKI_URL` no está definida, solo stdout. En prod se añade en Doppler y los logs van a Loki sin cambios de código.
-
-Variable a añadir en Doppler config `prd`:
-```
-LOKI_URL=http://loki:3100
-```
+## Fase 3 — Pendiente 🔲
 
 ### OpenTelemetry — Traces
 
