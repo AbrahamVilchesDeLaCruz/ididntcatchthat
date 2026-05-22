@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext"
-  }
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "resolvePackageJsonExports": false
+  },
+  "include": ["src/**/*", "test/**/*"]
 }

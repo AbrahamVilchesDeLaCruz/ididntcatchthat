@@ -29,6 +29,12 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
+  // NestJS packages ship CJS — transform them so ESM vm-modules can load them
+  // pnpm symlinks live under node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>
+  transformIgnorePatterns: [
+    '/node_modules/.pnpm/(?!(@nestjs\\+common|@nestjs\\+core|reflect-metadata))',
+    '/node_modules/(?!(@nestjs)/)',
+  ],
   testEnvironment: 'node',
   // ─── Coverage ───────────────────────────────────────────────────────────────
   collectCoverageFrom: [
