@@ -1,7 +1,7 @@
 # Spec: Observability Stack — Fase 1
 
 **Change**: `feat/observability-stack`  
-**Estado**: Aprobado  
+**Estado**: Implementado  
 **Fecha**: 2026-05-22  
 **ADRs relacionados**: ADR-010, ADR-020
 
@@ -168,17 +168,24 @@ infra/
         └── dashboards/
             └── dashboards.yml              ← (vacío en Fase 1)
 
-apps/api/src/shared/
-├── domain/
-│   └── logger.port.ts                      ← interfaz Logger
-└── infrastructure/
-    ├── framework/
-    │   └── shared.module.ts                ← registrar PinoLogger + MetricsInterceptor
-    ├── logger/
-    │   └── pino-logger.ts                  ← implementación PinoLogger
-    └── metrics/
-        ├── metrics.controller.ts           ← GET /metrics
-        └── metrics.interceptor.ts          ← MetricsInterceptor global
+apps/api/src/
+├── observability/
+│   └── infrastructure/
+│       ├── controllers/
+│       │   └── metrics-get.controller.ts   ← GET /metrics (handler())
+│       ├── metrics.interceptor.ts          ← MetricsInterceptor global
+│       └── framework/
+│           └── observability.module.ts     ← Registry + APP_INTERCEPTOR + MetricsGetController
+└── shared/
+    ├── domain/
+    │   └── logger.ts                       ← interfaz Logger + LOGGER_SERVICE Symbol
+    └── infrastructure/
+        ├── controllers/
+        │   └── health-get.controller.ts
+        ├── logger/
+        │   └── pino-logger.ts              ← implementación PinoLogger
+        └── framework/
+            └── shared.module.ts            ← solo Logger
 ```
 
 ---
@@ -188,7 +195,7 @@ apps/api/src/shared/
 ```bash
 # API
 pnpm --filter @ididntcatchthat/api add pino pino-pretty prom-client
-pnpm --filter @ididntcatchthat/api add -D @types/pino
+# @types/pino NO instalar — pino v8+ incluye sus propios tipos
 ```
 
 ---
