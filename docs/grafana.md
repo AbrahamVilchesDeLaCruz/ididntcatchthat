@@ -1,6 +1,6 @@
 # Grafana — Guía de uso
 
-> Cómo acceder, explorar métricas y entender qué datos tenemos disponibles en **ididntcatchthat**.
+> Cómo acceder, explorar métricas y logs en **ididntcatchthat**.
 
 ---
 
@@ -21,18 +21,21 @@ Login: `admin` / password guardado en Doppler como `GRAFANA_PASSWORD`.
 
 ```
 API (NestJS)
-  └── MetricsInterceptor → prom-client (en memoria)
-        └── GET /metrics ← Prometheus (scrape cada 15s)
-                              └── Grafana (consulta con PromQL)
+  ├── MetricsInterceptor → prom-client (en memoria)
+  │       └── GET /metrics ← Prometheus (scrape cada 15s)
+  │                             └── Grafana (PromQL) → dashboards
+  │
+  └── PinoLogger → pino-loki transport
+                        └── Loki → Grafana (LogQL) → logs
 ```
 
-- **Prometheus** es la base de datos de series temporales — guarda las métricas históricas
-- **Grafana** es la UI — consulta Prometheus con PromQL y dibuja las gráficas
-- **Loki** es para logs — pendiente de configurar en Fase 2
+- **Prometheus** — base de datos de series temporales para métricas
+- **Loki** — storage de logs estructurados (JSON via pino-loki)
+- **Grafana** — UI unificada que consulta ambos con PromQL y LogQL
 
 ---
 
-## Explorar métricas (Grafana Explore)
+## Explorar métricas (PromQL)
 
 1. Abrir `http://localhost:3002`
 2. Menú izquierdo → **Drilldown** (antes llamado Explore)
@@ -41,7 +44,7 @@ API (NestJS)
 
 ---
 
-## Métricas disponibles ahora
+## Métricas disponibles
 
 ### `http_requests_total` — Counter
 
@@ -96,8 +99,6 @@ histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{route="/api/v
 
 ### Métricas de Node.js (automáticas via prom-client)
 
-prom-client registra automáticamente métricas del proceso:
-
 | Métrica                         | Qué mide                              |
 | ------------------------------- | ------------------------------------- |
 | `nodejs_heap_size_used_bytes`   | Memoria heap usada                    |
@@ -118,9 +119,46 @@ nodejs_event_loop_lag_seconds * 1000
 
 ---
 
-## Métricas clave para este proyecto
+## Explorar logs (LogQL)
 
-ididntcatchthat es una app de aprendizaje con gamificación y audio. Las métricas más relevantes por área:
+1. Menú izquierdo → **Drilldown**
+2. Seleccionar datasource: **Loki**
+3. Escribir la query en el campo **Log query**
+
+Los logs llegan via `pino-loki` — JSON estructurado con los labels `app` y `env`.
+
+### Queries útiles
+
+```logql
+# Todos los logs de la API
+{app="ididntcatchthat-api"}
+
+# Solo errores
+{app="ididntcatchthat-api"} | json | level = "error"
+
+# Solo warnings y errores
+{app="ididntcatchthat-api"} | json | level =~ "warn|error"
+
+# Buscar texto libre
+{app="ididntcatchthat-api"} |= "API started"
+
+# Logs de prod
+{app="ididntcatchthat-api", env="production"}
+
+# Logs con contexto de un port concreto
+{app="ididntcatchthat-api"} | json | line_format "{{.level}} — {{.msg}}"
+```
+
+### Labels disponibles en Loki
+
+| Label | Valores |
+| ----- | ------- |
+| `app` | `ididntcatchthat-api` |
+| `env` | `development` \| `production` |
+
+---
+
+## Métricas clave para este proyecto
 
 ### Rendimiento general
 
@@ -129,8 +167,6 @@ ididntcatchthat es una app de aprendizaje con gamificación y audio. Las métric
 - **Event loop lag** — si sube, la API está bloqueada procesando algo pesado
 
 ### Endpoints críticos
-
-Estos son los más sensibles al rendimiento — monitorizarlos por separado:
 
 | Endpoint                              | Por qué importa                             |
 | ------------------------------------- | ------------------------------------------- |
@@ -171,17 +207,3 @@ Cuando implementemos el pipeline de audio, añadir métricas custom para:
 | Latencia p99 crítica | `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))` | > 3s    | 🔴 Critical |
 | Heap memory alta     | `nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes`               | > 0.85  | 🟡 Warning  |
 | Event loop lag       | `nodejs_event_loop_lag_seconds * 1000`                                     | > 100ms | 🟡 Warning  |
-
----
-
-## Loki (Fase 2 — pendiente)
-
-Loki está levantado y listo pero la API aún no envía logs a él — `PinoLogger` escribe a stdout.
-
-Cuando se implemente el transport `pino-loki`, desde Grafana se podrá:
-
-- Buscar logs por nivel (`error`, `warn`)
-- Correlacionar un spike de latencia con los logs de ese momento
-- Ver trazas de errores completas con contexto
-
-Ver `docs/observability.md` para el plan de Fase 2.
