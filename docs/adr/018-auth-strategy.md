@@ -8,13 +8,16 @@
 
 ## Contexto
 
-La plataforma ididntcatchthat tiene tres tipos de usuarios:
+La plataforma ididntcatchthat tiene los siguientes roles de usuario:
 
-1. **Guest** — accede sin registro. Puede jugar pero con funcionalidades limitadas.
-2. **Registered** — usuario registrado con email/password o OAuth.
-3. **Admin** — gestión de contenido (backoffice).
+1. **Guest** — accede sin registro. Puede jugar pero con funcionalidades limitadas (sin pausa, sin historial, sin progreso persistido).
+2. **User** — usuario registrado con email/password u OAuth. Acceso completo a juego, progreso, estadísticas y ranking.
+3. **Premium / Pro** — usuario de pago. Rol reservado para futuro — **no implementado en el TFM**. Se incluye en el modelo de datos para no requerir migración posterior. Tendrá acceso a funcionalidades avanzadas por definir (acceso a más módulos, estadísticas extendidas, etc.).
+4. **Teacher** — acceso al backoffice de contenido. Puede crear, editar y publicar flashcards (individual, bulk JSON o PDF con análisis IA). No tiene acceso a métricas ni gestión de usuarios.
+5. **Admin** — acceso total: métricas, observabilidad (Grafana, Loki), documentación de la API (Swagger), gestión de usuarios y roles. No necesariamente gestiona contenido directamente.
 
 Necesitamos una estrategia de auth que:
+
 - Permita acceso guest sin fricción (sin registro)
 - Soporte OAuth con Google
 - Permita rastrear guests para rate limiting y detección de abuso (sin identidad)
@@ -29,14 +32,15 @@ Necesitamos una estrategia de auth que:
 
 ### Tokens
 
-| Token | Dónde | TTL | Contenido |
-|---|---|---|---|
-| Access token | `Authorization: Bearer` header | **15 minutos** | `userId?`, `deviceId`, `ip`, `type: guest\|registered\|admin` |
-| Refresh token | Cookie `httpOnly`, `Secure`, `SameSite=Strict` | 30 días | `tokenId` (referencia a DB) |
+| Token         | Dónde                                          | TTL            | Contenido                                                        |
+| ------------- | ---------------------------------------------- | -------------- | ---------------------------------------------------------------- |
+| Access token  | `Authorization: Bearer` header                 | **15 minutos** | `userId?`, `deviceId`, `ip`, `type: guest\|user\|teacher\|admin` |
+| Refresh token | Cookie `httpOnly`, `Secure`, `SameSite=Strict` | 30 días        | `tokenId` (referencia a DB)                                      |
 
 ### Tipos de token por flujo
 
 **Guest:**
+
 ```json
 {
   "type": "guest",
@@ -47,9 +51,10 @@ Necesitamos una estrategia de auth que:
 ```
 
 **Registered:**
+
 ```json
 {
-  "type": "registered",
+  "type": "user",
   "userId": "uuid",
   "deviceId": "uuid",
   "email": "user@example.com",
@@ -57,9 +62,13 @@ Necesitamos una estrategia de auth que:
 }
 ```
 
+> Nota: `roles` puede contener `["user"]`, `["teacher"]`, `["admin"]` o combinaciones.
+> El rol `premium` se añadirá al modelo cuando se implemente la monetización.
+
 ### Flujos
 
 **Guest:**
+
 ```
 POST /auth/guest
   → backend genera deviceId + firma JWT access (15min) + JWT refresh (30d en cookie)
@@ -69,6 +78,7 @@ POST /auth/guest
 ```
 
 **Registro / Login:**
+
 ```
 POST /auth/register  o  POST /auth/login
   → verifica credenciales
@@ -77,6 +87,7 @@ POST /auth/register  o  POST /auth/login
 ```
 
 **OAuth Google:**
+
 ```
 GET  /auth/google          → redirect a Google
 GET  /auth/google/callback → Google devuelve code
@@ -86,6 +97,7 @@ GET  /auth/google/callback → Google devuelve code
 ```
 
 **Refresh:**
+
 ```
 POST /auth/refresh
   → lee refresh token de cookie httpOnly
@@ -94,6 +106,7 @@ POST /auth/refresh
 ```
 
 **Logout:**
+
 ```
 POST /auth/logout
   → revoca refresh token en DB
@@ -105,15 +118,19 @@ POST /auth/logout
 ## Alternativas consideradas
 
 ### Sessions server-side
+
 **Rechazado** — requiere Redis para estado compartido entre instancias. Stateful, complejidad innecesaria para un VPS simple.
 
 ### Cookies httpOnly para access token
+
 **Rechazado** — CORS con cookies es complejo (SameSite, dominios cruzados). El guest token con deviceId se complica porque las cookies las manda el browser automáticamente sin control explícito del cliente.
 
 ### JWT sin refresh (access de larga duración)
+
 **Rechazado** — si el token se compromete, es válido durante días. Sin mecanismo de revocación.
 
 ### JWT en localStorage
+
 **Rechazado** — vulnerable a XSS. El access token va en memoria JS (variable), el refresh en cookie httpOnly.
 
 ---
@@ -121,6 +138,7 @@ POST /auth/logout
 ## Consecuencias
 
 **Positivas:**
+
 - Stateless — el servidor no guarda sesiones
 - Funciona en browser y mobile sin cambios
 - OAuth con Google devuelve JWT — flujo natural
@@ -129,6 +147,7 @@ POST /auth/logout
 - `deviceId` firmado por el backend — no falsificable, útil para rate limiting
 
 **Negativas / trade-offs:**
+
 - Access token de 15min requiere lógica de refresh en el cliente
 - Refresh tokens necesitan tabla en DB para revocación (logout, sesiones múltiples)
 - Rotation de refresh tokens añade complejidad (si el token se usa dos veces → sesión comprometida)
