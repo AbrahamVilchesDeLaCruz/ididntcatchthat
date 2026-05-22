@@ -17,3 +17,31 @@ services:
       - "4001:80"
     environment:
       NODE_ENV: ${NODE_ENV}
+
+  # ─── Observability ───────────────────────────────────────────────────────────
+
+  prometheus:
+    container_name: ididntcatchthat-prometheus-dev
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data_dev:/prometheus
+
+  grafana:
+    container_name: ididntcatchthat-grafana-dev
+    ports:
+      - "3002:3000"
+    volumes:
+      - grafana_data_dev:/var/lib/grafana
+
+  loki:
+    container_name: ididntcatchthat-loki-dev
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data_dev:/loki
+
+volumes:
+  prometheus_data_dev:
+  grafana_data_dev:
+  loki_data_dev:

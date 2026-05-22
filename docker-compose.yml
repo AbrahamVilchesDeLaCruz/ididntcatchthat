@@ -18,3 +18,39 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+
+  # ─── Observability ───────────────────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    container_name: ididntcatchthat-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+
+  grafana:
+    image: grafana/grafana:12.0.1
+    container_name: ididntcatchthat-grafana
+    restart: unless-stopped
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: ididntcatchthat-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki

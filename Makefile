@@ -1,6 +1,7 @@
 .PHONY: up up-prod down down-prod restart restart-prod build rebuild \
         dev dev-api dev-client \
         logs logs-api logs-client ps \
+        obs-up obs-down obs-logs \
         clean purge prune clean-dangling \
         deploy-prod deploy-dev \
         vps-ps-prod vps-ps-dev \
@@ -87,6 +88,19 @@ build: ## Build all images (dev)
 rebuild: ## Force rebuild all images without cache (dev)
 	$(ensure-docker)
 	$(COMPOSE_DEV) build --no-cache
+
+# ─── Observability (dev) ──────────────────────────────────────────────────────
+
+obs-up: ## Start observability stack only (Prometheus + Grafana + Loki)
+	$(ensure-docker)
+	$(COMPOSE_DEV) up -d prometheus grafana loki
+
+obs-down: ## Stop observability stack
+	$(ensure-docker)
+	$(COMPOSE_DEV) stop prometheus grafana loki
+
+obs-logs: ## Tail logs from observability services
+	$(COMPOSE_DEV) logs -f prometheus grafana loki
 
 # ─── Logs ─────────────────────────────────────────────────────────────────────
 
