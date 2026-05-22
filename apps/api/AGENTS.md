@@ -82,12 +82,35 @@ apps/api/src/
 
 ```bash
 # Desde apps/api/
-npm run dev         # Dev server con hot-reload
-npm run test        # Todos los tests
-npm run test:unit   # Solo unit tests
-npm run test:e2e    # Tests E2E
-npm run test:cov    # Coverage
+pnpm start:dev        # Dev server con hot-reload
+pnpm lint             # ESLint --fix sobre src/ y test/
+
+# ─── Unit tests ───────────────────────────────────────────────────────────────
+pnpm test             # Unit tests (pass si no hay tests aún)
+pnpm test:watch       # TDD loop — re-run on change
+pnpm test:cov         # Unit tests + coverage → coverage/unit/
+
+# ─── E2E tests ────────────────────────────────────────────────────────────────
+pnpm test:e2e         # E2E tests (requiere DB corriendo: make up)
+pnpm test:e2e:watch   # E2E en watch mode
+pnpm test:e2e:cov     # E2E + coverage → coverage/e2e/
+
+# ─── All ──────────────────────────────────────────────────────────────────────
+pnpm test:all         # Unit + E2E secuencial
+
+# ─── CI ───────────────────────────────────────────────────────────────────────
+pnpm test:ci          # Unit + coverage --ci --forceExit (GitHub Actions)
+pnpm test:e2e:ci      # E2E + coverage --ci --forceExit (GitHub Actions)
+
+# ─── Debug ────────────────────────────────────────────────────────────────────
+pnpm test:debug       # Jest con inspector de Node
 ```
+
+**Configs Jest:**
+- `jest.config.ts` — unit tests (`src/**/*.spec.ts`)
+- `jest.e2e.config.ts` — E2E tests (`test/**/*.e2e-spec.ts`)
+
+**Coverage thresholds (unit):** 80% branches / functions / lines / statements
 
 ---
 

@@ -1,9 +1,11 @@
 #!/bin/bash
 # Setup AI Skills for ididntcatchthat
 # Configures AI coding assistants:
-#   - opencode: .claude/skills/ symlink
-#   - GitHub Copilot: .github/copilot-instructions.md symlink → AGENTS.md
-#                     .github/skills/ symlink → skills/
+#   - opencode (project): .opencode/skills/ symlink → skills/
+#   - opencode (local):   .claude/skills/ symlink → skills/
+#   - opencode (global):  ~/.config/opencode/skills/<name> symlinks (per-skill)
+#   - GitHub Copilot:     .github/copilot-instructions.md symlink → AGENTS.md
+#                         .github/skills/ symlink → skills/
 #
 # Usage:
 #   bash skills/setup.sh
@@ -13,10 +15,12 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 SKILLS_SOURCE="$SCRIPT_DIR"
+OPENCODE_SKILLS_DIR="$HOME/.config/opencode/skills"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m'
 
 add_to_gitignore() {
@@ -35,8 +39,21 @@ add_to_gitignore() {
     fi
 }
 
-# ─── opencode (.claude/skills/) ───────────────────────────────────────────────
-echo -e "${YELLOW}[1/2] Setting up opencode...${NC}"
+# ─── opencode project (.opencode/skills/) ────────────────────────────────────
+echo -e "${YELLOW}[1/4] Setting up opencode (project)...${NC}"
+
+mkdir -p "$REPO_ROOT/.opencode"
+TARGET="$REPO_ROOT/.opencode/skills"
+
+[ -L "$TARGET" ] && rm "$TARGET"
+[ -d "$TARGET" ] && mv "$TARGET" "$REPO_ROOT/.opencode/skills.backup.$(date +%s)"
+
+ln -s "$SKILLS_SOURCE" "$TARGET"
+add_to_gitignore ".opencode/skills"
+echo -e "${GREEN}  ✓ .opencode/skills -> skills/${NC}"
+
+# ─── opencode local (.claude/skills/) ─────────────────────────────────────────
+echo -e "${YELLOW}[2/4] Setting up opencode (local)...${NC}"
 
 mkdir -p "$REPO_ROOT/.claude"
 TARGET="$REPO_ROOT/.claude/skills"
@@ -48,8 +65,45 @@ ln -s "$SKILLS_SOURCE" "$TARGET"
 add_to_gitignore ".claude/skills"
 echo -e "${GREEN}  ✓ .claude/skills -> skills/${NC}"
 
+# ─── opencode global (~/.config/opencode/skills/<name>) ───────────────────────
+echo -e "${YELLOW}[3/4] Setting up opencode (global skill loader)...${NC}"
+
+mkdir -p "$OPENCODE_SKILLS_DIR"
+
+REGISTERED=0
+SKIPPED=0
+
+for skill_dir in "$SKILLS_SOURCE"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    skill_md="$skill_dir/SKILL.md"
+
+    # skip non-skill dirs (e.g. setup.sh itself isn't a dir, but guard anyway)
+    [ ! -f "$skill_md" ] && continue
+
+    target_link="$OPENCODE_SKILLS_DIR/$skill_name"
+
+    if [ -L "$target_link" ]; then
+        # already a symlink — update it
+        rm "$target_link"
+        ln -s "$skill_dir" "$target_link"
+        echo -e "${GREEN}  ↻ updated ~/.config/opencode/skills/$skill_name${NC}"
+        REGISTERED=$((REGISTERED + 1))
+    elif [ -d "$target_link" ]; then
+        # real directory with same name — skip, warn
+        echo -e "${RED}  ⚠ SKIP $skill_name — ~/.config/opencode/skills/$skill_name is a real directory (not a symlink). Remove it manually if you want to override.${NC}"
+        SKIPPED=$((SKIPPED + 1))
+    else
+        ln -s "$skill_dir" "$target_link"
+        echo -e "${GREEN}  ✓ registered ~/.config/opencode/skills/$skill_name${NC}"
+        REGISTERED=$((REGISTERED + 1))
+    fi
+done
+
+echo -e "${GREEN}  $REGISTERED skills registered in opencode global loader${NC}"
+[ "$SKIPPED" -gt 0 ] && echo -e "${RED}  $SKIPPED skills skipped (real dirs conflict)${NC}"
+
 # ─── GitHub Copilot (.github/copilot-instructions.md + .github/skills/) ──────
-echo -e "${YELLOW}[2/2] Setting up GitHub Copilot...${NC}"
+echo -e "${YELLOW}[4/4] Setting up GitHub Copilot...${NC}"
 
 mkdir -p "$REPO_ROOT/.github"
 
@@ -74,8 +128,10 @@ SKILL_COUNT=$(find "$SKILLS_SOURCE" -maxdepth 2 -name "SKILL.md" | wc -l | tr -d
 echo ""
 echo -e "${GREEN}✅ Done — $SKILL_COUNT skills configured${NC}"
 echo ""
-echo "  • opencode:        .claude/skills/"
-echo "  • GitHub Copilot:  .github/copilot-instructions.md + .github/skills/"
+echo "  • opencode (project): .opencode/skills/"
+echo "  • opencode (local):   .claude/skills/"
+echo "  • opencode (global):  ~/.config/opencode/skills/<name> (per-skill symlinks)"
+echo "  • GitHub Copilot:     .github/copilot-instructions.md + .github/skills/"
 echo ""
-echo -e "${BLUE}Restart your AI assistant to load the skills.${NC}"
+echo -e "${BLUE}Restart your AI assistant to load the updated skills.${NC}"
 echo -e "${BLUE}AGENTS.md is the source of truth — changes reflect automatically via symlinks.${NC}"

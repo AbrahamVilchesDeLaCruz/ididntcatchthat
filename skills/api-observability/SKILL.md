@@ -1,3 +1,14 @@
+---
+name: api-observability
+description: >
+  Logger interface, pino, métricas Prometheus, OTel traces en apps/api/.
+  Trigger: Al añadir logging en use cases, configurar métricas Prometheus, o setup de OpenTelemetry.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-observability
 
 ## When to Use

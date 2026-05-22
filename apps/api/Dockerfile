@@ -6,10 +6,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy workspace manifests first for layer caching
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json* ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json* .npmrc* ./
 COPY apps/api/package.json ./apps/api/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source
 COPY apps/api/ ./apps/api/
@@ -24,10 +24,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json* ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json* .npmrc* ./
 COPY apps/api/package.json ./apps/api/
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 

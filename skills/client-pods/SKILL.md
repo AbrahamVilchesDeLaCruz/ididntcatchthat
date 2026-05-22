@@ -1,3 +1,14 @@
+---
+name: client-pods
+description: >
+  Estructura de pods, naming, cuándo crear qué en apps/client/.
+  Trigger: Al crear un nuevo pod, definir la estructura de directorios de una feature, o decidir qué va dentro de un pod.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # client-pods
 
 Estructura de pods para `apps/client/`. Un pod es una unidad funcional autocontenida que encapsula toda la lógica, UI y acceso a datos de una feature de dominio.

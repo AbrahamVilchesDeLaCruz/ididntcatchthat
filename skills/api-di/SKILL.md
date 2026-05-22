@@ -1,3 +1,14 @@
+---
+name: api-di
+description: >
+  Tokens Symbol, registro de providers, inyección sin acoplamiento en apps/api/.
+  Trigger: Al definir tokens de inyección, registrar providers en módulos, o inyectar dependencias en use cases o controllers.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-di
 
 ## When to Use

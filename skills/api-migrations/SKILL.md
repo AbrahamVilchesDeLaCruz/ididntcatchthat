@@ -1,3 +1,14 @@
+---
+name: api-migrations
+description: >
+  TypeORM migrations formato, seeds idempotentes en apps/api/.
+  Trigger: Al crear una nueva migración TypeORM, añadir seeds de datos iniciales o de prueba.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-migrations
 
 ## When to Use

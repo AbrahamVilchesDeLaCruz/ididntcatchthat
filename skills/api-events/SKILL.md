@@ -1,3 +1,14 @@
+---
+name: api-events
+description: >
+  EventBus interface, DomainEventConsumer, Handler abstract en apps/api/.
+  Trigger: Al definir el EventBus, crear un Handler concreto en application, o entender el flujo de domain events.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-events
 
 ## When to Use

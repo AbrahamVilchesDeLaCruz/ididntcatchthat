@@ -1,3 +1,14 @@
+---
+name: client-api
+description: >
+  Capa api/: api-model, api.ts, mapper, ViewModel types en apps/client/.
+  Trigger: Al crear la capa api/ de un pod, definir tipos crudos, hooks TanStack Query, o mappers de datos.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # client-api
 
 Capa de acceso a datos de cada pod. Vive en `api/` dentro del pod y tiene tres responsabilidades: tipos crudos, hooks TanStack Query, y transformación de datos.
