@@ -1,3 +1,14 @@
+---
+name: api-response
+description: >
+  Envelope de respuesta, paginación, commands sin body en apps/api/.
+  Trigger: Al definir el formato de respuesta de un endpoint, implementar paginación, o respuestas de commands.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-response
 
 ## When to Use

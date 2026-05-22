@@ -1,3 +1,14 @@
+---
+name: api-validation
+description: >
+  ValidationPipe global, Payload/Query con class-validator en apps/api/.
+  Trigger: Al configurar ValidationPipe en main.ts, crear Payload o Query DTOs con class-validator, o guards globales.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-validation
 
 ## When to Use

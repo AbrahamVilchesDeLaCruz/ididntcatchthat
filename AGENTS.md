@@ -34,6 +34,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Creating new skills                                   | `skill-creator` |
 | AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`    |
 | Creating a branch, opening a PR, or merging code      | `git-workflow`  |
+| Before implementing any new feature, use case, hook or component | `tdd-workflow` |
 
 ---
 
@@ -41,6 +42,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 | Skill                | Scope  | Description                                                      | URL                                            |
 | -------------------- | ------ | ---------------------------------------------------------------- | ---------------------------------------------- |
+| `tdd-workflow`       | global | Workflow TDD obligatorio: Red→Green→Refactor antes de cualquier código nuevo | [SKILL.md](skills/tdd-workflow/SKILL.md) |
 | `skill-creator`      | global | Crea nuevas skills siguiendo el spec del repo                    | [SKILL.md](skills/skill-creator/SKILL.md)      |
 | `skill-sync`         | global | Sincroniza skills a las tablas de AGENTS.md                      | [SKILL.md](skills/skill-sync/SKILL.md)         |
 | `git-workflow`       | global | Branching, naming, merge strategy y PRs para este repo           | [SKILL.md](skills/git-workflow/SKILL.md)       |
