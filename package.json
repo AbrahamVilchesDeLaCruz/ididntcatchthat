@@ -1,0 +1,28 @@
+{
+  "name": "ididntcatchthat",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint": "pnpm --recursive lint",
+    "test": "pnpm --recursive test",
+    "test:e2e": "pnpm --recursive test:e2e",
+    "test:all": "pnpm --recursive test && pnpm --recursive test:e2e",
+    "test:ci": "pnpm --recursive test:ci"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5"
+  },
+  "lint-staged": {
+    "apps/api/**/*.ts": [
+      "pnpm --filter @ididntcatchthat/api exec eslint --fix --max-warnings=0",
+      "pnpm --filter @ididntcatchthat/api exec prettier --write"
+    ],
+    "apps/client/**/*.{ts,tsx}": [
+      "pnpm --filter @ididntcatchthat/client exec eslint --fix --max-warnings=0",
+      "pnpm --filter @ididntcatchthat/client exec prettier --write"
+    ]
+  }
+}

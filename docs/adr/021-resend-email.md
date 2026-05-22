@@ -1,86 +1,75 @@
-# ADR 021 — Email transaccional: Resend
+# ADR 021 — Email Provider: Resend
 
-**Estado**: Aceptado  
-**Fecha**: 2026-05-22  
-**Autores**: Abraham Vilches de la Cruz
-
----
-
-## Contexto
-
-La plataforma necesita enviar emails transaccionales a usuarios registrados:
-
-- Bienvenida tras el registro
-- Racha rota
-- Hitos de racha (30, 100 días)
-- Recordatorio de inactividad (> 7 días)
-
-Se requiere un proveedor con buena reputación de entrega, API simple, tier gratuito suficiente para el TFM y sin complejidad operacional adicional en el VPS.
+**Date**: 2026-05-22  
+**Status**: Accepted
 
 ---
 
-## Decisión
+## Context
 
-**Resend** como proveedor de email transaccional.
+La plataforma necesita enviar emails transaccionales en varios puntos del ciclo de vida del usuario:
 
----
+- Email de bienvenida al registrarse
+- Notificación de streak roto
+- (Futuro) newsletter con contenido personalizado por IA
 
-## Alternativas consideradas
-
-| Proveedor   |       Tier gratuito       | Complejidad | Motivo de descarte                                                           |
-| ----------- | :-----------------------: | :---------: | ---------------------------------------------------------------------------- |
-| **Resend**  | 3.000 emails/mes, 100/día |   Mínima    | ✅ Elegido                                                                   |
-| SendGrid    |          100/día          |    Media    | API más verbosa, reputación de entrega variable en tier free                 |
-| Mailgun     |    1.000/mes (3 meses)    |    Media    | Tier gratuito expira, requiere verificación de dominio compleja              |
-| SES (AWS)   |   62.000/mes desde EC2    |    Alta     | Requiere cuenta AWS + configuración IAM — overkill para el TFM               |
-| SMTP propio |         Ilimitado         |    Alta     | Reputación de entrega pésima sin warmup + gestión de SPF/DKIM/DMARC compleja |
+Se necesita un proveedor que sea simple de integrar en NestJS, con buena DX, SDK moderno en TypeScript y deliverability confiable para producción.
 
 ---
 
-## Por qué Resend
+## Options Considered
 
-- **API minimalista** — una llamada, sin configuración extra
-- **SDK oficial para Node.js / NestJS** — integración directa
-- **Tier gratuito generoso** — 3.000 emails/mes más que suficiente para el TFM
-- **Buena reputación de entrega** — dominio verificado con SPF/DKIM gestionado por ellos
-- **React Email compatible** — plantillas con componentes React (opcional pero elegante)
-- **Defendible académicamente** — proveedor moderno, bien documentado
-
----
-
-## Consecuencias
-
-**Positivas:**
-
-- Sin infraestructura adicional en el VPS
-- Integración en minutos con el SDK oficial
-- Logs y analytics de entrega en el dashboard de Resend
-
-**Negativas / trade-offs:**
-
-- Dependencia de servicio externo (como ElevenLabs o Azure)
-- Límite de 100 emails/día en tier free — suficiente para el TFM, no para producción real
-- Para escalar necesitaría plan de pago (~$20/mes para 50k emails)
+| Proveedor | Free tier | SDK TS | DX | Deliverability | Precio |
+|---|---|---|---|---|---|
+| **Resend** | 3.000 emails/mes | ✅ Oficial | ⭐⭐⭐ | Alta | $20/mes (50k) |
+| SendGrid | 100 emails/día | ✅ | ⭐⭐ | Alta | $19.95/mes (50k) |
+| Mailgun | 1.000 emails/mes (3 meses) | ✅ | ⭐⭐ | Alta | $35/mes (50k) |
+| Nodemailer + SMTP | — | Manual | ⭐ | Depende del SMTP | Variable |
+| AWS SES | 62k emails/mes (desde EC2) | ✅ | ⭐ | Alta | $0.10/1k |
 
 ---
 
-## Scope en el TFM
+## Decision
 
-Emails implementados en MVP:
+**Resend**.
 
-| Trigger                      | Email                          |
-| ---------------------------- | ------------------------------ |
-| Registro                     | Bienvenida + tips para empezar |
-| Racha rota                   | "Se rompió tu racha de N días" |
-| Hito de racha (30, 100 días) | Felicitación                   |
-| Inactividad > 7 días         | Recordatorio suave             |
+### Razones
 
-Newsletter con tips generados por IA: **documentado, no implementado** — reservado para fase post-entrega.
+1. **SDK TypeScript de primera clase** — `resend.emails.send()` con tipos completos, no wrappers legacy
+2. **DX superior** — dashboard limpio, logs de entrega en tiempo real, webhooks simples
+3. **Idempotency key nativo** — crítico para el patrón de idempotencia de los handlers de eventos
+4. **React Email compatible** — si se quieren templates ricos con componentes React en el futuro
+5. **Free tier suficiente para MVP** — 3.000 emails/mes cubre holgadamente el lanzamiento del TFM
+6. **Fundadores ex-Vercel** — calidad de producto y DX consistente con el resto del stack
 
 ---
 
-## Referencias
+## Consequences
+
+### Positivas
+- Integración en pocas líneas desde el handler `send_welcome_email_on_user_registered`
+- Idempotency key mapeado al `eventId` del mensaje — evita doble envío en retry
+- Logs de entrega observables desde el dashboard sin configuración adicional
+
+### Negativas / Riesgos
+- Vendor lock-in moderado — migrar implica cambiar el SDK, no la lógica de negocio (está en el handler)
+- Si se supera el free tier, $20/mes es el salto mínimo
+
+### Mitigación del lock-in
+
+El handler que envía email vive en la capa `infrastructure/` del BC `Notification`. Está detrás de una interfaz `EmailSender` definida en `application/`. Cambiar de proveedor implica solo cambiar la implementación concreta — no los use cases ni el dominio.
+
+```
+notification/
+├── application/
+│   └── ports/email-sender.port.ts    ← interface — agnóstica del proveedor
+└── infrastructure/
+    └── email/resend-email-sender.ts  ← implementación concreta con Resend SDK
+```
+
+---
+
+## References
 
 - [Resend docs](https://resend.com/docs)
-- [Resend Node.js SDK](https://resend.com/docs/send-with-nodejs)
-- Documento de notificaciones: [docs/domain/notifications.md](../domain/notifications.md)
+- [ADR 019 — Event Bus Strategy](./019-event-bus-strategy.md) — contexto del handler que usa Resend

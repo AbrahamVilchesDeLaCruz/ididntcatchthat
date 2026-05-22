@@ -48,3 +48,4 @@ id_ed25519
 *_deploy.pub
 .doppler-token
 doppler.yaml
+.opencode/skills

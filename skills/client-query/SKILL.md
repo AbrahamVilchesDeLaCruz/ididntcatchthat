@@ -1,3 +1,14 @@
+---
+name: client-query
+description: >
+  TanStack Query: queries, mutations, query keys, invalidación en apps/client/.
+  Trigger: Al usar useQuery, useMutation, definir query keys, o invalidar queries tras una mutation.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # client-query
 
 Cómo usar TanStack Query en `apps/client/`. Las queries y mutations viven en `api/{feature}.api.ts` dentro de cada pod.

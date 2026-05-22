@@ -1,3 +1,14 @@
+---
+name: client-testing
+description: >
+  Vitest + RTL (unit/integration), Playwright E2E, MSW en apps/client/.
+  Trigger: Al crear tests de componentes con RTL, tests E2E con Playwright, o mocks de API con MSW.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # client-testing
 
 Testing del cliente `apps/client/`. Vitest + React Testing Library para unit/integration, Playwright para E2E.

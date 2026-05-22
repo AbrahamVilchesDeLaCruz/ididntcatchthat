@@ -34,6 +34,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Creating new skills                                   | `skill-creator` |
 | AGENTS.md Available Skills or Auto-invoke out of sync | `skill-sync`    |
 | Creating a branch, opening a PR, or merging code      | `git-workflow`  |
+| Before implementing any new feature, use case, hook or component | `tdd-workflow` |
 
 ---
 
@@ -41,6 +42,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 | Skill                | Scope  | Description                                                      | URL                                            |
 | -------------------- | ------ | ---------------------------------------------------------------- | ---------------------------------------------- |
+| `tdd-workflow`       | global | Workflow TDD obligatorio: Red→Green→Refactor antes de cualquier código nuevo | [SKILL.md](skills/tdd-workflow/SKILL.md) |
 | `skill-creator`      | global | Crea nuevas skills siguiendo el spec del repo                    | [SKILL.md](skills/skill-creator/SKILL.md)      |
 | `skill-sync`         | global | Sincroniza skills a las tablas de AGENTS.md                      | [SKILL.md](skills/skill-sync/SKILL.md)         |
 | `git-workflow`       | global | Branching, naming, merge strategy y PRs para este repo           | [SKILL.md](skills/git-workflow/SKILL.md)       |
@@ -104,9 +106,44 @@ ididntcatchthat/
 
 - **TypeScript** estricto en todos los paquetes — no usar `any`
 - **Zod and Class Validator** para validación cliente-servidor`
-- **Conventional Commits**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`
-- **ESLint + Prettier** — no commitear código sin pasar linting
+- **Conventional Commits**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `ci`, `revert`
+- **ESLint + Prettier** — no commitear código sin pasar linting — enforced por Husky
 - **Imports**: usar path aliases, nunca rutas relativas largas
+
+---
+
+## Git Hooks (Husky)
+
+Configurados en `.husky/` a nivel raíz del monorepo.
+
+| Hook | Herramienta | Qué hace |
+| ------------- | ----------- | ------------------------------------------------------------ |
+| `pre-commit`  | lint-staged | ESLint --fix + Prettier --write sobre archivos staged únicamente |
+| `commit-msg`  | commitlint  | Valida que el mensaje siga Conventional Commits              |
+
+**lint-staged** corre eslint y prettier **solo sobre los archivos staged** — no sobre todo el proyecto. Rápido, < 2s.
+
+**tsc --noEmit** NO está en pre-commit — va en CI. El ESLint con `recommendedTypeChecked` cubre type-safety por archivo.
+
+**Tipos válidos en commit-msg:** `feat` | `fix` | `docs` | `chore` | `refactor` | `test` | `perf` | `ci` | `revert`
+
+Config commitlint: `commitlint.config.ts` en la raíz.
+
+---
+
+## Scripts raíz (monorepo)
+
+Desde la raíz del monorepo, estos scripts propagan el comando a todos los workspaces:
+
+```bash
+pnpm lint          # ESLint en api + client
+pnpm test          # Unit tests en api + client
+pnpm test:e2e      # E2E tests en api + client
+pnpm test:all      # Unit + E2E en api + client
+pnpm test:ci       # Tests + coverage en modo CI (GitHub Actions)
+```
+
+> Para correr solo en un workspace: `pnpm --filter @ididntcatchthat/api test`
 
 ---
 

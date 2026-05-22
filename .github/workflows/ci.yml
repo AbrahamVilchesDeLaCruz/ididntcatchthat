@@ -78,7 +78,7 @@ jobs:
         run: pnpm lint
 
       - name: Test
-        run: doppler run -- pnpm exec jest --passWithNoTests
+        run: doppler run -- pnpm test:ci
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
@@ -120,7 +120,7 @@ jobs:
         run: pnpm lint
 
       - name: Test
-        run: doppler run -- pnpm test --passWithNoTests
+        run: doppler run -- pnpm test:ci
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 

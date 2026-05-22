@@ -1,3 +1,14 @@
+---
+name: api-shared
+description: >
+  SharedModule global, bounded context shared, env validation Joi en apps/api/.
+  Trigger: Al crear o modificar SharedModule, añadir validación de variables de entorno con Joi, o infraestructura transversal.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-shared
 
 ## When to Use

@@ -1,3 +1,14 @@
+---
+name: api-events-infra
+description: >
+  AmqpMessageBus, HandlersBootstrapper, retry, DLQ, idempotencia en apps/api/.
+  Trigger: Al implementar AmqpMessageBus, configurar HandlersBootstrapper, o entender retry y DLQ.
+license: Apache-2.0
+metadata:
+  author: AbrahamVilchesDeLaCruz
+  version: "1.0"
+---
+
 # Skill: api-events-infra
 
 ## When to Use
