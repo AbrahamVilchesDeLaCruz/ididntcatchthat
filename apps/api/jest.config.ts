@@ -4,7 +4,7 @@ import type { Config } from 'jest';
  * Jest config — Unit tests
  *
  * Scope  : test/**\/*.spec.ts  (replica la estructura de src/)
- * Runner : ts-jest (no build step)
+ * Runner : ts-jest en modo ESM (requerido por @faker-js/faker v10+)
  * Use    : pnpm test | pnpm test:watch | pnpm test:cov
  *
  * Convención: los specs NO viven junto al código fuente.
@@ -18,20 +18,24 @@ const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testMatch: ['<rootDir>/test/**/*.spec.ts'],
+  extensionsToTreatAsEsm: ['.ts'],
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': [
+      'ts-jest',
+      { useESM: true, tsconfig: '<rootDir>/tsconfig.test.json' },
+    ],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
   },
   testEnvironment: 'node',
   // ─── Coverage ───────────────────────────────────────────────────────────────
-  // Mide cobertura sobre src/ — nunca sobre test/
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/**/*.module.ts', // NestJS modules — pure wiring, no logic
+    '!src/**/*.module.ts',
     '!src/main.ts',
-    '!src/**/*.entity.ts', // TypeORM entities — data shape, no logic
+    '!src/**/*.entity.ts',
     '!src/**/index.ts',
   ],
   coverageDirectory: 'coverage/unit',
