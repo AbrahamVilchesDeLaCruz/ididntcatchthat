@@ -2,12 +2,15 @@
         dev dev-api dev-client \
         logs logs-api logs-client ps \
         obs-up obs-down obs-logs \
+        tunnel-dev tunnel-prod \
         clean purge prune clean-dangling \
         deploy-prod deploy-dev \
         vps-ps-prod vps-ps-dev \
         vps-logs-prod vps-logs-dev \
         vps-restart-prod vps-restart-dev \
         help
+
+VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
 
 COMPOSE      = docker compose
 COMPOSE_DEV  = doppler run --config dev  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
@@ -132,6 +135,18 @@ purge: clean ## ⚠️  Also removes volumes (deletes all data)
 
 prune: ## ☢️  Nuclear: removes all unused Docker resources
 	docker system prune -af --volumes
+
+# ─── Observability tunnels ────────────────────────────────────────────────────
+
+tunnel-dev: ## Open SSH tunnel to dev observability (Prometheus :9090, Grafana :3002, Loki :3100)
+	@echo "🔭 Tunnel open → Prometheus: http://localhost:9090  Grafana: http://localhost:3002"
+	@echo "   Press Ctrl+C to close."
+	ssh -L 9090:localhost:9090 -L 3002:localhost:3002 -L 3100:localhost:3100 $(VPS_HOST) -N
+
+tunnel-prod: ## Open SSH tunnel to prod observability (Prometheus :9091, Grafana :3003, Loki :3101)
+	@echo "🔭 Tunnel open → Prometheus: http://localhost:9091  Grafana: http://localhost:3003"
+	@echo "   Press Ctrl+C to close."
+	ssh -L 9091:localhost:9090 -L 3003:localhost:3002 -L 3101:localhost:3100 $(VPS_HOST) -N
 
 # ─── Help ─────────────────────────────────────────────────────────────────────
 
