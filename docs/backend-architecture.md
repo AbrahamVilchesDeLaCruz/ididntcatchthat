@@ -124,10 +124,16 @@ src/
     │       ├── domain/
     │       ├── application/
     │       └── infrastructure/
-    └── shared/                          ← shared global del sistema
-        ├── domain/                      ← AggregateRoot base, VO base, interfaces globales
-        ├── application/
-        └── infrastructure/              ← conexión DB, EventBus impl, Criteria, DI container
+    ├── shared/                          ← shared global del sistema
+    │   ├── domain/                      ← AggregateRoot base, VO base, interfaces globales (Logger)
+    │   ├── application/
+    │   └── infrastructure/              ← conexión DB, EventBus impl, Criteria, DI container, PinoLogger
+    └── observability/                   ← módulo técnico transversal (no es un BC de dominio)
+        └── infrastructure/
+            ├── controllers/             ← metrics-get.controller.ts
+            ├── metrics.interceptor.ts   ← MetricsInterceptor (prom-client)
+            └── framework/
+                └── observability.module.ts
 ```
 
 ### Bounded Context = Módulo (caso simple)
@@ -201,8 +207,23 @@ El aggregate es el único que puede garantizar invariantes. Reglas:
 
 Contiene conocimiento compartido entre todo el sistema:
 
-- **Domain**: AggregateRoot base, Value Object bases, interfaces globales (EventBus, Criteria)
+- **Domain**: AggregateRoot base, Value Object bases, interfaces globales (EventBus, Criteria, Logger)
 - **Application**: casos de uso base, interfaces de handlers
-- **Infrastructure**: conexión a base de datos, implementación del EventBus, Criteria, contenedor DI
+- **Infrastructure**: conexión a base de datos, implementación del EventBus, Criteria, contenedor DI, PinoLogger
 
 Regla: si algo es usado por **más de un bounded context**, va a shared. Si solo lo usa uno, es del módulo.
+
+---
+
+## Observability Module
+
+Módulo técnico transversal — no es un Bounded Context de dominio sino infraestructura de plataforma.
+
+Responsabilidades:
+- **`MetricsInterceptor`** — intercepta cada request HTTP y registra duración y conteo en prom-client
+- **`MetricsGetController`** — expone `GET /metrics` para que Prometheus haga scraping
+- **`ObservabilityModule`** — registra el Registry de prom-client, el interceptor global y el controller
+
+No tiene capa `domain/` ni `application/` — es puramente infraestructura técnica.
+
+`SharedModule` exporta el `Logger`. `ObservabilityModule` gestiona todo lo relacionado con métricas HTTP.

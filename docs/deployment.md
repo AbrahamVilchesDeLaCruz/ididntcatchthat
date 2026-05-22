@@ -244,7 +244,37 @@ Esto ejecuta internamente:
 
 ---
 
-## Operaciones habituales
+## Acceso a observabilidad (Prometheus + Grafana)
+
+Prometheus y Grafana corren en el VPS pero **no están expuestos públicamente** — correcto por seguridad. Para acceder desde tu máquina local usás un SSH tunnel.
+
+### ¿Qué es el SSH tunnel?
+
+SSH abre un "tubo" encriptado entre un puerto de tu máquina local y un puerto del VPS. Grafana sigue corriendo en el VPS — vos simplemente lo alcanzás a través del tunnel como si fuera local.
+
+### Abrir tunnel
+
+```bash
+# Dev — Prometheus en :9090, Grafana en :3002
+make tunnel-dev
+
+# Prod — Prometheus en :9091, Grafana en :3003 (puertos distintos para no colisionar)
+make tunnel-prod
+```
+
+`VPS_HOST` se lee automáticamente desde Doppler (`ubuntu@<IP>`). Añadirla en Doppler config `dev` y `prd` antes de usar estos targets.
+
+Mientras el tunnel está abierto:
+
+| Servicio   | Dev                   | Prod                  |
+| ---------- | --------------------- | --------------------- |
+| Prometheus | http://localhost:9090 | http://localhost:9091 |
+| Grafana    | http://localhost:3002 | http://localhost:3003 |
+| Loki (health) | http://localhost:3100/ready | http://localhost:3101/ready |
+
+Cerrás el tunnel con `Ctrl+C`.
+
+---
 
 ```bash
 # Ver estado de containers prod
@@ -310,11 +340,13 @@ doppler secrets --project ididntcatchthat --config dev
 
 Variables mínimas requeridas:
 
-| Variable       | Descripción                     |
-| -------------- | ------------------------------- |
-| `NODE_ENV`     | `production` o `development`    |
-| `PORT`         | Puerto interno de la API (3000) |
-| `DATABASE_URL` | Connection string PostgreSQL    |
+| Variable            | Descripción                                          |
+| ------------------- | ---------------------------------------------------- |
+| `NODE_ENV`          | `production` o `development`                         |
+| `PORT`              | Puerto interno de la API (3000)                      |
+| `DATABASE_URL`      | Connection string PostgreSQL                         |
+| `GRAFANA_PASSWORD`  | Password del admin de Grafana — valor fuerte en prod |
+| `VPS_HOST`          | `ubuntu@<IP>` — usado por `make tunnel-*`            |
 
 ---
 
