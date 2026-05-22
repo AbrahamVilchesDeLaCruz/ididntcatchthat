@@ -7,8 +7,8 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   // ─── Global prefix ─────────────────────────────────────────────────────────
-  // /health is excluded — it must be reachable without versioning for uptime monitors
-  app.setGlobalPrefix('api/v1', { exclude: ['/health'] });
+  // /health and /metrics are excluded — reachable without versioning prefix
+  app.setGlobalPrefix('api/v1', { exclude: ['/health', '/metrics'] });
 
   // ─── Validation ────────────────────────────────────────────────────────────
   app.useGlobalPipes(
