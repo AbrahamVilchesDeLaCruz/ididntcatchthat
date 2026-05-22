@@ -47,12 +47,12 @@ API (NestJS)
 
 Total de requests HTTP procesados. Labels disponibles:
 
-| Label | Valores de ejemplo |
-|---|---|
-| `method` | `GET`, `POST`, `PATCH`, `DELETE` |
-| `route` | `/health`, `/api/v1/flashcards`, etc. |
-| `status_code` | `200`, `201`, `400`, `404`, `500` |
-| `app` | `ididntcatchthat-api` |
+| Label         | Valores de ejemplo                    |
+| ------------- | ------------------------------------- |
+| `method`      | `GET`, `POST`, `PATCH`, `DELETE`      |
+| `route`       | `/health`, `/api/v1/flashcards`, etc. |
+| `status_code` | `200`, `201`, `400`, `404`, `500`     |
+| `app`         | `ididntcatchthat-api`                 |
 
 **Queries útiles:**
 
@@ -98,13 +98,13 @@ histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{route="/api/v
 
 prom-client registra automáticamente métricas del proceso:
 
-| Métrica | Qué mide |
-|---|---|
-| `nodejs_heap_size_used_bytes` | Memoria heap usada |
-| `nodejs_heap_size_total_bytes` | Memoria heap total |
+| Métrica                         | Qué mide                              |
+| ------------------------------- | ------------------------------------- |
+| `nodejs_heap_size_used_bytes`   | Memoria heap usada                    |
+| `nodejs_heap_size_total_bytes`  | Memoria heap total                    |
 | `nodejs_event_loop_lag_seconds` | Lag del event loop — señal de bloqueo |
-| `nodejs_active_handles_total` | Handles activos (conexiones, timers) |
-| `process_cpu_seconds_total` | CPU consumido por el proceso |
+| `nodejs_active_handles_total`   | Handles activos (conexiones, timers)  |
+| `process_cpu_seconds_total`     | CPU consumido por el proceso          |
 
 **Queries útiles:**
 
@@ -123,19 +123,21 @@ nodejs_event_loop_lag_seconds * 1000
 ididntcatchthat es una app de aprendizaje con gamificación y audio. Las métricas más relevantes por área:
 
 ### Rendimiento general
+
 - **p95 latencia** — los usuarios perciben lentitud si supera 300ms
 - **Tasa de errores 5xx** — cualquier valor > 0 en prod es una alerta
 - **Event loop lag** — si sube, la API está bloqueada procesando algo pesado
 
 ### Endpoints críticos
+
 Estos son los más sensibles al rendimiento — monitorizarlos por separado:
 
-| Endpoint | Por qué importa |
-|---|---|
-| `POST /api/v1/games` | Inicio de sesión de juego — alta frecuencia |
-| `POST /api/v1/attempts` | Registro de intentos — el más llamado |
-| `POST /api/v1/pronunciation/evaluate` | Llama a Azure Speech — latencia externa |
-| `GET /api/v1/flashcards` | Carga del catálogo — puede crecer mucho |
+| Endpoint                              | Por qué importa                             |
+| ------------------------------------- | ------------------------------------------- |
+| `POST /api/v1/games`                  | Inicio de sesión de juego — alta frecuencia |
+| `POST /api/v1/attempts`               | Registro de intentos — el más llamado       |
+| `POST /api/v1/pronunciation/evaluate` | Llama a Azure Speech — latencia externa     |
+| `GET /api/v1/flashcards`              | Carga del catálogo — puede crecer mucho     |
 
 ```promql
 # Latencia p95 solo en endpoints críticos
@@ -147,11 +149,14 @@ histogram_quantile(0.95,
 ```
 
 ### Audio (ElevenLabs)
+
 Cuando implementemos el pipeline de audio, añadir métricas custom para:
+
 - Tiempo de generación de audio por flashcard
 - Tasa de fallos en ElevenLabs
 
 ### Spaced repetition
+
 - Volumen de `attempts` por minuto — pico durante sesiones de estudio
 - Distribución de scores de pronunciación — señal de dificultad del contenido
 
@@ -159,13 +164,13 @@ Cuando implementemos el pipeline de audio, añadir métricas custom para:
 
 ## Alertas recomendadas (configurar en Grafana Alerting)
 
-| Alerta | Query | Umbral | Severidad |
-|---|---|---|---|
-| Errores 5xx | `rate(http_requests_total{status_code=~"5.."}[5m])` | > 0 | 🔴 Critical |
-| Latencia p99 alta | `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))` | > 1s | 🟡 Warning |
-| Latencia p99 crítica | `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))` | > 3s | 🔴 Critical |
-| Heap memory alta | `nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes` | > 0.85 | 🟡 Warning |
-| Event loop lag | `nodejs_event_loop_lag_seconds * 1000` | > 100ms | 🟡 Warning |
+| Alerta               | Query                                                                      | Umbral  | Severidad   |
+| -------------------- | -------------------------------------------------------------------------- | ------- | ----------- |
+| Errores 5xx          | `rate(http_requests_total{status_code=~"5.."}[5m])`                        | > 0     | 🔴 Critical |
+| Latencia p99 alta    | `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))` | > 1s    | 🟡 Warning  |
+| Latencia p99 crítica | `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))` | > 3s    | 🔴 Critical |
+| Heap memory alta     | `nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes`               | > 0.85  | 🟡 Warning  |
+| Event loop lag       | `nodejs_event_loop_lag_seconds * 1000`                                     | > 100ms | 🟡 Warning  |
 
 ---
 
@@ -174,6 +179,7 @@ Cuando implementemos el pipeline de audio, añadir métricas custom para:
 Loki está levantado y listo pero la API aún no envía logs a él — `PinoLogger` escribe a stdout.
 
 Cuando se implemente el transport `pino-loki`, desde Grafana se podrá:
+
 - Buscar logs por nivel (`error`, `warn`)
 - Correlacionar un spike de latencia con los logs de ese momento
 - Ver trazas de errores completas con contexto
