@@ -17,14 +17,14 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["UserRegistered"]
-        E2["StreakUpdated"]
-        E3["StreakBroken"]
-        E4["GuestProgressMigrated"]
+        E1["UserRegistered\nidct.identity.users.user.registered"]
+        E2["StreakUpdated\nidct.identity.streaks.streak.updated"]
+        E3["StreakBroken\nidct.identity.streaks.streak.broken"]
+        E4["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
     end
 
     subgraph Consumes ["Eventos que consume"]
-        C1["GameCompleted\n(desde Gaming)"]
+        C1["GameCompleted\nidct.gaming.games.game.completed"]
     end
 
     Identity -->|emite| E1
@@ -34,16 +34,16 @@ graph LR
     C1 -->|consume| Identity
 ```
 
-| Evento emitido          | Trigger                                               |
-| ----------------------- | ----------------------------------------------------- |
-| `UserRegistered`        | Usuario completa registro (email o OAuth)             |
-| `StreakUpdated`         | `GameCompleted` o sesión de estudio — primera del día |
-| `StreakBroken`          | Job nocturno detecta que `last_activity_date < ayer`  |
-| `GuestProgressMigrated` | Guest completa registro y envía estado Zustand        |
+| Evento emitido | Exchange | Trigger |
+|----------------|----------|---------|
+| `UserRegistered` | `idct.identity.users.user.registered` | Usuario completa registro (email o OAuth) |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | `GameCompleted` o sesión de estudio — primera del día |
+| `StreakBroken` | `idct.identity.streaks.streak.broken` | Job nocturno detecta que `last_activity_date < ayer` |
+| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Guest completa registro y envía estado Zustand |
 
-| Evento consumido | Acción                                         |
-| ---------------- | ---------------------------------------------- |
-| `GameCompleted`  | Evalúa si incrementar streak (una vez por día) |
+| Evento consumido | Exchange | Acción |
+|-----------------|----------|--------|
+| `GameCompleted` | `idct.gaming.games.game.completed` | Evalúa si incrementar streak (una vez por día) |
 
 ---
 
@@ -60,8 +60,8 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["FlashcardCreated"]
-        E2["FlashcardUpdated"]
+        E1["FlashcardCreated\nidct.content.flashcard.created"]
+        E2["FlashcardUpdated\nidct.content.flashcard.updated"]
     end
 
     subgraph Internal ["Handlers internos"]
@@ -74,15 +74,15 @@ graph LR
     E2 -->|consume interno — si cambió expression/examples| H1
 ```
 
-| Evento emitido     | Trigger                                                   |
-| ------------------ | --------------------------------------------------------- |
-| `FlashcardCreated` | Teacher publica nueva flashcard (manual, bulk JSON o PDF) |
-| `FlashcardUpdated` | Teacher edita una flashcard existente                     |
+| Evento emitido | Exchange | Trigger |
+|----------------|----------|---------|
+| `FlashcardCreated` | `idct.content.flashcard.created` | Teacher publica nueva flashcard (manual, bulk JSON o PDF) |
+| `FlashcardUpdated` | `idct.content.flashcard.updated` | Teacher edita una flashcard existente |
 
-| Evento consumido   | Acción                                                            |
-| ------------------ | ----------------------------------------------------------------- |
-| `FlashcardCreated` | AudioGenerationHandler → ElevenLabs → CDN → `audio_status: ready` |
-| `FlashcardUpdated` | AudioGenerationHandler (solo si cambió `expression` o `examples`) |
+| Evento consumido | Exchange | Acción |
+|-----------------|----------|--------|
+| `FlashcardCreated` | `idct.content.flashcard.created` | AudioGenerationHandler → ElevenLabs → CDN → `audio_status: ready` |
+| `FlashcardUpdated` | `idct.content.flashcard.updated` | AudioGenerationHandler (solo si cambió `expression` o `examples`) |
 
 ---
 
@@ -99,10 +99,10 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["AttemptRecorded"]
-        E2["GameCompleted"]
-        E3["GamePaused"]
-        E4["GameAbandoned"]
+        E1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
+        E2["GameCompleted\nidct.gaming.games.game.completed"]
+        E3["GamePaused\n(interno — sin cola)"]
+        E4["GameAbandoned\n(interno — sin cola)"]
     end
 
     Gaming -->|emite| E1
@@ -111,12 +111,14 @@ graph LR
     Gaming -->|emite| E4
 ```
 
-| Evento emitido    | Trigger                                                               |
-| ----------------- | --------------------------------------------------------------------- |
-| `AttemptRecorded` | Usuario responde una flashcard (✓ o ✗) — inmediato                    |
-| `GameCompleted`   | Usuario termina todas las flashcards del game                         |
-| `GamePaused`      | Usuario sale de la pantalla / inactividad > 15 min / acción explícita |
-| `GameAbandoned`   | Usuario elige abandonar explícitamente / FIFO al superar 5 pausados   |
+| Evento emitido | Exchange | Trigger |
+|----------------|----------|---------|
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Usuario responde una flashcard (✓ o ✗) — inmediato |
+| `GameCompleted` | `idct.gaming.games.game.completed` | Usuario termina todas las flashcards del game |
+| `GamePaused` | — interno | Usuario sale de la pantalla / inactividad > 15 min / acción explícita |
+| `GameAbandoned` | — interno | Usuario elige abandonar explícitamente / FIFO al superar 5 pausados |
+
+> `GamePaused` y `GameAbandoned` son eventos de dominio internos — no se publican al bus ya que ningún otro BC los consume.
 
 ---
 
@@ -127,10 +129,10 @@ graph LR
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["AttemptRecorded\n(desde Gaming)"]
-        C2["GameCompleted\n(desde Gaming)"]
-        C3["GuestProgressMigrated\n(desde Identity)"]
-        C4["PronunciationEvaluated\n(desde Pronunciation)"]
+        C1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
+        C2["GameCompleted\nidct.gaming.games.game.completed"]
+        C3["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
+        C4["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated"]
     end
 
     subgraph Progress ["📈 Progress"]
@@ -140,7 +142,7 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["ModuleLevelUp"]
+        E1["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
     end
 
     C1 -->|consume| Progress
@@ -150,16 +152,16 @@ graph LR
     Progress -->|emite| E1
 ```
 
-| Evento consumido         | Acción                                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------------------ |
-| `AttemptRecorded`        | UPSERT `user_flashcard_stats` — actualiza `times_played`, `correct_count`, `accuracy_rate` |
-| `GameCompleted`          | Recalcula `ModuleProgress` (study/mastery/combined level)                                  |
-| `GuestProgressMigrated`  | Bulk UPSERT `user_flashcard_stats` desde historial guest                                   |
-| `PronunciationEvaluated` | Actualiza pronunciation stats en `user_flashcard_stats`                                    |
+| Evento consumido | Exchange | Acción |
+|-----------------|----------|--------|
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | UPSERT `user_flashcard_stats` — actualiza `times_played`, `correct_count`, `accuracy_rate` |
+| `GameCompleted` | `idct.gaming.games.game.completed` | Recalcula `ModuleProgress` (study/mastery/combined level) |
+| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest |
+| `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Actualiza pronunciation stats en `user_flashcard_stats` |
 
-| Evento emitido  | Trigger                                               |
-| --------------- | ----------------------------------------------------- |
-| `ModuleLevelUp` | Recálculo de `ModuleProgress` detecta subida de nivel |
+| Evento emitido | Exchange | Trigger |
+|----------------|----------|---------|
+| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Recálculo de `ModuleProgress` detecta subida de nivel |
 
 ---
 
@@ -174,7 +176,7 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["PronunciationEvaluated"]
+        E1["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated"]
     end
 
     subgraph External ["Externo"]
@@ -186,9 +188,9 @@ graph LR
     Pronunciation -->|emite| E1
 ```
 
-| Evento emitido           | Trigger                                                       |
-| ------------------------ | ------------------------------------------------------------- |
-| `PronunciationEvaluated` | Azure devuelve resultado → se persiste `PronunciationAttempt` |
+| Evento emitido | Exchange | Trigger |
+|----------------|----------|---------|
+| `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Azure devuelve resultado → se persiste `PronunciationAttempt` |
 
 ---
 
@@ -199,7 +201,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["ModuleLevelUp\n(desde Progress)"]
+        C1["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
     end
 
     subgraph Ranking ["🏆 Ranking"]
@@ -214,14 +216,13 @@ graph LR
     J1 -->|recomputa| RC
 ```
 
-| Evento consumido | Acción                                                                          |
-| ---------------- | ------------------------------------------------------------------------------- |
-| `ModuleLevelUp`  | Marca ranking correspondiente como `dirty` → será recomputado en el próximo job |
+| Evento consumido | Exchange | Acción |
+|-----------------|----------|--------|
+| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Marca ranking como `dirty` → recomputado en próximo job |
 
 **No emite eventos.** Es un pure read model — solo responde a queries.
 
 Fuentes de datos para el cálculo:
-
 - `user_flashcard_stats` → accuracy, flashcards acertadas, module level
 - `games` → partidas jugadas
 - `users` → streak actual
@@ -235,10 +236,10 @@ Fuentes de datos para el cálculo:
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["UserRegistered\n(desde Identity)"]
-        C2["StreakUpdated\n(desde Identity)"]
-        C3["StreakBroken\n(desde Identity)"]
-        C4["ModuleLevelUp\n(desde Progress)"]
+        C1["UserRegistered\nidct.identity.users.user.registered"]
+        C2["StreakUpdated\nidct.identity.streaks.streak.updated"]
+        C3["StreakBroken\nidct.identity.streaks.streak.broken"]
+        C4["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
     end
 
     subgraph Notification ["🔔 Notification"]
@@ -255,11 +256,11 @@ graph LR
     C4 -->|consume| TJ
 ```
 
-| Evento consumido | Canal          | Condición                      |
-| ---------------- | -------------- | ------------------------------ |
-| `UserRegistered` | Email (Resend) | Siempre                        |
-| `StreakUpdated`  | Toast + Push   | Solo si hito (7, 30, 100 días) |
-| `StreakBroken`   | Email + Push   | Siempre que streak > 0         |
-| `ModuleLevelUp`  | Toast          | Siempre                        |
+| Evento consumido | Exchange | Canal | Condición |
+|-----------------|----------|-------|-----------|
+| `UserRegistered` | `idct.identity.users.user.registered` | Email (Resend) | Siempre |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Toast + Push | Solo si hito (7, 30, 100 días) |
+| `StreakBroken` | `idct.identity.streaks.streak.broken` | Email + Push | Siempre que streak > 0 |
+| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Toast | Siempre |
 
 **No emite eventos.** Es un pure consumer — solo ejecuta side effects.

@@ -190,7 +190,7 @@ CREATE INDEX idx_ufs_flashcard ON user_flashcard_stats(flashcard_id);
 -- Attempts por game (retoma de partida)
 CREATE INDEX idx_attempts_game ON attempts(game_id);
 
--- Rankings por tipo + período
+-- Ranking por tipo + período
 CREATE INDEX idx_rankings_type_period ON rankings_cache(type, period, module);
 
 -- Flashcards por categoría (selección de cartas para un game)

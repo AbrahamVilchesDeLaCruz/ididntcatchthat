@@ -38,20 +38,20 @@ graph TB
 
 ## Flujo de eventos — tabla resumen
 
-| Evento                   | Emitido por   | Consumido por     | Efecto                                                      |
-| ------------------------ | ------------- | ----------------- | ----------------------------------------------------------- |
-| `FlashcardCreated`       | Content       | Content (interno) | Trigger audio pipeline async (×4 archivos)                  |
-| `FlashcardUpdated`       | Content       | Content (interno) | Regenera audio si cambió `expression` o `examples`          |
-| `AttemptRecorded`        | Gaming        | Progress          | Actualiza `user_flashcard_stats` en write-time              |
-| `GameCompleted`          | Gaming        | Progress          | Recalcula `ModuleProgress` (study/mastery/combined level)   |
-| `GameCompleted`          | Gaming        | Identity          | Incrementa streak si no se incrementó hoy                   |
-| `UserRegistered`         | Identity      | Notification      | Envía email de bienvenida (Resend)                          |
-| `StreakUpdated`          | Identity      | Notification      | Toast + push si hito (7, 30, 100 días)                      |
-| `StreakBroken`           | Identity      | Notification      | Email + push notification                                   |
-| `GuestProgressMigrated`  | Identity      | Progress          | Importa games + attempts del guest → `user_flashcard_stats` |
-| `ModuleLevelUp`          | Progress      | Notification      | Toast de logro en app                                       |
-| `ModuleLevelUp`          | Progress      | Ranking           | Marca ranking como dirty → recomputa en próximo job         |
-| `PronunciationEvaluated` | Pronunciation | Progress          | Actualiza pronunciation stats en `user_flashcard_stats`     |
+| Evento | Exchange | Emitido por | Consumido por | Efecto |
+|--------|----------|-------------|---------------|--------|
+| `FlashcardCreated` | `idct.content.flashcard.created` | Content | Content (interno) | Trigger audio pipeline async (×4 archivos) |
+| `FlashcardUpdated` | `idct.content.flashcard.updated` | Content | Content (interno) | Regenera audio si cambió `expression` o `examples` |
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Gaming | Progress | Actualiza `user_flashcard_stats` en write-time |
+| `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (study/mastery/combined level) |
+| `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
+| `UserRegistered` | `idct.identity.users.user.registered` | Identity | Notification | Envía email de bienvenida (Resend) |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
+| `StreakBroken` | `idct.identity.streaks.streak.broken` | Identity | Notification | Email + push notification |
+| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Identity | Progress | Importa games + attempts del guest → `user_flashcard_stats` |
+| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Progress | Notification | Toast de logro en app |
+| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Progress | Ranking | Marca ranking como dirty → recomputa en próximo job |
+| `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Pronunciation | Progress | Actualiza pronunciation stats en `user_flashcard_stats` |
 
 ---
 
