@@ -340,11 +340,13 @@ doppler secrets --project ididntcatchthat --config dev
 
 Variables mínimas requeridas:
 
-| Variable       | Descripción                     |
-| -------------- | ------------------------------- |
-| `NODE_ENV`     | `production` o `development`    |
-| `PORT`         | Puerto interno de la API (3000) |
-| `DATABASE_URL` | Connection string PostgreSQL    |
+| Variable            | Descripción                                          |
+| ------------------- | ---------------------------------------------------- |
+| `NODE_ENV`          | `production` o `development`                         |
+| `PORT`              | Puerto interno de la API (3000)                      |
+| `DATABASE_URL`      | Connection string PostgreSQL                         |
+| `GRAFANA_PASSWORD`  | Password del admin de Grafana — valor fuerte en prod |
+| `VPS_HOST`          | `ubuntu@<IP>` — usado por `make tunnel-*`            |
 
 ---
 
