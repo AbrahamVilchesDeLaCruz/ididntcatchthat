@@ -23,9 +23,9 @@ const config: Config = {
   },
   testEnvironment: 'node',
   // ─── Coverage ───────────────────────────────────────────────────────────────
+  // Mide cobertura sobre src/ — nunca sobre test/
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/**/*.spec.ts',
     '!src/**/*.module.ts',
     '!src/main.ts',
     '!src/**/*.entity.ts',
