@@ -1,6 +1,10 @@
 import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HealthResponse } from './health-get.response';
+
+interface HealthGetResponse {
+  status: string;
+  timestamp: string;
+}
 
 @ApiTags('health')
 @Controller('health')
@@ -15,9 +19,15 @@ export class HealthGetController {
   @ApiResponse({
     status: 200,
     description: 'Service is operational',
-    type: HealthResponse,
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', example: 'ok' },
+        timestamp: { type: 'string', example: '2026-05-22T14:00:00.000Z' },
+      },
+    },
   })
-  handler(): HealthResponse {
+  handler(): HealthGetResponse {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),

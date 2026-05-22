@@ -13,9 +13,9 @@ async function bootstrap(): Promise<void> {
   // ─── Validation ────────────────────────────────────────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,       // strip unknown properties
+      whitelist: true, // strip unknown properties
       forbidNonWhitelisted: true, // throw on unknown properties
-      transform: true,       // coerce query params / path params to declared types
+      transform: true, // coerce query params / path params to declared types
     }),
   );
 

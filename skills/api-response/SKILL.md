@@ -202,3 +202,19 @@ async handler(@Param('id') id: string): Promise<void> {
 - `pagination` solo si el endpoint acepta `page` y `limit` en la query
 - Sin `success`, sin `message` en respuestas exitosas
 - El `request_id` se lee del header `X-Request-Id` si viene del cliente, o se genera con `crypto.randomUUID()`
+
+---
+
+## Anti-patterns
+
+```typescript
+// ❌ Archivos .response.ts por controller — PROHIBIDO
+// search-flashcards-get.response.ts  ← no crear
+// find-flashcard-get.response.ts     ← no crear
+
+// ✅ Correcto: el controller devuelve primitivos del dominio o un tipo inline
+async handler(): Promise<ApiResponse<FlashcardPrimitives>> { ... }
+
+// ✅ Si necesitás un tipo de respuesta nombrado, va en shared como interface genérica
+// shared/infrastructure/http/response/api-response.ts  ← único lugar para tipos de respuesta
+```

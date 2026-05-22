@@ -91,11 +91,30 @@ containers/{feature}/
 
 ```bash
 # Desde apps/client/
-pnpm dev         # Dev server
-pnpm test        # Vitest
-pnpm test:e2e    # Playwright
-pnpm lint        # ESLint
+pnpm dev              # Dev server (Vite)
+pnpm lint             # ESLint --fix
+
+# ─── Unit tests ───────────────────────────────────────────────────────────────
+pnpm test             # Vitest run — single pass (pass si no hay tests aún)
+pnpm test:watch       # TDD loop — re-run on change
+pnpm test:cov         # Vitest + coverage → coverage/
+pnpm test:ui          # Vitest UI en browser (visualización interactiva)
+
+# ─── E2E tests ────────────────────────────────────────────────────────────────
+pnpm test:e2e         # Playwright (requiere instalación previa)
+pnpm test:e2e:ui      # Playwright con UI interactiva
+
+# ─── All ──────────────────────────────────────────────────────────────────────
+pnpm test:all         # Unit + E2E secuencial
+
+# ─── CI ───────────────────────────────────────────────────────────────────────
+pnpm test:ci          # Vitest + coverage + verbose (GitHub Actions)
+pnpm test:e2e:ci      # Playwright --reporter=github (GitHub Actions)
 ```
+
+**Config Vitest:** `vitest.config.ts` — separado de `vite.config.ts` intencionalmente.
+**Setup:** `src/test/setup.ts` — importa `@testing-library/jest-dom`.
+**Coverage thresholds:** 80% branches / functions / lines / statements
 
 ---
 

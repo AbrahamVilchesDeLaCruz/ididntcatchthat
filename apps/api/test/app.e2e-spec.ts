@@ -1,8 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { Test, type TestingModule } from '@nestjs/testing';
+import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
+import { type App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+
+interface HealthGetResponse {
+  status: string;
+  timestamp: string;
+}
 
 describe('shared/health HealthGetController (e2e)', () => {
   let app: INestApplication<App>;
@@ -22,16 +27,14 @@ describe('shared/health HealthGetController (e2e)', () => {
       .get('/health')
       .expect(200);
 
-    expect(response.body).toMatchObject({
-      status: 'ok',
-      timestamp: expect.any(String),
-    });
-    expect(new Date(response.body.timestamp as string).toISOString()).toBe(
-      response.body.timestamp,
-    );
+    const body = response.body as HealthGetResponse;
+
+    expect(body.status).toBe('ok');
+    expect(typeof body.timestamp).toBe('string');
+    expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
   });
 
   afterEach(async () => {
-    await app.close();
+    await app.close().catch(() => undefined);
   });
 });

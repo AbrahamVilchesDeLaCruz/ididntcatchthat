@@ -244,4 +244,10 @@ constructor(private readonly repository: FlashcardRepository) {}
 
 // ❌ TypeORM entity saliendo del repositorio
 async search(id: FlashcardId): Promise<FlashcardEntity> { ... }
+
+// ❌ Archivos .response.ts por controller — PROHIBIDO
+// search-flashcards-get.response.ts  ← NO existe este patrón
+// find-flashcard-get.response.ts     ← NO existe este patrón
+// Los tipos de respuesta son primitivos del dominio (toPrimitives()) o interfaces inline
+// Para el envelope usa ApiResponse<T> / PaginatedApiResponse<T> de shared — ver skill api-response
 ```
