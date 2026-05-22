@@ -146,7 +146,7 @@ tunnel-dev: ## Open SSH tunnel to dev observability (Prometheus :9090, Grafana :
 tunnel-prod: ## Open SSH tunnel to prod observability (Prometheus :9091, Grafana :3003, Loki :3101)
 	@echo "🔭 Tunnel open → Prometheus: http://localhost:9091  Grafana: http://localhost:3003"
 	@echo "   Press Ctrl+C to close."
-	ssh -L 9091:localhost:9090 -L 3003:localhost:3002 -L 3101:localhost:3100 $(VPS_HOST) -N
+	ssh -L 9091:localhost:9091 -L 3003:localhost:3003 -L 3101:localhost:3101 $(VPS_HOST) -N
 
 # ─── Help ─────────────────────────────────────────────────────────────────────
 

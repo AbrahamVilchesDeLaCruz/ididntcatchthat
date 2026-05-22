@@ -23,6 +23,8 @@ services:
 
   prometheus:
     container_name: ididntcatchthat-prometheus-prod
+    ports:
+      - "9091:9090"
     environment:
       GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
@@ -31,7 +33,7 @@ services:
   grafana:
     container_name: ididntcatchthat-grafana-prod
     ports:
-      - "3002:3000"
+      - "3003:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
@@ -39,6 +41,8 @@ services:
 
   loki:
     container_name: ididntcatchthat-loki-prod
+    ports:
+      - "3101:3100"
     volumes:
       - loki_data_prod:/loki
 
