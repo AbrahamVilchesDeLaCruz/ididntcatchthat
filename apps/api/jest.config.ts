@@ -38,11 +38,12 @@ const config: Config = {
   testEnvironment: 'node',
   // ─── Coverage ───────────────────────────────────────────────────────────────
   collectCoverageFrom: [
-    'src/**/*.ts',
+    'src/**/domain/**/*.ts',
+    'src/**/application/**/*.ts',
     '!src/**/*.module.ts',
-    '!src/main.ts',
-    '!src/**/*.entity.ts',
     '!src/**/index.ts',
+    '!src/**/domain/**/*.repository.ts', // interfaces — no tienen implementación que testear
+    '!src/**/domain/**/*.service.ts', // interfaces — idem
   ],
   coverageDirectory: 'coverage/unit',
   coverageReporters: ['text', 'lcov', 'html'],
