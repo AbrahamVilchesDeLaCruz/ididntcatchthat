@@ -615,50 +615,50 @@ apps/api/test/
 
 ### Guest token
 
-- [ ] `POST /auth/guest` devuelve `accessToken` + `deviceId` sin autenticación previa.
-- [ ] El payload del `accessToken` contiene `type: "guest"`, `deviceId`, `fingerprint`, `ip`.
-- [ ] El access token expira a los 15 minutos.
-- [ ] `POST /auth/refresh` con cookie válida devuelve nuevo `accessToken` (rotation).
+- [x] `POST /auth/guest` devuelve `accessToken` + `deviceId` sin autenticación previa.
+- [x] El payload del `accessToken` contiene `type: "guest"`, `deviceId`, `fingerprint`, `ip`.
+- [x] El access token expira a los 15 minutos.
+- [x] `POST /auth/refresh` con cookie válida devuelve nuevo `accessToken` (rotation).
 
 ### Registro
 
-- [ ] `POST /auth/register` crea user, devuelve `accessToken` y setea cookie `refreshToken`.
-- [ ] Email duplicado → 409 `EmailAlreadyTaken`.
-- [ ] Nickname duplicado → 409 `NicknameAlreadyTaken`.
-- [ ] Password débil → 422 `WeakPassword`.
-- [ ] Se emite `UserRegisteredEvent` en el event bus.
+- [x] `POST /auth/register` crea user, devuelve `accessToken` y setea cookie `refreshToken`.
+- [x] Email duplicado → 409 `EmailAlreadyTaken`.
+- [x] Nickname duplicado → 409 `NicknameAlreadyTaken`.
+- [x] Password débil → 422 `WeakPassword`.
+- [ ] Se emite `UserRegisteredEvent` en el event bus. _(pendiente: event bus en infra — actualmente NooopDomainEventPublisher)_
 
 ### Login
 
-- [ ] `POST /auth/login` con credenciales válidas → 200 + `accessToken` + cookie.
-- [ ] Email incorrecto → 401 `InvalidCredentials`.
-- [ ] Password incorrecta → 401 `InvalidCredentials` (mismo mensaje — no revelar qué campo falló).
+- [x] `POST /auth/login` con credenciales válidas → 200 + `accessToken` + cookie.
+- [x] Email incorrecto → 401 `InvalidCredentials`.
+- [x] Password incorrecta → 401 `InvalidCredentials` (mismo mensaje — no revelar qué campo falló).
 
 ### Refresh + logout
 
-- [ ] Refresh exitoso → 200 + rotation del refresh token.
-- [ ] Mismo `tokenId` usado dos veces → 401 + todos los tokens del usuario revocados.
-- [ ] Token expirado → 401 `ExpiredRefreshToken`.
-- [ ] Logout → 204 + cookie borrada.
-- [ ] Refresh tras logout → 401 `InvalidRefreshToken`.
+- [x] Refresh exitoso → 200 + rotation del refresh token.
+- [x] Mismo `tokenId` usado dos veces → 401 + todos los tokens del usuario revocados.
+- [x] Token expirado → 401 `ExpiredRefreshToken`.
+- [x] Logout → 204 + cookie borrada.
+- [x] Refresh tras logout → 401 `InvalidRefreshToken`.
 
 ### OAuth Google
 
-- [ ] `GET /auth/google` redirige a Google.
-- [ ] Callback crea user si no existe, hace login si existe.
-- [ ] `UserRegisteredEvent` solo se emite si el user es nuevo.
+- [ ] `GET /auth/google` redirige a Google. _(pendiente: requiere vars OAuth en entorno)_
+- [ ] Callback crea user si no existe, hace login si existe. _(pendiente)_
+- [ ] `UserRegisteredEvent` solo se emite si el user es nuevo. _(pendiente)_
 
 ### Migración guest
 
-- [ ] `POST /auth/migrate-guest` persiste games + attempts + stats.
-- [ ] Idempotente: llamar dos veces con los mismos datos no duplica registros.
-- [ ] Se emite `GuestProgressMigratedEvent`.
+- [ ] `POST /auth/migrate-guest` persiste games + attempts + stats. _(pendiente: depende de BC games)_
+- [ ] Idempotente: llamar dos veces con los mismos datos no duplica registros. _(pendiente)_
+- [ ] Se emite `GuestProgressMigratedEvent`. _(pendiente)_
 
 ### Guards
 
-- [ ] Endpoint protegido sin token → 401.
-- [ ] Endpoint protegido con token guest → 401 (si requiere role `user`).
-- [ ] Endpoint de teacher/admin con token `user` → 403.
+- [x] Endpoint protegido sin token → 401.
+- [x] Endpoint protegido con token guest → 401 (si requiere role `user`).
+- [x] Endpoint de teacher/admin con token `user` → 403.
 
 ---
 
@@ -670,3 +670,70 @@ apps/api/test/
 - **Nickname auto-generado (OAuth)**: parte antes del `@` del email, sanitizado a alfanumérico + guiones; sufijo numérico aleatorio si hay colisión.
 - **`GuestProgressMigrator` es fire-and-forget** — el controller no espera resolución. Errores se loggean, no propagan.
 - **Rate limiting** en `/auth/guest` — fuera de este spec, se añade en `infra/rate-limiting`.
+
+---
+
+## Notas de implementación real (divergencias y decisiones)
+
+> Esta sección documenta lo que difiere o complementa al spec original, descubierto durante la implementación.
+
+### `RefreshToken.userId` es `string | null`
+
+El spec original declaraba `userId: string`. Durante la implementación se descubrió que los tokens **guest** no tienen userId asociado (no existe un `User` en DB para ellos). La entidad se cambió a `userId: string | null`.
+
+```typescript
+// identity/domain/refresh-token.ts
+userId: string | null  // null para tokens guest
+```
+
+### La cookie lleva `refreshTokenId` (JWT JTI), NO `deviceId`
+
+El spec decía "devolver `deviceId`" en la cookie del refresh token. En realidad el controller `RefreshAuthPostController` busca en DB por `tokenId` (el JTI del JWT), no por `deviceId`. Por tanto la cookie debe contener el JTI, y los use cases devuelven `{ accessToken, refreshTokenId }`.
+
+```typescript
+// Correcto
+res.cookie('refreshToken', result.refreshTokenId, cookieOptions)
+
+// Incorrecto (causaba 401 siempre)
+res.cookie('refreshToken', result.deviceId, cookieOptions)
+```
+
+### `ValidationPipe` usa `errorHttpStatusCode: 422`
+
+Los errores de validación de payload (`class-validator`) devuelven `422 Unprocessable Entity`, no `400 Bad Request`. Esto incluye campos desconocidos (`forbidNonWhitelisted: true`).
+
+### Cookie en supertest: solo `key=value`, sin atributos
+
+Al extraer la cookie de la respuesta para reenviarla en tests E2E, hay que hacer `split(';')[0]` para quedarse solo con `refreshToken=<value>`. El header `Cookie` no acepta atributos como `HttpOnly`, `SameSite`, etc.
+
+```typescript
+const fullCookie = res.headers['set-cookie'][0]
+const refreshTokenCookie = fullCookie.split(';')[0] // "refreshToken=<value>"
+```
+
+### `APP_FILTER` con `useExisting` en `SharedModule`
+
+Para que el filtro global de excepciones sea DI-aware (y pueda inyectar `GlobalExceptionRegistry`), se registra como:
+
+```typescript
+{ provide: APP_FILTER, useExisting: HttpExceptionFilter }
+```
+
+No `useClass`, porque `useClass` crea una instancia separada sin DI del módulo completo.
+
+### `UserRegisterer`: save secuencial (FK constraint)
+
+`user` se guarda antes que `refreshToken` porque `refresh_tokens.user_id` tiene FK → `users.id`. Un save paralelo o invertido lanza error de FK en Postgres.
+
+### Domain Event Publisher actual: Noop
+
+`identity/infrastructure/framework/noop-domain-event-publisher.ts` — no publica eventos al bus real (AMQP). El event bus está previsto para cuando se implemente `api-events-infra`. Por eso el criterio de aceptación "Se emite `UserRegisteredEvent` en el event bus" queda pendiente.
+
+### Estructura de archivos real vs. spec
+
+El spec indicaba `errors/` como subdirectorio pero la implementación usa `exceptions/` (alineado con la convención NestJS del proyecto):
+
+```
+identity/domain/exceptions/   ← implementado
+identity/domain/errors/       ← lo que decía el spec original
+```
