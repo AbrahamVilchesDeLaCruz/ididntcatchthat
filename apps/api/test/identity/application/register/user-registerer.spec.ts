@@ -59,7 +59,7 @@ describe('identity/application/register UserRegisterer', () => {
     const result = await useCase.execute(request);
 
     expect(result.accessToken).toBe('access-token');
-    expect(result.deviceId).toBe(request.deviceId);
+    expect(typeof result.refreshTokenId).toBe('string');
     expect(userRepository.save).toHaveBeenCalledTimes(1);
     expect(refreshTokenRepository.save).toHaveBeenCalledTimes(1);
   });

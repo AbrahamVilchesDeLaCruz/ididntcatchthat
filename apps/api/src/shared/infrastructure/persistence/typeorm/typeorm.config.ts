@@ -29,6 +29,7 @@ export const AppDataSource = new DataSource({
   entities: [UserEntity, RefreshTokenEntity],
   migrations: [Migration202605230526271779506787479],
   migrationsTableName: 'migrations',
+  migrationsRun: !isProd, // auto-run on dev/test; in prod use CLI
   synchronize: false,
-  logging: !isProd,
+  logging: !isProd && !isTest,
 });
