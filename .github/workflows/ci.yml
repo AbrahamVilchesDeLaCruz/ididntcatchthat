@@ -37,19 +37,22 @@ jobs:
         working-directory: apps/api
 
     services:
+      # ── Mirrors docker-compose.test.yml ──────────────────────────────────────
+      # To add more infra (RabbitMQ, Redis…): add service here AND in
+      # docker-compose.test.yml so local and CI stay in sync.
       postgres:
-        image: postgres:17-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: ididntcatchthat_test
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
         ports:
-          - 5432:5432
+          - 5433:5432
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     steps:
       - name: Checkout
@@ -77,10 +80,14 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Test
+      - name: Unit tests
         run: doppler run -- pnpm test:ci
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: E2E tests
+        # No Doppler needed — vars come from .env.test (no real secrets)
+        run: pnpm test:e2e:ci
 
       - name: Build
         run: pnpm build

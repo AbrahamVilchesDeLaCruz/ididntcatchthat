@@ -4,6 +4,7 @@ import { RefreshTokenEntity } from '../../../../identity/infrastructure/persiste
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 
 const isProd = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
 const dbUrl = new URL(
   process.env.DATABASE_URL ?? 'postgres://localhost/defaultdb',
 );
@@ -15,7 +16,11 @@ export const AppDataSource = new DataSource({
   username: dbUrl.username,
   password: dbUrl.password,
   database: dbUrl.pathname.replace('/', ''),
-  ssl: isProd ? { rejectUnauthorized: true } : { rejectUnauthorized: false },
+  ssl: isProd
+    ? { rejectUnauthorized: true }
+    : isTest
+      ? false
+      : { rejectUnauthorized: false },
   entities: [UserEntity, RefreshTokenEntity],
   migrations: [Migration202605230526271779506787479],
   migrationsTableName: 'migrations',

@@ -8,7 +8,10 @@ import type { Config } from 'jest';
  * Use   : pnpm test:e2e | pnpm test:e2e:cov
  *
  * Note  : E2E tests require the DB to be running.
- *         Use `make up` or start via docker-compose before running.
+ *         Locally: make test:e2e:up  (starts docker-compose.test.yml)
+ *         CI:      postgres service in .github/workflows/ci.yml
+ *
+ *         Env vars are loaded from .env.test via dotenv/config setupFile.
  */
 const config: Config = {
   displayName: 'e2e',
@@ -22,6 +25,8 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testEnvironment: 'node',
+  // Load .env.test before any NestJS module is bootstrapped
+  setupFiles: ['<rootDir>/test/setup-env.ts'],
   // ─── Coverage ───────────────────────────────────────────────────────────────
   // Mide cobertura sobre src/ — nunca sobre test/
   collectCoverageFrom: [

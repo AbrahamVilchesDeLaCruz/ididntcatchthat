@@ -38,7 +38,7 @@ export class GuestAuthenticator {
     const refreshToken = RefreshToken.create({
       id: crypto.randomUUID(),
       tokenId: refreshTokenId,
-      userId: deviceId,
+      userId: null, // guests have no user account
       deviceId,
     });
 

@@ -21,6 +21,7 @@ import {
 
 export type UserLoggerResult = {
   accessToken: string;
+  refreshTokenId: string;
 };
 
 @Injectable()
@@ -76,6 +77,6 @@ export class UserLogger {
 
     await this.refreshTokenRepository.save(refreshToken);
 
-    return { accessToken };
+    return { accessToken, refreshTokenId };
   }
 }

@@ -4,6 +4,7 @@ import { RefreshTokenEntity } from '@/identity/infrastructure/persistence/refres
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 
 const isProd = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
 
 // Parse DATABASE_URL manually to avoid pg-connection-string overriding ssl options
 const dbUrl = new URL(
@@ -17,7 +18,14 @@ export const AppDataSource = new DataSource({
   username: dbUrl.username,
   password: dbUrl.password,
   database: dbUrl.pathname.replace('/', ''),
-  ssl: isProd ? { rejectUnauthorized: true } : { rejectUnauthorized: false },
+  // test: no SSL (local Docker Postgres)
+  // dev:  SSL without strict verification (Aiven dev)
+  // prod: SSL with full verification
+  ssl: isProd
+    ? { rejectUnauthorized: true }
+    : isTest
+      ? false
+      : { rejectUnauthorized: false },
   entities: [UserEntity, RefreshTokenEntity],
   migrations: [Migration202605230526271779506787479],
   migrationsTableName: 'migrations',

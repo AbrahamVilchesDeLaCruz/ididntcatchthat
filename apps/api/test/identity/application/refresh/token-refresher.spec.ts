@@ -49,7 +49,7 @@ describe('identity/application/refresh TokenRefresher', () => {
 
   it('should return new access token and rotate the refresh token', async () => {
     const token = RefreshTokenMother.valid({ tokenId: params.tokenId });
-    const user = UserMother.random({ id: token.userId });
+    const user = UserMother.random({ id: token.userId! });
 
     refreshTokenRepository.match.mockResolvedValueOnce([token]);
     userRepository.search.mockResolvedValueOnce(user);
@@ -88,7 +88,7 @@ describe('identity/application/refresh TokenRefresher', () => {
       tokenId: params.tokenId,
     });
     const activeToken = RefreshTokenMother.valid({
-      userId: revokedToken.userId,
+      userId: revokedToken.userId!,
     });
 
     refreshTokenRepository.match

@@ -6,24 +6,27 @@ export class RefreshTokenMother {
     overrides?: Partial<{
       id: string;
       tokenId: string;
-      userId: string;
+      userId: string | null;
       deviceId: string;
     }>,
   ): RefreshToken {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30);
-
     return RefreshToken.create({
       id: overrides?.id ?? UuidMother.random(),
       tokenId: overrides?.tokenId ?? UuidMother.random(),
-      userId: overrides?.userId ?? UuidMother.random(),
+      userId:
+        overrides?.userId !== undefined
+          ? overrides.userId
+          : UuidMother.random(),
       deviceId: overrides?.deviceId ?? UuidMother.random(),
-      expiresAt,
     });
   }
 
   static expired(
-    overrides?: Partial<{ tokenId: string; userId: string; deviceId: string }>,
+    overrides?: Partial<{
+      tokenId: string;
+      userId: string | null;
+      deviceId: string;
+    }>,
   ): RefreshToken {
     const p = this.valid(overrides).toPrimitives();
     const past = new Date();
@@ -32,7 +35,11 @@ export class RefreshTokenMother {
   }
 
   static revoked(
-    overrides?: Partial<{ tokenId: string; userId: string; deviceId: string }>,
+    overrides?: Partial<{
+      tokenId: string;
+      userId: string | null;
+      deviceId: string;
+    }>,
   ): RefreshToken {
     return this.valid(overrides).revoke();
   }

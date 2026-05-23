@@ -32,7 +32,7 @@ import { RefreshToken } from '@/identity/domain/refresh-token';
 
 export type UserRegistererResult = {
   accessToken: string;
-  deviceId: string;
+  refreshTokenId: string;
 };
 
 @Injectable()
@@ -106,13 +106,11 @@ export class UserRegisterer {
       deviceId: params.deviceId,
     });
 
-    await Promise.all([
-      this.userRepository.save(user),
-      this.refreshTokenRepository.save(refreshToken),
-    ]);
+    await this.userRepository.save(user);
+    await this.refreshTokenRepository.save(refreshToken);
 
     await this.publisher.publish(user.pullDomainEvents());
 
-    return { accessToken, deviceId: params.deviceId };
+    return { accessToken, refreshTokenId };
   }
 }

@@ -1,7 +1,7 @@
 export type RefreshTokenPrimitives = {
   id: string;
   tokenId: string;
-  userId: string;
+  userId: string | null;
   deviceId: string;
   expiresAt: Date;
   revokedAt: Date | null;
@@ -12,7 +12,7 @@ export class RefreshToken {
   private constructor(
     readonly id: string,
     readonly tokenId: string,
-    readonly userId: string,
+    readonly userId: string | null,
     readonly deviceId: string,
     readonly expiresAt: Date,
     readonly revokedAt: Date | null,
@@ -24,7 +24,7 @@ export class RefreshToken {
   static create(params: {
     id: string;
     tokenId: string;
-    userId: string;
+    userId: string | null;
     deviceId: string;
   }): RefreshToken {
     const expiresAt = new Date();

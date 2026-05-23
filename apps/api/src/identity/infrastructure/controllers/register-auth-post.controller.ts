@@ -47,7 +47,7 @@ export class RegisterAuthPostController {
       ip: ip ?? '',
     });
 
-    res.cookie('refreshToken', result.deviceId, {
+    res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

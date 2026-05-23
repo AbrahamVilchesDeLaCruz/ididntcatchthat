@@ -49,19 +49,26 @@ export class TokenRefresher {
     if (!token) throw new InvalidRefreshTokenException();
 
     if (token.isRevoked()) {
-      // Token reuse detected — revoke ALL tokens of this user
-      const userTokens = await this.refreshTokenRepository.match(
-        new Criteria([{ field: 'userId', operator: '=', value: token.userId }]),
-      );
-      await Promise.all(
-        userTokens
-          .filter((t) => !t.isRevoked())
-          .map((t) => this.refreshTokenRepository.save(t.revoke())),
-      );
+      // Token reuse detected — revoke ALL tokens of this device/user
+      if (token.userId !== null) {
+        const userTokens = await this.refreshTokenRepository.match(
+          new Criteria([
+            { field: 'userId', operator: '=', value: token.userId },
+          ]),
+        );
+        await Promise.all(
+          userTokens
+            .filter((t) => !t.isRevoked())
+            .map((t) => this.refreshTokenRepository.save(t.revoke())),
+        );
+      }
       throw new UserSessionCompromisedException();
     }
 
     if (token.isExpired()) throw new ExpiredRefreshTokenException();
+
+    // Guest tokens (userId === null) cannot be refreshed into a user session
+    if (token.userId === null) throw new InvalidRefreshTokenException();
 
     const user = await this.userRepository.search(new UserId(token.userId));
     if (!user) throw new UserNotFoundException(token.userId);

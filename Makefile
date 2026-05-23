@@ -8,13 +8,15 @@
         vps-ps-prod vps-ps-dev \
         vps-logs-prod vps-logs-dev \
         vps-restart-prod vps-restart-dev \
+        test\:e2e\:up test\:e2e\:down test\:e2e \
         help
 
 VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
 
-COMPOSE      = docker compose
-COMPOSE_DEV  = doppler run --config dev  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
-COMPOSE_PROD = doppler run --config prd  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml
+COMPOSE       = docker compose
+COMPOSE_DEV   = doppler run --config dev  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
+COMPOSE_PROD  = doppler run --config prd  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml
+COMPOSE_TEST  = $(COMPOSE) -f docker-compose.test.yml
 
 PROD_DIR = /opt/ididntcatchthat
 DEV_DIR  = /opt/ididntcatchthat-dev
@@ -147,6 +149,27 @@ tunnel-prod: ## Open SSH tunnel to prod observability (Prometheus :9091, Grafana
 	@echo "🔭 Tunnel open → Prometheus: http://localhost:9091  Grafana: http://localhost:3003"
 	@echo "   Press Ctrl+C to close."
 	ssh -L 9091:localhost:9091 -L 3003:localhost:3003 -L 3101:localhost:3101 $(VPS_HOST) -N
+
+# ─── E2E Tests ────────────────────────────────────────────────────────────────
+# Runs against a local Docker Postgres — no Doppler needed.
+# To add more infra services (RabbitMQ, Redis…) add them to docker-compose.test.yml
+# and mirror them in .github/workflows/ci.yml under `services:`.
+
+test\:e2e\:up: ## Start E2E test infrastructure (Postgres on :5433)
+	$(ensure-docker)
+	$(COMPOSE_TEST) up -d --wait
+
+test\:e2e\:down: ## Stop and remove E2E test infrastructure
+	$(ensure-docker)
+	$(COMPOSE_TEST) down -v
+
+test\:e2e: ## Run E2E tests (starts infra, runs tests, stops infra)
+	$(ensure-docker)
+	$(COMPOSE_TEST) up -d --wait
+	pnpm --filter @ididntcatchthat/api test:e2e:ci; \
+	EXIT_CODE=$$?; \
+	$(COMPOSE_TEST) down -v; \
+	exit $$EXIT_CODE
 
 # ─── Help ─────────────────────────────────────────────────────────────────────
 

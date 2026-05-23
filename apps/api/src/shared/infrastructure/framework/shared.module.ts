@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { LOGGER_SERVICE } from '@/shared/domain/logger';
 import { HealthGetController } from '../controllers/health-get.controller';
 import { PinoLogger } from '../logger/pino-logger';
@@ -14,6 +15,10 @@ import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
     },
     GlobalExceptionRegistry,
     HttpExceptionFilter,
+    {
+      provide: APP_FILTER,
+      useExisting: HttpExceptionFilter,
+    },
   ],
   exports: [LOGGER_SERVICE, GlobalExceptionRegistry, HttpExceptionFilter],
 })
