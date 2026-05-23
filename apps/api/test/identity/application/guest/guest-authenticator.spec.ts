@@ -1,0 +1,76 @@
+import { mock } from 'jest-mock-extended';
+import { GuestAuthenticator } from '@/identity/application/guest/guest-authenticator';
+import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
+import { type TokenService } from '@/identity/domain/token.service';
+import { RequestGuestAuthenticatorMother } from './request-guest-authenticator-mother';
+import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { JestTimers } from '@test/shared/jest-timers';
+
+describe('identity/application/guest GuestAuthenticator', () => {
+  const refreshTokenRepository = mock<RefreshTokenRepository>();
+  const tokenService = mock<TokenService>();
+  let useCase: GuestAuthenticator;
+
+  beforeEach(() => {
+    JestTimers.setup();
+    refreshTokenRepository.save.mockReset();
+    tokenService.generateGuest.mockReset();
+
+    useCase = new GuestAuthenticator(refreshTokenRepository, tokenService);
+  });
+
+  afterEach(() => JestTimers.teardown());
+
+  it('should return access token and deviceId', async () => {
+    const request = RequestGuestAuthenticatorMother.random();
+    const fakeAccessToken = UuidMother.random();
+    const fakeRefreshTokenId = UuidMother.random();
+
+    tokenService.generateGuest.mockReturnValueOnce({
+      accessToken: fakeAccessToken,
+      refreshTokenId: fakeRefreshTokenId,
+    });
+
+    const result = await useCase.execute(request);
+
+    expect(result.accessToken).toBe(fakeAccessToken);
+    expect(result.deviceId).toBeDefined();
+    expect(typeof result.deviceId).toBe('string');
+  });
+
+  it('should persist the refresh token', async () => {
+    const request = RequestGuestAuthenticatorMother.random();
+    const fakeRefreshTokenId = UuidMother.random();
+
+    tokenService.generateGuest.mockReturnValueOnce({
+      accessToken: UuidMother.random(),
+      refreshTokenId: fakeRefreshTokenId,
+    });
+
+    await useCase.execute(request);
+
+    expect(refreshTokenRepository.save).toHaveBeenCalledTimes(1);
+    const savedToken = refreshTokenRepository.save.mock.calls[0][0];
+    expect(savedToken.tokenId).toBe(fakeRefreshTokenId);
+    expect(savedToken.isRevoked()).toBe(false);
+    expect(savedToken.isExpired()).toBe(false);
+  });
+
+  it('should call tokenService with fingerprint and ip', async () => {
+    const request = RequestGuestAuthenticatorMother.random();
+
+    tokenService.generateGuest.mockReturnValueOnce({
+      accessToken: UuidMother.random(),
+      refreshTokenId: UuidMother.random(),
+    });
+
+    await useCase.execute(request);
+
+    expect(tokenService.generateGuest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fingerprint: request.fingerprint,
+        ip: request.ip,
+      }),
+    );
+  });
+});

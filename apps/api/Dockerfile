@@ -30,6 +30,7 @@ COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY apps/api/docker-entrypoint.sh ./apps/api/docker-entrypoint.sh
 
 WORKDIR /app/apps/api
 
@@ -38,4 +39,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/main"]
+CMD ["sh", "docker-entrypoint.sh"]

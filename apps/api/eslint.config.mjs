@@ -26,6 +26,15 @@ export default tseslint.config(
       },
     },
   },
+  // ─── Test files: relax rules that produce false positives with jest-mock-extended ───
+  {
+    files: ['test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+    },
+  },
   {
     rules: {
       // ─── TypeScript ────────────────────────────────────────────────
