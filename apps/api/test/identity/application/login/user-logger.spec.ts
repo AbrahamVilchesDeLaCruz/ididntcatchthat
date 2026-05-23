@@ -75,4 +75,17 @@ describe('identity/application/login UserLogger', () => {
     );
     expect(refreshTokenRepository.save).not.toHaveBeenCalled();
   });
+
+  it('should throw InvalidCredentialsException when user has no password (guest account)', async () => {
+    const request = RequestUserLoggerMother.random();
+    // UserMother.random() creates a guest — no passwordHash
+    const guestUser = UserMother.random({ email: request.email });
+
+    userRepository.match.mockResolvedValueOnce([guestUser]);
+
+    await expect(useCase.execute(request)).rejects.toThrow(
+      InvalidCredentialsException,
+    );
+    expect(refreshTokenRepository.save).not.toHaveBeenCalled();
+  });
 });

@@ -83,6 +83,20 @@ describe('identity/application/refresh TokenRefresher', () => {
     expect(refreshTokenRepository.save).not.toHaveBeenCalled();
   });
 
+  it('should throw InvalidRefreshTokenException for guest token (userId null)', async () => {
+    const guestToken = RefreshTokenMother.valid({
+      tokenId: params.tokenId,
+      userId: null,
+    });
+
+    refreshTokenRepository.match.mockResolvedValueOnce([guestToken]);
+
+    await expect(useCase.execute(params)).rejects.toThrow(
+      InvalidRefreshTokenException,
+    );
+    expect(refreshTokenRepository.save).not.toHaveBeenCalled();
+  });
+
   it('should revoke all user tokens and throw UserSessionCompromisedException on token reuse', async () => {
     const revokedToken = RefreshTokenMother.revoked({
       tokenId: params.tokenId,
