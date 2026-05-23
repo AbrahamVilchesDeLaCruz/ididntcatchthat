@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { NicknameInvalid } from '@/identity/domain/nickname-invalid';
+import { NicknameInvalidException } from '@/identity/domain/exceptions/nickname-invalid.exception';
 
 // 3–30 chars, alphanumeric + hyphen, no leading/trailing hyphen
 const NICKNAME_REGEX =
@@ -10,7 +10,7 @@ export class Nickname extends StringValueObject {
     super(value);
 
     if (!NICKNAME_REGEX.test(value)) {
-      throw new NicknameInvalid(value);
+      throw new NicknameInvalidException(value);
     }
   }
 }

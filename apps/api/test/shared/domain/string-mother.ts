@@ -20,4 +20,8 @@ export class StringMother {
   static alphanumeric(length: number): string {
     return MotherCreator.random().string.alphanumeric({ length });
   }
+
+  static ip(): string {
+    return MotherCreator.random().internet.ipv4();
+  }
 }

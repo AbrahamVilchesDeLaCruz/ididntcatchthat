@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { UserRoleInvalid } from '@/identity/domain/user-role-invalid';
+import { UserRoleInvalidException } from '@/identity/domain/exceptions/user-role-invalid.exception';
 
 export type UserRoleValue = 'user' | 'teacher' | 'admin';
 
@@ -14,7 +14,7 @@ export class UserRole extends StringValueObject {
 
   static create(value: string): UserRole {
     if (!VALID_ROLES.includes(value as UserRoleValue)) {
-      throw new UserRoleInvalid(value);
+      throw new UserRoleInvalidException(value);
     }
     return new UserRole(value as UserRoleValue);
   }

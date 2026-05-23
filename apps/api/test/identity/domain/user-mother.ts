@@ -1,5 +1,6 @@
 import { User } from '@/identity/domain/user';
 import { UserRole } from '@/identity/domain/user-role';
+import { PasswordHash } from '@/identity/domain/password-hash';
 import { UserIdMother } from '@test/identity/domain/user-id-mother';
 import { EmailMother } from '@test/identity/domain/email-mother';
 import { NicknameMother } from '@test/identity/domain/nickname-mother';
@@ -29,6 +30,19 @@ export class UserMother {
       role: UserRole.create('user'),
       oauthProvider: null,
       deviceId: overrides?.deviceId ?? UuidMother.random(),
+    });
+  }
+
+  static randomWithPassword(email?: string): User {
+    return User.register({
+      id: UserIdMother.random(),
+      email: email ? EmailMother.withValue(email) : EmailMother.random(),
+      passwordHash: new PasswordHash('hashed-password'),
+      nickname: NicknameMother.random(),
+      avatarUrl: null,
+      role: UserRole.create('user'),
+      oauthProvider: null,
+      deviceId: UuidMother.random(),
     });
   }
 }

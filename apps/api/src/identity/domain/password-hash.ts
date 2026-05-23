@@ -1,12 +1,12 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { PasswordHashEmpty } from '@/identity/domain/password-hash-empty';
+import { PasswordHashEmptyException } from '@/identity/domain/exceptions/password-hash-empty.exception';
 
 export class PasswordHash extends StringValueObject {
   constructor(value: string) {
     super(value);
 
     if (!value?.trim()) {
-      throw new PasswordHashEmpty();
+      throw new PasswordHashEmptyException();
     }
   }
 }

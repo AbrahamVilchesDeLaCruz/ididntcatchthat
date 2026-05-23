@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { EmailInvalid } from '@/identity/domain/email-invalid';
+import { EmailInvalidException } from '@/identity/domain/exceptions/email-invalid.exception';
 
 // RFC 5321 — max 254 chars, basic format validation
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,7 +11,7 @@ export class Email extends StringValueObject {
     super(normalized);
 
     if (!EMAIL_REGEX.test(normalized) || normalized.length > EMAIL_MAX_LENGTH) {
-      throw new EmailInvalid(value);
+      throw new EmailInvalidException(value);
     }
   }
 }

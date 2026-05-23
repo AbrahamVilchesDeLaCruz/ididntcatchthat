@@ -5,7 +5,7 @@ import { PasswordHash } from '@/identity/domain/password-hash';
 import { Nickname } from '@/identity/domain/nickname';
 import { UserRole } from '@/identity/domain/user-role';
 import { OauthProvider } from '@/identity/domain/oauth-provider';
-import { UserRegisteredEvent } from '@/identity/domain/user-registered.event';
+import { UserRegisteredEvent } from '@/identity/domain/events/user-registered.event';
 
 export type UserPrimitives = {
   id: string;
@@ -96,6 +96,24 @@ export class User extends AggregateRoot<UserPrimitives> {
       p.lastActivityDate,
       p.createdAt,
       p.updatedAt,
+    );
+  }
+
+  withAvatar(avatarUrl: string): User {
+    return new User(
+      this.id,
+      this.email,
+      this.passwordHash,
+      this.nickname,
+      avatarUrl,
+      this.role,
+      this.oauthProvider,
+      this.showInRanking,
+      this.currentStreak,
+      this.longestStreak,
+      this.lastActivityDate,
+      this.createdAt,
+      new Date(),
     );
   }
 

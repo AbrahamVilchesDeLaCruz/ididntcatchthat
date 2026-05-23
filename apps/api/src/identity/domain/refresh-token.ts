@@ -19,19 +19,23 @@ export class RefreshToken {
     readonly createdAt: Date,
   ) {}
 
+  private static readonly TTL_DAYS = 30;
+
   static create(params: {
     id: string;
     tokenId: string;
     userId: string;
     deviceId: string;
-    expiresAt: Date;
   }): RefreshToken {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + RefreshToken.TTL_DAYS);
+
     return new RefreshToken(
       params.id,
       params.tokenId,
       params.userId,
       params.deviceId,
-      params.expiresAt,
+      expiresAt,
       null,
       new Date(),
     );
