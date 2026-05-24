@@ -12,12 +12,12 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { UserLogouter } from '@/identity/application/logout/user-logouter';
+import { SessionRevoker } from '@/identity/application/logout/session-revoker';
 
 @ApiTags('auth')
 @Controller('auth')
 export class LogoutAuthPostController {
-  constructor(private readonly logouter: UserLogouter) {}
+  constructor(private readonly revoker: SessionRevoker) {}
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
@@ -32,7 +32,7 @@ export class LogoutAuthPostController {
     const tokenId: string =
       (req.cookies as Record<string, string>)['refreshToken'] ?? '';
 
-    await this.logouter.execute({ tokenId });
+    await this.revoker.execute({ tokenId });
 
     res.clearCookie('refreshToken', {
       httpOnly: true,

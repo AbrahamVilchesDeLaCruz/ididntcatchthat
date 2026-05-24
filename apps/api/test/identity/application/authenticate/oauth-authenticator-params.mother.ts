@@ -3,7 +3,6 @@ import { StringMother } from '@test/shared/domain/string-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 type OAuthParams = {
-  id: string;
   email: string;
   avatarUrl: string | null;
   displayName: string;
@@ -14,7 +13,6 @@ type OAuthParams = {
 export class OAuthAuthenticatorParamsMother {
   static random(overrides: Partial<OAuthParams> = {}): OAuthParams {
     return {
-      id: UuidMother.random(),
       email: EmailMother.random().value,
       avatarUrl: null,
       displayName: 'Test User',

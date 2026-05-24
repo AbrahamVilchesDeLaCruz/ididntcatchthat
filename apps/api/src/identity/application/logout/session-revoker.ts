@@ -7,7 +7,7 @@ import {
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 @Injectable()
-export class UserLogouter {
+export class SessionRevoker {
   constructor(
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,

@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserLogger } from '@/identity/application/login/user-logger';
+import { UserAuthenticator } from '@/identity/application/login/user-authenticator';
 import { LoginAuthPostPayload } from './login-auth-post.payload';
 import crypto from 'crypto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class LoginAuthPostController {
-  constructor(private readonly logger: UserLogger) {}
+  constructor(private readonly authenticator: UserAuthenticator) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -36,7 +36,7 @@ export class LoginAuthPostController {
     ).toString('base64');
     const deviceId = body.guestDeviceId ?? crypto.randomUUID();
 
-    const result = await this.logger.execute({
+    const result = await this.authenticator.execute({
       email: body.email,
       password: body.password,
       deviceId,

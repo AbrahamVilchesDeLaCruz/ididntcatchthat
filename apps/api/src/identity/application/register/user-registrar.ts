@@ -1,7 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/domain/user';
-import { Email } from '@/identity/domain/email';
-import { Nickname } from '@/identity/domain/nickname';
 import { Criteria } from '@/shared/domain/criteria';
 import { EmailAlreadyTakenException } from '@/identity/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/domain/exceptions/nickname-already-taken.exception';
@@ -28,13 +26,13 @@ import {
 import { RefreshToken } from '@/identity/domain/refresh-token';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
-export type UserRegistererResult = {
+export type UserRegistrarResult = {
   accessToken: string;
   refreshTokenId: string;
 };
 
 @Injectable()
-export class UserRegisterer {
+export class UserRegistrar {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
@@ -58,10 +56,7 @@ export class UserRegisterer {
     deviceId: string;
     fingerprint: string;
     ip: string;
-  }): Promise<UserRegistererResult> {
-    new Email(params.email);
-    new Nickname(params.nickname);
-
+  }): Promise<UserRegistrarResult> {
     const [byEmail, byNickname] = await Promise.all([
       this.userRepository.match(
         new Criteria([{ field: 'email', operator: '=', value: params.email }]),

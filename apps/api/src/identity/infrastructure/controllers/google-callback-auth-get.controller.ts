@@ -37,7 +37,6 @@ export class GoogleCallbackAuthGetController {
     const deviceId = profile.deviceId ?? crypto.randomUUID();
 
     const result = await this.authenticator.execute(
-      crypto.randomUUID(),
       profile.email ?? '',
       null,
       profile.email?.split('@')[0] ?? 'user',

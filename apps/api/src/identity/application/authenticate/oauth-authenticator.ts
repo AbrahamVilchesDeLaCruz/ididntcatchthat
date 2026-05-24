@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/domain/user';
 import { NicknameResolver } from '@/identity/domain/nickname-resolver';
+import crypto from 'crypto';
 import {
   type UserRepository,
   USER_REPOSITORY,
@@ -45,7 +46,6 @@ export class OAuthAuthenticator {
   ) {}
 
   async execute(
-    id: string,
     email: string,
     avatarUrl: string | null,
     displayName: string,
@@ -62,7 +62,7 @@ export class OAuthAuthenticator {
       isNewUser = true;
 
       user = User.register(
-        id,
+        crypto.randomUUID(),
         email,
         null,
         nickname,

@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import { UserRegisterer } from '@/identity/application/register/user-registerer';
+import { UserRegistrar } from '@/identity/application/register/user-registrar';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type PasswordHasher } from '@/identity/domain/password-hasher';
@@ -13,18 +13,18 @@ import { type User } from '@/identity/domain/user';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type Criteria } from '@/shared/domain/criteria';
 import { UserMother } from '@test/identity/domain/user-mother';
-import { RequestUserRegistererMother } from './request-user-registerer-mother';
+import { RequestUserRegistrarMother } from './request-user-registrar-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { JestTimers } from '@test/shared/jest-timers';
 
-describe('identity/application/register UserRegisterer', () => {
+describe('identity/application/register UserRegistrar', () => {
   const userRepository = mock<UserRepository>();
   const refreshTokenRepository = mock<RefreshTokenRepository>();
   const passwordHasher = mock<PasswordHasher>();
   const tokenGenerator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
-  let useCase: UserRegisterer;
+  let useCase: UserRegistrar;
 
   beforeEach(() => {
     JestTimers.setup();
@@ -44,7 +44,7 @@ describe('identity/application/register UserRegisterer', () => {
     });
     publisher.publish.mockResolvedValue(undefined);
 
-    useCase = new UserRegisterer(
+    useCase = new UserRegistrar(
       userRepository,
       refreshTokenRepository,
       passwordHasher,
@@ -57,7 +57,7 @@ describe('identity/application/register UserRegisterer', () => {
   afterEach(() => JestTimers.teardown());
 
   it('should register the user and return access token', async () => {
-    const request = RequestUserRegistererMother.random();
+    const request = RequestUserRegistrarMother.random();
 
     const result = await useCase.execute(request);
 
@@ -68,7 +68,7 @@ describe('identity/application/register UserRegisterer', () => {
   });
 
   it('should hash the password before saving', async () => {
-    const request = RequestUserRegistererMother.random();
+    const request = RequestUserRegistrarMother.random();
 
     await useCase.execute(request);
 
@@ -78,7 +78,7 @@ describe('identity/application/register UserRegisterer', () => {
   });
 
   it('should publish UserRegisteredEvent', async () => {
-    const request = RequestUserRegistererMother.random();
+    const request = RequestUserRegistrarMother.random();
 
     await useCase.execute(request);
 
@@ -88,7 +88,7 @@ describe('identity/application/register UserRegisterer', () => {
   });
 
   it('should throw EmailAlreadyTakenException when email is in use', async () => {
-    const request = RequestUserRegistererMother.random();
+    const request = RequestUserRegistrarMother.random();
     const existing = UserMother.random({ email: request.email });
 
     userRepository.match.mockImplementation((criteria: Criteria) => {
@@ -104,7 +104,7 @@ describe('identity/application/register UserRegisterer', () => {
   });
 
   it('should throw NicknameAlreadyTakenException when nickname is in use', async () => {
-    const request = RequestUserRegistererMother.random();
+    const request = RequestUserRegistrarMother.random();
     const existing = UserMother.random({ nickname: request.nickname });
 
     userRepository.match.mockImplementation((criteria: Criteria) => {

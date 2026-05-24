@@ -20,13 +20,13 @@ import {
 } from '@/identity/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
-export type UserLoggerResult = {
+export type UserAuthenticatorResult = {
   accessToken: string;
   refreshTokenId: string;
 };
 
 @Injectable()
-export class UserLogger {
+export class UserAuthenticator {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
@@ -46,7 +46,7 @@ export class UserLogger {
     deviceId: string;
     fingerprint: string;
     ip: string;
-  }): Promise<UserLoggerResult> {
+  }): Promise<UserAuthenticatorResult> {
     const [user] = await this.userRepository.match(
       new Criteria([{ field: 'email', operator: '=', value: params.email }]),
     );

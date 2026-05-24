@@ -2,7 +2,7 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
 import { EmailMother } from '@test/identity/domain/email-mother';
 
-type RequestUserLogger = {
+type RequestUserAuthenticator = {
   email: string;
   password: string;
   deviceId: string;
@@ -10,8 +10,10 @@ type RequestUserLogger = {
   ip: string;
 };
 
-export class RequestUserLoggerMother {
-  static random(overrides?: Partial<RequestUserLogger>): RequestUserLogger {
+export class RequestUserAuthenticatorMother {
+  static random(
+    overrides?: Partial<RequestUserAuthenticator>,
+  ): RequestUserAuthenticator {
     return {
       email: overrides?.email ?? EmailMother.random().value,
       password: overrides?.password ?? StringMother.ofLength(12) + 'Aa1!',

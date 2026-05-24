@@ -3,7 +3,7 @@ import { StringMother } from '@test/shared/domain/string-mother';
 import { EmailMother } from '@test/identity/domain/email-mother';
 import { NicknameMother } from '@test/identity/domain/nickname-mother';
 
-type RequestUserRegisterer = {
+type RequestUserRegistrar = {
   id: string;
   email: string;
   password: string;
@@ -13,10 +13,10 @@ type RequestUserRegisterer = {
   ip: string;
 };
 
-export class RequestUserRegistererMother {
+export class RequestUserRegistrarMother {
   static random(
-    overrides?: Partial<RequestUserRegisterer>,
-  ): RequestUserRegisterer {
+    overrides?: Partial<RequestUserRegistrar>,
+  ): RequestUserRegistrar {
     return {
       id: overrides?.id ?? UuidMother.random(),
       email: overrides?.email ?? EmailMother.random().value,

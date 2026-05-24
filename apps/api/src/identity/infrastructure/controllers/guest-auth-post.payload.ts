@@ -5,9 +5,3 @@ export class GuestAuthPostPayload {
   @IsString()
   guestDeviceId?: string;
 }
-
-// fingerprint + ip are extracted from request in the controller
-export type GuestAuthRequestMeta = {
-  fingerprint: string;
-  ip: string;
-};

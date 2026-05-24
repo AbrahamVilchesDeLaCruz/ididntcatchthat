@@ -35,10 +35,10 @@ import { IdentityExceptionRegistry } from './identity-exception-registry';
 
 // Application — use cases
 import { GuestAuthenticator } from '@/identity/application/authenticate/guest-authenticator';
-import { UserRegisterer } from '@/identity/application/register/user-registerer';
-import { UserLogger } from '@/identity/application/login/user-logger';
+import { UserRegistrar } from '@/identity/application/register/user-registrar';
+import { UserAuthenticator } from '@/identity/application/login/user-authenticator';
 import { TokenRefresher } from '@/identity/application/refresh/token-refresher';
-import { UserLogouter } from '@/identity/application/logout/user-logouter';
+import { SessionRevoker } from '@/identity/application/logout/session-revoker';
 import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-authenticator';
 import { GuestProgressMigrator } from '@/identity/application/migrate-guest/guest-progress-migrator';
 
@@ -92,10 +92,10 @@ import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
 
     // Use cases
     GuestAuthenticator,
-    UserRegisterer,
-    UserLogger,
+    UserRegistrar,
+    UserAuthenticator,
     TokenRefresher,
-    UserLogouter,
+    SessionRevoker,
     OAuthAuthenticator,
     GuestProgressMigrator,
 

@@ -30,10 +30,10 @@ const config: Config = {
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
   // NestJS packages ship CJS — transform them so ESM vm-modules can load them
+  // @faker-js/faker v10+ is ESM-only — must be transformed too
   // pnpm symlinks live under node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>
   transformIgnorePatterns: [
-    '/node_modules/.pnpm/(?!(@nestjs\\+common|@nestjs\\+core|reflect-metadata))',
-    '/node_modules/(?!(@nestjs)/)',
+    '/node_modules/.pnpm/(?!(@nestjs\\+common|@nestjs\\+core|reflect-metadata|@faker-js\\+faker))',
   ],
   testEnvironment: 'node',
   // Use V8 native coverage — more accurate with TypeScript decorators.

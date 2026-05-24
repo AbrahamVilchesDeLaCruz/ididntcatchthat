@@ -56,14 +56,13 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   afterEach(() => JestTimers.teardown());
 
   it('should create new user, emit UserRegisteredEvent and return isNewUser=true', async () => {
-    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random();
 
     // no existing user by email, no nickname collision
     searcher.search.mockResolvedValue(null);
 
     const result = await authenticator.execute(
-      id,
       email,
       avatarUrl,
       displayName,
@@ -82,7 +81,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   it('should return existing user, update avatar and return isNewUser=false', async () => {
     const email = EmailMother.random().value;
     const existing = UserMother.random({ email });
-    const { id, avatarUrl, displayName, deviceId, fingerprint, ip } =
+    const { avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random({
         email,
         avatarUrl: 'https://cdn.example.com/avatar.jpg',
@@ -91,7 +90,6 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     searcher.search.mockResolvedValueOnce(existing);
 
     await authenticator.execute(
-      id,
       email,
       avatarUrl,
       displayName,
@@ -107,13 +105,12 @@ describe('identity/application/google GoogleOAuthHandler', () => {
 
   it('should not emit event for existing user', async () => {
     const existing = UserMother.random();
-    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random({ email: existing.email.value });
 
     searcher.search.mockResolvedValueOnce(existing);
 
     await authenticator.execute(
-      id,
       email,
       avatarUrl,
       displayName,
@@ -127,7 +124,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
 
   it('should keep existing user unchanged when avatarUrl is null', async () => {
     const existing = UserMother.random();
-    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random({
         email: existing.email.value,
         avatarUrl: null,
@@ -136,7 +133,6 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     searcher.search.mockResolvedValueOnce(existing);
 
     await authenticator.execute(
-      id,
       email,
       avatarUrl,
       displayName,
@@ -151,14 +147,13 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   });
 
   it('should delegate nickname resolution to NicknameResolver', async () => {
-    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random({ displayName: 'John Doe 123' });
     nicknameResolver.resolve.mockResolvedValue('john-doe-123');
 
     searcher.search.mockResolvedValue(null);
 
     await authenticator.execute(
-      id,
       email,
       avatarUrl,
       displayName,
