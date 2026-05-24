@@ -1,0 +1,88 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { UserSession } from '@/identity/session/domain/user-session';
+import { Criteria } from '@/shared/domain/criteria';
+import { InvalidCredentialsException } from '@/identity/user/domain/exceptions/invalid-credentials.exception';
+import {
+  type UserRepository,
+  USER_REPOSITORY,
+} from '@/identity/user/domain/user.repository';
+import {
+  type UserSessionRepository,
+  USER_SESSION_REPOSITORY,
+} from '@/identity/session/domain/user-session.repository';
+import {
+  type PasswordHasher,
+  PASSWORD_HASHER,
+} from '@/identity/user/domain/password-hasher';
+import {
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/shared/domain/token-generator';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+
+export type UserAuthenticatorResult = {
+  accessToken: string;
+  refreshTokenId: string;
+};
+
+@Injectable()
+export class UserAuthenticator {
+  constructor(
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository,
+    @Inject(USER_SESSION_REPOSITORY)
+    private readonly sessionRepository: UserSessionRepository,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
+  ) {}
+
+  async execute(params: {
+    email: string;
+    password: string;
+    deviceId: string;
+    fingerprint: string;
+    ip: string;
+  }): Promise<UserAuthenticatorResult> {
+    const [user] = await this.userRepository.match(
+      new Criteria([{ field: 'email', operator: '=', value: params.email }]),
+    );
+
+    if (!user) throw new InvalidCredentialsException();
+
+    if (!user.passwordHash) throw new InvalidCredentialsException();
+
+    const valid = await this.passwordHasher.compare(
+      params.password,
+      user.passwordHash.value,
+    );
+
+    if (!valid) throw new InvalidCredentialsException();
+
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+      type: 'user',
+      userId: user.id.value,
+      deviceId: params.deviceId,
+      fingerprint: params.fingerprint,
+      ip: params.ip,
+      roles: [user.role.value],
+    });
+
+    const session = UserSession.create(
+      crypto.randomUUID(),
+      refreshTokenId,
+      user.id.value,
+      params.deviceId,
+      params.fingerprint,
+    );
+
+    await this.sessionRepository.save(session);
+
+    this.logger.info('User logged in', { userId: user.id.value });
+
+    return { accessToken, refreshTokenId };
+  }
+}

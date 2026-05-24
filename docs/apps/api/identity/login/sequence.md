@@ -12,7 +12,7 @@ sequenceDiagram
     participant UREPO as UserRepository
     participant PH as PasswordHasher
     participant TG as TokenGenerator
-    participant RTREPO as RefreshTokenRepository
+    participant RTREPO as UserSessionRepository
 
     Client->>C: POST /auth/login { email, password }
     C->>UC: execute({ email, password, deviceId, fingerprint, ip })
@@ -24,13 +24,13 @@ sequenceDiagram
     PH-->>UC: true
 
     UC->>TG: generatePair({ type:"user", userId, deviceId, fingerprint, ip, roles })
-    TG-->>UC: { accessToken, refreshTokenId }
+    TG-->>UC: { accessToken, userSessionId }
 
-    UC->>RTREPO: save(new RefreshToken({ userId, deviceId, ... }))
+    UC->>RTREPO: save(new UserSession({ userId, deviceId, ... }))
     RTREPO-->>UC: void
 
-    UC-->>C: { accessToken, refreshTokenId }
-    C->>C: res.cookie("refreshToken", refreshTokenId, {...})
+    UC-->>C: { accessToken, userSessionId }
+    C->>C: res.cookie("userSession", userSessionId, {...})
     C-->>Client: 200 { accessToken }
 ```
 

@@ -11,13 +11,13 @@ classDiagram
     }
 
     class TokenRefresher {
-        -refreshTokenRepository: RefreshTokenRepository
+        -userSessionRepository: UserSessionRepository
         -userRepository: UserRepository
         -tokenService: TokenService
         +execute(params): Promise~TokenRefresherResult~
     }
 
-    class RefreshToken {
+    class UserSession {
         +id: string
         +tokenId: string
         +userId: string | null
@@ -27,16 +27,16 @@ classDiagram
         +createdAt: Date
         +isExpired(): boolean
         +isRevoked(): boolean
-        +revoke(): RefreshToken
-        +create(id, tokenId, userId, deviceId)$ RefreshToken
-        +fromPrimitives(p)$ RefreshToken
-        +toPrimitives(): RefreshTokenPrimitives
+        +revoke(): UserSession
+        +create(id, tokenId, userId, deviceId)$ UserSession
+        +fromPrimitives(p)$ UserSession
+        +toPrimitives(): UserSessionPrimitives
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
-        +match(criteria): Promise~RefreshToken[]~
-        +search(id): Promise~RefreshToken | null~
+        +match(criteria): Promise~UserSession[]~
+        +search(id): Promise~UserSession | null~
         +save(token): Promise~void~
         +remove(id): Promise~void~
     }
@@ -50,7 +50,7 @@ classDiagram
 
     class TokenService {
         <<interface>>
-        +generatePair(params): { accessToken, refreshTokenId }
+        +generatePair(params): { accessToken, userSessionId }
         +verifyAccess(token): UserContext
     }
 
@@ -60,19 +60,19 @@ classDiagram
         +pagination: Pagination | null
     }
 
-    class InvalidRefreshTokenException
-    class ExpiredRefreshTokenException
+    class InvalidUserSessionException
+    class ExpiredUserSessionException
     class UserSessionCompromisedException
     class UserNotFoundException
 
     RefreshAuthPostController --> TokenRefresher
-    TokenRefresher --> RefreshTokenRepository
+    TokenRefresher --> UserSessionRepository
     TokenRefresher --> UserRepository
     TokenRefresher --> TokenService
-    TokenRefresher --> RefreshToken
+    TokenRefresher --> UserSession
     TokenRefresher --> Criteria
-    TokenRefresher ..> InvalidRefreshTokenException
-    TokenRefresher ..> ExpiredRefreshTokenException
+    TokenRefresher ..> InvalidUserSessionException
+    TokenRefresher ..> ExpiredUserSessionException
     TokenRefresher ..> UserSessionCompromisedException
     TokenRefresher ..> UserNotFoundException
 ```

@@ -17,7 +17,7 @@ classDiagram
 
     class OAuthAuthenticator {
         -userRepository: UserRepository
-        -refreshTokenRepository: RefreshTokenRepository
+        -userSessionRepository: UserSessionRepository
         -tokenService: TokenService
         -publisher: DomainEventPublisher
         -nicknameResolver: NicknameResolverService
@@ -56,14 +56,14 @@ classDiagram
         +save(user): Promise~void~
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
         +save(token): Promise~void~
     }
 
     class TokenService {
         <<interface>>
-        +generatePair(params): { accessToken, refreshTokenId }
+        +generatePair(params): { accessToken, userSessionId }
     }
 
     class DomainEventPublisher {
@@ -81,7 +81,7 @@ classDiagram
     GoogleCallbackAuthGetController ..> GoogleAuthGuard
     OAuthAuthenticator --> UserSearcher
     OAuthAuthenticator --> UserRepository
-    OAuthAuthenticator --> RefreshTokenRepository
+    OAuthAuthenticator --> UserSessionRepository
     OAuthAuthenticator --> TokenService
     OAuthAuthenticator --> DomainEventPublisher
     OAuthAuthenticator --> NicknameResolverService

@@ -16,22 +16,22 @@ classDiagram
     }
 
     class SessionRevoker {
-        -refreshTokenRepository: RefreshTokenRepository
+        -userSessionRepository: UserSessionRepository
         +execute(params): Promise~void~
     }
 
-    class RefreshToken {
+    class UserSession {
         +id: string
         +tokenId: string
         +userId: string | null
         +revokedAt: Date | null
         +isRevoked(): boolean
-        +revoke(): RefreshToken
+        +revoke(): UserSession
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
-        +match(criteria): Promise~RefreshToken[]~
+        +match(criteria): Promise~UserSession[]~
         +save(token): Promise~void~
     }
 
@@ -42,7 +42,7 @@ classDiagram
     LogoutAuthPostController --> SessionRevoker
     LogoutAuthPostController ..> JwtAuthGuard
     LogoutAuthPostController ..> CurrentUser
-    SessionRevoker --> RefreshTokenRepository
-    SessionRevoker --> RefreshToken
+    SessionRevoker --> UserSessionRepository
+    SessionRevoker --> UserSession
     SessionRevoker --> Criteria
 ```

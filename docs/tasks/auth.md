@@ -54,7 +54,7 @@
 
 - [x] **TASK-AUTH-09** — Domain Errors
   - `EmailAlreadyTaken`, `NicknameAlreadyTaken`, `WeakPassword`, `InvalidCredentials`
-  - `InvalidRefreshToken`, `ExpiredRefreshToken`, `UserSessionCompromised`, `UserNotFound`
+  - `InvalidUserSession`, `ExpiredUserSession`, `UserSessionCompromised`, `UserNotFound`
   - Todos extienden `DomainError` de shared. Sin sufijo `Error` ni `Exception`.
 
 - [x] **TASK-AUTH-10** — Domain Events `UserRegisteredEvent` y `GuestProgressMigratedEvent`
@@ -68,9 +68,9 @@
   - Test: `register` genera evento, `fromPrimitives` no genera eventos, getters correctos.
   - Mother: `UserMother` con `random(overrides?)`, `UserIdMother`, `EmailMother`, `NicknameMother`.
 
-- [x] **TASK-AUTH-12** — Entidad `RefreshToken` y su repositorio
+- [x] **TASK-AUTH-12** — Entidad `UserSession` y su repositorio
   - Campos: `id`, `tokenId`, `userId`, `deviceId`, `expiresAt`, `revokedAt | null`, `createdAt`.
-  - Interface `RefreshTokenRepository` + token `REFRESH_TOKEN_REPOSITORY` en mismo archivo.
+  - Interface `UserSessionRepository` + token `REFRESH_TOKEN_REPOSITORY` en mismo archivo.
   - Interface `UserRepository` + token `USER_REPOSITORY` en mismo archivo.
   - Contratos: `match`, `search`, `save`, `remove` — sin métodos ad-hoc.
 
@@ -81,7 +81,7 @@
 > Reciben primitivos. Usan repositorios via interface. Mockeados en tests con `jest-mock-extended`.
 
 - [x] **TASK-AUTH-13** — `GuestAuthenticator`
-  - Genera `deviceId`, fingerprint, firma JWT guest, persiste `RefreshToken`.
+  - Genera `deviceId`, fingerprint, firma JWT guest, persiste `UserSession`.
   - Test: access token con payload correcto, `deviceId` retornado, refresh token persistido.
   - Mother: `RequestGuestAuthenticatorMother`.
 
@@ -118,10 +118,10 @@
 > NestJS, TypeORM, Passport. Cubiertos principalmente por tests E2E.
 
 - [x] **TASK-AUTH-20** — Migración TypeORM `create-identity`
-  - Crea tablas `users` y `refresh_tokens` con índices y constraints del spec.
+  - Crea tablas `users` y `user_sessions` con índices y constraints del spec.
   - Siguiendo el skill `api-migrations`.
 
-- [x] **TASK-AUTH-21** — Entidades TypeORM `UserEntity` y `RefreshTokenEntity`
+- [x] **TASK-AUTH-21** — Entidades TypeORM `UserEntity` y `UserSessionEntity`
   - Solo mapeo DB ↔ objeto plano. Sin lógica. Sufijo `Entity`.
   - En `identity/infrastructure/persistence/`.
 
@@ -129,8 +129,8 @@
   - Implementa `UserRepository`. Métodos `toDomain()` y `toEntity()` privados.
   - Mapeo explícito via `User.fromPrimitives()` y `user.toPrimitives()`.
 
-- [x] **TASK-AUTH-23** — `TypeOrmRefreshTokenRepository`
-  - Implementa `RefreshTokenRepository`. Mismo patrón de mapeo.
+- [x] **TASK-AUTH-23** — `TypeOrmUserSessionRepository`
+  - Implementa `UserSessionRepository`. Mismo patrón de mapeo.
 
 - [x] **TASK-AUTH-24** — Payloads con `class-validator`
   - `GuestAuthPostPayload` (vacío — sin body)

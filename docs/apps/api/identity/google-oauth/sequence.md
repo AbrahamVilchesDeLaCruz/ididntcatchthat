@@ -16,7 +16,7 @@ sequenceDiagram
     participant Searcher as UserSearcher
     participant UserRepo as UserRepository
     participant NicknameResolver as NicknameResolverService
-    participant RefreshRepo as RefreshTokenRepository
+    participant RefreshRepo as UserSessionRepository
     participant TokenSvc as TokenService
     participant Publisher as DomainEventPublisher
     participant DB as PostgreSQL
@@ -63,13 +63,13 @@ sequenceDiagram
     end
 
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
-    TokenSvc-->>UC: { accessToken, refreshTokenId }
+    TokenSvc-->>UC: { accessToken, userSessionId }
 
-    UC->>RefreshRepo: save(RefreshToken.create(id, refreshTokenId, userId, deviceId))
-    RefreshRepo->>DB: INSERT refresh_token
+    UC->>RefreshRepo: save(UserSession.create(id, userSessionId, userId, deviceId))
+    RefreshRepo->>DB: INSERT user_session
 
     UC-->>CallbackController: { accessToken }
 
-    CallbackController->>CallbackController: res.cookie('refreshToken', deviceId, httpOnly)
-    CallbackController-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: refreshToken=<deviceId>
+    CallbackController->>CallbackController: res.cookie('userSession', deviceId, httpOnly)
+    CallbackController-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: userSession=<deviceId>
 ```

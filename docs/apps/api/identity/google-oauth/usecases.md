@@ -16,8 +16,8 @@ graph TD
         F["User.register()<br/>oauthProvider: google<br/>passwordHash: null"]
         G["Publica UserRegistered"]
         H["Genera access + refresh tokens"]
-        I["Persiste RefreshToken en DB"]
-        J["Set cookie refreshToken<br/>Devuelve accessToken"]
+        I["Persiste UserSession en DB"]
+        J["Set cookie userSession<br/>Devuelve accessToken"]
     end
 
     Client --> A --> B

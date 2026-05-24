@@ -18,7 +18,7 @@ classDiagram
 
     class UserRegistrar {
         -userRepo: UserRepository
-        -refreshTokenRepo: RefreshTokenRepository
+        -userSessionRepo: UserSessionRepository
         -passwordHasher: PasswordHasher
         -tokenGenerator: TokenGenerator
         -publisher: DomainEventPublisher
@@ -63,5 +63,5 @@ classDiagram
     UserRegistrar --> PasswordHasher : hashea password
     UserRegistrar --> DomainEventPublisher : publica eventos
     UserRegistrar --> UserRepository : verifica unicidad + save
-    UserRegistrar --> RefreshTokenRepository : persiste token
+    UserRegistrar --> UserSessionRepository : persiste token
 ```

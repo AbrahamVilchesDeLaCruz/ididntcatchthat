@@ -17,7 +17,7 @@ classDiagram
 
     class UserAuthenticator {
         -userRepo: UserRepository
-        -refreshTokenRepo: RefreshTokenRepository
+        -userSessionRepo: UserSessionRepository
         -passwordHasher: PasswordHasher
         -tokenGenerator: TokenGenerator
         +execute(req): Promise~UserAuthenticatorResult~
@@ -46,7 +46,7 @@ classDiagram
     LoginAuthPostController --> UserAuthenticator : invoca
     UserAuthenticator --> UserRepository : busca por email
     UserAuthenticator --> PasswordHasher : compara hash
-    UserAuthenticator --> RefreshTokenRepository : persiste token
+    UserAuthenticator --> UserSessionRepository : persiste token
     UserAuthenticator ..> InvalidCredentials : lanza si email/password inválidos
     PasswordHasher ..> User : usa passwordHash de
 ```

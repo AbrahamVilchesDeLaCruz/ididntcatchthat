@@ -12,7 +12,7 @@ sequenceDiagram
     participant PH as PasswordHasher
     participant U as User
     participant UREPO as UserRepository
-    participant RTREPO as RefreshTokenRepository
+    participant RTREPO as UserSessionRepository
     participant PUB as DomainEventPublisher
 
     Client->>C: POST /auth/register { email, password, nickname }
@@ -33,14 +33,14 @@ sequenceDiagram
     U-->>UC: user
 
     UC->>UREPO: save(user)
-    Note over UREPO: Primero — FK constraint en refresh_tokens
+    Note over UREPO: Primero — FK constraint en user_sessions
 
-    UC->>RTREPO: save(refreshToken)
+    UC->>RTREPO: save(userSession)
 
     UC->>PUB: publish(user.pullEvents())
 
-    UC-->>C: { accessToken, refreshTokenId }
-    C->>C: res.cookie("refreshToken", refreshTokenId, {...})
+    UC-->>C: { accessToken, userSessionId }
+    C->>C: res.cookie("userSession", userSessionId, {...})
     C-->>Client: 201 { accessToken }
 ```
 

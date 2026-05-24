@@ -25,7 +25,7 @@ Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
 | `POST` | `/auth/guest` | [Guest](./guest/) | — |
 | `POST` | `/auth/register` | [Register](./register/) | — |
 | `POST` | `/auth/login` | [Login](./login/) | — |
-| `POST` | `/auth/refresh` | [Refresh](./refresh/) | Cookie `refreshToken` |
+| `POST` | `/auth/refresh` | [Refresh](./refresh/) | Cookie `userSession` |
 | `POST` | `/auth/logout` | [Logout](./logout/) | Bearer JWT |
 | `GET` | `/auth/google` | [Google OAuth](./google-oauth/) | — |
 | `GET` | `/auth/google/callback` | [Google OAuth](./google-oauth/) | Google OAuth2 |

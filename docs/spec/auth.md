@@ -66,20 +66,26 @@ User extends AggregateRoot<UserPrimitives>
   + toPrimitives(): UserPrimitives
 ```
 
-### Entidad `RefreshToken`
+### Aggregate `UserSession`
 
 ```
-RefreshToken
+UserSession extends AggregateRoot<UserSessionPrimitives>
   ├── id: string
   ├── tokenId: string          — firmado en el JWT refresh
-  ├── userId: string
+  ├── ownerId: string          — userId para users, deviceId para guests
+  ├── ownerType: 'user' | 'guest'
   ├── deviceId: string
+  ├── fingerprint: string      — base64(userAgent|acceptLanguage|ip)
   ├── expiresAt: Date
   ├── revokedAt: Date | null
   └── createdAt: Date
 
   + isRevoked(): boolean
   + isExpired(): boolean
+  + isGuest(): boolean
+
+  factory create(id, tokenId, ownerId, deviceId, fingerprint)      → ownerType='user'
+  factory createGuest(id, tokenId, deviceId, fingerprint)          → ownerType='guest', ownerId=deviceId
 ```
 
 ### Domain Events
@@ -87,11 +93,27 @@ RefreshToken
 ```
 DomainEvent (shared)
   ├── UserRegisteredEvent
-  │     eventName: ididntcatchthat.identity.users.user.registered
+  │     eventName: ididntcatchthat.identity.user.registered
   │     emitido por: User.register()
   │
+  ├── SessionStartedEvent
+  │     eventName: ididntcatchthat.identity.session.started
+  │     emitido por: UserSession.create() / UserSession.createGuest()
+  │
+  ├── SessionRevokedEvent
+  │     eventName: ididntcatchthat.identity.session.revoked
+  │     emitido por: UserSession.revoke()
+  │
+  ├── SessionRotatedEvent
+  │     eventName: ididntcatchthat.identity.session.rotated
+  │     emitido por: UserSession.rotate()
+  │
+  ├── SessionCompromisedEvent
+  │     eventName: ididntcatchthat.identity.session.compromised
+  │     emitido por: TokenRefresher (reuse detection)
+  │
   └── GuestProgressMigratedEvent
-        eventName: ididntcatchthat.identity.users.guest_progress.migrated
+        eventName: ididntcatchthat.identity.guest_progress.migrated
         emitido por: GuestProgressMigrator
 ```
 
@@ -103,8 +125,8 @@ DomainError (shared)
   ├── NicknameAlreadyTaken     → 409
   ├── WeakPassword             → 422
   ├── InvalidCredentials       → 401
-  ├── InvalidRefreshToken      → 401
-  ├── ExpiredRefreshToken      → 401
+  ├── InvalidUserSession      → 401
+  ├── ExpiredUserSession      → 401
   ├── UserSessionCompromised   → 401
   └── UserNotFound             → 404
 ```
@@ -119,9 +141,9 @@ UserRepository
   + remove(id: UserId): Promise<void>
   TOKEN: USER_REPOSITORY
 
-RefreshTokenRepository
-  + match(criteria): Promise<RefreshToken[]>
-  + search(id): Promise<RefreshToken | null>
+UserSessionRepository
+  + match(criteria): Promise<UserSession[]>
+  + search(id): Promise<UserSession | null>
   + save(token): Promise<void>
   + remove(id): Promise<void>
   TOKEN: REFRESH_TOKEN_REPOSITORY
@@ -130,14 +152,14 @@ RefreshTokenRepository
 ### Use Cases y dependencias
 
 ```
-GuestAuthenticator       → RefreshTokenRepository
-UserRegistrar           → UserRepository, RefreshTokenRepository
+GuestAuthenticator       → UserSessionRepository
+UserRegistrar           → UserRepository, UserSessionRepository
                            ··> GuestProgressMigrator (fire-and-forget)
-UserAuthenticator               → UserRepository, RefreshTokenRepository
+UserAuthenticator               → UserRepository, UserSessionRepository
                            ··> GuestProgressMigrator (fire-and-forget)
-TokenRefresher           → RefreshTokenRepository
-SessionRevoker             → RefreshTokenRepository
-GoogleOAuthHandler       → UserRepository, RefreshTokenRepository
+TokenRefresher           → UserSessionRepository
+SessionRevoker             → UserSessionRepository
+GoogleOAuthHandler       → UserRepository, UserSessionRepository
                            ··> GuestProgressMigrator (fire-and-forget)
 GuestProgressMigrator    → (games/attempts repos — fuera de este BC)
                            ··> emite GuestProgressMigratedEvent
@@ -169,7 +191,7 @@ El sistema es **stateless** (sin Redis), con JWT access token de vida corta en m
 - `GET  /auth/google` — iniciar flujo OAuth
 - `GET  /auth/google/callback` — callback OAuth Google
 - `POST /auth/migrate-guest` — migrar progreso guest al registrarse
-- Tablas `users` y `refresh_tokens` en DB
+- Tablas `users` y `user_sessions` en DB
 - Migración TypeORM inicial
 - Guards y strategies en `shared/infrastructure/auth/`
 - Decorator `@CurrentUser`
@@ -246,19 +268,19 @@ export const USER_REPOSITORY = Symbol("UserRepository");
 
 > Búsquedas por email o nickname se resuelven via `match(criteria)` — no métodos ad-hoc.
 
-### Entidad: `RefreshToken`
+### Entidad: `UserSession`
 
 Entidad independiente (no parte del aggregate `User`), con su propio repositorio.
 
 ```typescript
 // identity/domain/refresh-token.repository.ts
-export interface RefreshTokenRepository {
-  match(criteria: Criteria): Promise<RefreshToken[]>;
-  search(id: RefreshTokenId): Promise<RefreshToken | null>;
-  save(token: RefreshToken): Promise<void>;
-  remove(id: RefreshTokenId): Promise<void>;
+export interface UserSessionRepository {
+  match(criteria: Criteria): Promise<UserSession[]>;
+  search(id: UserSessionId): Promise<UserSession | null>;
+  save(token: UserSession): Promise<void>;
+  remove(id: UserSessionId): Promise<void>;
 }
-export const REFRESH_TOKEN_REPOSITORY = Symbol("RefreshTokenRepository");
+export const REFRESH_TOKEN_REPOSITORY = Symbol("UserSessionRepository");
 ```
 
 Campos: `id`, `tokenId` (firmado en JWT), `userId`, `deviceId`, `expiresAt`, `revokedAt | null`, `createdAt`.
@@ -289,10 +311,10 @@ CREATE TABLE users (
 );
 ```
 
-### Tabla `refresh_tokens`
+### Tabla `user_sessions`
 
 ```sql
-CREATE TABLE refresh_tokens (
+CREATE TABLE user_sessions (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   token_id    VARCHAR NOT NULL UNIQUE,
   user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -302,8 +324,8 @@ CREATE TABLE refresh_tokens (
   created_at  TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_refresh_tokens_user    ON refresh_tokens(user_id);
-CREATE INDEX idx_refresh_tokens_token_id ON refresh_tokens(token_id);
+CREATE INDEX idx_user_sessions_user    ON user_sessions(user_id);
+CREATE INDEX idx_user_sessions_token_id ON user_sessions(token_id);
 ```
 
 ---
@@ -322,7 +344,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 1. Generar `deviceId` (UUID).
 2. Calcular `fingerprint = hash(userAgent + acceptLanguage + ip)`.
 3. Firmar JWT access: `{ type: "guest", deviceId, fingerprint, ip }`, TTL 15min.
-4. Persistir `RefreshToken` en repo (para rate limiting por deviceId): TTL 30d.
+4. Persistir `UserSession` en repo (para rate limiting por deviceId): TTL 30d.
 5. Devolver `{ accessToken, deviceId }`.
 
 > El refresh token guest se guarda para permitir `POST /auth/refresh` y control de límite de partidas (3/día por deviceId).
@@ -332,7 +354,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 ### `UserRegistrar`
 
 **Entrada**: `{ email: string, password: string, nickname: string, guestDeviceId?: string }`  
-**Salida**: `{ accessToken: string }` + cookie `refreshToken` (seteada por el controller)
+**Salida**: `{ accessToken: string }` + cookie `userSession` (seteada por el controller)
 
 **Flujo**:
 
@@ -366,16 +388,16 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 ### `TokenRefresher`
 
 **Entrada**: `{ tokenId: string }` (extraído de la cookie por el controller)  
-**Salida**: `{ accessToken: string, newRefreshTokenId: string }`
+**Salida**: `{ accessToken: string, newUserSessionId: string }`
 
 **Flujo**:
 
-1. Buscar `RefreshToken` via `match(criteria)` por `tokenId` → `InvalidRefreshToken` si no existe o revocado.
-2. Verificar `expiresAt > now()` → `ExpiredRefreshToken` si expirado.
+1. Buscar `UserSession` via `match(criteria)` por `tokenId` → `InvalidUserSession` si no existe o revocado.
+2. Verificar `expiresAt > now()` → `ExpiredUserSession` si expirado.
 3. **Rotation**: revocar token actual (`revokedAt = now()`), `repository.save`.
 4. Si el mismo `tokenId` se usa una segunda vez (ya estaba revocado) → revocar TODOS los tokens del usuario (`match` por userId) + `UserSessionCompromised`.
-5. Crear nuevo `RefreshToken`, firmar nuevo access token.
-6. Devolver `{ accessToken, newRefreshTokenId }`.
+5. Crear nuevo `UserSession`, firmar nuevo access token.
+6. Devolver `{ accessToken, newUserSessionId }`.
 
 ---
 
@@ -386,7 +408,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 
 **Flujo**:
 
-1. Buscar `RefreshToken` por `tokenId`.
+1. Buscar `UserSession` por `tokenId`.
 2. `revokedAt = now()`, `repository.save`.
 3. (Controller borra la cookie.)
 
@@ -455,8 +477,8 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 | `NicknameAlreadyTaken`   | 409         | Nickname ya en uso                                    |
 | `WeakPassword`           | 422         | Password no cumple política                           |
 | `InvalidCredentials`     | 401         | Email o password incorrectos (mismo error para ambos) |
-| `InvalidRefreshToken`    | 401         | Token no existe o revocado                            |
-| `ExpiredRefreshToken`    | 401         | Token expirado                                        |
+| `InvalidUserSession`    | 401         | Token no existe o revocado                            |
+| `ExpiredUserSession`    | 401         | Token expirado                                        |
 | `UserSessionCompromised` | 401         | Token reusado — posible robo de sesión                |
 | `UserNotFound`           | 404         | Uso interno (domain service)                          |
 
@@ -622,7 +644,7 @@ apps/api/test/
 
 ### Registro
 
-- [x] `POST /auth/register` crea user, devuelve `accessToken` y setea cookie `refreshToken`.
+- [x] `POST /auth/register` crea user, devuelve `accessToken` y setea cookie `userSession`.
 - [x] Email duplicado → 409 `EmailAlreadyTaken`.
 - [x] Nickname duplicado → 409 `NicknameAlreadyTaken`.
 - [x] Password débil → 422 `WeakPassword`.
@@ -638,9 +660,9 @@ apps/api/test/
 
 - [x] Refresh exitoso → 200 + rotation del refresh token.
 - [x] Mismo `tokenId` usado dos veces → 401 + todos los tokens del usuario revocados.
-- [x] Token expirado → 401 `ExpiredRefreshToken`.
+- [x] Token expirado → 401 `ExpiredUserSession`.
 - [x] Logout → 204 + cookie borrada.
-- [x] Refresh tras logout → 401 `InvalidRefreshToken`.
+- [x] Refresh tras logout → 401 `InvalidUserSession`.
 
 ### OAuth Google
 
@@ -677,25 +699,27 @@ apps/api/test/
 
 > Esta sección documenta lo que difiere o complementa al spec original, descubierto durante la implementación.
 
-### `RefreshToken.userId` es `string | null`
+### `UserSession.userId` es `string | null`
 
-El spec original declaraba `userId: string`. Durante la implementación se descubrió que los tokens **guest** no tienen userId asociado (no existe un `User` en DB para ellos). La entidad se cambió a `userId: string | null`.
+El spec original declaraba `userId: string`. Durante la implementación se descubrió que los tokens **guest** no tienen userId asociado (no existe un `User` en DB para ellos). La entidad se cambió a `ownerId: string
+  ownerType: user | guest`.
 
 ```typescript
 // identity/domain/refresh-token.ts
-userId: string | null  // null para tokens guest
+ownerId: string
+  ownerType: user | guest  // null para tokens guest
 ```
 
-### La cookie lleva `refreshTokenId` (JWT JTI), NO `deviceId`
+### La cookie lleva `userSessionId` (JWT JTI), NO `deviceId`
 
-El spec decía "devolver `deviceId`" en la cookie del refresh token. En realidad el controller `RefreshAuthPostController` busca en DB por `tokenId` (el JTI del JWT), no por `deviceId`. Por tanto la cookie debe contener el JTI, y los use cases devuelven `{ accessToken, refreshTokenId }`.
+El spec decía "devolver `deviceId`" en la cookie del refresh token. En realidad el controller `RefreshAuthPostController` busca en DB por `tokenId` (el JTI del JWT), no por `deviceId`. Por tanto la cookie debe contener el JTI, y los use cases devuelven `{ accessToken, userSessionId }`.
 
 ```typescript
 // Correcto
-res.cookie('refreshToken', result.refreshTokenId, cookieOptions)
+res.cookie('userSession', result.userSessionId, cookieOptions)
 
 // Incorrecto (causaba 401 siempre)
-res.cookie('refreshToken', result.deviceId, cookieOptions)
+res.cookie('userSession', result.deviceId, cookieOptions)
 ```
 
 ### `ValidationPipe` usa `errorHttpStatusCode: 422`
@@ -704,11 +728,11 @@ Los errores de validación de payload (`class-validator`) devuelven `422 Unproce
 
 ### Cookie en supertest: solo `key=value`, sin atributos
 
-Al extraer la cookie de la respuesta para reenviarla en tests E2E, hay que hacer `split(';')[0]` para quedarse solo con `refreshToken=<value>`. El header `Cookie` no acepta atributos como `HttpOnly`, `SameSite`, etc.
+Al extraer la cookie de la respuesta para reenviarla en tests E2E, hay que hacer `split(';')[0]` para quedarse solo con `userSession=<value>`. El header `Cookie` no acepta atributos como `HttpOnly`, `SameSite`, etc.
 
 ```typescript
 const fullCookie = res.headers['set-cookie'][0]
-const refreshTokenCookie = fullCookie.split(';')[0] // "refreshToken=<value>"
+const userSessionCookie = fullCookie.split(';')[0] // "userSession=<value>"
 ```
 
 ### `APP_FILTER` con `useExisting` en `SharedModule`
@@ -723,7 +747,7 @@ No `useClass`, porque `useClass` crea una instancia separada sin DI del módulo 
 
 ### `UserRegistrar`: save secuencial (FK constraint)
 
-`user` se guarda antes que `refreshToken` porque `refresh_tokens.user_id` tiene FK → `users.id`. Un save paralelo o invertido lanza error de FK en Postgres.
+`user` se guarda antes que `userSession` porque `user_sessions.user_id` tiene FK → `users.id`. Un save paralelo o invertido lanza error de FK en Postgres.
 
 ### Domain Event Publisher actual: Noop
 

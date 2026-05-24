@@ -10,7 +10,7 @@ classDiagram
     }
 
     class GuestAuthenticator {
-        -refreshTokenRepo: RefreshTokenRepository
+        -userSessionRepo: UserSessionRepository
         -tokenService: TokenService
         -logger: Logger
         +execute(params): Promise~GuestAuthenticatorResult~
@@ -18,12 +18,12 @@ classDiagram
 
     class TokenService {
         <<interface>>
-        +generateGuest(params): { accessToken, refreshTokenId }
-        +generatePair(params): { accessToken, refreshTokenId }
+        +generateGuest(params): { accessToken, userSessionId }
+        +generatePair(params): { accessToken, userSessionId }
         +verifyAccess(token): UserContext
     }
 
-    class RefreshToken {
+    class UserSession {
         +id: string
         +tokenId: string
         +userId: string | null
@@ -31,19 +31,19 @@ classDiagram
         +expiresAt: Date
         +revokedAt: Date | null
         +createdAt: Date
-        +create(id, tokenId, userId, deviceId)$ RefreshToken
+        +create(id, tokenId, userId, deviceId)$ UserSession
         +isRevoked(): boolean
         +isExpired(): boolean
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
-        +match(criteria): Promise~RefreshToken[]~
+        +match(criteria): Promise~UserSession[]~
         +save(token): Promise~void~
     }
 
     GuestAuthPostController --> GuestAuthenticator : invoca
     GuestAuthenticator --> TokenService : generateGuest
-    GuestAuthenticator --> RefreshToken : crea instancia
-    GuestAuthenticator --> RefreshTokenRepository : persiste
+    GuestAuthenticator --> UserSession : crea instancia
+    GuestAuthenticator --> UserSessionRepository : persiste
 ```
