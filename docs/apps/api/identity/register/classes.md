@@ -5,7 +5,7 @@
 ```mermaid
 classDiagram
     class RegisterAuthPostController {
-        -useCase: UserRegisterer
+        -useCase: UserRegistrar
         +handler(payload, res): Promise~void~
     }
 
@@ -16,13 +16,13 @@ classDiagram
         +guestDeviceId?: string
     }
 
-    class UserRegisterer {
+    class UserRegistrar {
         -userRepo: UserRepository
         -refreshTokenRepo: RefreshTokenRepository
-        -passwordService: PasswordService
-        -tokenService: TokenService
+        -passwordHasher: PasswordHasher
+        -tokenGenerator: TokenGenerator
         -publisher: DomainEventPublisher
-        +execute(req): Promise~UserRegisterResult~
+        +execute(req): Promise~UserRegistrarResult~
     }
 
     class User {
@@ -45,11 +45,10 @@ classDiagram
         +occurredOn: Date
     }
 
-    class PasswordService {
+    class PasswordHasher {
         <<interface>>
         +hash(plain, cost): Promise~string~
         +compare(plain, hash): Promise~boolean~
-        +validatePolicy(plain): void
     }
 
     class DomainEventPublisher {
@@ -58,11 +57,11 @@ classDiagram
     }
 
     RegisterAuthPostController --> RegisterAuthPostPayload : valida
-    RegisterAuthPostController --> UserRegisterer : invoca
-    UserRegisterer --> User : crea via register()
-    UserRegisterer --> UserRegisteredEvent : emite via User
-    UserRegisterer --> PasswordService : hashea + valida
-    UserRegisterer --> DomainEventPublisher : publica eventos
-    UserRegisterer --> UserRepository : verifica unicidad + save
-    UserRegisterer --> RefreshTokenRepository : persiste token
+    RegisterAuthPostController --> UserRegistrar : invoca
+    UserRegistrar --> User : crea via register()
+    UserRegistrar --> UserRegisteredEvent : emite via User
+    UserRegistrar --> PasswordHasher : hashea password
+    UserRegistrar --> DomainEventPublisher : publica eventos
+    UserRegistrar --> UserRepository : verifica unicidad + save
+    UserRegistrar --> RefreshTokenRepository : persiste token
 ```

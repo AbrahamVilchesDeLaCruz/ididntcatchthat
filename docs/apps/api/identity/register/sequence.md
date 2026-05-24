@@ -8,8 +8,8 @@
 sequenceDiagram
     actor Client
     participant C as RegisterAuthPostController
-    participant UC as UserRegisterer
-    participant PS as PasswordService
+    participant UC as UserRegistrar
+    participant PH as PasswordHasher
     participant U as User
     participant UREPO as UserRepository
     participant RTREPO as RefreshTokenRepository
@@ -25,8 +25,8 @@ sequenceDiagram
     UC->>UREPO: match(criteria { nickname })
     UREPO-->>UC: [] ← nickname libre
 
-    UC->>PS: hash(password, cost=12)
-    PS-->>UC: passwordHash
+    UC->>PH: hash(password, cost=12)
+    PH-->>UC: passwordHash
 
     UC->>U: User.register(id, email, passwordHash, nickname, null, 'user', null)
     U->>U: record(new UserRegisteredEvent(...))
@@ -48,9 +48,9 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant UC as UserRegisterer
+    participant UC as UserRegistrar
     participant UREPO as UserRepository
-    participant PS as PasswordService
+    participant PH as PasswordHasher
 
     alt Email ya registrado
         UC->>UREPO: match(criteria { email })
@@ -61,7 +61,7 @@ sequenceDiagram
         UREPO-->>UC: [existingUser]
         UC-->>UC: throw NicknameAlreadyTaken → 409
     else Password débil
-        UC->>PS: validatePolicy("abc")
-        PS-->>UC: throw WeakPassword → 422
+        UC->>PH: hash("abc")
+        PH-->>UC: throw WeakPassword → 422
     end
 ```

@@ -85,21 +85,21 @@
   - Test: access token con payload correcto, `deviceId` retornado, refresh token persistido.
   - Mother: `RequestGuestAuthenticatorMother`.
 
-- [x] **TASK-AUTH-14** — `UserRegisterer`
+- [x] **TASK-AUTH-14** — `UserRegistrar`
   - Verifica unicidad email/nickname via `match(criteria)`, valida password policy, hashea, crea `User`, publica eventos, lanza `GuestProgressMigrator` fire-and-forget si aplica.
   - Test: registro exitoso, `EmailAlreadyTaken`, `NicknameAlreadyTaken`, `WeakPassword`, evento publicado.
-  - Mother: `RequestUserRegistererMother`.
+  - Mother: `RequestUserRegistrarMother`.
 
-- [x] **TASK-AUTH-15** — `UserLogger`
+- [x] **TASK-AUTH-15** — `UserAuthenticator`
   - Busca por email via `match(criteria)`, compara hash, genera tokens.
   - Test: login exitoso, email inexistente → `InvalidCredentials`, password incorrecta → mismo `InvalidCredentials`.
-  - Mother: `RequestUserLoggerMother`.
+  - Mother: `RequestUserAuthenticatorMother`.
 
 - [x] **TASK-AUTH-16** — `TokenRefresher`
   - Busca token, verifica expiración, rotation. Detección de token reusado → revocar todos + `UserSessionCompromised`.
   - Test: refresh exitoso, token revocado, token expirado, token reutilizado (todos los del user revocados).
 
-- [x] **TASK-AUTH-17** — `UserLogouter`
+- [x] **TASK-AUTH-17** — `SessionRevoker`
   - Revoca refresh token.
   - Test: logout exitoso, token ya revocado (idempotente — no lanza error).
 

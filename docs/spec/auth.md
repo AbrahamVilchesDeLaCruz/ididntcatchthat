@@ -131,12 +131,12 @@ RefreshTokenRepository
 
 ```
 GuestAuthenticator       → RefreshTokenRepository
-UserRegisterer           → UserRepository, RefreshTokenRepository
+UserRegistrar           → UserRepository, RefreshTokenRepository
                            ··> GuestProgressMigrator (fire-and-forget)
-UserLogger               → UserRepository, RefreshTokenRepository
+UserAuthenticator               → UserRepository, RefreshTokenRepository
                            ··> GuestProgressMigrator (fire-and-forget)
 TokenRefresher           → RefreshTokenRepository
-UserLogouter             → RefreshTokenRepository
+SessionRevoker             → RefreshTokenRepository
 GoogleOAuthHandler       → UserRepository, RefreshTokenRepository
                            ··> GuestProgressMigrator (fire-and-forget)
 GuestProgressMigrator    → (games/attempts repos — fuera de este BC)
@@ -329,7 +329,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 
 ---
 
-### `UserRegisterer`
+### `UserRegistrar`
 
 **Entrada**: `{ email: string, password: string, nickname: string, guestDeviceId?: string }`  
 **Salida**: `{ accessToken: string }` + cookie `refreshToken` (seteada por el controller)
@@ -349,7 +349,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 
 ---
 
-### `UserLogger`
+### `UserAuthenticator`
 
 **Entrada**: `{ email: string, password: string, guestDeviceId?: string }`  
 **Salida**: `{ accessToken: string }`
@@ -379,7 +379,7 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 
 ---
 
-### `UserLogouter`
+### `SessionRevoker`
 
 **Entrada**: `{ tokenId: string }`  
 **Salida**: `void`
@@ -437,10 +437,10 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 | Método | Ruta                    | Use Case                | Auth               |
 | ------ | ----------------------- | ----------------------- | ------------------ |
 | `POST` | `/auth/guest`           | `GuestAuthenticator`    | Ninguna            |
-| `POST` | `/auth/register`        | `UserRegisterer`        | Ninguna            |
-| `POST` | `/auth/login`           | `UserLogger`            | Ninguna            |
+| `POST` | `/auth/register`        | `UserRegistrar`        | Ninguna            |
+| `POST` | `/auth/login`           | `UserAuthenticator`            | Ninguna            |
 | `POST` | `/auth/refresh`         | `TokenRefresher`        | Cookie refresh     |
-| `POST` | `/auth/logout`          | `UserLogouter`          | Cookie refresh     |
+| `POST` | `/auth/logout`          | `SessionRevoker`          | Cookie refresh     |
 | `GET`  | `/auth/google`          | —                       | Ninguna (redirect) |
 | `GET`  | `/auth/google/callback` | `GoogleOAuthHandler`    | Ninguna            |
 | `POST` | `/auth/migrate-guest`   | `GuestProgressMigrator` | Bearer (user)      |
@@ -541,13 +541,13 @@ apps/api/src/
       guest/
         guest-authenticator.ts
       register/
-        user-registerer.ts
+        user-registrar.ts
       login/
-        user-logger.ts
+        user-authenticator.ts
       refresh/
         token-refresher.ts
       logout/
-        user-logouter.ts
+        session-revoker.ts
       google/
         google-oauth-handler.ts
       migrate-guest/
@@ -589,15 +589,15 @@ apps/api/test/
         guest-authenticator.spec.ts
         request-guest-authenticator-mother.ts
       register/
-        user-registerer.spec.ts
-        request-user-registerer-mother.ts
+        user-registrar.spec.ts
+        request-user-registrar-mother.ts
       login/
-        user-logger.spec.ts
-        request-user-logger-mother.ts
+        user-authenticator.spec.ts
+        request-user-authenticator-mother.ts
       refresh/
         token-refresher.spec.ts
       logout/
-        user-logouter.spec.ts
+        session-revoker.spec.ts
       migrate-guest/
         guest-progress-migrator.spec.ts
   shared/
@@ -721,7 +721,7 @@ Para que el filtro global de excepciones sea DI-aware (y pueda inyectar `GlobalE
 
 No `useClass`, porque `useClass` crea una instancia separada sin DI del módulo completo.
 
-### `UserRegisterer`: save secuencial (FK constraint)
+### `UserRegistrar`: save secuencial (FK constraint)
 
 `user` se guarda antes que `refreshToken` porque `refresh_tokens.user_id` tiene FK → `users.id`. Un save paralelo o invertido lanza error de FK en Postgres.
 

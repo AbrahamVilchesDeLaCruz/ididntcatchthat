@@ -5,7 +5,7 @@
 ```mermaid
 classDiagram
     class LoginAuthPostController {
-        -useCase: UserLogger
+        -authenticator: UserAuthenticator
         +handler(payload, res): Promise~void~
     }
 
@@ -15,12 +15,12 @@ classDiagram
         +guestDeviceId?: string
     }
 
-    class UserLogger {
+    class UserAuthenticator {
         -userRepo: UserRepository
         -refreshTokenRepo: RefreshTokenRepository
-        -passwordService: PasswordService
-        -tokenService: TokenService
-        +execute(req): Promise~UserLoginResult~
+        -passwordHasher: PasswordHasher
+        -tokenGenerator: TokenGenerator
+        +execute(req): Promise~UserAuthenticatorResult~
     }
 
     class User {
@@ -32,7 +32,7 @@ classDiagram
         +toPrimitives(): UserPrimitives
     }
 
-    class PasswordService {
+    class PasswordHasher {
         <<interface>>
         +compare(plain, hash): Promise~boolean~
     }
@@ -43,10 +43,10 @@ classDiagram
     }
 
     LoginAuthPostController --> LoginAuthPostPayload : valida
-    LoginAuthPostController --> UserLogger : invoca
-    UserLogger --> UserRepository : busca por email
-    UserLogger --> PasswordService : compara hash
-    UserLogger --> RefreshTokenRepository : persiste token
-    UserLogger ..> InvalidCredentials : lanza si email/password inválidos
-    PasswordService ..> User : usa passwordHash de
+    LoginAuthPostController --> UserAuthenticator : invoca
+    UserAuthenticator --> UserRepository : busca por email
+    UserAuthenticator --> PasswordHasher : compara hash
+    UserAuthenticator --> RefreshTokenRepository : persiste token
+    UserAuthenticator ..> InvalidCredentials : lanza si email/password inválidos
+    PasswordHasher ..> User : usa passwordHash de
 ```

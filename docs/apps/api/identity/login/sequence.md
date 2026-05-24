@@ -8,25 +8,25 @@
 sequenceDiagram
     actor Client
     participant C as LoginAuthPostController
-    participant UC as UserLogger
+    participant UC as UserAuthenticator
     participant UREPO as UserRepository
-    participant PS as PasswordService
-    participant TS as TokenService
+    participant PH as PasswordHasher
+    participant TG as TokenGenerator
     participant RTREPO as RefreshTokenRepository
 
     Client->>C: POST /auth/login { email, password }
-    C->>UC: execute({ email, password })
+    C->>UC: execute({ email, password, deviceId, fingerprint, ip })
 
     UC->>UREPO: match(criteria { email })
     UREPO-->>UC: [user]
 
-    UC->>PS: compare(password, user.passwordHash)
-    PS-->>UC: true
+    UC->>PH: compare(password, user.passwordHash)
+    PH-->>UC: true
 
-    UC->>TS: signAccessToken({ type:"user", userId, email, role })
-    TS-->>UC: accessToken
+    UC->>TG: generatePair({ type:"user", userId, deviceId, fingerprint, ip, roles })
+    TG-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RTREPO: save(new RefreshToken({ userId, deviceId, expiresAt: +30d }))
+    UC->>RTREPO: save(new RefreshToken({ userId, deviceId, ... }))
     RTREPO-->>UC: void
 
     UC-->>C: { accessToken, refreshTokenId }
@@ -38,9 +38,9 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant UC as UserLogger
+    participant UC as UserAuthenticator
     participant UREPO as UserRepository
-    participant PS as PasswordService
+    participant PH as PasswordHasher
 
     alt Email no existe
         UC->>UREPO: match(criteria { email })
@@ -48,8 +48,8 @@ sequenceDiagram
         UC-->>UC: throw InvalidCredentials → 401
         Note over UC: Mismo error que password incorrecta
     else Password incorrecta
-        UC->>PS: compare(password, hash)
-        PS-->>UC: false
+        UC->>PH: compare(password, hash)
+        PH-->>UC: false
         UC-->>UC: throw InvalidCredentials → 401
         Note over UC: No se revela qué campo falló
     end

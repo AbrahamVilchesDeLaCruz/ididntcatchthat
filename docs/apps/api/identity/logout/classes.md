@@ -3,7 +3,7 @@
 ```mermaid
 classDiagram
     class LogoutAuthPostController {
-        -logouter: UserLogouter
+        -sessionRevoker: SessionRevoker
         +handler(req, res, user): Promise~void~
     }
 
@@ -15,7 +15,7 @@ classDiagram
         <<decorator>>
     }
 
-    class UserLogouter {
+    class SessionRevoker {
         -refreshTokenRepository: RefreshTokenRepository
         +execute(params): Promise~void~
     }
@@ -39,10 +39,10 @@ classDiagram
         +filters: Filter[]
     }
 
-    LogoutAuthPostController --> UserLogouter
+    LogoutAuthPostController --> SessionRevoker
     LogoutAuthPostController ..> JwtAuthGuard
     LogoutAuthPostController ..> CurrentUser
-    UserLogouter --> RefreshTokenRepository
-    UserLogouter --> RefreshToken
-    UserLogouter --> Criteria
+    SessionRevoker --> RefreshTokenRepository
+    SessionRevoker --> RefreshToken
+    SessionRevoker --> Criteria
 ```

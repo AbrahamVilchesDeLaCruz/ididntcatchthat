@@ -9,7 +9,7 @@ sequenceDiagram
     actor Client
     participant Guard as JwtAuthGuard
     participant Controller as LogoutAuthPostController
-    participant UC as UserLogouter
+    participant UC as SessionRevoker
     participant RefreshRepo as RefreshTokenRepository
     participant DB as PostgreSQL
 
