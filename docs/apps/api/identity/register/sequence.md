@@ -17,7 +17,7 @@ sequenceDiagram
 
     Client->>C: POST /auth/register { email, password, nickname }
 
-    C->>UC: execute({ email, password, nickname })
+    C->>UC: execute({ email, password, nickname, deviceId, fingerprint, ip })
 
     UC->>UREPO: match(criteria { email })
     UREPO-->>UC: [] ← email libre
@@ -25,13 +25,10 @@ sequenceDiagram
     UC->>UREPO: match(criteria { nickname })
     UREPO-->>UC: [] ← nickname libre
 
-    UC->>PS: validatePolicy(password)
-    Note over PS: min 8 chars, 1 mayúscula, 1 número
-
     UC->>PS: hash(password, cost=12)
     PS-->>UC: passwordHash
 
-    UC->>U: User.register(id, email, passwordHash, nickname, role:"user")
+    UC->>U: User.register(id, email, passwordHash, nickname, null, 'user', null)
     U->>U: record(new UserRegisteredEvent(...))
     U-->>UC: user
 

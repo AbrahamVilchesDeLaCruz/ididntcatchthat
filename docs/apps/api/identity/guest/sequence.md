@@ -8,25 +8,23 @@ sequenceDiagram
     participant C as GuestAuthPostController
     participant UC as GuestAuthenticator
     participant TS as TokenService
-    participant RT as RefreshToken
     participant RTREPO as RefreshTokenRepository
 
-    Client->>C: POST /auth/guest { userAgent, acceptLanguage, ip }
-    C->>UC: execute({ userAgent, acceptLanguage, ip })
+    Client->>C: POST /auth/guest { fingerprint, ip }
+    C->>UC: execute({ fingerprint, ip })
 
-    UC->>UC: deviceId = UserId.generate()
-    UC->>UC: fingerprint = sha256(userAgent + acceptLanguage + ip)
+    UC->>UC: deviceId = crypto.randomUUID()
 
-    UC->>TS: signAccessToken({ type:"guest", deviceId, fingerprint, ip }, TTL:15m)
-    TS-->>UC: accessToken
+    UC->>TS: generateGuest({ deviceId, fingerprint, ip })
+    TS-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RT: new RefreshToken({ id, tokenId, userId: null, deviceId, expiresAt: +30d })
-    Note over RT: userId es null — no hay User en DB para guests
+    UC->>UC: RefreshToken.create(id, refreshTokenId, null, deviceId)
+    Note over UC: userId es null — no hay User en DB para guests
 
     UC->>RTREPO: save(refreshToken)
     RTREPO-->>UC: void
 
-    UC-->>C: { accessToken, refreshTokenId }
+    UC-->>C: { accessToken, deviceId }
 
     C->>C: res.cookie("refreshToken", refreshTokenId, { httpOnly, sameSite:"strict" })
     C-->>Client: 200 { accessToken, deviceId }

@@ -28,7 +28,7 @@ classDiagram
         +isExpired(): boolean
         +isRevoked(): boolean
         +revoke(): RefreshToken
-        +create(params)$ RefreshToken
+        +create(id, tokenId, userId, deviceId)$ RefreshToken
         +fromPrimitives(p)$ RefreshToken
         +toPrimitives(): RefreshTokenPrimitives
     }

@@ -76,7 +76,7 @@ sequenceDiagram
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
     TokenSvc-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RefreshRepo: save(RefreshToken.create({ tokenId: refreshTokenId, userId, deviceId }))
+    UC->>RefreshRepo: save(RefreshToken.create(id, refreshTokenId, userId, deviceId))
     RefreshRepo->>DB: INSERT refresh_token
 
     UC-->>Controller: { accessToken }

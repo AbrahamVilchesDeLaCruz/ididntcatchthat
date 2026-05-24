@@ -44,6 +44,7 @@ import { GuestProgressMigrator } from '@/identity/application/migrate-guest/gues
 
 // Domain services
 import { NicknameResolverService } from '@/identity/application/nickname-resolver.service';
+import { UserSearcher } from '@/identity/domain/user-searcher';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -87,6 +88,7 @@ import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
 
     // Domain services
     NicknameResolverService,
+    UserSearcher,
 
     // Use cases
     GuestAuthenticator,

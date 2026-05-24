@@ -12,7 +12,8 @@ sequenceDiagram
     participant CallbackController as GoogleCallbackAuthGetController
     participant Guard as GoogleAuthGuard (Passport)
     participant Google as Google OAuth2
-    participant UC as GoogleOAuthHandler
+    participant UC as OAuthAuthenticator
+    participant Searcher as UserSearcher
     participant UserRepo as UserRepository
     participant NicknameResolver as NicknameResolverService
     participant RefreshRepo as RefreshTokenRepository
@@ -29,43 +30,46 @@ sequenceDiagram
     Google->>CallbackController: GET /auth/google/callback?code=...
     CallbackController->>Guard: GoogleAuthGuard validates code
     Guard->>Google: Exchange code for profile
-    Google-->>Guard: { email, googleId, displayName }
+    Google-->>Guard: { email, googleId, displayName, avatarUrl }
     Guard-->>CallbackController: UserContext injected via @CurrentUser
 
-    CallbackController->>CallbackController: Build fingerprint<br/>Assign deviceId
+    CallbackController->>CallbackController: Build fingerprint<br/>Extract deviceId from cookie
 
-    CallbackController->>UC: execute({ id, email, googleId, avatarUrl, displayName, deviceId, fingerprint, ip })
+    CallbackController->>UC: execute(id, email, avatarUrl, displayName, deviceId, fingerprint, ip)
 
-    UC->>UserRepo: match(Criteria[email = email])
+    UC->>Searcher: search(email)
+    Searcher->>UserRepo: match(Criteria[email = email])
     UserRepo->>DB: SELECT WHERE email = ?
     DB-->>UserRepo: User | null
-    UserRepo-->>UC: [existing] | []
+    UserRepo-->>Searcher: [existing] | []
+    Searcher-->>UC: existing | null
 
     alt existing user
-        UC->>UserRepo: save(user.withAvatar(avatarUrl))
+        UC->>UC: user = avatarUrl ? user.addAvatar(avatarUrl) : user
+        UC->>UserRepo: save(user)
         UserRepo->>DB: UPDATE users SET avatar_url = ?
-        Note over UC: isNewUser = false
+        Note over UC: isNewUser = false — no events published
     else new user
         UC->>NicknameResolver: resolve(displayName)
         NicknameResolver-->>UC: unique nickname
 
-        UC->>UC: User.register({ id, email, passwordHash: null,<br/>nickname, avatarUrl, role: user,<br/>oauthProvider: google, deviceId })
+        UC->>UC: User.register(id, email, null, nickname, avatarUrl, 'user', 'google')
 
         UC->>UserRepo: save(user)
         UserRepo->>DB: INSERT users
 
-        UC->>Publisher: publish(UserRegistered event)
+        UC->>Publisher: publish(user.pullDomainEvents())
         Note over UC: isNewUser = true
     end
 
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
     TokenSvc-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RefreshRepo: save(RefreshToken.create({ tokenId: refreshTokenId, userId, deviceId }))
+    UC->>RefreshRepo: save(RefreshToken.create(id, refreshTokenId, userId, deviceId))
     RefreshRepo->>DB: INSERT refresh_token
 
-    UC-->>CallbackController: { accessToken, isNewUser }
+    UC-->>CallbackController: { accessToken }
 
     CallbackController->>CallbackController: res.cookie('refreshToken', deviceId, httpOnly)
-    CallbackController-->>Client: 200 OK<br/>{ accessToken, isNewUser }<br/>Cookie: refreshToken=<deviceId>
+    CallbackController-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: refreshToken=<deviceId>
 ```

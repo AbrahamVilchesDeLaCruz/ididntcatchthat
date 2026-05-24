@@ -12,14 +12,15 @@ classDiagram
     class GuestAuthenticator {
         -refreshTokenRepo: RefreshTokenRepository
         -tokenService: TokenService
-        +execute(req): Promise~GuestAuthResult~
+        -logger: Logger
+        +execute(params): Promise~GuestAuthenticatorResult~
     }
 
     class TokenService {
         <<interface>>
-        +signAccessToken(payload, ttl): string
-        +signRefreshToken(payload, ttl): string
-        +verifyAccessToken(token): JwtPayload
+        +generateGuest(params): { accessToken, refreshTokenId }
+        +generatePair(params): { accessToken, refreshTokenId }
+        +verifyAccess(token): UserContext
     }
 
     class RefreshToken {
@@ -30,6 +31,7 @@ classDiagram
         +expiresAt: Date
         +revokedAt: Date | null
         +createdAt: Date
+        +create(id, tokenId, userId, deviceId)$ RefreshToken
         +isRevoked(): boolean
         +isExpired(): boolean
     }
@@ -37,13 +39,11 @@ classDiagram
     class RefreshTokenRepository {
         <<interface>>
         +match(criteria): Promise~RefreshToken[]~
-        +search(id): Promise~RefreshToken | null~
         +save(token): Promise~void~
-        +remove(id): Promise~void~
     }
 
     GuestAuthPostController --> GuestAuthenticator : invoca
-    GuestAuthenticator --> TokenService : firma JWT
+    GuestAuthenticator --> TokenService : generateGuest
     GuestAuthenticator --> RefreshToken : crea instancia
     GuestAuthenticator --> RefreshTokenRepository : persiste
 ```
