@@ -13,13 +13,13 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GoogleAuthGuard } from '@/shared/infrastructure/auth/google.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { GoogleOAuthHandler } from '@/identity/application/google/google-oauth-handler';
+import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-authenticator';
 import crypto from 'crypto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class GoogleCallbackAuthGetController {
-  constructor(private readonly oauthHandler: GoogleOAuthHandler) {}
+  constructor(private readonly authenticator: OAuthAuthenticator) {}
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
@@ -32,22 +32,19 @@ export class GoogleCallbackAuthGetController {
     @Headers('accept-language') acceptLanguage: string,
     @Res({ passthrough: true }) res: Response,
     @CurrentUser() profile: UserContext,
-  ): Promise<{ accessToken: string; isNewUser: boolean }> {
-    const fingerprint = Buffer.from(
-      `${userAgent ?? ''}|${acceptLanguage ?? ''}|${ip ?? ''}`,
-    ).toString('base64');
+  ): Promise<{ accessToken: string }> {
+    const fingerprint = this.generateFingerprint(userAgent, acceptLanguage, ip);
     const deviceId = profile.deviceId ?? crypto.randomUUID();
 
-    const result = await this.oauthHandler.execute({
-      id: crypto.randomUUID(),
-      email: profile.email ?? '',
-      googleId: profile.userId ?? '',
-      avatarUrl: null,
-      displayName: profile.email?.split('@')[0] ?? 'user',
+    const result = await this.authenticator.execute(
+      crypto.randomUUID(),
+      profile.email ?? '',
+      null,
+      profile.email?.split('@')[0] ?? 'user',
       deviceId,
       fingerprint,
-      ip: ip ?? '',
-    });
+      ip ?? '',
+    );
 
     res.cookie('refreshToken', deviceId, {
       httpOnly: true,
@@ -56,6 +53,16 @@ export class GoogleCallbackAuthGetController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    return { accessToken: result.accessToken, isNewUser: result.isNewUser };
+    return { accessToken: result.accessToken };
+  }
+
+  private generateFingerprint(
+    userAgent: string,
+    acceptLanguage: string,
+    ip: string,
+  ): string {
+    return Buffer.from(
+      `${userAgent ?? ''}|${acceptLanguage ?? ''}|${ip ?? ''}`,
+    ).toString('base64');
   }
 }

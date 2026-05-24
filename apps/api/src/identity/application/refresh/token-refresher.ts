@@ -92,12 +92,12 @@ export class TokenRefresher {
       roles: [user.role.value],
     });
 
-    const newToken = RefreshToken.create({
-      id: crypto.randomUUID(),
-      tokenId: refreshTokenId,
-      userId: user.id.value,
-      deviceId: params.deviceId,
-    });
+    const newToken = RefreshToken.create(
+      crypto.randomUUID(),
+      refreshTokenId,
+      user.id.value,
+      params.deviceId,
+    );
 
     await this.refreshTokenRepository.save(newToken);
 

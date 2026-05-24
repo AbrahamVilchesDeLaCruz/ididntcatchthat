@@ -42,26 +42,25 @@ export class User extends AggregateRoot<UserPrimitives> {
     super();
   }
 
-  static register(params: {
-    id: UserId;
-    email: Email;
-    passwordHash: PasswordHash | null;
-    nickname: Nickname;
-    avatarUrl: string | null;
-    role: UserRole;
-    oauthProvider: OauthProvider | null;
-    deviceId: string;
-  }): User {
+  static register(
+    id: string,
+    email: string,
+    passwordHash: string | null,
+    nickname: string,
+    avatarUrl: string | null,
+    role: string,
+    oauthProvider: string | null,
+  ): User {
     const now = new Date();
 
     const user = new User(
-      params.id,
-      params.email,
-      params.passwordHash,
-      params.nickname,
-      params.avatarUrl,
-      params.role,
-      params.oauthProvider,
+      new UserId(id),
+      new Email(email),
+      passwordHash ? new PasswordHash(passwordHash) : null,
+      new Nickname(nickname),
+      avatarUrl,
+      UserRole.create(role),
+      oauthProvider ? OauthProvider.create(oauthProvider) : null,
       true,
       0,
       0,
@@ -70,13 +69,7 @@ export class User extends AggregateRoot<UserPrimitives> {
       now,
     );
 
-    user.record(
-      new UserRegisteredEvent(params.id.value, {
-        email: params.email.value,
-        nickname: params.nickname.value,
-        deviceId: params.deviceId,
-      }),
-    );
+    user.record(new UserRegisteredEvent(user.id.value, user.toPrimitives()));
 
     return user;
   }
@@ -99,22 +92,11 @@ export class User extends AggregateRoot<UserPrimitives> {
     );
   }
 
-  withAvatar(avatarUrl: string): User {
-    return new User(
-      this.id,
-      this.email,
-      this.passwordHash,
-      this.nickname,
+  addAvatar(avatarUrl: string): User {
+    return User.fromPrimitives({
+      ...this.toPrimitives(),
       avatarUrl,
-      this.role,
-      this.oauthProvider,
-      this.showInRanking,
-      this.currentStreak,
-      this.longestStreak,
-      this.lastActivityDate,
-      this.createdAt,
-      new Date(),
-    );
+    });
   }
 
   toPrimitives(): UserPrimitives {

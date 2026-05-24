@@ -1,10 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/domain/user';
-import { UserId } from '@/identity/domain/user-id';
 import { Email } from '@/identity/domain/email';
-import { PasswordHash } from '@/identity/domain/password-hash';
 import { Nickname } from '@/identity/domain/nickname';
-import { UserRole } from '@/identity/domain/user-role';
 import { Criteria } from '@/shared/domain/criteria';
 import { EmailAlreadyTakenException } from '@/identity/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/domain/exceptions/nickname-already-taken.exception';
@@ -62,8 +59,8 @@ export class UserRegisterer {
     fingerprint: string;
     ip: string;
   }): Promise<UserRegistererResult> {
-    const email = new Email(params.email);
-    const nickname = new Nickname(params.nickname);
+    new Email(params.email);
+    new Nickname(params.nickname);
 
     const [byEmail, byNickname] = await Promise.all([
       this.userRepository.match(
@@ -82,16 +79,15 @@ export class UserRegisterer {
 
     const passwordHash = await this.passwordService.hash(params.password);
 
-    const user = User.register({
-      id: new UserId(params.id),
-      email,
-      passwordHash: new PasswordHash(passwordHash),
-      nickname,
-      avatarUrl: null,
-      role: UserRole.create('user'),
-      oauthProvider: null,
-      deviceId: params.deviceId,
-    });
+    const user = User.register(
+      params.id,
+      params.email,
+      passwordHash,
+      params.nickname,
+      null,
+      'user',
+      null,
+    );
 
     const { accessToken, refreshTokenId } = this.tokenService.generatePair({
       type: 'user',
@@ -102,12 +98,12 @@ export class UserRegisterer {
       roles: [user.role.value],
     });
 
-    const refreshToken = RefreshToken.create({
-      id: crypto.randomUUID(),
-      tokenId: refreshTokenId,
-      userId: user.id.value,
-      deviceId: params.deviceId,
-    });
+    const refreshToken = RefreshToken.create(
+      crypto.randomUUID(),
+      refreshTokenId,
+      user.id.value,
+      params.deviceId,
+    );
 
     await this.userRepository.save(user);
     await this.refreshTokenRepository.save(refreshToken);

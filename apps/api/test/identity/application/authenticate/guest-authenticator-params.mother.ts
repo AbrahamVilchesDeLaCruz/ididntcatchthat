@@ -1,15 +1,15 @@
 import { StringMother } from '@test/shared/domain/string-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
-type RequestGuestAuthenticator = {
+type GuestAuthenticatorParams = {
   fingerprint: string;
   ip: string;
 };
 
-export class RequestGuestAuthenticatorMother {
+export class GuestAuthenticatorParamsMother {
   static random(
-    overrides?: Partial<RequestGuestAuthenticator>,
-  ): RequestGuestAuthenticator {
+    overrides?: Partial<GuestAuthenticatorParams>,
+  ): GuestAuthenticatorParams {
     return {
       fingerprint: overrides?.fingerprint ?? UuidMother.random(),
       ip: overrides?.ip ?? StringMother.ip(),

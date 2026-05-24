@@ -38,12 +38,12 @@ export class GuestAuthenticator {
       ip: params.ip,
     });
 
-    const refreshToken = RefreshToken.create({
-      id: crypto.randomUUID(),
-      tokenId: refreshTokenId,
-      userId: null, // guests have no user account
+    const refreshToken = RefreshToken.create(
+      crypto.randomUUID(),
+      refreshTokenId,
+      null, // guests have no user account
       deviceId,
-    });
+    );
 
     await this.refreshTokenRepository.save(refreshToken);
 

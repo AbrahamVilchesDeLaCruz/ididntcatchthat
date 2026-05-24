@@ -10,15 +10,12 @@ export class RefreshTokenMother {
       deviceId: string;
     }>,
   ): RefreshToken {
-    return RefreshToken.create({
-      id: overrides?.id ?? UuidMother.random(),
-      tokenId: overrides?.tokenId ?? UuidMother.random(),
-      userId:
-        overrides?.userId !== undefined
-          ? overrides.userId
-          : UuidMother.random(),
-      deviceId: overrides?.deviceId ?? UuidMother.random(),
-    });
+    return RefreshToken.create(
+      overrides?.id ?? UuidMother.random(),
+      overrides?.tokenId ?? UuidMother.random(),
+      overrides?.userId !== undefined ? overrides.userId : UuidMother.random(),
+      overrides?.deviceId ?? UuidMother.random(),
+    );
   }
 
   static expired(

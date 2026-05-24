@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import { GoogleOAuthHandler } from '@/identity/application/google/google-oauth-handler';
+import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-authenticator';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type TokenService } from '@/identity/domain/token.service';
@@ -11,34 +11,10 @@ import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type User } from '@/identity/domain/user';
 import { UserMother } from '@test/identity/domain/user-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
-import { StringMother } from '@test/shared/domain/string-mother';
 import { EmailMother } from '@test/identity/domain/email-mother';
 import { JestTimers } from '@test/shared/jest-timers';
-
-type GoogleOAuthParams = {
-  id: string;
-  email: string;
-  googleId: string;
-  avatarUrl: string | null;
-  displayName: string;
-  deviceId: string;
-  fingerprint: string;
-  ip: string;
-};
-
-const makeParams = (
-  overrides?: Partial<GoogleOAuthParams>,
-): GoogleOAuthParams => ({
-  id: UuidMother.random(),
-  email: EmailMother.random().value,
-  googleId: UuidMother.random(),
-  avatarUrl: null,
-  displayName: 'Test User',
-  deviceId: UuidMother.random(),
-  fingerprint: UuidMother.random(),
-  ip: StringMother.ip(),
-  ...overrides,
-});
+import { type UserSearcher } from '@/identity/domain/user-searcher';
+import { OAuthAuthenticatorParamsMother } from './oauth-authenticator-params.mother';
 
 describe('identity/application/google GoogleOAuthHandler', () => {
   const userRepository = mock<UserRepository>();
@@ -47,16 +23,17 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   const publisher = mock<DomainEventPublisher>();
   const nicknameResolver = mock<NicknameResolverService>();
   const logger = mock<Logger>();
-  let useCase: GoogleOAuthHandler;
+  const searcher = mock<UserSearcher>();
+  let authenticator: OAuthAuthenticator;
 
   beforeEach((): void => {
     JestTimers.setup();
-    userRepository.match.mockReset();
     userRepository.save.mockReset();
     refreshTokenRepository.save.mockReset();
     tokenService.generatePair.mockReset();
     publisher.publish.mockReset();
     nicknameResolver.resolve.mockReset();
+    searcher.search.mockReset();
 
     tokenService.generatePair.mockReturnValue({
       accessToken: 'access-token',
@@ -65,27 +42,36 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     publisher.publish.mockResolvedValue(undefined);
     nicknameResolver.resolve.mockResolvedValue('test-user');
 
-    useCase = new GoogleOAuthHandler(
+    authenticator = new OAuthAuthenticator(
       userRepository,
       refreshTokenRepository,
       tokenService,
       publisher,
       nicknameResolver,
       logger,
+      searcher,
     );
   });
 
   afterEach(() => JestTimers.teardown());
 
   it('should create new user, emit UserRegisteredEvent and return isNewUser=true', async () => {
-    const params = makeParams();
+    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      OAuthAuthenticatorParamsMother.random();
 
     // no existing user by email, no nickname collision
-    userRepository.match.mockResolvedValue([]);
+    searcher.search.mockResolvedValue(null);
 
-    const result = await useCase.execute(params);
+    const result = await authenticator.execute(
+      id,
+      email,
+      avatarUrl,
+      displayName,
+      deviceId,
+      fingerprint,
+      ip,
+    );
 
-    expect(result.isNewUser).toBe(true);
     expect(result.accessToken).toBe('access-token');
     expect(userRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).toHaveBeenCalledTimes(1);
@@ -96,16 +82,24 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   it('should return existing user, update avatar and return isNewUser=false', async () => {
     const email = EmailMother.random().value;
     const existing = UserMother.random({ email });
-    const params = makeParams({
+    const { id, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      OAuthAuthenticatorParamsMother.random({
+        email,
+        avatarUrl: 'https://cdn.example.com/avatar.jpg',
+      });
+
+    searcher.search.mockResolvedValueOnce(existing);
+
+    await authenticator.execute(
+      id,
       email,
-      avatarUrl: 'https://cdn.example.com/avatar.jpg',
-    });
+      avatarUrl,
+      displayName,
+      deviceId,
+      fingerprint,
+      ip,
+    );
 
-    userRepository.match.mockResolvedValueOnce([existing]);
-
-    const result = await useCase.execute(params);
-
-    expect(result.isNewUser).toBe(false);
     expect(publisher.publish).not.toHaveBeenCalled();
     const saved: User = userRepository.save.mock.calls[0][0];
     expect(saved.avatarUrl).toBe('https://cdn.example.com/avatar.jpg');
@@ -113,22 +107,43 @@ describe('identity/application/google GoogleOAuthHandler', () => {
 
   it('should not emit event for existing user', async () => {
     const existing = UserMother.random();
-    const params = makeParams({ email: existing.email.value });
+    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      OAuthAuthenticatorParamsMother.random({ email: existing.email.value });
 
-    userRepository.match.mockResolvedValueOnce([existing]);
+    searcher.search.mockResolvedValueOnce(existing);
 
-    await useCase.execute(params);
+    await authenticator.execute(
+      id,
+      email,
+      avatarUrl,
+      displayName,
+      deviceId,
+      fingerprint,
+      ip,
+    );
 
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 
   it('should keep existing user unchanged when avatarUrl is null', async () => {
     const existing = UserMother.random();
-    const params = makeParams({ email: existing.email.value, avatarUrl: null });
+    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      OAuthAuthenticatorParamsMother.random({
+        email: existing.email.value,
+        avatarUrl: null,
+      });
 
-    userRepository.match.mockResolvedValueOnce([existing]);
+    searcher.search.mockResolvedValueOnce(existing);
 
-    await useCase.execute(params);
+    await authenticator.execute(
+      id,
+      email,
+      avatarUrl,
+      displayName,
+      deviceId,
+      fingerprint,
+      ip,
+    );
 
     // save is still called (to update session), but user is same instance (no withAvatar)
     const saved: User = userRepository.save.mock.calls[0][0];
@@ -136,12 +151,21 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   });
 
   it('should delegate nickname resolution to NicknameResolverService', async () => {
-    const params = makeParams({ displayName: 'John Doe 123' });
+    const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      OAuthAuthenticatorParamsMother.random({ displayName: 'John Doe 123' });
     nicknameResolver.resolve.mockResolvedValue('john-doe-123');
 
-    userRepository.match.mockResolvedValue([]);
+    searcher.search.mockResolvedValue(null);
 
-    await useCase.execute(params);
+    await authenticator.execute(
+      id,
+      email,
+      avatarUrl,
+      displayName,
+      deviceId,
+      fingerprint,
+      ip,
+    );
 
     expect(nicknameResolver.resolve).toHaveBeenCalledWith('John Doe 123');
     const saved: User = userRepository.save.mock.calls[0][0];

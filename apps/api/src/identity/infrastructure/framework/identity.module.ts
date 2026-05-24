@@ -34,12 +34,12 @@ import { MigrateGuestAuthPostController } from '@/identity/infrastructure/contro
 import { IdentityExceptionRegistry } from './identity-exception-registry';
 
 // Application — use cases
-import { GuestAuthenticator } from '@/identity/application/guest/guest-authenticator';
+import { GuestAuthenticator } from '@/identity/application/authenticate/guest-authenticator';
 import { UserRegisterer } from '@/identity/application/register/user-registerer';
 import { UserLogger } from '@/identity/application/login/user-logger';
 import { TokenRefresher } from '@/identity/application/refresh/token-refresher';
 import { UserLogouter } from '@/identity/application/logout/user-logouter';
-import { GoogleOAuthHandler } from '@/identity/application/google/google-oauth-handler';
+import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-authenticator';
 import { GuestProgressMigrator } from '@/identity/application/migrate-guest/guest-progress-migrator';
 
 // Domain services
@@ -94,7 +94,7 @@ import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
     UserLogger,
     TokenRefresher,
     UserLogouter,
-    GoogleOAuthHandler,
+    OAuthAuthenticator,
     GuestProgressMigrator,
 
     // Exception registry

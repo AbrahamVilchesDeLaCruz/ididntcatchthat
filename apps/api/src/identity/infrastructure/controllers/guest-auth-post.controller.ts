@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GuestAuthenticator } from '@/identity/application/guest/guest-authenticator';
+import { GuestAuthenticator } from '@/identity/application/authenticate/guest-authenticator';
 import { GuestAuthPostPayload } from './guest-auth-post.payload';
 
 @ApiTags('auth')

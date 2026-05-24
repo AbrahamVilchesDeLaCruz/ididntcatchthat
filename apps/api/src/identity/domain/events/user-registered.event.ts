@@ -2,19 +2,14 @@ import {
   DomainEvent,
   type DomainEventAttributes,
 } from '@/shared/domain/domain-event';
-
-type UserRegisteredAttributes = {
-  email: string;
-  nickname: string;
-  deviceId: string;
-};
+import type { UserPrimitives } from '../user';
 
 export class UserRegisteredEvent extends DomainEvent {
   static readonly EVENT_NAME = 'ididntcatchthat.identity.user.registered';
 
   constructor(
     aggregateId: string,
-    attributes: UserRegisteredAttributes,
+    attributes: UserPrimitives,
     eventId?: string,
     occurredOn?: Date,
   ) {
@@ -33,7 +28,7 @@ export class UserRegisteredEvent extends DomainEvent {
   ): UserRegisteredEvent {
     return new UserRegisteredEvent(
       aggregateId,
-      attributes as UserRegisteredAttributes,
+      attributes as UserPrimitives,
       eventId,
       occurredOn,
     );
