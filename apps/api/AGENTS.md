@@ -51,6 +51,37 @@ apps/api/src/
 
 **Regla de oro**: dependencias apuntan hacia adentro. `infrastructure` depende de `application`, `application` depende de `domain`. Nunca al revés.
 
+### Módulos DDD dentro de un Bounded Context
+
+Cuando un BC tiene **múltiples agregados**, se organiza por módulos DDD (Vaughn Vernon, IDDD):
+
+```
+apps/api/src/{bc}/
+├── {module-a}/           ← dueño del agregado A
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+│       ├── controllers/
+│       └── persistence/
+├── {module-b}/           ← dueño del agregado B
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+│       ├── controllers/
+│       └── persistence/
+└── shared/               ← lo que cruza módulos dentro del BC
+    ├── domain/           ← VOs o interfaces compartidas entre módulos
+    └── infrastructure/
+        ├── framework/    ← NestJS module del BC, exception registry, wiring
+        └── persistence/  ← stubs o repos compartidos
+```
+
+**Reglas:**
+- Si un BC tiene submódulos, **no puede haber capas sueltas (`domain/`, `application/`, `infrastructure/`) en la raíz del BC** — todo va en submódulos o en `shared/`
+- Un módulo = un agregado o concepto cohesivo (no una entidad cualquiera)
+- `shared/` dentro del BC es solo para lo que cruza módulos; el NestJS module del BC entero va en `shared/infrastructure/framework/`
+- Los tests espejean la misma estructura: `test/{bc}/{module}/`
+
 ---
 
 ## Stack

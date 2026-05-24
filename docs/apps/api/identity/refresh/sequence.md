@@ -11,12 +11,12 @@ sequenceDiagram
     actor Client
     participant Controller as RefreshAuthPostController
     participant UC as TokenRefresher
-    participant RefreshRepo as RefreshTokenRepository
+    participant RefreshRepo as UserSessionRepository
     participant UserRepo as UserRepository
-    participant TokenSvc as TokenService
+    participant TokenSvc as TokenGenerator
     participant DB as PostgreSQL
 
-    Client->>Controller: POST /auth/refresh<br/>Cookie: refreshToken=<tokenId>
+    Client->>Controller: POST /auth/refresh<br/>Cookie: userSession=<tokenId>
 
     Controller->>Controller: Extract tokenId from req.cookies<br/>Build fingerprint (UA + lang + IP)
 
@@ -24,11 +24,11 @@ sequenceDiagram
 
     UC->>RefreshRepo: match(Criteria[tokenId = tokenId])
     RefreshRepo->>DB: SELECT WHERE token_id = ?
-    DB-->>RefreshRepo: RefreshToken | null
+    DB-->>RefreshRepo: UserSession | null
     RefreshRepo-->>UC: [token] | []
 
     alt token not found
-        UC-->>Controller: throw InvalidRefreshTokenException
+        UC-->>Controller: throw InvalidUserSessionException
         Controller-->>Client: 401 Unauthorized
     end
 
@@ -36,7 +36,7 @@ sequenceDiagram
         Note over UC: Token reuse detected!
         UC->>RefreshRepo: match(Criteria[userId = token.userId])
         RefreshRepo->>DB: SELECT WHERE user_id = ?
-        DB-->>RefreshRepo: RefreshToken[]
+        DB-->>RefreshRepo: UserSession[]
         RefreshRepo-->>UC: allUserTokens
 
         loop for each active token
@@ -49,12 +49,12 @@ sequenceDiagram
     end
 
     alt token.isExpired()
-        UC-->>Controller: throw ExpiredRefreshTokenException
+        UC-->>Controller: throw ExpiredUserSessionException
         Controller-->>Client: 401 Unauthorized
     end
 
     alt token.userId === null (guest token)
-        UC-->>Controller: throw InvalidRefreshTokenException
+        UC-->>Controller: throw InvalidUserSessionException
         Controller-->>Client: 401 Unauthorized
     end
 
@@ -74,13 +74,13 @@ sequenceDiagram
     RefreshRepo->>DB: UPDATE SET revoked_at = NOW()
 
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
-    TokenSvc-->>UC: { accessToken, refreshTokenId }
+    TokenSvc-->>UC: { accessToken, userSessionId }
 
-    UC->>RefreshRepo: save(RefreshToken.create({ tokenId: refreshTokenId, userId, deviceId }))
-    RefreshRepo->>DB: INSERT refresh_token
+    UC->>RefreshRepo: save(UserSession.create(id, userSessionId, userId, deviceId))
+    RefreshRepo->>DB: INSERT user_session
 
     UC-->>Controller: { accessToken }
 
-    Controller->>Controller: res.cookie('refreshToken', tokenId, httpOnly)
-    Controller-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: refreshToken=<tokenId> (renovada)
+    Controller->>Controller: res.cookie('userSession', tokenId, httpOnly)
+    Controller-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: userSession=<tokenId> (renovada)
 ```

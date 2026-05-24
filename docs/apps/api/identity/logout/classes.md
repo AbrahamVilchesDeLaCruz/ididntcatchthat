@@ -1,9 +1,11 @@
-# Logout — Class Diagram
+# Logout — Diagrama de Clases
+
+> Artefactos involucrados en `POST /auth/logout`
 
 ```mermaid
 classDiagram
     class LogoutAuthPostController {
-        -logouter: UserLogouter
+        -sessionRevoker: SessionRevoker
         +handler(req, res, user): Promise~void~
     }
 
@@ -15,34 +17,46 @@ classDiagram
         <<decorator>>
     }
 
-    class UserLogouter {
-        -refreshTokenRepository: RefreshTokenRepository
+    class SessionRevoker {
+        -sessionRepository: UserSessionRepository
         +execute(params): Promise~void~
     }
 
-    class RefreshToken {
+    class UserSession {
         +id: string
         +tokenId: string
-        +userId: string | null
+        +ownerId: string
+        +ownerType: user | guest
+        +fingerprint: string
         +revokedAt: Date | null
         +isRevoked(): boolean
-        +revoke(): RefreshToken
+        +revoke(): UserSession
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
-        +match(criteria): Promise~RefreshToken[]~
-        +save(token): Promise~void~
+        +match(criteria): Promise~UserSession[]~
+        +search(id): Promise~UserSession | null~
+        +save(session): Promise~void~
+        +remove(id): Promise~void~
+    }
+
+    class SessionRevokedEvent {
+        +eventName: string
+        +sessionId: string
+        +ownerId: string
+        +ownerType: string
     }
 
     class Criteria {
         +filters: Filter[]
     }
 
-    LogoutAuthPostController --> UserLogouter
-    LogoutAuthPostController ..> JwtAuthGuard
-    LogoutAuthPostController ..> CurrentUser
-    UserLogouter --> RefreshTokenRepository
-    UserLogouter --> RefreshToken
-    UserLogouter --> Criteria
+    LogoutAuthPostController --> SessionRevoker : invoca
+    LogoutAuthPostController ..> JwtAuthGuard : protegido por
+    LogoutAuthPostController ..> CurrentUser : extrae user del token
+    SessionRevoker --> UserSessionRepository : busca + save
+    SessionRevoker --> UserSession : revoke()
+    SessionRevoker --> Criteria : filtra por tokenId
+    UserSession ..> SessionRevokedEvent : emite
 ```

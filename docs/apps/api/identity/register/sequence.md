@@ -8,16 +8,16 @@
 sequenceDiagram
     actor Client
     participant C as RegisterAuthPostController
-    participant UC as UserRegisterer
-    participant PS as PasswordService
+    participant UC as UserRegistrar
+    participant PH as PasswordHasher
     participant U as User
     participant UREPO as UserRepository
-    participant RTREPO as RefreshTokenRepository
+    participant RTREPO as UserSessionRepository
     participant PUB as DomainEventPublisher
 
     Client->>C: POST /auth/register { email, password, nickname }
 
-    C->>UC: execute({ email, password, nickname })
+    C->>UC: execute({ email, password, nickname, deviceId, fingerprint, ip })
 
     UC->>UREPO: match(criteria { email })
     UREPO-->>UC: [] ← email libre
@@ -25,25 +25,22 @@ sequenceDiagram
     UC->>UREPO: match(criteria { nickname })
     UREPO-->>UC: [] ← nickname libre
 
-    UC->>PS: validatePolicy(password)
-    Note over PS: min 8 chars, 1 mayúscula, 1 número
+    UC->>PH: hash(password, cost=12)
+    PH-->>UC: passwordHash
 
-    UC->>PS: hash(password, cost=12)
-    PS-->>UC: passwordHash
-
-    UC->>U: User.register(id, email, passwordHash, nickname, role:"user")
+    UC->>U: User.register(id, email, passwordHash, nickname, null, 'user', null)
     U->>U: record(new UserRegisteredEvent(...))
     U-->>UC: user
 
     UC->>UREPO: save(user)
-    Note over UREPO: Primero — FK constraint en refresh_tokens
+    Note over UREPO: Primero — FK constraint en user_sessions
 
-    UC->>RTREPO: save(refreshToken)
+    UC->>RTREPO: save(userSession)
 
     UC->>PUB: publish(user.pullEvents())
 
-    UC-->>C: { accessToken, refreshTokenId }
-    C->>C: res.cookie("refreshToken", refreshTokenId, {...})
+    UC-->>C: { accessToken, userSessionId }
+    C->>C: res.cookie("userSession", userSessionId, {...})
     C-->>Client: 201 { accessToken }
 ```
 
@@ -51,9 +48,9 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant UC as UserRegisterer
+    participant UC as UserRegistrar
     participant UREPO as UserRepository
-    participant PS as PasswordService
+    participant PH as PasswordHasher
 
     alt Email ya registrado
         UC->>UREPO: match(criteria { email })
@@ -64,7 +61,7 @@ sequenceDiagram
         UREPO-->>UC: [existingUser]
         UC-->>UC: throw NicknameAlreadyTaken → 409
     else Password débil
-        UC->>PS: validatePolicy("abc")
-        PS-->>UC: throw WeakPassword → 422
+        UC->>PH: hash("abc")
+        PH-->>UC: throw WeakPassword → 422
     end
 ```

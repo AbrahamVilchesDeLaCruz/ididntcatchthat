@@ -5,7 +5,7 @@ graph TD
     Client(["👤 Client"])
 
     subgraph "POST /auth/refresh"
-        A["Lee refreshToken<br/>de cookie HTTP-only"]
+        A["Lee userSession<br/>de cookie HTTP-only"]
         B{"Token existe?"}
         C{"Token revocado?"}
         D["Revoca TODOS los tokens<br/>activos del usuario<br/>(reuse detection)"]
@@ -14,15 +14,15 @@ graph TD
         G["Busca usuario en DB"]
         H{"Usuario existe?"}
         I["Revoca token actual<br/>(rotation)"]
-        J["Genera nuevo par<br/>accessToken + refreshTokenId"]
-        K["Persiste nuevo<br/>RefreshToken en DB"]
+        J["Genera nuevo par<br/>accessToken + userSessionId"]
+        K["Persiste nuevo<br/>UserSession en DB"]
         L["Devuelve accessToken<br/>Renueva cookie"]
     end
 
-    E401_notfound(["401 InvalidRefreshToken"])
+    E401_notfound(["401 InvalidUserSession"])
     E401_compromised(["401 UserSessionCompromised"])
-    E401_expired(["401 ExpiredRefreshToken"])
-    E401_guest(["401 InvalidRefreshToken"])
+    E401_expired(["401 ExpiredUserSession"])
+    E401_guest(["401 InvalidUserSession"])
     E401_nouser(["401 UserNotFound"])
 
     Client --> A

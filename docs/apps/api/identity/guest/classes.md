@@ -9,41 +9,59 @@ classDiagram
         +handler(payload, req, res): Promise~void~
     }
 
+    class GuestAuthPostPayload {
+        +guestDeviceId?: string
+    }
+
     class GuestAuthenticator {
-        -refreshTokenRepo: RefreshTokenRepository
-        -tokenService: TokenService
-        +execute(req): Promise~GuestAuthResult~
+        -sessionRepository: UserSessionRepository
+        -tokenGenerator: TokenGenerator
+        -logger: Logger
+        +execute(params): Promise~GuestAuthenticatorResult~
     }
 
-    class TokenService {
+    class TokenGenerator {
         <<interface>>
-        +signAccessToken(payload, ttl): string
-        +signRefreshToken(payload, ttl): string
-        +verifyAccessToken(token): JwtPayload
+        +generateGuest(context): TokenPair
+        +generatePair(context): TokenPair
     }
 
-    class RefreshToken {
+    class UserSession {
         +id: string
         +tokenId: string
-        +userId: string | null
+        +ownerId: string
+        +ownerType: guest
         +deviceId: string
+        +fingerprint: string
         +expiresAt: Date
         +revokedAt: Date | null
         +createdAt: Date
+        +createGuest(id, tokenId, deviceId, fingerprint)$ UserSession
         +isRevoked(): boolean
         +isExpired(): boolean
+        +isGuest(): boolean
     }
 
-    class RefreshTokenRepository {
+    class UserSessionRepository {
         <<interface>>
-        +match(criteria): Promise~RefreshToken[]~
-        +search(id): Promise~RefreshToken | null~
-        +save(token): Promise~void~
+        +match(criteria): Promise~UserSession[]~
+        +search(id): Promise~UserSession | null~
+        +save(session): Promise~void~
         +remove(id): Promise~void~
     }
 
+    class SessionStartedEvent {
+        +eventName: string
+        +sessionId: string
+        +ownerId: string
+        +ownerType: string
+        +deviceId: string
+    }
+
+    GuestAuthPostController --> GuestAuthPostPayload : valida
     GuestAuthPostController --> GuestAuthenticator : invoca
-    GuestAuthenticator --> TokenService : firma JWT
-    GuestAuthenticator --> RefreshToken : crea instancia
-    GuestAuthenticator --> RefreshTokenRepository : persiste
+    GuestAuthenticator --> TokenGenerator : generateGuest
+    GuestAuthenticator --> UserSession : crea via createGuest()
+    GuestAuthenticator --> UserSessionRepository : persiste
+    UserSession ..> SessionStartedEvent : emite
 ```

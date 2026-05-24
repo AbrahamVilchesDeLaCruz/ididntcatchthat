@@ -16,8 +16,8 @@ graph TD
         F["User.register()<br/>oauthProvider: google<br/>passwordHash: null"]
         G["Publica UserRegistered"]
         H["Genera access + refresh tokens"]
-        I["Persiste RefreshToken en DB"]
-        J["Set cookie refreshToken<br/>Devuelve accessToken + isNewUser"]
+        I["Persiste UserSession en DB"]
+        J["Set cookie userSession<br/>Devuelve accessToken"]
     end
 
     Client --> A --> B
@@ -38,4 +38,5 @@ graph TD
 | Usuario nuevo | `passwordHash = null`, `oauthProvider = 'google'`, nickname derivado de `displayName` |
 | Nickname único | `NicknameResolverService` garantiza unicidad (añade sufijo numérico si colisiona) |
 | Evento de dominio | `UserRegistered` solo se publica para usuarios **nuevos** |
-| `isNewUser` | El cliente puede usar este flag para mostrar onboarding |
+| `UserSearcher` | Domain Service que encapsula la búsqueda por email vía `UserRepository.match` |
+| Response | Solo devuelve `accessToken` — sin `isNewUser` |

@@ -9,11 +9,11 @@ sequenceDiagram
     actor Client
     participant Guard as JwtAuthGuard
     participant Controller as LogoutAuthPostController
-    participant UC as UserLogouter
-    participant RefreshRepo as RefreshTokenRepository
+    participant UC as SessionRevoker
+    participant RefreshRepo as UserSessionRepository
     participant DB as PostgreSQL
 
-    Client->>Guard: POST /auth/logout<br/>Authorization: Bearer <accessToken><br/>Cookie: refreshToken=<tokenId>
+    Client->>Guard: POST /auth/logout<br/>Authorization: Bearer <accessToken><br/>Cookie: userSession=<tokenId>
 
     Guard->>Guard: Verify JWT signature + expiry
     alt invalid or missing JWT
@@ -28,7 +28,7 @@ sequenceDiagram
 
     UC->>RefreshRepo: match(Criteria[tokenId = tokenId])
     RefreshRepo->>DB: SELECT WHERE token_id = ?
-    DB-->>RefreshRepo: RefreshToken | null
+    DB-->>RefreshRepo: UserSession | null
     RefreshRepo-->>UC: [token] | []
 
     alt token not found OR already revoked
@@ -40,6 +40,6 @@ sequenceDiagram
         UC-->>Controller: void
     end
 
-    Controller->>Controller: res.clearCookie('refreshToken')
+    Controller->>Controller: res.clearCookie('userSession')
     Controller-->>Client: 204 No Content
 ```
