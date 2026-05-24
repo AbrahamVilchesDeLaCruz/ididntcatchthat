@@ -1,0 +1,40 @@
+# Test infrastructure — local E2E test environment
+# No application services here — only infra (DB, message broker, etc.)
+# Usage: make test:e2e:up / make test:e2e:down
+#
+# Scalability note:
+#   To add RabbitMQ for domain event tests, add the service below and
+#   mirror it in .github/workflows/ci.yml under `services:`
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ididntcatchthat-postgres-test
+    environment:
+      POSTGRES_DB: ididntcatchthat_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d ididntcatchthat_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql/data # ephemeral — no persistence between runs
+
+  # ─── Future services ─────────────────────────────────────────────────────────
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   container_name: ididntcatchthat-rabbitmq-test
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: test
+  #     RABBITMQ_DEFAULT_PASS: test
+  #   ports:
+  #     - "5673:5672"
+  #     - "15673:15672"
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "ping"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 10

@@ -7,6 +7,19 @@ import { type Logger, LOGGER_SERVICE } from './shared/domain/logger';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // ─── CORS ──────────────────────────────────────────────────────────────────
+  // CORS_ORIGIN: comma-separated list of allowed origins.
+  // Defaults to localhost:5173 (Vite dev server) in non-production environments.
+  const rawOrigins = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+  const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
+
+  app.enableCors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // required for cookies (refreshToken)
+  });
+
   // ─── Global prefix ─────────────────────────────────────────────────────────
   // /health and /metrics are excluded — reachable without versioning prefix
   app.setGlobalPrefix('api/v1', { exclude: ['/health', '/metrics'] });
@@ -17,6 +30,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true, // strip unknown properties
       forbidNonWhitelisted: true, // throw on unknown properties
       transform: true, // coerce query params / path params to declared types
+      errorHttpStatusCode: 422, // validation errors → 422 Unprocessable Entity
     }),
   );
 

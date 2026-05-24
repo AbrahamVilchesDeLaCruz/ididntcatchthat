@@ -1,20 +1,22 @@
 import {
-  type CallHandler,
-  type ExecutionContext,
+  Inject,
   Injectable,
   type NestInterceptor,
+  type ExecutionContext,
+  type CallHandler,
 } from '@nestjs/common';
 import { type Request, type Response } from 'express';
 import { Counter, Histogram, Registry } from 'prom-client';
 import { type Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
+import { METRICS_REGISTRY } from './metrics-registry.token';
 
 @Injectable()
 export class MetricsInterceptor implements NestInterceptor {
   private readonly requestsTotal: Counter;
   private readonly requestDuration: Histogram;
 
-  constructor(registry: Registry) {
+  constructor(@Inject(METRICS_REGISTRY) registry: Registry) {
     this.requestsTotal = new Counter({
       name: 'http_requests_total',
       help: 'Total number of HTTP requests',
@@ -25,7 +27,7 @@ export class MetricsInterceptor implements NestInterceptor {
     this.requestDuration = new Histogram({
       name: 'http_request_duration_seconds',
       help: 'Duration of HTTP requests in seconds',
-      labelNames: ['method', 'route'],
+      labelNames: ['method', 'route', 'status_code'],
       buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
       registers: [registry],
     });
@@ -43,10 +45,10 @@ export class MetricsInterceptor implements NestInterceptor {
     const end = this.requestDuration.startTimer({ method, route });
 
     return next.handle().pipe(
-      tap(() => {
+      finalize(() => {
         const statusCode = String(response.statusCode);
         this.requestsTotal.inc({ method, route, status_code: statusCode });
-        end();
+        end({ status_code: statusCode });
       }),
     );
   }
