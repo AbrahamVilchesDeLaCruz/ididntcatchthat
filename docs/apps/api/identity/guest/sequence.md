@@ -7,7 +7,7 @@ sequenceDiagram
     actor Client
     participant C as GuestAuthPostController
     participant UC as GuestAuthenticator
-    participant TS as TokenService
+    participant TS as TokenGenerator
     participant RTREPO as UserSessionRepository
 
     Client->>C: POST /auth/guest { fingerprint, ip }

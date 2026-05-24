@@ -13,7 +13,7 @@ sequenceDiagram
     participant UC as TokenRefresher
     participant RefreshRepo as UserSessionRepository
     participant UserRepo as UserRepository
-    participant TokenSvc as TokenService
+    participant TokenSvc as TokenGenerator
     participant DB as PostgreSQL
 
     Client->>Controller: POST /auth/refresh<br/>Cookie: userSession=<tokenId>

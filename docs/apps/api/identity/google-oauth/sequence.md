@@ -17,7 +17,7 @@ sequenceDiagram
     participant UserRepo as UserRepository
     participant NicknameResolver as NicknameResolverService
     participant RefreshRepo as UserSessionRepository
-    participant TokenSvc as TokenService
+    participant TokenSvc as TokenGenerator
     participant Publisher as DomainEventPublisher
     participant DB as PostgreSQL
 

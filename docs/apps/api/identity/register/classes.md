@@ -6,7 +6,7 @@
 classDiagram
     class RegisterAuthPostController {
         -useCase: UserRegistrar
-        +handler(payload, res): Promise~void~
+        +handler(payload, req, res): Promise~void~
     }
 
     class RegisterAuthPostPayload {
@@ -18,11 +18,11 @@ classDiagram
 
     class UserRegistrar {
         -userRepo: UserRepository
-        -userSessionRepo: UserSessionRepository
+        -sessionRepository: UserSessionRepository
         -passwordHasher: PasswordHasher
         -tokenGenerator: TokenGenerator
         -publisher: DomainEventPublisher
-        +execute(req): Promise~UserRegistrarResult~
+        +execute(params): Promise~UserRegistrarResult~
     }
 
     class User {
@@ -31,10 +31,23 @@ classDiagram
         +passwordHash: PasswordHash | null
         +nickname: Nickname
         +role: UserRole
-        +register(...)$ User
+        +register(id, email, hash, nickname, avatarUrl, role, oauthProvider)$ User
         +fromPrimitives(p)$ User
         +toPrimitives(): UserPrimitives
         +pullEvents(): DomainEvent[]
+    }
+
+    class UserSession {
+        +id: string
+        +tokenId: string
+        +ownerId: string
+        +ownerType: user
+        +deviceId: string
+        +fingerprint: string
+        +expiresAt: Date
+        +revokedAt: Date | null
+        +createdAt: Date
+        +create(id, tokenId, ownerId, deviceId, fingerprint)$ UserSession
     }
 
     class UserRegisteredEvent {
@@ -43,6 +56,12 @@ classDiagram
         +email: string
         +nickname: string
         +occurredOn: Date
+    }
+
+    class TokenGenerator {
+        <<interface>>
+        +generatePair(context): TokenPair
+        +generateGuest(context): TokenPair
     }
 
     class PasswordHasher {
@@ -61,7 +80,9 @@ classDiagram
     UserRegistrar --> User : crea via register()
     UserRegistrar --> UserRegisteredEvent : emite via User
     UserRegistrar --> PasswordHasher : hashea password
+    UserRegistrar --> TokenGenerator : generatePair
     UserRegistrar --> DomainEventPublisher : publica eventos
     UserRegistrar --> UserRepository : verifica unicidad + save
-    UserRegistrar --> UserSessionRepository : persiste token
+    UserRegistrar --> UserSession : crea via create()
+    UserRegistrar --> UserSessionRepository : persiste sesión
 ```

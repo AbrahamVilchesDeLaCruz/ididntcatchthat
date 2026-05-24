@@ -1,4 +1,6 @@
-# Google OAuth — Class Diagram
+# Google OAuth — Diagrama de Clases
+
+> Artefactos involucrados en `GET /auth/google` y `GET /auth/google/callback`
 
 ```mermaid
 classDiagram
@@ -8,7 +10,7 @@ classDiagram
 
     class GoogleCallbackAuthGetController {
         -authenticator: OAuthAuthenticator
-        +handler(ip, userAgent, acceptLanguage, res, profile): Promise~{ accessToken }~
+        +handler(req, res, profile): Promise~void~
     }
 
     class GoogleAuthGuard {
@@ -17,13 +19,13 @@ classDiagram
 
     class OAuthAuthenticator {
         -userRepository: UserRepository
-        -userSessionRepository: UserSessionRepository
-        -tokenService: TokenService
+        -sessionRepository: UserSessionRepository
+        -tokenGenerator: TokenGenerator
         -publisher: DomainEventPublisher
         -nicknameResolver: NicknameResolverService
-        -logger: Logger
         -searcher: UserSearcher
-        +execute(id, email, avatarUrl, displayName, deviceId, fingerprint, ip): Promise~OAuthAuthenticationResponse~
+        -logger: Logger
+        +execute(params): Promise~OAuthAuthenticatorResult~
     }
 
     class UserSearcher {
@@ -39,14 +41,33 @@ classDiagram
         +avatarUrl: string | null
         +role: UserRole
         +oauthProvider: OauthProvider | null
-        +register(id, email, passwordHash, nickname, avatarUrl, role, oauthProvider)$ User
+        +register(id, email, hash, nickname, avatarUrl, role, oauthProvider)$ User
         +fromPrimitives(p)$ User
         +addAvatar(url): User
-        +pullDomainEvents(): DomainEvent[]
+        +pullEvents(): DomainEvent[]
+    }
+
+    class UserSession {
+        +id: string
+        +tokenId: string
+        +ownerId: string
+        +ownerType: user
+        +deviceId: string
+        +fingerprint: string
+        +expiresAt: Date
+        +revokedAt: Date | null
+        +createdAt: Date
+        +create(id, tokenId, ownerId, deviceId, fingerprint)$ UserSession
     }
 
     class NicknameResolverService {
         +resolve(displayName): Promise~string~
+    }
+
+    class TokenGenerator {
+        <<interface>>
+        +generatePair(context): TokenPair
+        +generateGuest(context): TokenPair
     }
 
     class UserRepository {
@@ -58,12 +79,10 @@ classDiagram
 
     class UserSessionRepository {
         <<interface>>
-        +save(token): Promise~void~
-    }
-
-    class TokenService {
-        <<interface>>
-        +generatePair(params): { accessToken, userSessionId }
+        +match(criteria): Promise~UserSession[]~
+        +search(id): Promise~UserSession | null~
+        +save(session): Promise~void~
+        +remove(id): Promise~void~
     }
 
     class DomainEventPublisher {
@@ -77,15 +96,15 @@ classDiagram
         +nickname: string
     }
 
-    GoogleCallbackAuthGetController --> OAuthAuthenticator
-    GoogleCallbackAuthGetController ..> GoogleAuthGuard
-    OAuthAuthenticator --> UserSearcher
-    OAuthAuthenticator --> UserRepository
-    OAuthAuthenticator --> UserSessionRepository
-    OAuthAuthenticator --> TokenService
-    OAuthAuthenticator --> DomainEventPublisher
-    OAuthAuthenticator --> NicknameResolverService
-    OAuthAuthenticator --> User
-    UserSearcher --> UserRepository
-    User ..> UserRegisteredEvent
+    GoogleCallbackAuthGetController --> OAuthAuthenticator : invoca
+    GoogleCallbackAuthGetController ..> GoogleAuthGuard : protegido por
+    OAuthAuthenticator --> UserSearcher : busca user por email
+    OAuthAuthenticator --> UserRepository : save si nuevo
+    OAuthAuthenticator --> UserSession : crea via create()
+    OAuthAuthenticator --> UserSessionRepository : persiste sesión
+    OAuthAuthenticator --> TokenGenerator : generatePair
+    OAuthAuthenticator --> DomainEventPublisher : publica eventos
+    OAuthAuthenticator --> NicknameResolverService : resuelve nickname único
+    UserSearcher --> UserRepository : match por email
+    User ..> UserRegisteredEvent : emite si registro nuevo
 ```

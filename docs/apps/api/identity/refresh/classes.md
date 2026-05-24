@@ -1,34 +1,37 @@
-# Refresh — Class Diagram
+# Refresh — Diagrama de Clases
 
-Clases y dependencias involucradas en el flujo de renovación de token.
+> Artefactos involucrados en `POST /auth/refresh`
 
 ```mermaid
 classDiagram
     class RefreshAuthPostController {
         -refresher: TokenRefresher
-        +handler(req, res): Promise~{ accessToken }~
-        -buildFingerprint(req): string
+        +handler(req, res): Promise~void~
     }
 
     class TokenRefresher {
-        -userSessionRepository: UserSessionRepository
+        -sessionRepository: UserSessionRepository
         -userRepository: UserRepository
-        -tokenService: TokenService
+        -tokenGenerator: TokenGenerator
         +execute(params): Promise~TokenRefresherResult~
     }
 
     class UserSession {
         +id: string
         +tokenId: string
-        +userId: string | null
+        +ownerId: string
+        +ownerType: user | guest
         +deviceId: string
+        +fingerprint: string
         +expiresAt: Date
         +revokedAt: Date | null
         +createdAt: Date
         +isExpired(): boolean
         +isRevoked(): boolean
+        +isGuest(): boolean
         +revoke(): UserSession
-        +create(id, tokenId, userId, deviceId)$ UserSession
+        +rotate(newTokenId, newSessionId): UserSession
+        +create(id, tokenId, ownerId, deviceId, fingerprint)$ UserSession
         +fromPrimitives(p)$ UserSession
         +toPrimitives(): UserSessionPrimitives
     }
@@ -37,7 +40,7 @@ classDiagram
         <<interface>>
         +match(criteria): Promise~UserSession[]~
         +search(id): Promise~UserSession | null~
-        +save(token): Promise~void~
+        +save(session): Promise~void~
         +remove(id): Promise~void~
     }
 
@@ -48,31 +51,48 @@ classDiagram
         +save(user): Promise~void~
     }
 
-    class TokenService {
+    class TokenGenerator {
         <<interface>>
-        +generatePair(params): { accessToken, userSessionId }
-        +verifyAccess(token): UserContext
+        +generatePair(context): TokenPair
+        +generateGuest(context): TokenPair
+    }
+
+    class SessionRotatedEvent {
+        +eventName: string
+        +sessionId: string
+        +newSessionId: string
+        +ownerId: string
+    }
+
+    class SessionRevokedEvent {
+        +eventName: string
+        +sessionId: string
+        +ownerId: string
+        +ownerType: string
     }
 
     class Criteria {
         +filters: Filter[]
         +order: Order | null
-        +pagination: Pagination | null
+        +limit: number | null
+        +offset: number | null
     }
 
-    class InvalidUserSessionException
-    class ExpiredUserSessionException
+    class InvalidRefreshTokenException
+    class ExpiredRefreshTokenException
     class UserSessionCompromisedException
     class UserNotFoundException
 
-    RefreshAuthPostController --> TokenRefresher
-    TokenRefresher --> UserSessionRepository
-    TokenRefresher --> UserRepository
-    TokenRefresher --> TokenService
-    TokenRefresher --> UserSession
-    TokenRefresher --> Criteria
-    TokenRefresher ..> InvalidUserSessionException
-    TokenRefresher ..> ExpiredUserSessionException
-    TokenRefresher ..> UserSessionCompromisedException
-    TokenRefresher ..> UserNotFoundException
+    RefreshAuthPostController --> TokenRefresher : invoca
+    TokenRefresher --> UserSessionRepository : busca + save
+    TokenRefresher --> UserRepository : busca owner si type=user
+    TokenRefresher --> TokenGenerator : generatePair / generateGuest
+    TokenRefresher --> UserSession : rotate() / revoke()
+    TokenRefresher --> Criteria : filtra por tokenId
+    UserSession ..> SessionRotatedEvent : emite en rotate()
+    UserSession ..> SessionRevokedEvent : emite en revoke()
+    TokenRefresher ..> InvalidRefreshTokenException : lanza si no existe
+    TokenRefresher ..> ExpiredRefreshTokenException : lanza si expirado
+    TokenRefresher ..> UserSessionCompromisedException : lanza si reuse detectado
+    TokenRefresher ..> UserNotFoundException : lanza si owner no existe
 ```
