@@ -20,38 +20,44 @@ export class Migration202605241854361779641676650 implements MigrationInterface 
       ALTER TABLE "refresh_tokens" RENAME TO "user_sessions"
     `);
 
-    // 2. Add owner_type with temporary default
+    // 2. Drop the FK constraint (owner_id no longer references users — guests use deviceId as ownerId)
+    await queryRunner.query(`
+      ALTER TABLE "user_sessions" DROP CONSTRAINT "refresh_tokens_user_id_fkey"
+    `);
+
+    // 3. Add owner_type with temporary default
     await queryRunner.query(`
       ALTER TABLE "user_sessions"
         ADD COLUMN "owner_type" VARCHAR(10) NOT NULL DEFAULT 'user'
     `);
 
-    // 3. Add fingerprint with temporary default
+    // 4. Add fingerprint with temporary default
     await queryRunner.query(`
       ALTER TABLE "user_sessions"
         ADD COLUMN "fingerprint" TEXT NOT NULL DEFAULT ''
     `);
 
-    // 4. Back-fill: rows where user_id was NULL are guest sessions
-    await queryRunner.query(`
-      UPDATE "user_sessions"
-        SET "owner_type" = 'guest',
-            "owner_id"   = "device_id"
-        WHERE "user_id" IS NULL
-    `);
-
-    // 5. Rename user_id → owner_id
+    // 5. Rename user_id → owner_id (still nullable at this point)
     await queryRunner.query(`
       ALTER TABLE "user_sessions" RENAME COLUMN "user_id" TO "owner_id"
     `);
 
-    // 6. Make owner_id NOT NULL (all rows now have a value)
+    // 6. Back-fill: rows where owner_id was NULL are guest sessions
+    // device_id is VARCHAR so we cast to UUID (device_id is always crypto.randomUUID())
+    await queryRunner.query(`
+      UPDATE "user_sessions"
+        SET "owner_type" = 'guest',
+            "owner_id"   = "device_id"::uuid
+        WHERE "owner_id" IS NULL
+    `);
+
+    // 7. Make owner_id NOT NULL (all rows now have a value)
     await queryRunner.query(`
       ALTER TABLE "user_sessions"
         ALTER COLUMN "owner_id" SET NOT NULL
     `);
 
-    // 7. Drop temporary defaults (fingerprint stays empty for old rows)
+    // 8. Drop temporary defaults (fingerprint stays empty for old rows)
     await queryRunner.query(`
       ALTER TABLE "user_sessions"
         ALTER COLUMN "owner_type" DROP DEFAULT,

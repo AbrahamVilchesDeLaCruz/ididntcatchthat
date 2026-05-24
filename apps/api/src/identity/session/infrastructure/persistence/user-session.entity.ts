@@ -8,7 +8,7 @@ export class UserSessionEntity {
   @Column({ name: 'token_id', unique: true })
   tokenId: string;
 
-  @Column({ name: 'owner_id' })
+  @Column({ name: 'owner_id', type: 'uuid' })
   ownerId: string;
 
   @Column({ name: 'owner_type', type: 'varchar', length: 10 })

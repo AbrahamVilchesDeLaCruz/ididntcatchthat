@@ -16,7 +16,6 @@ export async function createTestApp(): Promise<INestApplication<App>> {
 
   const app = moduleFixture.createNestApplication<INestApplication<App>>();
 
-  // Silence all framework-level logs (bootstrap, routing, etc.)
   app.useLogger(false);
   app.setGlobalPrefix('api/v1', { exclude: ['/health', '/metrics'] });
   app.use(cookieParser());
