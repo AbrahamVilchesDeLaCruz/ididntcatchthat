@@ -5,6 +5,7 @@ import {
   type GuestGame,
 } from '@/identity/domain/guest-game-migration.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
+import { type Logger } from '@/shared/domain/logger';
 import { GuestProgressMigratedEvent } from '@/identity/domain/events/guest-progress-migrated.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
@@ -27,6 +28,7 @@ const makeGame = (overrides?: { gameId?: string }): GuestGame => ({
 describe('identity/application/migrate-guest GuestProgressMigrator', () => {
   const guestGameMigrationRepository = mock<GuestGameMigrationRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let useCase: GuestProgressMigrator;
 
   const params = {
@@ -44,6 +46,7 @@ describe('identity/application/migrate-guest GuestProgressMigrator', () => {
     useCase = new GuestProgressMigrator(
       guestGameMigrationRepository,
       publisher,
+      logger,
     );
   });
 

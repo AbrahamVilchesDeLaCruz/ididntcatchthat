@@ -1,17 +1,19 @@
 import { mock } from 'jest-mock-extended';
 import { UserLogouter } from '@/identity/application/logout/user-logouter';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
+import { type Logger } from '@/shared/domain/logger';
 import { RefreshTokenMother } from '@test/identity/domain/refresh-token-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 describe('identity/application/logout UserLogouter', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
+  const logger = mock<Logger>();
   let useCase: UserLogouter;
 
   beforeEach(() => {
     refreshTokenRepository.match.mockReset();
     refreshTokenRepository.save.mockReset();
-    useCase = new UserLogouter(refreshTokenRepository);
+    useCase = new UserLogouter(refreshTokenRepository, logger);
   });
 
   it('should revoke the refresh token on logout', async () => {

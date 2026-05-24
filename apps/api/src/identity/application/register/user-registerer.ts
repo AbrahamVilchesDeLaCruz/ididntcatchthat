@@ -29,6 +29,7 @@ import {
   REFRESH_TOKEN_REPOSITORY,
 } from '@/identity/domain/refresh-token.repository';
 import { RefreshToken } from '@/identity/domain/refresh-token';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type UserRegistererResult = {
   accessToken: string;
@@ -48,6 +49,8 @@ export class UserRegisterer {
     private readonly tokenService: TokenService,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -108,8 +111,12 @@ export class UserRegisterer {
 
     await this.userRepository.save(user);
     await this.refreshTokenRepository.save(refreshToken);
-
     await this.publisher.publish(user.pullDomainEvents());
+
+    this.logger.info('User registered', {
+      userId: user.id.value,
+      email: params.email,
+    });
 
     return { accessToken, refreshTokenId };
   }

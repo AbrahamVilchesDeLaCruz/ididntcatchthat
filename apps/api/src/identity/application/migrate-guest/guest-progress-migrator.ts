@@ -9,6 +9,7 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 @Injectable()
 export class GuestProgressMigrator {
@@ -17,6 +18,8 @@ export class GuestProgressMigrator {
     private readonly guestGameMigrationRepository: GuestGameMigrationRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -39,5 +42,11 @@ export class GuestProgressMigrator {
         guestDeviceId: params.guestDeviceId,
       }),
     ]);
+
+    this.logger.info('Guest progress migrated', {
+      userId: params.userId,
+      gamesCount: params.guestGames.length,
+      guestDeviceId: params.guestDeviceId,
+    });
   }
 }

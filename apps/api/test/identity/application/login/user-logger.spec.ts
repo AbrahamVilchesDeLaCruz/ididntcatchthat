@@ -4,6 +4,7 @@ import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type PasswordService } from '@/identity/domain/password.service';
 import { type TokenService } from '@/identity/domain/token.service';
+import { type Logger } from '@/shared/domain/logger';
 import { InvalidCredentialsException } from '@/identity/domain/exceptions/invalid-credentials.exception';
 import { UserMother } from '@test/identity/domain/user-mother';
 import { RequestUserLoggerMother } from './request-user-logger-mother';
@@ -15,6 +16,7 @@ describe('identity/application/login UserLogger', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
   const passwordService = mock<PasswordService>();
   const tokenService = mock<TokenService>();
+  const logger = mock<Logger>();
   let useCase: UserLogger;
 
   beforeEach(() => {
@@ -34,6 +36,7 @@ describe('identity/application/login UserLogger', () => {
       refreshTokenRepository,
       passwordService,
       tokenService,
+      logger,
     );
   });
 

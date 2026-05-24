@@ -5,6 +5,7 @@ import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.rep
 import { type PasswordService } from '@/identity/domain/password.service';
 import { type TokenService } from '@/identity/domain/token.service';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
+import { type Logger } from '@/shared/domain/logger';
 import { EmailAlreadyTakenException } from '@/identity/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/domain/exceptions/nickname-already-taken.exception';
 import { UserRegisteredEvent } from '@/identity/domain/events/user-registered.event';
@@ -22,6 +23,7 @@ describe('identity/application/register UserRegisterer', () => {
   const passwordService = mock<PasswordService>();
   const tokenService = mock<TokenService>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let useCase: UserRegisterer;
 
   beforeEach(() => {
@@ -48,6 +50,7 @@ describe('identity/application/register UserRegisterer', () => {
       passwordService,
       tokenService,
       publisher,
+      logger,
     );
   });
 

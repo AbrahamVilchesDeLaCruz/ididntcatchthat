@@ -4,7 +4,8 @@ import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type TokenService } from '@/identity/domain/token.service';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
-import { type NicknameResolverService } from '@/identity/domain/nickname-resolver.service';
+import { type NicknameResolverService } from '@/identity/application/nickname-resolver.service';
+import { type Logger } from '@/shared/domain/logger';
 import { UserRegisteredEvent } from '@/identity/domain/events/user-registered.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type User } from '@/identity/domain/user';
@@ -45,6 +46,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
   const tokenService = mock<TokenService>();
   const publisher = mock<DomainEventPublisher>();
   const nicknameResolver = mock<NicknameResolverService>();
+  const logger = mock<Logger>();
   let useCase: GoogleOAuthHandler;
 
   beforeEach((): void => {
@@ -69,6 +71,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
       tokenService,
       publisher,
       nicknameResolver,
+      logger,
     );
   });
 
@@ -117,6 +120,19 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     await useCase.execute(params);
 
     expect(publisher.publish).not.toHaveBeenCalled();
+  });
+
+  it('should keep existing user unchanged when avatarUrl is null', async () => {
+    const existing = UserMother.random();
+    const params = makeParams({ email: existing.email.value, avatarUrl: null });
+
+    userRepository.match.mockResolvedValueOnce([existing]);
+
+    await useCase.execute(params);
+
+    // save is still called (to update session), but user is same instance (no withAvatar)
+    const saved: User = userRepository.save.mock.calls[0][0];
+    expect(saved).toBe(existing);
   });
 
   it('should delegate nickname resolution to NicknameResolverService', async () => {

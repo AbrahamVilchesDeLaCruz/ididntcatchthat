@@ -177,15 +177,13 @@ test\:api\:e2e: ## Run API E2E tests (starts infra, runs tests, stops infra)
 	$(COMPOSE_TEST) down -v; \
 	exit $$EXIT_CODE
 
-test\:api: ## Run all API tests — unit + E2E (starts infra, runs all, stops infra)
+test\:api: ## Run all API tests — unit + E2E with combined coverage (starts infra, runs all, stops infra)
 	$(ensure-docker)
-	pnpm --filter @ididntcatchthat/api test; \
-	UNIT_CODE=$$?; \
 	$(COMPOSE_TEST) up -d --wait; \
-	pnpm --filter @ididntcatchthat/api test:e2e:ci; \
-	E2E_CODE=$$?; \
+	pnpm --filter @ididntcatchthat/api test:cov:all; \
+	EXIT_CODE=$$?; \
 	$(COMPOSE_TEST) down -v; \
-	exit $$(( UNIT_CODE || E2E_CODE ))
+	exit $$EXIT_CODE
 
 test\:client\:unit: ## Run client unit tests only
 	pnpm --filter @ididntcatchthat/client test

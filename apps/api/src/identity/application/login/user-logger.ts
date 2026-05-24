@@ -18,6 +18,7 @@ import {
   type TokenService,
   TOKEN_SERVICE,
 } from '@/identity/domain/token.service';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type UserLoggerResult = {
   accessToken: string;
@@ -35,6 +36,8 @@ export class UserLogger {
     private readonly passwordService: PasswordService,
     @Inject(TOKEN_SERVICE)
     private readonly tokenService: TokenService,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -76,6 +79,8 @@ export class UserLogger {
     });
 
     await this.refreshTokenRepository.save(refreshToken);
+
+    this.logger.info('User logged in', { userId: user.id.value });
 
     return { accessToken, refreshTokenId };
   }

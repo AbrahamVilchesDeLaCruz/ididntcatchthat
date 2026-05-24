@@ -2,6 +2,7 @@ import { mock } from 'jest-mock-extended';
 import { GuestAuthenticator } from '@/identity/application/guest/guest-authenticator';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type TokenService } from '@/identity/domain/token.service';
+import { type Logger } from '@/shared/domain/logger';
 import { RequestGuestAuthenticatorMother } from './request-guest-authenticator-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { JestTimers } from '@test/shared/jest-timers';
@@ -9,6 +10,7 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/guest GuestAuthenticator', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
   const tokenService = mock<TokenService>();
+  const logger = mock<Logger>();
   let useCase: GuestAuthenticator;
 
   beforeEach(() => {
@@ -16,7 +18,11 @@ describe('identity/application/guest GuestAuthenticator', () => {
     refreshTokenRepository.save.mockReset();
     tokenService.generateGuest.mockReset();
 
-    useCase = new GuestAuthenticator(refreshTokenRepository, tokenService);
+    useCase = new GuestAuthenticator(
+      refreshTokenRepository,
+      tokenService,
+      logger,
+    );
   });
 
   afterEach(() => JestTimers.teardown());

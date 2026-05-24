@@ -8,6 +8,7 @@ import {
   type TokenService,
   TOKEN_SERVICE,
 } from '@/identity/domain/token.service';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type GuestAuthenticatorResult = {
   accessToken: string;
@@ -21,6 +22,8 @@ export class GuestAuthenticator {
     private readonly refreshTokenRepository: RefreshTokenRepository,
     @Inject(TOKEN_SERVICE)
     private readonly tokenService: TokenService,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -43,6 +46,8 @@ export class GuestAuthenticator {
     });
 
     await this.refreshTokenRepository.save(refreshToken);
+
+    this.logger.info('Guest authenticated', { deviceId });
 
     return { accessToken, deviceId };
   }

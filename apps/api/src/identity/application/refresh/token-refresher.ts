@@ -18,6 +18,7 @@ import {
   TOKEN_SERVICE,
 } from '@/identity/domain/token.service';
 import { UserId } from '@/identity/domain/user-id';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type TokenRefresherResult = {
   accessToken: string;
@@ -32,6 +33,8 @@ export class TokenRefresher {
     private readonly userRepository: UserRepository,
     @Inject(TOKEN_SERVICE)
     private readonly tokenService: TokenService,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -61,6 +64,9 @@ export class TokenRefresher {
             .filter((t) => !t.isRevoked())
             .map((t) => this.refreshTokenRepository.save(t.revoke())),
         );
+        this.logger.warn('Token reuse detected — all sessions revoked', {
+          userId: token.userId,
+        });
       }
       throw new UserSessionCompromisedException();
     }
@@ -94,6 +100,8 @@ export class TokenRefresher {
     });
 
     await this.refreshTokenRepository.save(newToken);
+
+    this.logger.info('Token refreshed', { userId: user.id.value });
 
     return { accessToken };
   }

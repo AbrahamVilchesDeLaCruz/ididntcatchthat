@@ -13,6 +13,8 @@ import { AppModule } from '../../../src/app.module';
 import { JwtAuthGuard } from '../../../src/shared/infrastructure/auth/jwt.guard';
 import { Roles } from '../../../src/shared/infrastructure/auth/roles.decorator';
 import { RolesGuard } from '../../../src/shared/infrastructure/auth/roles.guard';
+import { LOGGER_SERVICE } from '../../../src/shared/domain/logger';
+import { NullLogger } from '../../shared/null-logger';
 
 // ─── Inline test controllers ─────────────────────────────────────────────────
 
@@ -45,9 +47,14 @@ async function createGuardsTestApp(): Promise<INestApplication<App>> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
     controllers: [TestGuardsController],
-  }).compile();
+  })
+    .overrideProvider(LOGGER_SERVICE)
+    .useClass(NullLogger)
+    .compile();
 
   const app = moduleFixture.createNestApplication<INestApplication<App>>();
+
+  app.useLogger(false);
 
   app.setGlobalPrefix('api/v1', {
     exclude: ['/health', '/metrics'],

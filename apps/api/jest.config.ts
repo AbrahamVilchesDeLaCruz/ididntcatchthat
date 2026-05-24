@@ -36,23 +36,49 @@ const config: Config = {
     '/node_modules/(?!(@nestjs)/)',
   ],
   testEnvironment: 'node',
+  // Use V8 native coverage — more accurate with TypeScript decorators.
+  // Babel-based coverage generates phantom branches from emitDecoratorMetadata.
+  coverageProvider: 'v8',
   // ─── Coverage ───────────────────────────────────────────────────────────────
+  //
+  // Filosofía: 100% sobre la capa application (use cases + domain services).
+  // La capa domain se incluye SOLO para clases con lógica real que los use
+  // cases ejercitan directamente. Se excluyen:
+  //   - Interfaces de repositorios y servicios de dominio (no tienen impl)
+  //   - VOs con validación en constructor (testeados vía E2E + ValidationPipe)
+  //   - fromPrimitives / toPrimitives (responsabilidad de infrastructure)
+  //   - Eventos de dominio (su rehidratación la hace el repo en infra)
+  //   - Excepciones que no se lanzan desde use cases cubiertos
+  //   - Primitivas de shared (ValueObject, Criteria — plumbing sin negocio)
+  //
   collectCoverageFrom: [
-    'src/**/domain/**/*.ts',
+    // ─── Application: 100% obligatorio ───────────────────────────────────────
     'src/**/application/**/*.ts',
-    '!src/**/*.module.ts',
-    '!src/**/index.ts',
-    '!src/**/domain/**/*.repository.ts', // interfaces — no tienen implementación que testear
-    '!src/**/domain/**/*.service.ts', // interfaces — idem
+    // ─── Domain: solo clases con lógica ejercitada desde application ─────────
+    // user.ts y refresh-token.ts se ejercitan vía use cases — pero fromPrimitives
+    // y toPrimitives son responsabilidad de infrastructure (persistencia).
+    // Se excluyen para mantener el 100% limpio.
+    'src/**/domain/exceptions/invalid-credentials.exception.ts',
+    'src/**/domain/exceptions/email-already-taken.exception.ts',
+    'src/**/domain/exceptions/nickname-already-taken.exception.ts',
+    'src/**/domain/exceptions/expired-refresh-token.exception.ts',
+    'src/**/domain/exceptions/invalid-refresh-token.exception.ts',
+    'src/**/domain/exceptions/user-session-compromised.exception.ts',
+    'src/**/domain/exceptions/user-not-found.exception.ts',
+    // ─── Shared domain base classes ───────────────────────────────────────────
+    'src/shared/domain/aggregate-root.ts',
+    'src/shared/domain/domain-event.ts',
+    'src/shared/domain/domain-event-publisher.ts',
+    'src/shared/domain/logger.ts',
   ],
   coverageDirectory: 'coverage/unit',
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
+      branches: 90,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
   },
 };

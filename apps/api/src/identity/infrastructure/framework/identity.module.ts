@@ -43,7 +43,7 @@ import { GoogleOAuthHandler } from '@/identity/application/google/google-oauth-h
 import { GuestProgressMigrator } from '@/identity/application/migrate-guest/guest-progress-migrator';
 
 // Domain services
-import { NicknameResolverService } from '@/identity/domain/nickname-resolver.service';
+import { NicknameResolverService } from '@/identity/application/nickname-resolver.service';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';

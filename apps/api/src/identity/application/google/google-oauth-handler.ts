@@ -6,7 +6,7 @@ import { Nickname } from '@/identity/domain/nickname';
 import { UserRole } from '@/identity/domain/user-role';
 import { OauthProvider } from '@/identity/domain/oauth-provider';
 import { Criteria } from '@/shared/domain/criteria';
-import { NicknameResolverService } from '@/identity/domain/nickname-resolver.service';
+import { NicknameResolverService } from '@/identity/application/nickname-resolver.service';
 import {
   type UserRepository,
   USER_REPOSITORY,
@@ -24,6 +24,7 @@ import {
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
 import { RefreshToken } from '@/identity/domain/refresh-token';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type GoogleOAuthHandlerResult = {
   accessToken: string;
@@ -41,7 +42,11 @@ export class GoogleOAuthHandler {
     private readonly tokenService: TokenService,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(NicknameResolverService)
+    /* istanbul ignore next */
     private readonly nicknameResolver: NicknameResolverService,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(params: {
@@ -67,6 +72,9 @@ export class GoogleOAuthHandler {
         ? existing.withAvatar(params.avatarUrl)
         : existing;
       await this.userRepository.save(user);
+      this.logger.info('Google OAuth — existing user logged in', {
+        userId: user.id.value,
+      });
     } else {
       isNewUser = true;
       const nickname = await this.nicknameResolver.resolve(params.displayName);
@@ -84,6 +92,10 @@ export class GoogleOAuthHandler {
 
       await this.userRepository.save(user);
       await this.publisher.publish(user.pullDomainEvents());
+      this.logger.info('Google OAuth — new user registered', {
+        userId: user.id.value,
+        email: params.email,
+      });
     }
 
     const { accessToken, refreshTokenId } = this.tokenService.generatePair({

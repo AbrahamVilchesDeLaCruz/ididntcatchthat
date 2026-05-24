@@ -4,9 +4,11 @@ import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.rep
 import { type RefreshToken } from '@/identity/domain/refresh-token';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type TokenService } from '@/identity/domain/token.service';
+import { type Logger } from '@/shared/domain/logger';
 import { InvalidRefreshTokenException } from '@/identity/domain/exceptions/invalid-refresh-token.exception';
 import { ExpiredRefreshTokenException } from '@/identity/domain/exceptions/expired-refresh-token.exception';
 import { UserSessionCompromisedException } from '@/identity/domain/exceptions/user-session-compromised.exception';
+import { UserNotFoundException } from '@/identity/domain/exceptions/user-not-found.exception';
 import { RefreshTokenMother } from '@test/identity/domain/refresh-token-mother';
 import { UserMother } from '@test/identity/domain/user-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
@@ -17,6 +19,7 @@ describe('identity/application/refresh TokenRefresher', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
   const userRepository = mock<UserRepository>();
   const tokenService = mock<TokenService>();
+  const logger = mock<Logger>();
   let useCase: TokenRefresher;
 
   const params = {
@@ -42,6 +45,7 @@ describe('identity/application/refresh TokenRefresher', () => {
       refreshTokenRepository,
       userRepository,
       tokenService,
+      logger,
     );
   });
 
@@ -118,5 +122,17 @@ describe('identity/application/refresh TokenRefresher', () => {
     expect(saved.some(([t]) => t.id === activeToken.id && t.isRevoked())).toBe(
       true,
     );
+  });
+
+  it('should throw UserNotFoundException when token is valid but user does not exist', async () => {
+    const token = RefreshTokenMother.valid({ tokenId: params.tokenId });
+
+    refreshTokenRepository.match.mockResolvedValueOnce([token]);
+    userRepository.search.mockResolvedValueOnce(null);
+
+    await expect(useCase.execute(params)).rejects.toThrow(
+      UserNotFoundException,
+    );
+    expect(refreshTokenRepository.save).not.toHaveBeenCalled();
   });
 });
