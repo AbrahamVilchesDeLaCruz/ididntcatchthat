@@ -1,6 +1,6 @@
-export interface PasswordService {
+export interface PasswordHasher {
   hash(plain: string): Promise<string>;
   compare(plain: string, hashed: string): Promise<boolean>;
 }
 
-export const PASSWORD_SERVICE = Symbol('PasswordService');
+export const PASSWORD_HASHER = Symbol('PasswordHasher');

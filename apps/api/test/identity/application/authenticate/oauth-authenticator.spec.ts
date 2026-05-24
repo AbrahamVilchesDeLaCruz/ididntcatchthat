@@ -2,9 +2,9 @@ import { mock } from 'jest-mock-extended';
 import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-authenticator';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
-import { type TokenService } from '@/identity/domain/token.service';
+import { type TokenGenerator } from '@/identity/domain/token-generator';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
-import { type NicknameResolverService } from '@/identity/application/nickname-resolver.service';
+import { type NicknameResolver } from '@/identity/domain/nickname-resolver';
 import { type Logger } from '@/shared/domain/logger';
 import { UserRegisteredEvent } from '@/identity/domain/events/user-registered.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
@@ -19,9 +19,9 @@ import { OAuthAuthenticatorParamsMother } from './oauth-authenticator-params.mot
 describe('identity/application/google GoogleOAuthHandler', () => {
   const userRepository = mock<UserRepository>();
   const refreshTokenRepository = mock<RefreshTokenRepository>();
-  const tokenService = mock<TokenService>();
+  const tokenGenerator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
-  const nicknameResolver = mock<NicknameResolverService>();
+  const nicknameResolver = mock<NicknameResolver>();
   const logger = mock<Logger>();
   const searcher = mock<UserSearcher>();
   let authenticator: OAuthAuthenticator;
@@ -30,12 +30,12 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     JestTimers.setup();
     userRepository.save.mockReset();
     refreshTokenRepository.save.mockReset();
-    tokenService.generatePair.mockReset();
+    tokenGenerator.generatePair.mockReset();
     publisher.publish.mockReset();
     nicknameResolver.resolve.mockReset();
     searcher.search.mockReset();
 
-    tokenService.generatePair.mockReturnValue({
+    tokenGenerator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -45,7 +45,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     authenticator = new OAuthAuthenticator(
       userRepository,
       refreshTokenRepository,
-      tokenService,
+      tokenGenerator,
       publisher,
       nicknameResolver,
       logger,
@@ -150,7 +150,7 @@ describe('identity/application/google GoogleOAuthHandler', () => {
     expect(saved).toBe(existing);
   });
 
-  it('should delegate nickname resolution to NicknameResolverService', async () => {
+  it('should delegate nickname resolution to NicknameResolver', async () => {
     const { id, email, avatarUrl, displayName, deviceId, fingerprint, ip } =
       OAuthAuthenticatorParamsMother.random({ displayName: 'John Doe 123' });
     nicknameResolver.resolve.mockResolvedValue('john-doe-123');

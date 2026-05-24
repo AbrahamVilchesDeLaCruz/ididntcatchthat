@@ -6,7 +6,7 @@ import {
 } from '@/identity/domain/user.repository';
 
 @Injectable()
-export class NicknameResolverService {
+export class NicknameResolver {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly repository: UserRepository,

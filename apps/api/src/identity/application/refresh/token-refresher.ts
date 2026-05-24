@@ -14,9 +14,9 @@ import {
   USER_REPOSITORY,
 } from '@/identity/domain/user.repository';
 import {
-  type TokenService,
-  TOKEN_SERVICE,
-} from '@/identity/domain/token.service';
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/domain/token-generator';
 import { UserId } from '@/identity/domain/user-id';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
@@ -31,8 +31,8 @@ export class TokenRefresher {
     private readonly refreshTokenRepository: RefreshTokenRepository,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
-    @Inject(TOKEN_SERVICE)
-    private readonly tokenService: TokenService,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -83,7 +83,7 @@ export class TokenRefresher {
     const revokedToken = token.revoke();
     await this.refreshTokenRepository.save(revokedToken);
 
-    const { accessToken, refreshTokenId } = this.tokenService.generatePair({
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId: params.deviceId,

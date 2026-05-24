@@ -11,13 +11,13 @@ import {
   REFRESH_TOKEN_REPOSITORY,
 } from '@/identity/domain/refresh-token.repository';
 import {
-  type PasswordService,
-  PASSWORD_SERVICE,
-} from '@/identity/domain/password.service';
+  type PasswordHasher,
+  PASSWORD_HASHER,
+} from '@/identity/domain/password-hasher';
 import {
-  type TokenService,
-  TOKEN_SERVICE,
-} from '@/identity/domain/token.service';
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type UserLoggerResult = {
@@ -32,10 +32,10 @@ export class UserLogger {
     private readonly userRepository: UserRepository,
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    @Inject(PASSWORD_SERVICE)
-    private readonly passwordService: PasswordService,
-    @Inject(TOKEN_SERVICE)
-    private readonly tokenService: TokenService,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -55,14 +55,14 @@ export class UserLogger {
 
     if (!user.passwordHash) throw new InvalidCredentialsException();
 
-    const valid = await this.passwordService.compare(
+    const valid = await this.passwordHasher.compare(
       params.password,
       user.passwordHash.value,
     );
 
     if (!valid) throw new InvalidCredentialsException();
 
-    const { accessToken, refreshTokenId } = this.tokenService.generatePair({
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId: params.deviceId,

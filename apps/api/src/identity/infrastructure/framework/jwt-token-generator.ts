@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
-  type TokenService,
+  type TokenGenerator,
   type TokenPair,
-} from '@/identity/domain/token.service';
+} from '@/identity/domain/token-generator';
 import { type UserContext } from '@/shared/domain/user-context';
 import crypto from 'crypto';
 
 @Injectable()
-export class JwtTokenService implements TokenService {
+export class JwtTokenGenerator implements TokenGenerator {
   constructor(private readonly jwt: JwtService) {}
 
   generatePair(context: UserContext): TokenPair {

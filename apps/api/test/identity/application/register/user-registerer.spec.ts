@@ -2,8 +2,8 @@ import { mock } from 'jest-mock-extended';
 import { UserRegisterer } from '@/identity/application/register/user-registerer';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
-import { type PasswordService } from '@/identity/domain/password.service';
-import { type TokenService } from '@/identity/domain/token.service';
+import { type PasswordHasher } from '@/identity/domain/password-hasher';
+import { type TokenGenerator } from '@/identity/domain/token-generator';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type Logger } from '@/shared/domain/logger';
 import { EmailAlreadyTakenException } from '@/identity/domain/exceptions/email-already-taken.exception';
@@ -20,8 +20,8 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/register UserRegisterer', () => {
   const userRepository = mock<UserRepository>();
   const refreshTokenRepository = mock<RefreshTokenRepository>();
-  const passwordService = mock<PasswordService>();
-  const tokenService = mock<TokenService>();
+  const passwordHasher = mock<PasswordHasher>();
+  const tokenGenerator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
   let useCase: UserRegisterer;
@@ -31,14 +31,14 @@ describe('identity/application/register UserRegisterer', () => {
     userRepository.match.mockReset();
     userRepository.save.mockReset();
     refreshTokenRepository.save.mockReset();
-    passwordService.hash.mockReset();
-    tokenService.generatePair.mockReset();
+    passwordHasher.hash.mockReset();
+    tokenGenerator.generatePair.mockReset();
     publisher.publish.mockReset();
 
     // defaults: no conflicts
     userRepository.match.mockResolvedValue([]);
-    passwordService.hash.mockResolvedValue('hashed-password');
-    tokenService.generatePair.mockReturnValue({
+    passwordHasher.hash.mockResolvedValue('hashed-password');
+    tokenGenerator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -47,8 +47,8 @@ describe('identity/application/register UserRegisterer', () => {
     useCase = new UserRegisterer(
       userRepository,
       refreshTokenRepository,
-      passwordService,
-      tokenService,
+      passwordHasher,
+      tokenGenerator,
       publisher,
       logger,
     );
@@ -72,7 +72,7 @@ describe('identity/application/register UserRegisterer', () => {
 
     await useCase.execute(request);
 
-    expect(passwordService.hash).toHaveBeenCalledWith(request.password);
+    expect(passwordHasher.hash).toHaveBeenCalledWith(request.password);
     const savedUser: User = userRepository.save.mock.calls[0][0];
     expect(savedUser.passwordHash?.value).toBe('hashed-password');
   });

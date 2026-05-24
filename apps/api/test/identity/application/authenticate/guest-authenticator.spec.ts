@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { GuestAuthenticator } from '@/identity/application/authenticate/guest-authenticator';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
-import { type TokenService } from '@/identity/domain/token.service';
+import { type TokenGenerator } from '@/identity/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
 import { GuestAuthenticatorParamsMother } from './guest-authenticator-params.mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
@@ -9,18 +9,18 @@ import { JestTimers } from '@test/shared/jest-timers';
 
 describe('identity/application/guest GuestAuthenticator', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
-  const tokenService = mock<TokenService>();
+  const tokenGenerator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: GuestAuthenticator;
 
   beforeEach(() => {
     JestTimers.setup();
     refreshTokenRepository.save.mockReset();
-    tokenService.generateGuest.mockReset();
+    tokenGenerator.generateGuest.mockReset();
 
     useCase = new GuestAuthenticator(
       refreshTokenRepository,
-      tokenService,
+      tokenGenerator,
       logger,
     );
   });
@@ -32,7 +32,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
     const fakeAccessToken = UuidMother.random();
     const fakeRefreshTokenId = UuidMother.random();
 
-    tokenService.generateGuest.mockReturnValueOnce({
+    tokenGenerator.generateGuest.mockReturnValueOnce({
       accessToken: fakeAccessToken,
       refreshTokenId: fakeRefreshTokenId,
     });
@@ -48,7 +48,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
     const request = GuestAuthenticatorParamsMother.random();
     const fakeRefreshTokenId = UuidMother.random();
 
-    tokenService.generateGuest.mockReturnValueOnce({
+    tokenGenerator.generateGuest.mockReturnValueOnce({
       accessToken: UuidMother.random(),
       refreshTokenId: fakeRefreshTokenId,
     });
@@ -65,14 +65,14 @@ describe('identity/application/guest GuestAuthenticator', () => {
   it('should call tokenService with fingerprint and ip', async () => {
     const request = GuestAuthenticatorParamsMother.random();
 
-    tokenService.generateGuest.mockReturnValueOnce({
+    tokenGenerator.generateGuest.mockReturnValueOnce({
       accessToken: UuidMother.random(),
       refreshTokenId: UuidMother.random(),
     });
 
     await useCase.execute(request);
 
-    expect(tokenService.generateGuest).toHaveBeenCalledWith(
+    expect(tokenGenerator.generateGuest).toHaveBeenCalledWith(
       expect.objectContaining({
         fingerprint: request.fingerprint,
         ip: request.ip,

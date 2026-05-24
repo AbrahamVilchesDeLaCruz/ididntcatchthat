@@ -5,9 +5,9 @@ import {
   REFRESH_TOKEN_REPOSITORY,
 } from '@/identity/domain/refresh-token.repository';
 import {
-  type TokenService,
-  TOKEN_SERVICE,
-} from '@/identity/domain/token.service';
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type GuestAuthenticatorResult = {
@@ -20,8 +20,8 @@ export class GuestAuthenticator {
   constructor(
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    @Inject(TOKEN_SERVICE)
-    private readonly tokenService: TokenService,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -32,7 +32,7 @@ export class GuestAuthenticator {
   }): Promise<GuestAuthenticatorResult> {
     const deviceId = crypto.randomUUID();
 
-    const { accessToken, refreshTokenId } = this.tokenService.generateGuest({
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generateGuest({
       deviceId,
       fingerprint: params.fingerprint,
       ip: params.ip,

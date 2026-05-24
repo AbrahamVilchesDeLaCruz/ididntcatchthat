@@ -4,8 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // Domain tokens
 import { USER_REPOSITORY } from '@/identity/domain/user.repository';
 import { REFRESH_TOKEN_REPOSITORY } from '@/identity/domain/refresh-token.repository';
-import { TOKEN_SERVICE } from '@/identity/domain/token.service';
-import { PASSWORD_SERVICE } from '@/identity/domain/password.service';
+import { TOKEN_GENERATOR } from '@/identity/domain/token-generator';
+import { PASSWORD_HASHER } from '@/identity/domain/password-hasher';
 import { GUEST_GAME_MIGRATION_REPOSITORY } from '@/identity/domain/guest-game-migration.repository';
 import { DOMAIN_EVENT_PUBLISHER } from '@/shared/domain/domain-event-publisher';
 
@@ -17,8 +17,8 @@ import { TypeOrmRefreshTokenRepository } from '@/identity/infrastructure/persist
 import { StubGuestGameMigrationRepository } from '@/identity/infrastructure/persistence/stub-guest-game-migration.repository';
 
 // Infrastructure — services
-import { JwtTokenService } from './jwt-token.service';
-import { BcryptPasswordService } from './bcrypt-password.service';
+import { JwtTokenGenerator } from './jwt-token-generator';
+import { BcryptPasswordHasher } from './bcrypt-password-hasher';
 
 // Infrastructure — controllers
 import { GuestAuthPostController } from '@/identity/infrastructure/controllers/guest-auth-post.controller';
@@ -43,7 +43,7 @@ import { OAuthAuthenticator } from '@/identity/application/authenticate/oauth-au
 import { GuestProgressMigrator } from '@/identity/application/migrate-guest/guest-progress-migrator';
 
 // Domain services
-import { NicknameResolverService } from '@/identity/application/nickname-resolver.service';
+import { NicknameResolver } from '@/identity/domain/nickname-resolver';
 import { UserSearcher } from '@/identity/domain/user-searcher';
 
 // Shared modules
@@ -82,12 +82,12 @@ import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
     },
 
     // Services
-    { provide: TOKEN_SERVICE, useClass: JwtTokenService },
-    { provide: PASSWORD_SERVICE, useClass: BcryptPasswordService },
+    { provide: TOKEN_GENERATOR, useClass: JwtTokenGenerator },
+    { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: DOMAIN_EVENT_PUBLISHER, useClass: NoopDomainEventPublisher },
 
     // Domain services
-    NicknameResolverService,
+    NicknameResolver,
     UserSearcher,
 
     // Use cases

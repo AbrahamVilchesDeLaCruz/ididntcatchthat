@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/domain/user';
-import { NicknameResolverService } from '@/identity/application/nickname-resolver.service';
+import { NicknameResolver } from '@/identity/domain/nickname-resolver';
 import {
   type UserRepository,
   USER_REPOSITORY,
@@ -10,9 +10,9 @@ import {
   REFRESH_TOKEN_REPOSITORY,
 } from '@/identity/domain/refresh-token.repository';
 import {
-  type TokenService,
-  TOKEN_SERVICE,
-} from '@/identity/domain/token.service';
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/domain/token-generator';
 import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
@@ -32,12 +32,12 @@ export class OAuthAuthenticator {
     private readonly userRepository: UserRepository,
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    @Inject(TOKEN_SERVICE)
-    private readonly tokenService: TokenService,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
-    @Inject(NicknameResolverService)
-    private readonly nicknameResolver: NicknameResolverService,
+    @Inject(NicknameResolver)
+    private readonly nicknameResolver: NicknameResolver,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
     @Inject(UserSearcher)
@@ -83,7 +83,7 @@ export class OAuthAuthenticator {
 
     this.logUserAuthentication(isNewUser, user, email);
 
-    const { accessToken, refreshTokenId } = this.tokenService.generatePair({
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId: deviceId,

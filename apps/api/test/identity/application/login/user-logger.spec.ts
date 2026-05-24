@@ -2,8 +2,8 @@ import { mock } from 'jest-mock-extended';
 import { UserLogger } from '@/identity/application/login/user-logger';
 import { type UserRepository } from '@/identity/domain/user.repository';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
-import { type PasswordService } from '@/identity/domain/password.service';
-import { type TokenService } from '@/identity/domain/token.service';
+import { type PasswordHasher } from '@/identity/domain/password-hasher';
+import { type TokenGenerator } from '@/identity/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
 import { InvalidCredentialsException } from '@/identity/domain/exceptions/invalid-credentials.exception';
 import { UserMother } from '@test/identity/domain/user-mother';
@@ -14,8 +14,8 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/login UserLogger', () => {
   const userRepository = mock<UserRepository>();
   const refreshTokenRepository = mock<RefreshTokenRepository>();
-  const passwordService = mock<PasswordService>();
-  const tokenService = mock<TokenService>();
+  const passwordHasher = mock<PasswordHasher>();
+  const tokenGenerator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: UserLogger;
 
@@ -23,10 +23,10 @@ describe('identity/application/login UserLogger', () => {
     JestTimers.setup();
     userRepository.match.mockReset();
     refreshTokenRepository.save.mockReset();
-    passwordService.compare.mockReset();
-    tokenService.generatePair.mockReset();
+    passwordHasher.compare.mockReset();
+    tokenGenerator.generatePair.mockReset();
 
-    tokenService.generatePair.mockReturnValue({
+    tokenGenerator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -34,8 +34,8 @@ describe('identity/application/login UserLogger', () => {
     useCase = new UserLogger(
       userRepository,
       refreshTokenRepository,
-      passwordService,
-      tokenService,
+      passwordHasher,
+      tokenGenerator,
       logger,
     );
   });
@@ -47,7 +47,7 @@ describe('identity/application/login UserLogger', () => {
     const user = UserMother.randomWithPassword(request.email);
 
     userRepository.match.mockResolvedValueOnce([user]);
-    passwordService.compare.mockResolvedValueOnce(true);
+    passwordHasher.compare.mockResolvedValueOnce(true);
 
     const result = await useCase.execute(request);
 
@@ -71,7 +71,7 @@ describe('identity/application/login UserLogger', () => {
     const user = UserMother.randomWithPassword(request.email);
 
     userRepository.match.mockResolvedValueOnce([user]);
-    passwordService.compare.mockResolvedValueOnce(false);
+    passwordHasher.compare.mockResolvedValueOnce(false);
 
     await expect(useCase.execute(request)).rejects.toThrow(
       InvalidCredentialsException,

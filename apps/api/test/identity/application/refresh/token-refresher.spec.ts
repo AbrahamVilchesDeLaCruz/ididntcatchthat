@@ -3,7 +3,7 @@ import { TokenRefresher } from '@/identity/application/refresh/token-refresher';
 import { type RefreshTokenRepository } from '@/identity/domain/refresh-token.repository';
 import { type RefreshToken } from '@/identity/domain/refresh-token';
 import { type UserRepository } from '@/identity/domain/user.repository';
-import { type TokenService } from '@/identity/domain/token.service';
+import { type TokenGenerator } from '@/identity/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
 import { InvalidRefreshTokenException } from '@/identity/domain/exceptions/invalid-refresh-token.exception';
 import { ExpiredRefreshTokenException } from '@/identity/domain/exceptions/expired-refresh-token.exception';
@@ -18,7 +18,7 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/refresh TokenRefresher', () => {
   const refreshTokenRepository = mock<RefreshTokenRepository>();
   const userRepository = mock<UserRepository>();
-  const tokenService = mock<TokenService>();
+  const tokenGenerator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: TokenRefresher;
 
@@ -34,9 +34,9 @@ describe('identity/application/refresh TokenRefresher', () => {
     refreshTokenRepository.match.mockReset();
     refreshTokenRepository.save.mockReset();
     userRepository.search.mockReset();
-    tokenService.generatePair.mockReset();
+    tokenGenerator.generatePair.mockReset();
 
-    tokenService.generatePair.mockReturnValue({
+    tokenGenerator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -44,7 +44,7 @@ describe('identity/application/refresh TokenRefresher', () => {
     useCase = new TokenRefresher(
       refreshTokenRepository,
       userRepository,
-      tokenService,
+      tokenGenerator,
       logger,
     );
   });

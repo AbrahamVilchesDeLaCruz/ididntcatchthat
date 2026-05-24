@@ -10,13 +10,13 @@ import {
   USER_REPOSITORY,
 } from '@/identity/domain/user.repository';
 import {
-  type PasswordService,
-  PASSWORD_SERVICE,
-} from '@/identity/domain/password.service';
+  type PasswordHasher,
+  PASSWORD_HASHER,
+} from '@/identity/domain/password-hasher';
 import {
-  type TokenService,
-  TOKEN_SERVICE,
-} from '@/identity/domain/token.service';
+  type TokenGenerator,
+  TOKEN_GENERATOR,
+} from '@/identity/domain/token-generator';
 import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
@@ -40,10 +40,10 @@ export class UserRegisterer {
     private readonly userRepository: UserRepository,
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    @Inject(PASSWORD_SERVICE)
-    private readonly passwordService: PasswordService,
-    @Inject(TOKEN_SERVICE)
-    private readonly tokenService: TokenService,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
+    @Inject(TOKEN_GENERATOR)
+    private readonly tokenGenerator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -77,7 +77,7 @@ export class UserRegisterer {
     if (byNickname.length > 0)
       throw new NicknameAlreadyTakenException(params.nickname);
 
-    const passwordHash = await this.passwordService.hash(params.password);
+    const passwordHash = await this.passwordHasher.hash(params.password);
 
     const user = User.register(
       params.id,
@@ -89,7 +89,7 @@ export class UserRegisterer {
       null,
     );
 
-    const { accessToken, refreshTokenId } = this.tokenService.generatePair({
+    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId: params.deviceId,
