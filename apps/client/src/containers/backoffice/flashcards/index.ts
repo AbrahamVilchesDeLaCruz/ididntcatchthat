@@ -1,0 +1,1 @@
+export { BackofficeFlashcardsContainer } from './BackofficeFlashcardsContainer';
