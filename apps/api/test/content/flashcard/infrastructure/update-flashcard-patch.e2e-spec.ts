@@ -40,7 +40,6 @@ describe('content/flashcard UpdateFlashcardPatchController (e2e)', () => {
           examples: [
             {
               id: exampleId,
-              flashcardId: id,
               textEn: "I'm gonna be late.",
               textEs: 'Voy a llegar tarde.',
               position: 1,

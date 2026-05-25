@@ -42,7 +42,6 @@ describe('content/flashcard BulkCreateFlashcardPostController (e2e)', () => {
               examples: [
                 {
                   id: crypto.randomUUID(),
-                  flashcardId: id1,
                   textEn: "I'm gonna be late.",
                   textEs: 'Voy a llegar tarde.',
                   position: 1,
@@ -57,7 +56,6 @@ describe('content/flashcard BulkCreateFlashcardPostController (e2e)', () => {
               examples: [
                 {
                   id: crypto.randomUUID(),
-                  flashcardId: id2,
                   textEn: 'I wanna go home.',
                   textEs: 'Quiero ir a casa.',
                   position: 1,
