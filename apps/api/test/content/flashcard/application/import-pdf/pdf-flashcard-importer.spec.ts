@@ -38,8 +38,16 @@ describe('content/flashcard/application/import-pdf PdfFlashcardImporter', () => 
     expect(result).toEqual(drafts);
   });
 
-  it('should throw PdfExtractionFailed when extractor throws', async () => {
+  it('should throw PdfExtractionFailed when extractor throws an Error', async () => {
     extractor.extract.mockRejectedValue(new Error('parse error'));
+
+    await expect(importer.execute(Buffer.from('pdf'))).rejects.toThrow(
+      PdfExtractionFailed,
+    );
+  });
+
+  it('should throw PdfExtractionFailed when extractor throws a non-Error value', async () => {
+    extractor.extract.mockRejectedValue('string error');
 
     await expect(importer.execute(Buffer.from('pdf'))).rejects.toThrow(
       PdfExtractionFailed,
