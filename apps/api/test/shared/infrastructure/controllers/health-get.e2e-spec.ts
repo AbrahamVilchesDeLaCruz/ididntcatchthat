@@ -18,7 +18,7 @@ describe('shared/health HealthGetController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api/v1', { exclude: ['/health'] });
+    app.setGlobalPrefix('v1', { exclude: ['/health'] });
     await app.init();
   });
 

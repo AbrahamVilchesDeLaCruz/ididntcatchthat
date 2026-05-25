@@ -26,13 +26,13 @@ describe('content/flashcard UpdateFlashcardPatchController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('PATCH /api/v1/flashcards/:id', () => {
+  describe('PATCH /v1/flashcards/:id', () => {
     it('should return 200 with updated flashcard when it exists', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
 
       await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           ...VALID_PAYLOAD,
@@ -50,7 +50,7 @@ describe('content/flashcard UpdateFlashcardPatchController (e2e)', () => {
         .expect(201);
 
       const res = await request(app.getHttpServer())
-        .patch(`/api/v1/flashcards/${id}`)
+        .patch(`/v1/flashcards/${id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ meaning: 'Updated meaning for gonna' })
         .expect(200);
@@ -61,7 +61,7 @@ describe('content/flashcard UpdateFlashcardPatchController (e2e)', () => {
 
     it('should return 404 when flashcard does not exist', async () => {
       await request(app.getHttpServer())
-        .patch('/api/v1/flashcards/f47ac10b-58cc-4372-a567-999999999999')
+        .patch('/v1/flashcards/f47ac10b-58cc-4372-a567-999999999999')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ meaning: 'new meaning' })
         .expect(404);

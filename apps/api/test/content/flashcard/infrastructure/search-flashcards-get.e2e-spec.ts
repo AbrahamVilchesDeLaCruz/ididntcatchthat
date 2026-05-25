@@ -26,13 +26,13 @@ describe('content/flashcard SearchFlashcardsGetController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('GET /api/v1/flashcards', () => {
+  describe('GET /v1/flashcards', () => {
     it('should return 200 with paginated result containing the created flashcard', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
 
       await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           ...VALID_PAYLOAD,
@@ -50,7 +50,7 @@ describe('content/flashcard SearchFlashcardsGetController (e2e)', () => {
         .expect(201);
 
       const res = await request(app.getHttpServer())
-        .get('/api/v1/flashcards')
+        .get('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, pageSize: 10 })
         .expect(200);

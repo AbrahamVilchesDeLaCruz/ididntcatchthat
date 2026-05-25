@@ -26,13 +26,13 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /api/v1/flashcards', () => {
+  describe('POST /v1/flashcards', () => {
     it('should return 201 with created flashcard when admin sends valid payload', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
 
       const res = await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           ...VALID_PAYLOAD,
@@ -56,7 +56,7 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
 
     it('should return 401 when no token is provided', async () => {
       await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .send({
           ...VALID_PAYLOAD,
           id: crypto.randomUUID(),
@@ -71,19 +71,19 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
       const nickname = `user${suffix}`.slice(0, 20);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({ email, password: 'Str0ng!Pass#2026', nickname })
         .expect(201);
 
       const loginRes = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
+        .post('/v1/auth/login')
         .send({ email, password: 'Str0ng!Pass#2026' })
         .expect(200);
 
       const userToken = (loginRes.body as { accessToken: string }).accessToken;
 
       await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           ...VALID_PAYLOAD,
@@ -95,7 +95,7 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
 
     it('should return 422 when expression is empty', async () => {
       await request(app.getHttpServer())
-        .post('/api/v1/flashcards')
+        .post('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           ...VALID_PAYLOAD,

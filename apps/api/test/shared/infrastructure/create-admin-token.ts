@@ -17,7 +17,7 @@ export async function createAdminToken(
   const nickname = `admin${suffix}`.slice(0, 20);
 
   await request(app.getHttpServer())
-    .post('/api/v1/auth/register')
+    .post('/v1/auth/register')
     .send({ email, password: VALID_PASSWORD, nickname })
     .expect(201);
 
@@ -26,7 +26,7 @@ export async function createAdminToken(
   await ds.query(`UPDATE users SET role = 'admin' WHERE email = $1`, [email]);
 
   const loginRes = await request(app.getHttpServer())
-    .post('/api/v1/auth/login')
+    .post('/v1/auth/login')
     .send({ email, password: VALID_PASSWORD })
     .expect(200);
 

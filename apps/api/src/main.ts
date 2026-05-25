@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
 
   // ─── Global prefix ─────────────────────────────────────────────────────────
   // /health and /metrics are excluded — reachable without versioning prefix
-  app.setGlobalPrefix('api/v1', { exclude: ['/health', '/metrics'] });
+  app.setGlobalPrefix('v1', { exclude: ['/health', '/metrics'] });
 
   // ─── Validation ────────────────────────────────────────────────────────────
   app.useGlobalPipes(

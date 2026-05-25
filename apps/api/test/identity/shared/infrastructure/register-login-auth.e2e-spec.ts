@@ -18,10 +18,10 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /api/v1/auth/register', () => {
+  describe('POST /v1/auth/register', () => {
     it('should return 201 on successful registration', async () => {
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({
           email: VALID_EMAIL,
           password: VALID_PASSWORD,
@@ -35,12 +35,12 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
       const nickname = `dupnick${Date.now()}`.slice(0, 20);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({ email, password: VALID_PASSWORD, nickname })
         .expect(201);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({
           email,
           password: VALID_PASSWORD,
@@ -53,7 +53,7 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
       const nickname = `dupnick${Date.now()}`.slice(0, 20);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({
           email: `e2e-nick1-${Date.now()}@test.com`,
           password: VALID_PASSWORD,
@@ -62,7 +62,7 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
         .expect(201);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({
           email: `e2e-nick2-${Date.now()}@test.com`,
           password: VALID_PASSWORD,
@@ -73,7 +73,7 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
 
     it('should return 422 when password is too weak', async () => {
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({
           email: `e2e-weak-${Date.now()}@test.com`,
           password: '123',
@@ -83,18 +83,18 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
     });
   });
 
-  describe('POST /api/v1/auth/login', () => {
+  describe('POST /v1/auth/login', () => {
     it('should return 200 with accessToken on valid credentials', async () => {
       const email = `e2e-login-${Date.now()}@test.com`;
       const nickname = `login${Date.now()}`.slice(0, 20);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({ email, password: VALID_PASSWORD, nickname })
         .expect(201);
 
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
+        .post('/v1/auth/login')
         .send({ email, password: VALID_PASSWORD })
         .expect(200);
 
@@ -111,7 +111,7 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
 
     it('should return 401 with same message for wrong email', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
+        .post('/v1/auth/login')
         .send({ email: 'nonexistent@test.com', password: VALID_PASSWORD })
         .expect(401);
 
@@ -124,12 +124,12 @@ describe('identity/auth RegisterAuthPostController (e2e)', () => {
       const nickname = `wrongpw${Date.now()}`.slice(0, 20);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
+        .post('/v1/auth/register')
         .send({ email, password: VALID_PASSWORD, nickname })
         .expect(201);
 
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
+        .post('/v1/auth/login')
         .send({ email, password: 'WrongPass!999' })
         .expect(401);
 
