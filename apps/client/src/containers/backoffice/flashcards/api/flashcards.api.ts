@@ -6,6 +6,7 @@ import type {
   BulkCreateFlashcardApiResult,
   CreateFlashcardApiPayload,
   FlashcardApiModel,
+  FlashcardCatalogApiModel,
   FlashcardDraftApiModel,
   FlashcardsListApiModel,
   SearchFlashcardsParams,
@@ -19,9 +20,24 @@ export const flashcardKeys = {
   list: (params: SearchFlashcardsParams) =>
     [...flashcardKeys.lists(), params] as const,
   detail: (id: string) => [...flashcardKeys.all, 'detail', id] as const,
+  catalog: () => [...flashcardKeys.all, 'catalog'] as const,
 };
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useFlashcardCatalog = () => {
+  return useQuery({
+    queryKey: flashcardKeys.catalog(),
+    queryFn: async (): Promise<FlashcardCatalogApiModel> => {
+      const res = await apiClient.get<FlashcardCatalogApiModel>(
+        '/flashcards/catalog',
+      );
+      return res.data;
+    },
+    staleTime: Infinity,
+  });
+};
+
 export const useFlashcards = (
   params: SearchFlashcardsParams = {},
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
