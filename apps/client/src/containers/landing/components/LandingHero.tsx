@@ -1,10 +1,13 @@
 import { type ReactElement } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
+import { useAuthStore } from '@/core/store/auth.store';
 
 export const LandingHero = (): ReactElement => {
   const { t, locale, toggleLocale } = useI18n();
   const h = t.landing.hero;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 py-20 text-center">
@@ -16,8 +19,32 @@ export const LandingHero = (): ReactElement => {
         <div className="h-[500px] w-[500px] rounded-full bg-[var(--color-brand)] opacity-[0.08] blur-[120px]" />
       </div>
 
-      {/* Language toggle — top right */}
-      <div className="absolute right-5 top-5 z-10">
+      {/* Top bar — language toggle + auth links */}
+      <div className="absolute right-5 top-5 z-10 flex items-center gap-3">
+        {isAuthenticated ? (
+          <Link
+            to="/backoffice/flashcards"
+            className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          >
+            Ir al backoffice →
+          </Link>
+        ) : (
+          <>
+            <Link
+              to="/auth/login"
+              className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+            >
+              Iniciar sesión
+            </Link>
+            <Link
+              to="/auth/register"
+              className="rounded-full bg-[var(--color-brand)] px-4 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Registrarse
+            </Link>
+          </>
+        )}
+
         <button
           onClick={toggleLocale}
           className="flex items-center gap-1.5 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
@@ -45,16 +72,6 @@ export const LandingHero = (): ReactElement => {
         </button>
       </div>
 
-      {/* Logo — wordmark */}
-      {/*  <div className="relative mb-3 w-2/3 sm:w-1/2 md:w-2/5">
-        <img
-          src="/logo.idct-cropped.png"
-          alt="ididntcatchthat"
-          className="w-full"
-          draggable={false}
-        />
-      </div> */}
-
       {/* Badge */}
       <div className="relative mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)]">
         <span className="size-2 animate-pulse rounded-full bg-[var(--color-accent-green)]" />
@@ -76,12 +93,12 @@ export const LandingHero = (): ReactElement => {
 
       {/* CTA */}
       <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-        <a
-          href="#notify"
+        <Link
+          to="/auth/register"
           className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand)] px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
         >
           {h.ctaPrimary}
-        </a>
+        </Link>
         <a
           href="#how-it-works"
           className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"

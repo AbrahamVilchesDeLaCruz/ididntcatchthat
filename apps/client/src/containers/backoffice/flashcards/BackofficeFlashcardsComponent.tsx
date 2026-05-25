@@ -1,8 +1,14 @@
 import { type ReactElement, useState } from 'react';
 import type { FlashcardFormValues, FlashcardVM } from './flashcards.types';
+import type {
+  CreateFlashcardApiPayload,
+  FlashcardDraftApiModel,
+} from './api/flashcards.api-model';
 import { FlashcardsTable } from './components/FlashcardsTable';
 import { FlashcardFormModal } from './components/FlashcardFormModal';
 import { FlashcardsToolbar } from './components/FlashcardsToolbar';
+import { BulkCreateModal } from './components/BulkCreateModal';
+import { ImportPdfModal } from './components/ImportPdfModal';
 
 interface BackofficeFlashcardsComponentProps {
   flashcards: FlashcardVM[];
@@ -12,12 +18,22 @@ interface BackofficeFlashcardsComponentProps {
   isLoading: boolean;
   isError: boolean;
   isMutating: boolean;
+  isImportingPdf: boolean;
+  pdfDrafts: FlashcardDraftApiModel[] | null;
   categoryFilter: string | undefined;
+  subcategoryFilter: string | undefined;
+  audioStatusFilter: string | undefined;
   onPageChange: (page: number) => void;
   onCategoryFilter: (category: string | undefined) => void;
+  onSubcategoryFilter: (subcategory: string | undefined) => void;
+  onAudioStatusFilter: (audioStatus: string | undefined) => void;
   onCreate: (values: FlashcardFormValues) => void;
   onUpdate: (id: string, values: Partial<FlashcardFormValues>) => void;
   onDelete: (id: string) => void;
+  onBulkCreate: (flashcards: CreateFlashcardApiPayload[]) => void;
+  onPdfUpload: (file: File) => void;
+  onPdfConfirm: (drafts: FlashcardDraftApiModel[]) => void;
+  onPdfDraftsClose: () => void;
 }
 
 export const BackofficeFlashcardsComponent = ({
@@ -28,14 +44,26 @@ export const BackofficeFlashcardsComponent = ({
   isLoading,
   isError,
   isMutating,
+  isImportingPdf,
+  pdfDrafts,
   categoryFilter,
+  subcategoryFilter,
+  audioStatusFilter,
   onPageChange,
   onCategoryFilter,
+  onSubcategoryFilter,
+  onAudioStatusFilter,
   onCreate,
   onUpdate,
   onDelete,
+  onBulkCreate,
+  onPdfUpload,
+  onPdfConfirm,
+  onPdfDraftsClose,
 }: BackofficeFlashcardsComponentProps): ReactElement => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isImportPdfModalOpen, setIsImportPdfModalOpen] = useState(false);
   const [editingFlashcard, setEditingFlashcard] = useState<FlashcardVM | null>(
     null,
   );
@@ -60,6 +88,11 @@ export const BackofficeFlashcardsComponent = ({
     setDeletingId(null);
   };
 
+  const handleBulkSubmit = (flashcards: CreateFlashcardApiPayload[]): void => {
+    onBulkCreate(flashcards);
+    setIsBulkModalOpen(false);
+  };
+
   if (isError) {
     return (
       <div className="text-red-400 text-center py-16">
@@ -78,19 +111,39 @@ export const BackofficeFlashcardsComponent = ({
             {total} flashcards en total
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsCreateModalOpen(true)}
-          className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition text-sm"
-        >
-          + Nueva flashcard
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsImportPdfModalOpen(true)}
+            className="px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition text-sm border border-white/10"
+          >
+            📄 Importar PDF
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsBulkModalOpen(true)}
+            className="px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition text-sm border border-white/10"
+          >
+            + Bloque
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition text-sm"
+          >
+            + Nueva flashcard
+          </button>
+        </div>
       </div>
 
       {/* Toolbar */}
       <FlashcardsToolbar
         categoryFilter={categoryFilter}
+        subcategoryFilter={subcategoryFilter}
+        audioStatusFilter={audioStatusFilter}
         onCategoryFilter={onCategoryFilter}
+        onSubcategoryFilter={onSubcategoryFilter}
+        onAudioStatusFilter={onAudioStatusFilter}
       />
 
       {/* Table */}
@@ -186,6 +239,32 @@ export const BackofficeFlashcardsComponent = ({
             </div>
           </div>
         </div>
+      )}
+      {/* Bulk Create Modal */}
+      {isBulkModalOpen && (
+        <BulkCreateModal
+          isLoading={isMutating}
+          onSubmit={handleBulkSubmit}
+          onClose={() => setIsBulkModalOpen(false)}
+        />
+      )}
+
+      {/* Import PDF Modal */}
+      {isImportPdfModalOpen && (
+        <ImportPdfModal
+          isUploading={isImportingPdf}
+          isImporting={isMutating}
+          drafts={pdfDrafts}
+          onUpload={onPdfUpload}
+          onConfirm={(drafts) => {
+            onPdfConfirm(drafts);
+            setIsImportPdfModalOpen(false);
+          }}
+          onClose={() => {
+            onPdfDraftsClose();
+            setIsImportPdfModalOpen(false);
+          }}
+        />
       )}
     </div>
   );

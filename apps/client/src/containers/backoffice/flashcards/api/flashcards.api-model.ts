@@ -38,6 +38,15 @@ export interface CreateFlashcardApiPayload {
   examples: FlashcardExampleApiModel[];
 }
 
+export interface BulkCreateFlashcardApiPayload {
+  flashcards: CreateFlashcardApiPayload[];
+}
+
+export interface BulkCreateFlashcardApiResult {
+  created: number;
+  flashcards: FlashcardApiModel[];
+}
+
 export interface UpdateFlashcardApiPayload {
   expression?: string;
   meaning?: string;
@@ -54,4 +63,19 @@ export interface SearchFlashcardsParams {
   audioStatus?: string;
   page?: number;
   pageSize?: number;
+}
+
+export interface FlashcardDraftExampleApiModel {
+  textEn: string;
+  textEs: string;
+}
+
+export interface FlashcardDraftApiModel {
+  expression: string;
+  meaning: string;
+  category: string;
+  subcategory: string;
+  ipaNotation: string | null;
+  nativeSpeech: string | null;
+  examples: FlashcardDraftExampleApiModel[];
 }

@@ -2,8 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
 import type {
+  BulkCreateFlashcardApiPayload,
+  BulkCreateFlashcardApiResult,
   CreateFlashcardApiPayload,
   FlashcardApiModel,
+  FlashcardDraftApiModel,
   FlashcardsListApiModel,
   SearchFlashcardsParams,
   UpdateFlashcardApiPayload,
@@ -96,6 +99,38 @@ export const useDeleteFlashcard = () => {
     onSuccess: (_, id) => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
       queryClient.removeQueries({ queryKey: flashcardKeys.detail(id) });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useBulkCreateFlashcards = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      payload: BulkCreateFlashcardApiPayload,
+    ): Promise<BulkCreateFlashcardApiResult> =>
+      apiClient
+        .post<BulkCreateFlashcardApiResult>('/flashcards/bulk', payload)
+        .then((res) => res.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useImportPdfFlashcards = () => {
+  return useMutation({
+    mutationFn: (file: File): Promise<FlashcardDraftApiModel[]> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiClient
+        .post<FlashcardDraftApiModel[]>('/flashcards/import/pdf', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then((res) => res.data);
     },
   });
 };
