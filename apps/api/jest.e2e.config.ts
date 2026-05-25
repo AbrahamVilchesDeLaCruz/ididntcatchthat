@@ -37,7 +37,7 @@ const config: Config = {
     '!src/**/index.ts',
   ],
   coverageDirectory: './coverage/e2e',
-  coverageReporters: ['text', 'lcov', 'html'],
+  coverageReporters: ['text', 'lcov', 'html', 'json'],
 };
 
 export default config;
