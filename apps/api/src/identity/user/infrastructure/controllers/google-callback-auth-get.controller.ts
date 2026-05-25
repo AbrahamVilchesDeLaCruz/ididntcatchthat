@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Headers,
-  HttpCode,
-  HttpStatus,
-  Ip,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Headers, Ip, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GoogleAuthGuard } from '@/shared/infrastructure/auth/google.guard';
@@ -27,16 +18,18 @@ export class GoogleCallbackAuthGetController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  @ApiResponse({ status: 200, description: 'OAuth login successful' })
+  @ApiOperation({ summary: 'Google OAuth callback — redirects to frontend' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirects to /auth/callback?token=...',
+  })
   async handler(
     @Ip() ip: string,
     @Headers('user-agent') userAgent: string,
     @Headers('accept-language') acceptLanguage: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
     @CurrentUser() profile: UserContext,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<void> {
     const fingerprint = this.fingerprintBuilder.fromRequest(
       userAgent,
       acceptLanguage,
@@ -60,6 +53,11 @@ export class GoogleCallbackAuthGetController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    return { accessToken: result.accessToken };
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:4001';
+
+    res.redirect(
+      302,
+      `${frontendUrl}/auth/callback?token=${result.accessToken}`,
+    );
   }
 }

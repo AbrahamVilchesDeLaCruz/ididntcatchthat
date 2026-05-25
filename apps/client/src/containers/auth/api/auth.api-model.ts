@@ -3,6 +3,11 @@ export interface AuthResponseApiModel {
   accessToken: string;
 }
 
+export interface GuestAuthResponseApiModel {
+  accessToken: string;
+  deviceId: string;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -14,4 +19,19 @@ export interface RegisterPayload {
   password: string;
   nickname: string;
   guestDeviceId?: string;
+}
+
+export interface GuestAuthPayload {
+  timezone?: string;
+}
+
+export interface MigrateGuestPayload {
+  guestDeviceId: string;
+  guestGames: Array<{
+    gameId: string;
+    flashcardId: string;
+    score: number;
+    durationMs: number;
+    playedAt: string;
+  }>;
 }
