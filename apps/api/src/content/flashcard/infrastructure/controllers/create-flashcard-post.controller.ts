@@ -41,7 +41,7 @@ export class CreateFlashcardPostController {
       ipaNotation: body.ipaNotation,
       nativeSpeech: body.nativeSpeech,
       examples: body.examples,
-      createdBy: user.userId,
+      createdBy: user.userId!,
     });
   }
 }
