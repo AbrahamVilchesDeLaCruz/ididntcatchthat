@@ -16,6 +16,8 @@ import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated
 import { FlashcardAudioGeneratingEvent } from './events/flashcard-audio-generating.event';
 import { FlashcardAudioReadyEvent } from './events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from './events/flashcard-audio-failed.event';
+import { FlashcardExamplesCompletedEvent } from './events/flashcard-examples-completed.event';
+import { FlashcardPhoneticsCompletedEvent } from './events/flashcard-phonetics-completed.event';
 
 export type ExampleInput = Omit<ExamplePrimitives, 'flashcardId'>;
 
@@ -33,7 +35,7 @@ export type FlashcardPrimitives = {
   createdBy: string;
 };
 
-type FlashcardUpdateFields = {
+export type FlashcardUpdateFields = {
   expression?: string;
   meaning?: string;
   category?: string;
@@ -190,11 +192,39 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     );
   }
 
+  completeExamples(newExamples: ExampleInput[]): void {
+    const existing: ExampleInput[] = this.examples.map((e) => ({
+      id: e.id,
+      textEn: e.textEn,
+      textEs: e.textEs,
+      position: e.position,
+    }));
+    this.applyExamples([...existing, ...newExamples]);
+    this.record(
+      new FlashcardExamplesCompletedEvent(this.id.value, {
+        flashcardId: this.id.value,
+        examples: this.examples.map((e) => e.toPrimitives()),
+      }),
+    );
+  }
+
+  completePhonetics(ipaNotation: string, nativeSpeech: string): void {
+    this.ipaNotation = new IpaNotation(ipaNotation);
+    this.nativeSpeech = new NativeSpeech(nativeSpeech);
+    this.record(
+      new FlashcardPhoneticsCompletedEvent(this.id.value, {
+        flashcardId: this.id.value,
+        ipaNotation,
+        nativeSpeech,
+      }),
+    );
+  }
+
   private static buildExamples(
     flashcardId: string,
     primitives: ExampleInput[],
   ): Example[] {
-    if (primitives.length < 1 || primitives.length > 3) {
+    if (primitives.length > 3) {
       throw new InvalidExampleCount();
     }
     return primitives.map(

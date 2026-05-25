@@ -5,6 +5,11 @@ export interface FlashcardExampleVM {
   position: number;
 }
 
+export interface FlashcardAudioUrlsVM {
+  expression: { us: string; uk: string; au: string };
+  examples: { us: string };
+}
+
 export interface FlashcardVM {
   id: string;
   expression: string;
@@ -14,6 +19,7 @@ export interface FlashcardVM {
   ipaNotation: string | null;
   nativeSpeech: string | null;
   audioStatus: 'pending' | 'generating' | 'ready' | 'failed';
+  audioUrls: FlashcardAudioUrlsVM | null;
   examples: FlashcardExampleVM[];
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +37,5 @@ export type FlashcardFormValues = {
   meaning: string;
   category: string;
   subcategory: string;
-  ipaNotation: string;
-  nativeSpeech: string;
   examples: FlashcardExampleVM[];
 };

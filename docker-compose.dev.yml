@@ -14,6 +14,17 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      AMQP_URI: ${AMQP_URI}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      ELEVEN_LABS_API_KEY: ${ELEVEN_LABS_API_KEY}
+      ELEVENLABS_VOICE_ID_AMERICAN: ${ELEVENLABS_VOICE_ID_AMERICAN}
+      ELEVENLABS_VOICE_ID_BRITISH: ${ELEVENLABS_VOICE_ID_BRITISH}
+      ELEVENLABS_VOICE_ID_AUSTRALIAN: ${ELEVENLABS_VOICE_ID_AUSTRALIAN}
+      CLOUD_STORAGE: ${CLOUD_STORAGE}
+      CLOUD_STORAGE_PUBLIC_URL: ${CLOUD_STORAGE_PUBLIC_URL}
+      CLOUD_STORAGE_ACCESS_KEY_ID: ${CLOUD_STORAGE_ACCESS_KEY_ID}
+      CLOUD_STORAGE_SECRET_ACCESS_KEY: ${CLOUD_STORAGE_SECRET_ACCESS_KEY}
+      CLOUD_STORAGE_BUCKET: ${CLOUD_STORAGE_BUCKET}
 
   client:
     container_name: ididntcatchthat-client-dev
@@ -22,6 +33,15 @@ services:
       - "4001:80"
     environment:
       NODE_ENV: ${NODE_ENV}
+
+  rabbitmq:
+    container_name: ididntcatchthat-rabbitmq-dev
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
 
   # ─── Observability ───────────────────────────────────────────────────────────
 
@@ -50,3 +70,4 @@ volumes:
   prometheus_data_dev:
   grafana_data_dev:
   loki_data_dev:
+  rabbitmq_data_dev:

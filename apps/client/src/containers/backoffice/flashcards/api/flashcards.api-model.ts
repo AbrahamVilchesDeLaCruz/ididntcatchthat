@@ -15,6 +15,11 @@ export interface FlashcardExampleApiModel {
   position: number;
 }
 
+export interface FlashcardAudioUrlsApiModel {
+  expression: { us: string; uk: string; au: string };
+  examples: { us: string };
+}
+
 export interface FlashcardApiModel {
   id: string;
   expression: string;
@@ -24,6 +29,7 @@ export interface FlashcardApiModel {
   ipaNotation: string | null;
   nativeSpeech: string | null;
   audioStatus: 'pending' | 'generating' | 'ready' | 'failed';
+  audioUrls: FlashcardAudioUrlsApiModel | null;
   examples: FlashcardExampleApiModel[];
   createdAt: string;
   updatedAt: string;

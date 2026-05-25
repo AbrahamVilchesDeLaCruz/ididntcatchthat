@@ -1,4 +1,5 @@
 import { type ReactElement, useState } from 'react';
+import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
 import type {
   FlashcardExampleVM,
   FlashcardFormValues,
@@ -6,6 +7,7 @@ import type {
 
 interface FlashcardFormModalProps {
   title: string;
+  catalog: FlashcardCatalogApiModel | undefined;
   initialValues?: FlashcardFormValues;
   isLoading: boolean;
   onSubmit: (values: FlashcardFormValues) => void;
@@ -17,13 +19,18 @@ const DEFAULT_VALUES: FlashcardFormValues = {
   meaning: '',
   category: '',
   subcategory: '',
-  ipaNotation: '',
-  nativeSpeech: '',
   examples: [],
 };
 
+const selectClass =
+  'w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed';
+
+const inputClass =
+  'w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20';
+
 export const FlashcardFormModal = ({
   title,
+  catalog,
   initialValues = DEFAULT_VALUES,
   isLoading,
   onSubmit,
@@ -37,6 +44,14 @@ export const FlashcardFormModal = ({
   ): void => {
     setValues((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleCategoryChange = (category: string): void => {
+    setValues((prev) => ({ ...prev, category, subcategory: '' }));
+  };
+
+  const subcategories =
+    catalog?.categories.find((c) => c.value === values.category)
+      ?.subcategories ?? [];
 
   const addExample = (): void => {
     const newExample: FlashcardExampleVM = {
@@ -90,6 +105,7 @@ export const FlashcardFormModal = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Expresión + Significado */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -100,7 +116,7 @@ export const FlashcardFormModal = ({
                 required
                 value={values.expression}
                 onChange={(e) => setField('expression', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+                className={inputClass}
               />
             </div>
             <div>
@@ -112,66 +128,59 @@ export const FlashcardFormModal = ({
                 required
                 value={values.meaning}
                 onChange={(e) => setField('meaning', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+                className={inputClass}
               />
             </div>
           </div>
 
+          {/* Categoría + Subcategoría — selects del catalog */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
                 Categoría *
               </label>
-              <input
-                type="text"
+              <select
                 required
                 value={values.category}
-                onChange={(e) => setField('category', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
-              />
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className={selectClass}
+              >
+                <option value="" disabled>
+                  Seleccioná una categoría
+                </option>
+                {catalog?.categories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.value}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
                 Subcategoría *
               </label>
-              <input
-                type="text"
+              <select
                 required
                 value={values.subcategory}
+                disabled={!values.category}
                 onChange={(e) => setField('subcategory', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
-              />
+                className={selectClass}
+              >
+                <option value="" disabled>
+                  {values.category
+                    ? 'Seleccioná una subcategoría'
+                    : 'Primero elegí categoría'}
+                </option>
+                {subcategories.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                IPA Notation
-              </label>
-              <input
-                type="text"
-                value={values.ipaNotation}
-                onChange={(e) => setField('ipaNotation', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
-                placeholder="/ˈɛk.spre.ʃən/"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Native Speech
-              </label>
-              <input
-                type="text"
-                value={values.nativeSpeech}
-                onChange={(e) => setField('nativeSpeech', e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
-                placeholder="Transcripción fonética"
-              />
-            </div>
-          </div>
-
-          {/* Examples */}
+          {/* Ejemplos */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-gray-300">

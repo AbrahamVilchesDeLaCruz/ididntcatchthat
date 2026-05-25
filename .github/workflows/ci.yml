@@ -38,8 +38,6 @@ jobs:
 
     services:
       # ── Mirrors docker-compose.test.yml ──────────────────────────────────────
-      # To add more infra (RabbitMQ, Redis…): add service here AND in
-      # docker-compose.test.yml so local and CI stay in sync.
       postgres:
         image: postgres:16-alpine
         env:
@@ -50,6 +48,19 @@ jobs:
           - 5433:5432
         options: >-
           --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      rabbitmq:
+        image: rabbitmq:3-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: test
+          RABBITMQ_DEFAULT_PASS: test
+        ports:
+          - 5673:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics ping"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10

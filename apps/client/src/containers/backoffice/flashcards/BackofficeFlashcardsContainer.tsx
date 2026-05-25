@@ -3,6 +3,7 @@ import {
   useBulkCreateFlashcards,
   useCreateFlashcard,
   useDeleteFlashcard,
+  useFlashcardCatalog,
   useFlashcards,
   useImportPdfFlashcards,
   useUpdateFlashcard,
@@ -37,6 +38,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     audioStatus: audioStatusFilter,
   });
 
+  const { data: catalog } = useFlashcardCatalog();
+
   const { mutate: createFlashcard, isPending: isCreating } =
     useCreateFlashcard();
   const { mutate: updateFlashcard, isPending: isUpdating } =
@@ -55,8 +58,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       meaning: values.meaning,
       category: values.category,
       subcategory: values.subcategory,
-      ipaNotation: values.ipaNotation || null,
-      nativeSpeech: values.nativeSpeech || null,
+      ipaNotation: null,
+      nativeSpeech: null,
       examples: values.examples,
     });
   };
@@ -113,6 +116,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
   return (
     <BackofficeFlashcardsComponent
       flashcards={data?.items ?? []}
+      catalog={catalog}
       total={data?.total ?? 0}
       page={page}
       pageSize={data?.pageSize ?? 20}

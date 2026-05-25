@@ -49,6 +49,13 @@ export const useFlashcards = (
         .get<FlashcardsListApiModel>('/flashcards', { params })
         .then((res) => res.data),
     select: mapFlashcardsPage,
+    refetchInterval: (query) => {
+      const raw = query.state.data;
+      const hasPending = raw?.data.some(
+        (f) => f.audioStatus === 'pending' || f.audioStatus === 'generating',
+      );
+      return hasPending ? 3000 : false;
+    },
   });
 };
 
