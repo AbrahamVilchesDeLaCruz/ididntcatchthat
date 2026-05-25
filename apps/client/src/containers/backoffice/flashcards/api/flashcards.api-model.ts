@@ -1,3 +1,12 @@
+export interface FlashcardCatalogCategoryApiModel {
+  value: string;
+  subcategories: string[];
+}
+
+export interface FlashcardCatalogApiModel {
+  categories: FlashcardCatalogCategoryApiModel[];
+}
+
 // Tipos crudos que devuelve/recibe la API de content/flashcard
 export interface FlashcardExampleApiModel {
   id: string;
