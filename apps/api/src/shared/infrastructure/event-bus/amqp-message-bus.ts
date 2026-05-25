@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   connect,
@@ -16,7 +16,7 @@ const RETRY_DELAYS = [1000, 5000, 10000];
 
 @Injectable()
 export class AmqpMessageBus
-  implements DomainEventPublisher, DomainEventConsumer
+  implements DomainEventPublisher, DomainEventConsumer, OnModuleDestroy
 {
   private model: ChannelModel | null = null;
   private channel: Channel | null = null;
@@ -25,6 +25,13 @@ export class AmqpMessageBus
     @Inject(LOGGER_SERVICE) private readonly logger: Logger,
     private readonly config: ConfigService,
   ) {}
+
+  async onModuleDestroy(): Promise<void> {
+    await this.channel?.close().catch(() => undefined);
+    await this.model?.close().catch(() => undefined);
+    this.channel = null;
+    this.model = null;
+  }
 
   // ── Setup ────────────────────────────────────────────────────────────────────
 
@@ -75,10 +82,19 @@ export class AmqpMessageBus
           >;
           const event = this.instantiateDomainEvent(DomainEventClass, message);
           await handler(event);
-          ch.ack(msg);
+          try {
+            ch.ack(msg);
+          } catch {
+            // Channel may have been closed during shutdown — message will be
+            // requeued automatically by the broker.
+          }
         } catch (error) {
-          ch.nack(msg, false, false);
-          await this.handleRetry(msg, error as Error);
+          try {
+            ch.nack(msg, false, false);
+            await this.handleRetry(msg, error as Error);
+          } catch {
+            // Channel may have been closed during shutdown.
+          }
         }
       })();
     });
