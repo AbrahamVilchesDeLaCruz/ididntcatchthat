@@ -1,10 +1,12 @@
-# Spec: Content — Bounded Context Content (Backoffice)
+# Spec: Content — Bounded Context Content
 
 **Estado**: Borrador  
 **Fecha**: 2026-05-25  
 **BC**: Content  
 **Scope**: API (`apps/api/src/content/`)  
 **Tasks**: [docs/tasks/content.md](../tasks/content.md)
+
+> **Relación con BC Game**: Content es el dueño del ciclo de vida del aggregate `Flashcard` (write side). Game lo consume como read model. Son BCs distintos — Game nunca crea ni modifica Flashcards.
 
 ---
 
@@ -195,25 +197,42 @@ Example (Entity — sin AggregateRoot)
 
 ```
 Flashcard extends AggregateRoot<FlashcardPrimitives>
-  ├── id: FlashcardId
-  ├── expression: Expression
-  ├── meaning: Meaning
-  ├── category: Category
-  ├── subcategory: Subcategory
-  ├── ipaNotation: IpaNotation | null   — null = no generado todavía
-  ├── nativeSpeech: NativeSpeech | null — null = no generado todavía
-  ├── examples: Example[]        — 1 a 3 ejemplos
-  ├── audioStatus: AudioStatus
-  ├── audioUrls: AudioUrls | null
-  └── createdBy: string          — userId del teacher/admin
+  ├── id: FlashcardId                          (public readonly)
+  ├── expression: Expression                   (public)
+  ├── meaning: Meaning                         (public)
+  ├── category: Category                       (public)
+  ├── subcategory: Subcategory                 (public)
+  ├── ipaNotation: IpaNotation | null          (public) — null = no generado todavía
+  ├── nativeSpeech: NativeSpeech | null        (public) — null = no generado todavía
+  ├── examples: Example[]                      (public) — 1 a 3 ejemplos
+  ├── audioStatus: AudioStatus                 (public)
+  ├── audioUrls: AudioUrls | null              (public)
+  └── createdBy: string                        (public readonly) — userId del teacher/admin
+
+  > Sin getters ni setters — campos públicos directos.
+  > createdAt / updatedAt son responsabilidad de infraestructura (TypeORM @CreateDateColumn / @UpdateDateColumn).
 
   + create(id, expression, meaning, category, subcategory, ipaNotation, nativeSpeech, examples, createdBy): Flashcard  [static]
+    → emite FlashcardCreatedEvent via record()
+
   + update(fields: Partial<FlashcardUpdateFields>): void
-  + markAudioGenerating(): void
-  + markAudioReady(audioUrls: AudioUrls): void
-  + markAudioFailed(): void
+    → delega en métodos privados apply*()
+    → emite FlashcardExpressionUpdatedEvent si cambia expression
+    → emite FlashcardMeaningUpdatedEvent si cambia meaning
+
+  + markAudioGenerating(): void   → emite FlashcardAudioGeneratingEvent
+  + markAudioReady(audioUrls): void → emite FlashcardAudioReadyEvent
+  + markAudioFailed(): void       → emite FlashcardAudioFailedEvent
   + fromPrimitives(p): Flashcard  [static]
   + toPrimitives(): FlashcardPrimitives
+
+  Métodos privados (legibilidad):
+  - applyExpression(value)
+  - applyMeaning(value)
+  - applyCategory(category?, subcategory?)
+  - applyIpaNotation(value)
+  - applyNativeSpeech(value)
+  - applyExamples(examples)
 ```
 
 > `AudioUrls` es un Value Object compuesto:  
@@ -225,14 +244,37 @@ Flashcard extends AggregateRoot<FlashcardPrimitives>
 DomainEvent (shared)
   ├── FlashcardCreatedEvent
   │     eventName: ididntcatchthat.content.flashcard.created
-  │     emitido por: Flashcard.create() — registrado explícitamente en use case
-  │     atributos: flashcardId, expression, category, subcategory, examples[], createdBy
+  │     emitido por: Flashcard.create() via record()
+  │     atributos: FlashcardPrimitives completo
   │
-  └── FlashcardUpdatedEvent
-        eventName: ididntcatchthat.content.flashcard.updated
-        emitido por: Flashcard.update() — solo si cambia expression o examples
-        atributos: flashcardId, changedFields[], expression?, examples[]?
+  ├── FlashcardExpressionUpdatedEvent
+  │     eventName: ididntcatchthat.content.flashcard.expression_updated
+  │     emitido por: Flashcard.applyExpression() — solo si el valor cambia
+  │     atributos: { flashcardId, expression }
+  │
+  ├── FlashcardMeaningUpdatedEvent
+  │     eventName: ididntcatchthat.content.flashcard.meaning_updated
+  │     emitido por: Flashcard.applyMeaning() — solo si el valor cambia
+  │     atributos: { flashcardId, meaning }
+  │
+  ├── FlashcardAudioGeneratingEvent
+  │     eventName: ididntcatchthat.content.flashcard.audio_generating
+  │     emitido por: Flashcard.markAudioGenerating()
+  │     atributos: { flashcardId }
+  │
+  ├── FlashcardAudioReadyEvent
+  │     eventName: ididntcatchthat.content.flashcard.audio_ready
+  │     emitido por: Flashcard.markAudioReady()
+  │     atributos: { flashcardId, audioUrls }
+  │
+  └── FlashcardAudioFailedEvent
+        eventName: ididntcatchthat.content.flashcard.audio_failed
+        emitido por: Flashcard.markAudioFailed()
+        atributos: { flashcardId }
 ```
+
+> **Regla**: `record()` siempre en el aggregate. `pullDomainEvents()` siempre en el use case tras persistir.  
+> Los atributos de cada evento contienen lo mínimo suficiente para que el consumer actúe sin queries adicionales.
 
 ---
 
@@ -297,10 +339,10 @@ export const PDF_FLASHCARD_EXTRACTOR = Symbol("PdfFlashcardExtractor");
 
 **Algoritmo**:
 
-1. Crear `Flashcard.create(...)` → `audioStatus: pending`.
-2. Registrar `FlashcardCreatedEvent` en el aggregate.
+1. Generar `id` con `FlashcardId.generate()`.
+2. Llamar `Flashcard.create(...)` → emite `FlashcardCreatedEvent` internamente via `record()`.
 3. `FlashcardRepository.save(flashcard)`.
-4. Publicar eventos al bus → handler async genera audio.
+4. `eventBus.publish(flashcard.pullDomainEvents())` → handler async genera audio.
 5. Retornar `flashcard.toPrimitives()`.
 
 ### `FlashcardBulkCreator`
@@ -335,9 +377,10 @@ export const PDF_FLASHCARD_EXTRACTOR = Symbol("PdfFlashcardExtractor");
 
 1. Buscar flashcard — lanzar `FlashcardNotFound` si no existe.
 2. Verificar autorización: `flashcard.createdBy === updatedBy` OR `updatedBy.role === admin` → `FlashcardAccessDenied`.
-3. Llamar `flashcard.update(fields)` — emite `FlashcardUpdatedEvent` solo si cambia `expression` o `examples`.
+3. Llamar `flashcard.update(fields)` — emite eventos granulares internamente.
 4. Persistir.
-5. Retornar primitives.
+5. `eventBus.publish(flashcard.pullDomainEvents())`.
+6. Retornar primitives.
 
 ### `FlashcardFinder`
 
@@ -455,7 +498,11 @@ apps/api/src/
         pdf-extraction-failed.ts
       events/
         flashcard-created.event.ts
-        flashcard-updated.event.ts
+        flashcard-expression-updated.event.ts
+        flashcard-meaning-updated.event.ts
+        flashcard-audio-generating.event.ts
+        flashcard-audio-ready.event.ts
+        flashcard-audio-failed.event.ts
 
     application/
       create/
@@ -537,25 +584,25 @@ apps/api/test/
 
 ## Audio Pipeline (handler interno)
 
-El `FlashcardCreatedEvent` y `FlashcardUpdatedEvent` son consumidos por un handler dentro del propio BC Content:
+El `FlashcardCreatedEvent` dispara la generación de audio. `FlashcardExpressionUpdatedEvent` la regenera:
 
 ```
-FlashcardCreatedEvent
+FlashcardCreatedEvent / FlashcardExpressionUpdatedEvent
     ↓
 AudioGenerationHandler
-    ├── flashcard.markAudioGenerating()  → UPDATE audio_status = generating
+    ├── flashcard.markAudioGenerating()  → emite FlashcardAudioGeneratingEvent
     ├── ElevenLabs API × 3 voces (US, UK, AU) para expression
     ├── ElevenLabs API × 1 voz (US) para examples concatenados
     ├── Upload × 4 archivos a Cloudflare CDN
     └── flashcard.markAudioReady({ expression: { us, uk, au }, examples: { us } })
-        → UPDATE audio_status = ready, audio_urls = {...}
+        → emite FlashcardAudioReadyEvent
 
 En caso de error:
-    └── flashcard.markAudioFailed()  → UPDATE audio_status = failed
+    └── flashcard.markAudioFailed()  → emite FlashcardAudioFailedEvent
 ```
 
 > El handler reintenta automáticamente si falla (retry configurable via DLQ de AMQP).  
-> `FlashcardUpdatedEvent` dispara el mismo handler SOLO si `changedFields` incluye `expression` o `examples`.
+> Solo `FlashcardExpressionUpdatedEvent` regenera audio — `FlashcardMeaningUpdatedEvent` no lo hace.
 
 ---
 
@@ -586,8 +633,9 @@ En caso de error:
 - [ ] Flashcard inexistente → 404.
 - [ ] Teacher que no creó la flashcard → 403 `FlashcardAccessDenied`.
 - [ ] Admin puede editar cualquier flashcard.
-- [ ] Cambio en `expression` o `examples` → se emite `FlashcardUpdatedEvent` → regenera audio.
-- [ ] Cambio solo en `meaning` → NO se emite `FlashcardUpdatedEvent`.
+- [ ] Cambio en `expression` → emite `FlashcardExpressionUpdatedEvent` → regenera audio.
+- [ ] Cambio en `meaning` → emite `FlashcardMeaningUpdatedEvent` → NO regenera audio.
+- [ ] Cambio solo en `meaning` → NO regenera audio.
 
 ### Buscar y filtrar
 

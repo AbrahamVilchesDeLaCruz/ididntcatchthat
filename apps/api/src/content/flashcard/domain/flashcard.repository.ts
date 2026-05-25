@@ -4,6 +4,7 @@ import { type FlashcardId } from './flashcard-id';
 
 export interface FlashcardRepository {
   match(criteria: Criteria): Promise<Flashcard[]>;
+  count(criteria: Criteria): Promise<number>;
   search(id: FlashcardId): Promise<Flashcard | null>;
   save(flashcard: Flashcard): Promise<void>;
   remove(id: FlashcardId): Promise<void>;

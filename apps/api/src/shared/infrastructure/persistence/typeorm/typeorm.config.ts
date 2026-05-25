@@ -1,8 +1,10 @@
 import { DataSource } from 'typeorm';
 import { UserEntity } from '@/identity/user/infrastructure/persistence/user.entity';
 import { UserSessionEntity } from '@/identity/session/infrastructure/persistence/user-session.entity';
+import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
+import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -27,10 +29,11 @@ export const AppDataSource = new DataSource({
     : isTest
       ? false
       : { rejectUnauthorized: false },
-  entities: [UserEntity, UserSessionEntity],
+  entities: [UserEntity, UserSessionEntity, FlashcardEntity],
   migrations: [
     Migration202605230526271779506787479,
     Migration202605241854361779641676650,
+    Migration202605251200001779720000000,
   ],
   migrationsTableName: 'migrations',
   migrationsRun: !isProd, // auto-run on dev/test; in prod use CLI
