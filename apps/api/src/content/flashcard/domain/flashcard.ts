@@ -33,7 +33,7 @@ export type FlashcardPrimitives = {
   createdBy: string;
 };
 
-type FlashcardUpdateFields = {
+export type FlashcardUpdateFields = {
   expression?: string;
   meaning?: string;
   category?: string;

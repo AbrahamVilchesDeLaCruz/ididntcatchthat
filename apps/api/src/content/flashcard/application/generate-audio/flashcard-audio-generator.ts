@@ -1,0 +1,101 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { FlashcardId } from '@/content/flashcard/domain/flashcard-id';
+import {
+  type FlashcardRepository,
+  FLASHCARD_REPOSITORY,
+} from '@/content/flashcard/domain/flashcard.repository';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
+import {
+  type AudioGenerator,
+  AUDIO_GENERATOR,
+  type AudioAccent,
+} from '@/content/flashcard/domain/audio-generator';
+import {
+  type AudioStorage,
+  AUDIO_STORAGE,
+} from '@/content/flashcard/domain/audio-storage';
+import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
+
+export type GenerateFlashcardAudioRequest = {
+  flashcardId: string;
+};
+
+@Injectable()
+export class FlashcardAudioGenerator {
+  constructor(
+    @Inject(FLASHCARD_REPOSITORY)
+    private readonly repository: FlashcardRepository,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
+    @Inject(AUDIO_GENERATOR)
+    private readonly audioGenerator: AudioGenerator,
+    @Inject(AUDIO_STORAGE)
+    private readonly audioStorage: AudioStorage,
+  ) {}
+
+  async execute(request: GenerateFlashcardAudioRequest): Promise<void> {
+    const flashcard = await this.repository.search(
+      new FlashcardId(request.flashcardId),
+    );
+    if (!flashcard) return;
+
+    flashcard.markAudioGenerating();
+    await this.repository.save(flashcard);
+    await this.publisher.publish(flashcard.pullDomainEvents());
+
+    try {
+      const accents: AudioAccent[] = ['us', 'uk', 'au'];
+      const expressionBuffers = await Promise.all(
+        accents.map((accent) =>
+          this.audioGenerator.generate(flashcard.expression.value, accent),
+        ),
+      );
+
+      const examplesText = flashcard.examples.map((e) => e.textEn).join('. ');
+      const examplesBuffer = await this.audioGenerator.generate(
+        examplesText,
+        'us',
+      );
+
+      const flashcardId = flashcard.id.value;
+      const [usUrl, ukUrl, auUrl, examplesUsUrl] = await Promise.all([
+        this.audioStorage.upload(
+          `audio/${flashcardId}/expression-us.mp3`,
+          expressionBuffers[0],
+          'audio/mpeg',
+        ),
+        this.audioStorage.upload(
+          `audio/${flashcardId}/expression-uk.mp3`,
+          expressionBuffers[1],
+          'audio/mpeg',
+        ),
+        this.audioStorage.upload(
+          `audio/${flashcardId}/expression-au.mp3`,
+          expressionBuffers[2],
+          'audio/mpeg',
+        ),
+        this.audioStorage.upload(
+          `audio/${flashcardId}/examples-us.mp3`,
+          examplesBuffer,
+          'audio/mpeg',
+        ),
+      ]);
+
+      flashcard.markAudioReady(
+        new AudioUrls({
+          expression: { us: usUrl, uk: ukUrl, au: auUrl },
+          examples: { us: examplesUsUrl },
+        }),
+      );
+    } catch (_e: unknown) {
+      void _e;
+      flashcard.markAudioFailed();
+    }
+
+    await this.repository.save(flashcard);
+    await this.publisher.publish(flashcard.pullDomainEvents());
+  }
+}
