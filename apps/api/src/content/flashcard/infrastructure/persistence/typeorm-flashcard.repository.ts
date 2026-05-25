@@ -1,14 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, type SelectQueryBuilder } from 'typeorm';
 import { Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type FlashcardId } from '@/content/flashcard/domain/flashcard-id';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type Criteria } from '@/shared/domain/criteria';
+import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';
 import { FlashcardEntity } from './flashcard.entity';
 
 @Injectable()
 export class TypeOrmFlashcardRepository implements FlashcardRepository {
+  private readonly allowedFields: ReadonlySet<string> = new Set([
+    'id',
+    'expression',
+    'meaning',
+    'category',
+    'subcategory',
+    'ipaNotation',
+    'nativeSpeech',
+    'audioStatus',
+    'createdBy',
+  ]);
+
+  private readonly allowedOperators: ReadonlySet<string> = new Set([
+    '=',
+    '!=',
+    '<',
+    '<=',
+    '>',
+    '>=',
+    'LIKE',
+    'ILIKE',
+  ]);
+
   constructor(
     @InjectRepository(FlashcardEntity)
     private readonly repo: Repository<FlashcardEntity>,
@@ -16,15 +40,12 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
 
   async match(criteria: Criteria): Promise<Flashcard[]> {
     const qb = this.repo.createQueryBuilder('f');
-
-    for (const filter of criteria.filters) {
-      const param = `p_${filter.field}`;
-      qb.andWhere(`f.${filter.field} ${filter.operator} :${param}`, {
-        [param]: filter.value,
-      });
-    }
+    this.applyFilters(qb, criteria);
 
     if (criteria.order) {
+      if (!this.allowedFields.has(criteria.order.field)) {
+        throw new InvalidCriteriaField();
+      }
       qb.orderBy(`f.${criteria.order.field}`, criteria.order.direction);
     }
 
@@ -37,14 +58,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
 
   async count(criteria: Criteria): Promise<number> {
     const qb = this.repo.createQueryBuilder('f');
-
-    for (const filter of criteria.filters) {
-      const param = `p_${filter.field}`;
-      qb.andWhere(`f.${filter.field} ${filter.operator} :${param}`, {
-        [param]: filter.value,
-      });
-    }
-
+    this.applyFilters(qb, criteria);
     return qb.getCount();
   }
 
@@ -57,8 +71,30 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
     await this.repo.save(this.toEntity(flashcard));
   }
 
+  async saveAll(flashcards: Flashcard[]): Promise<void> {
+    await this.repo.save(flashcards.map((fc) => this.toEntity(fc)));
+  }
+
   async remove(id: FlashcardId): Promise<void> {
     await this.repo.delete({ id: id.value });
+  }
+
+  private applyFilters(
+    qb: SelectQueryBuilder<FlashcardEntity>,
+    criteria: Criteria,
+  ): void {
+    for (const filter of criteria.filters) {
+      if (!this.allowedFields.has(filter.field)) {
+        throw new InvalidCriteriaField();
+      }
+      if (!this.allowedOperators.has(filter.operator)) {
+        throw new InvalidCriteriaField();
+      }
+      const param = `p_${filter.field}`;
+      qb.andWhere(`f.${filter.field} ${filter.operator} :${param}`, {
+        [param]: filter.value,
+      });
+    }
   }
 
   private toDomain(entity: FlashcardEntity): Flashcard {

@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   type Flashcard,
   type FlashcardPrimitives,
-  type FlashcardUpdateFields,
 } from '@/content/flashcard/domain/flashcard';
 import { FlashcardId } from '@/content/flashcard/domain/flashcard-id';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
@@ -16,11 +15,30 @@ import {
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
 
+const ADMIN_ROLE = 'admin' as const;
+
+type FlashcardUpdaterExampleDto = {
+  id: string;
+  textEn: string;
+  textEs: string;
+  position: number;
+};
+
+type FlashcardUpdaterFieldsDto = {
+  expression?: string;
+  meaning?: string;
+  category?: string;
+  subcategory?: string;
+  ipaNotation?: string | null;
+  nativeSpeech?: string | null;
+  examples?: FlashcardUpdaterExampleDto[];
+};
+
 export type RequestFlashcardUpdater = {
   id: string;
   requesterId: string;
   requesterRole: string;
-  fields: FlashcardUpdateFields;
+  fields: FlashcardUpdaterFieldsDto;
 };
 
 @Injectable()
@@ -58,7 +76,7 @@ export class FlashcardUpdater {
     requesterId: string,
     requesterRole: string,
   ): void {
-    if (requesterRole === 'admin') return;
+    if (requesterRole === ADMIN_ROLE) return;
     if (flashcard.createdBy !== requesterId) throw new FlashcardAccessDenied();
   }
 }

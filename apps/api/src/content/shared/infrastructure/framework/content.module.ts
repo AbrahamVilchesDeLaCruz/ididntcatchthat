@@ -37,7 +37,7 @@ import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
 // Domain event publisher stub (real implementation pending events infra)
-import { NoopDomainEventPublisher } from '@/identity/shared/infrastructure/framework/noop-domain-event-publisher';
+import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
 
 @Module({
   imports: [
@@ -58,6 +58,7 @@ import { NoopDomainEventPublisher } from '@/identity/shared/infrastructure/frame
     { provide: FLASHCARD_REPOSITORY, useClass: TypeOrmFlashcardRepository },
 
     // External ports (stubs)
+    // TODO: replace with real ElevenLabs implementation — see issue #XXX
     { provide: PDF_FLASHCARD_EXTRACTOR, useClass: StubPdfFlashcardExtractor },
     { provide: DOMAIN_EVENT_PUBLISHER, useClass: NoopDomainEventPublisher },
 

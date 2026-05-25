@@ -16,11 +16,12 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
 
   beforeEach(() => {
     JestTimers.setup();
+    repository.saveAll.mockReset();
     repository.save.mockReset();
     publisher.publish.mockReset();
 
     publisher.publish.mockResolvedValue(undefined);
-    repository.save.mockResolvedValue(undefined);
+    repository.saveAll.mockResolvedValue(undefined);
 
     creator = new FlashcardBulkCreator(repository, publisher);
   });
@@ -32,7 +33,7 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
 
     const result = await creator.execute(request.flashcards);
 
-    expect(repository.save).toHaveBeenCalledTimes(3);
+    expect(repository.saveAll).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events).toHaveLength(3);
     events.forEach((event) =>
@@ -52,14 +53,14 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
       ExpressionEmpty,
     );
 
-    expect(repository.save).not.toHaveBeenCalled();
+    expect(repository.saveAll).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 
   it('should throw when array is empty', async () => {
     await expect(creator.execute([])).rejects.toThrow();
 
-    expect(repository.save).not.toHaveBeenCalled();
+    expect(repository.saveAll).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 });

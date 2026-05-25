@@ -3,7 +3,6 @@ import {
   Flashcard,
   type FlashcardPrimitives,
 } from '@/content/flashcard/domain/flashcard';
-import { type ExamplePrimitives } from '@/content/flashcard/domain/example';
 import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
@@ -13,6 +12,13 @@ import {
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
 
+type ExampleInputDto = {
+  id: string;
+  textEn: string;
+  textEs: string;
+  position: number;
+};
+
 export type RequestFlashcardCreator = {
   id: string;
   expression: string;
@@ -21,7 +27,7 @@ export type RequestFlashcardCreator = {
   subcategory: string;
   ipaNotation: string | null;
   nativeSpeech: string | null;
-  examples: ExamplePrimitives[];
+  examples: ExampleInputDto[];
   createdBy: string;
 };
 
@@ -45,7 +51,7 @@ export class FlashcardCreator {
       request.subcategory,
       request.ipaNotation,
       request.nativeSpeech,
-      request.examples,
+      request.examples.map((e) => ({ ...e, flashcardId: request.id })),
       request.createdBy,
     );
 

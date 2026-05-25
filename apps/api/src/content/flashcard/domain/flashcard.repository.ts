@@ -7,6 +7,7 @@ export interface FlashcardRepository {
   count(criteria: Criteria): Promise<number>;
   search(id: FlashcardId): Promise<Flashcard | null>;
   save(flashcard: Flashcard): Promise<void>;
+  saveAll(flashcards: Flashcard[]): Promise<void>;
   remove(id: FlashcardId): Promise<void>;
 }
 

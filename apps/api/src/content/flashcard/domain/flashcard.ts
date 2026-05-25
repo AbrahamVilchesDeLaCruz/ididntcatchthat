@@ -6,7 +6,7 @@ import { Category } from './category';
 import { Subcategory } from './subcategory';
 import { IpaNotation } from './ipa-notation';
 import { NativeSpeech } from './native-speech';
-import { AudioStatus } from './audio-status';
+import { AudioStatus, AudioStatusValue } from './audio-status';
 import { AudioUrls, type AudioUrlsPrimitives } from './audio-urls';
 import { Example, type ExamplePrimitives } from './example';
 import { InvalidExampleCount } from './exceptions/invalid-example-count';
@@ -16,6 +16,8 @@ import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated
 import { FlashcardAudioGeneratingEvent } from './events/flashcard-audio-generating.event';
 import { FlashcardAudioReadyEvent } from './events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from './events/flashcard-audio-failed.event';
+
+export type ExampleInput = Omit<ExamplePrimitives, 'flashcardId'>;
 
 export type FlashcardPrimitives = {
   id: string;
@@ -31,14 +33,14 @@ export type FlashcardPrimitives = {
   createdBy: string;
 };
 
-export type FlashcardUpdateFields = {
+type FlashcardUpdateFields = {
   expression?: string;
   meaning?: string;
   category?: string;
   subcategory?: string;
   ipaNotation?: string | null;
   nativeSpeech?: string | null;
-  examples?: ExamplePrimitives[];
+  examples?: ExampleInput[];
 };
 
 export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
@@ -66,18 +68,19 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     subcategory: string,
     ipaNotation: string | null,
     nativeSpeech: string | null,
-    examples: ExamplePrimitives[],
+    examples: ExampleInput[],
     createdBy: string,
   ): Flashcard {
+    const categoryVO = new Category(category);
     const flashcard = new Flashcard(
       new FlashcardId(id),
       new Expression(expression),
       new Meaning(meaning),
-      new Category(category),
-      Subcategory.create(subcategory, new Category(category)),
+      categoryVO,
+      new Subcategory(subcategory, categoryVO),
       ipaNotation !== null ? new IpaNotation(ipaNotation) : null,
       nativeSpeech !== null ? new NativeSpeech(nativeSpeech) : null,
-      AudioStatus.pending(),
+      new AudioStatus(AudioStatusValue.Pending),
       null,
       Flashcard.buildExamples(id, examples),
       createdBy,
@@ -131,12 +134,18 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   ): void {
     if (categoryValue !== undefined && categoryValue !== this.category.value) {
       this.category = new Category(categoryValue);
+      if (subcategoryValue === undefined) {
+        this.subcategory = new Subcategory(
+          this.subcategory.value,
+          this.category,
+        );
+      }
     }
     if (
       subcategoryValue !== undefined &&
       subcategoryValue !== this.subcategory.value
     ) {
-      this.subcategory = Subcategory.create(subcategoryValue, this.category);
+      this.subcategory = new Subcategory(subcategoryValue, this.category);
     }
   }
 
@@ -148,12 +157,12 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     this.nativeSpeech = value !== null ? new NativeSpeech(value) : null;
   }
 
-  private applyExamples(examples: ExamplePrimitives[]): void {
+  private applyExamples(examples: ExampleInput[]): void {
     this.examples = Flashcard.buildExamples(this.id.value, examples);
   }
 
   markAudioGenerating(): void {
-    this.audioStatus = AudioStatus.generating();
+    this.audioStatus = new AudioStatus(AudioStatusValue.Generating);
     this.record(
       new FlashcardAudioGeneratingEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -162,7 +171,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   markAudioReady(audioUrls: AudioUrls): void {
-    this.audioStatus = AudioStatus.ready();
+    this.audioStatus = new AudioStatus(AudioStatusValue.Ready);
     this.audioUrls = audioUrls;
     this.record(
       new FlashcardAudioReadyEvent(this.id.value, {
@@ -173,7 +182,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   markAudioFailed(): void {
-    this.audioStatus = AudioStatus.failed();
+    this.audioStatus = new AudioStatus(AudioStatusValue.Failed);
     this.record(
       new FlashcardAudioFailedEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -183,12 +192,14 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
 
   private static buildExamples(
     flashcardId: string,
-    primitives: ExamplePrimitives[],
+    primitives: ExampleInput[],
   ): Example[] {
     if (primitives.length < 1 || primitives.length > 3) {
       throw new InvalidExampleCount();
     }
-    return primitives.map((p) => Example.fromPrimitives({ ...p, flashcardId }));
+    return primitives.map(
+      (p) => new Example(p.id, flashcardId, p.textEn, p.textEs, p.position),
+    );
   }
 
   static fromPrimitives(p: FlashcardPrimitives): Flashcard {
@@ -198,12 +209,14 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
       new Expression(p.expression),
       new Meaning(p.meaning),
       categoryVO,
-      Subcategory.create(p.subcategory, categoryVO),
+      new Subcategory(p.subcategory, categoryVO),
       p.ipaNotation !== null ? new IpaNotation(p.ipaNotation) : null,
       p.nativeSpeech !== null ? new NativeSpeech(p.nativeSpeech) : null,
       new AudioStatus(p.audioStatus),
-      p.audioUrls !== null ? AudioUrls.fromPrimitives(p.audioUrls) : null,
-      p.examples.map((e) => Example.fromPrimitives(e)),
+      p.audioUrls !== null ? new AudioUrls(p.audioUrls) : null,
+      p.examples.map(
+        (e) => new Example(e.id, e.flashcardId, e.textEn, e.textEs, e.position),
+      ),
       p.createdBy,
     );
   }

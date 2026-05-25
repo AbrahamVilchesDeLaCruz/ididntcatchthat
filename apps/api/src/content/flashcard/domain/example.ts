@@ -1,6 +1,9 @@
+import { UuidValueObject } from '@/shared/domain/uuid-value-object';
 import { ExamplePositionInvalid } from './exceptions/example-position-invalid';
 import { ExampleTextEnEmpty } from './exceptions/example-text-en-empty';
 import { ExampleTextEsEmpty } from './exceptions/example-text-es-empty';
+import { FlashcardIdInvalid } from './exceptions/flashcard-id-invalid';
+import { ExampleIdInvalid } from './exceptions/example-id-invalid';
 
 export type ExamplePrimitives = {
   id: string;
@@ -11,35 +14,38 @@ export type ExamplePrimitives = {
 };
 
 export class Example {
-  private constructor(
+  constructor(
     readonly id: string,
     readonly flashcardId: string,
     readonly textEn: string,
     readonly textEs: string,
     readonly position: number,
-  ) {}
-
-  static create(
-    flashcardId: string,
-    textEn: string,
-    textEs: string,
-    position: number,
-  ): Example {
-    if (![1, 2, 3].includes(position)) throw new ExamplePositionInvalid();
-    if (!textEn?.trim()) throw new ExampleTextEnEmpty();
-    if (!textEs?.trim()) throw new ExampleTextEsEmpty();
-
-    return new Example(
-      crypto.randomUUID(),
-      flashcardId,
-      textEn,
-      textEs,
-      position,
-    );
+  ) {
+    this.ensureIdIsValid(id);
+    this.ensureFlashcardIdIsValid(flashcardId);
+    this.ensurePositionIsValid(position);
+    this.ensureTextEnIsNotEmpty(textEn);
+    this.ensureTextEsIsNotEmpty(textEs);
   }
 
-  static fromPrimitives(p: ExamplePrimitives): Example {
-    return new Example(p.id, p.flashcardId, p.textEn, p.textEs, p.position);
+  private ensureIdIsValid(id: string): void {
+    if (!UuidValueObject.isValid(id)) throw new ExampleIdInvalid();
+  }
+
+  private ensureFlashcardIdIsValid(flashcardId: string): void {
+    if (!UuidValueObject.isValid(flashcardId)) throw new FlashcardIdInvalid();
+  }
+
+  private ensurePositionIsValid(position: number): void {
+    if (![1, 2, 3].includes(position)) throw new ExamplePositionInvalid();
+  }
+
+  private ensureTextEnIsNotEmpty(textEn: string): void {
+    if (!textEn?.trim()) throw new ExampleTextEnEmpty();
+  }
+
+  private ensureTextEsIsNotEmpty(textEs: string): void {
+    if (!textEs?.trim()) throw new ExampleTextEsEmpty();
   }
 
   toPrimitives(): ExamplePrimitives {

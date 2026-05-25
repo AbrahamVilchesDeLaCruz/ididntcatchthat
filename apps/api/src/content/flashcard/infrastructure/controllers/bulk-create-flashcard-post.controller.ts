@@ -42,7 +42,7 @@ export class BulkCreateFlashcardPostController {
         ipaNotation: f.ipaNotation,
         nativeSpeech: f.nativeSpeech,
         examples: f.examples,
-        createdBy: user.userId!,
+        createdBy: user.userId,
       })),
     );
   }

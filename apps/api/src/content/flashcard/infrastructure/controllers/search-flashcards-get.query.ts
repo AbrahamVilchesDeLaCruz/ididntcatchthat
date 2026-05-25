@@ -1,4 +1,11 @@
-import { IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchFlashcardsGetQuery {
@@ -24,5 +31,6 @@ export class SearchFlashcardsGetQuery {
   @Type(() => Number)
   @IsNumber()
   @Min(1)
+  @Max(100)
   pageSize?: number;
 }

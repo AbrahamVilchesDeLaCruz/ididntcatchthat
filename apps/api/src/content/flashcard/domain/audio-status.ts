@@ -22,22 +22,6 @@ export class AudioStatus extends StringValueObject {
     if (!AudioStatus.VALID_VALUES.has(value)) throw new AudioStatusInvalid();
   }
 
-  static pending(): AudioStatus {
-    return new AudioStatus(AudioStatusValue.Pending);
-  }
-
-  static generating(): AudioStatus {
-    return new AudioStatus(AudioStatusValue.Generating);
-  }
-
-  static ready(): AudioStatus {
-    return new AudioStatus(AudioStatusValue.Ready);
-  }
-
-  static failed(): AudioStatus {
-    return new AudioStatus(AudioStatusValue.Failed);
-  }
-
   isPending(): boolean {
     return this.value === (AudioStatusValue.Pending as string);
   }

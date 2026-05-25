@@ -4,11 +4,12 @@ import { InvalidSubcategory } from './exceptions/invalid-subcategory';
 import { SUBCATEGORY_BY_CATEGORY } from './subcategory-enums';
 
 export class Subcategory extends StringValueObject {
-  private constructor(value: string) {
+  constructor(value: string, category: Category) {
     super(value);
+    this.ensureSubcategoryIsValid(value, category);
   }
 
-  static create(value: string, category: Category): Subcategory {
+  private ensureSubcategoryIsValid(value: string, category: Category): void {
     const valid =
       SUBCATEGORY_BY_CATEGORY[
         category.value as keyof typeof SUBCATEGORY_BY_CATEGORY
@@ -16,6 +17,5 @@ export class Subcategory extends StringValueObject {
     if (!valid?.has(value)) {
       throw new InvalidSubcategory();
     }
-    return new Subcategory(value);
   }
 }

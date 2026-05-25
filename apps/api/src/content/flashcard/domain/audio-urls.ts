@@ -10,12 +10,12 @@ export class AudioUrls {
   readonly examples: { us: string };
 
   constructor(primitives: AudioUrlsPrimitives) {
-    this.validate(primitives);
+    this.ensureUrlsAreValid(primitives);
     this.expression = primitives.expression;
     this.examples = primitives.examples;
   }
 
-  private validate(p: AudioUrlsPrimitives): void {
+  private ensureUrlsAreValid(p: AudioUrlsPrimitives): void {
     if (!p.expression?.us?.trim()) throw new AudioUrlsInvalid();
     if (!p.expression?.uk?.trim()) throw new AudioUrlsInvalid();
     if (!p.expression?.au?.trim()) throw new AudioUrlsInvalid();
@@ -27,9 +27,5 @@ export class AudioUrls {
       expression: { ...this.expression },
       examples: { ...this.examples },
     };
-  }
-
-  static fromPrimitives(p: AudioUrlsPrimitives): AudioUrls {
-    return new AudioUrls(p);
   }
 }

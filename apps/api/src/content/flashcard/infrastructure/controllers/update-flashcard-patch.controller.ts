@@ -37,7 +37,7 @@ export class UpdateFlashcardPatchController {
   ): Promise<FlashcardPrimitives> {
     return this.updater.execute({
       id,
-      requesterId: user.userId!,
+      requesterId: user.userId,
       requesterRole: user.type,
       fields: {
         expression: body.expression,

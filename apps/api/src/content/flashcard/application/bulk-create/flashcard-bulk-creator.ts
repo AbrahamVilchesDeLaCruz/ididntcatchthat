@@ -3,7 +3,6 @@ import {
   Flashcard,
   type FlashcardPrimitives,
 } from '@/content/flashcard/domain/flashcard';
-import { type RequestFlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 import { BulkEmptyFlashcards } from '@/content/flashcard/domain/exceptions/bulk-empty-flashcards';
 import {
   type FlashcardRepository,
@@ -13,6 +12,18 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+
+type FlashcardBulkItem = {
+  id: string;
+  expression: string;
+  meaning: string;
+  category: string;
+  subcategory: string;
+  ipaNotation?: string | null;
+  nativeSpeech?: string | null;
+  examples: { id: string; textEn: string; textEs: string; position: number }[];
+  createdBy: string;
+};
 
 export type FlashcardBulkCreatorResult = {
   created: number;
@@ -29,7 +40,7 @@ export class FlashcardBulkCreator {
   ) {}
 
   async execute(
-    requests: RequestFlashcardCreator[],
+    requests: FlashcardBulkItem[],
   ): Promise<FlashcardBulkCreatorResult> {
     if (requests.length === 0) throw new BulkEmptyFlashcards();
 
@@ -49,7 +60,7 @@ export class FlashcardBulkCreator {
     );
 
     // Persist all
-    await Promise.all(flashcards.map((fc) => this.repository.save(fc)));
+    await this.repository.saveAll(flashcards);
 
     // Collect and publish all events in a single call
     const allEvents = flashcards.flatMap((fc) => fc.pullDomainEvents());

@@ -6,6 +6,7 @@ import { PdfExtractionFailed } from '@/content/flashcard/domain/exceptions/pdf-e
 import { CategoryValue } from '@/content/flashcard/domain/category';
 import { MasteringSoundsSubcategory } from '@/content/flashcard/domain/subcategory-enums';
 import { StringMother } from '@test/shared/domain/string-mother';
+import { type Logger } from '@/shared/domain/logger';
 
 const makeDraft = (): FlashcardDraft => ({
   expression: StringMother.sentence(),
@@ -19,11 +20,12 @@ const makeDraft = (): FlashcardDraft => ({
 
 describe('content/flashcard/application/import-pdf PdfFlashcardImporter', () => {
   const extractor = mock<PdfFlashcardExtractor>();
+  const logger = mock<Logger>();
   let importer: PdfFlashcardImporter;
 
   beforeEach(() => {
     extractor.extract.mockReset();
-    importer = new PdfFlashcardImporter(extractor);
+    importer = new PdfFlashcardImporter(extractor, logger);
   });
 
   it('should return drafts extracted from the PDF without persisting', async () => {

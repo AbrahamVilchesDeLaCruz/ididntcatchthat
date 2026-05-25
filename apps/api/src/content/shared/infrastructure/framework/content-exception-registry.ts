@@ -4,6 +4,7 @@ import { AudioStatusInvalid } from '@/content/flashcard/domain/exceptions/audio-
 import { AudioUrlsInvalid } from '@/content/flashcard/domain/exceptions/audio-urls-invalid';
 import { BulkEmptyFlashcards } from '@/content/flashcard/domain/exceptions/bulk-empty-flashcards';
 import { CategoryInvalid } from '@/content/flashcard/domain/exceptions/category-invalid';
+import { ExampleIdInvalid } from '@/content/flashcard/domain/exceptions/example-id-invalid';
 import { ExamplePositionInvalid } from '@/content/flashcard/domain/exceptions/example-position-invalid';
 import { ExampleTextEnEmpty } from '@/content/flashcard/domain/exceptions/example-text-en-empty';
 import { ExampleTextEsEmpty } from '@/content/flashcard/domain/exceptions/example-text-es-empty';
@@ -12,6 +13,7 @@ import { ExpressionTooLong } from '@/content/flashcard/domain/exceptions/express
 import { FlashcardAccessDenied } from '@/content/flashcard/domain/exceptions/flashcard-access-denied';
 import { FlashcardIdInvalid } from '@/content/flashcard/domain/exceptions/flashcard-id-invalid';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
+import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';
 import { InvalidExampleCount } from '@/content/flashcard/domain/exceptions/invalid-example-count';
 import { InvalidSubcategory } from '@/content/flashcard/domain/exceptions/invalid-subcategory';
 import { IpaNotationEmpty } from '@/content/flashcard/domain/exceptions/ipa-notation-empty';
@@ -33,12 +35,14 @@ export class ContentExceptionRegistry implements OnModuleInit {
         [AudioUrlsInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [BulkEmptyFlashcards.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [CategoryInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [ExampleIdInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [ExamplePositionInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [ExampleTextEnEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [ExampleTextEsEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [ExpressionEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [ExpressionTooLong.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [FlashcardIdInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [InvalidCriteriaField.name, HttpStatus.BAD_REQUEST],
         [InvalidExampleCount.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [InvalidSubcategory.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [IpaNotationEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],

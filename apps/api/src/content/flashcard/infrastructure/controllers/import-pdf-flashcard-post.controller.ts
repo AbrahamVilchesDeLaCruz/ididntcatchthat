@@ -1,7 +1,10 @@
 import {
   Controller,
+  FileTypeValidator,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -35,7 +38,18 @@ export class ImportPdfFlashcardPostController {
   @ApiResponse({ status: 200, description: 'Extracted flashcard drafts' })
   @ApiResponse({ status: 422, description: 'PDF extraction failed' })
   async handler(
-    @UploadedFile() file: { buffer: Buffer },
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: 'application/pdf' }),
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    file: {
+      buffer: Buffer;
+    },
   ): Promise<FlashcardDraft[]> {
     return this.importer.execute(file.buffer);
   }
