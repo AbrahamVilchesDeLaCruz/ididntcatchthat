@@ -12,14 +12,14 @@ export class SubcategoryMother {
       [CategoryValue.BeautifyingSentences]: 'CONTRAST',
       [CategoryValue.SoundingNative]: 'DEAL_AND_OTHER_EXPRESSIONS',
     };
-    return Subcategory.create(
+    return new Subcategory(
       categorySubcategoryMap[category.value as CategoryValue],
       category,
     );
   }
 
   static masteringSounds(): Subcategory {
-    return Subcategory.create(
+    return new Subcategory(
       MasteringSoundsSubcategory.FLAP_T_PARTY_CITY,
       new Category(CategoryValue.MasteringSounds),
     );

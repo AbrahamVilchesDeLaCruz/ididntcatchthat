@@ -18,7 +18,13 @@ export class ExampleMother {
     textEs: string,
     position: 1 | 2 | 3,
   ): Example {
-    return Example.create(flashcardId, textEn, textEs, position);
+    return new Example(
+      UuidMother.random(),
+      flashcardId,
+      textEn,
+      textEs,
+      position,
+    );
   }
 
   static primitives(
