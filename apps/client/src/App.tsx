@@ -1,8 +1,8 @@
 import { type ReactElement } from 'react';
-import { LandingView } from '@/views/LandingView';
+import { AppRouter } from '@/core/router/AppRouter';
 
 function App(): ReactElement {
-  return <LandingView />;
+  return <AppRouter />;
 }
 
 export default App;

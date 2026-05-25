@@ -1,85 +1,41 @@
-# Tasks: Content — Bounded Context Content (Backoffice)
+# Tasks: Content — Bounded Context Content
 
 **Spec**: [docs/spec/content.md](../spec/content.md)  
 **Tasks**: este archivo (`docs/tasks/content.md`)  
-**Rama de implementación**: `feat/content-spec`  
+**Rama de implementación**: `feat/content-bc`  
 **Orden**: secuencial — cada bloque depende del anterior
 
 > **TDD obligatorio**: cada tarea de Application Layer tiene su test `.spec.ts` escrito PRIMERO (Red → Green → Refactor). Los tests E2E son el criterio de aceptación final de cada flujo.
+> **Regla domain events**: `record()` siempre en el aggregate. `pullDomainEvents()` siempre en el use case tras persistir.
+> **Regla aggregate**: campos `public` / `public readonly` — sin getters ni setters. `createdAt`/`updatedAt` en infra (TypeORM).
+> **Regla VOs**: sin métodos estáticos de creación — constructor público con validación interna vía `ensureXxx()` privado.
 
 ---
 
-## Bloque 1 — Domain
+## Bloque 1 — Domain ✅
 
 > TypeScript puro. Sin NestJS, sin TypeORM. Todo testeable sin I/O.
 
-- [ ] **TASK-CONTENT-01** — Value Object `FlashcardId`
-  - Extiende `StringValueObject`. UUID v4 válido. Método `FlashcardId.generate()`.
-  - **Test (RED primero)**: válido, inválido lanza error.
-  - Mother: `FlashcardIdMother.random()`, `FlashcardIdMother.create(value)`.
-
-- [ ] **TASK-CONTENT-02** — Value Objects `Expression` y `Meaning`
-  - `Expression`: non-empty, max 200 chars.
-  - `Meaning`: non-empty, max 500 chars.
-  - **Test (RED primero)**: válidos, vacíos lanzan error, exceso de longitud lanza error.
-
-- [ ] **TASK-CONTENT-03** — Value Object `Category`
-  - Enum: `native_sounds | connecting_words | beautifying_sentences | sounding_native`.
-  - Factory `create(value: string)` con validación.
-  - **Test (RED primero)**: valores válidos e inválidos.
-
-- [ ] **TASK-CONTENT-04** — Value Object `Subcategory` (con validación cruzada)
-  - Enum cerrado por categoría (ver spec).
-  - Factory `create(value: string, category: Category)` — lanza `InvalidSubcategory` si la combinación no es válida.
-  - **Test (RED primero)**: combinaciones válidas, subcategoría inválida para la categoría, subcategoría de otra categoría.
-
-- [ ] **TASK-CONTENT-05** — Value Objects `IpaNotation`, `NativeSpeech`, `AudioStatus`, `AudioUrls`
-  - `IpaNotation`: string nullable (puede ser null si IA no lo generó aún).
-  - `NativeSpeech`: string nullable.
-  - `AudioStatus`: enum `pending | generating | ready | failed`.
-  - `AudioUrls`: VO compuesto con estructura `{ expression: { us, uk, au }, examples: { us } }`. Validar que todos los campos son URLs non-empty.
-  - **Test**: `AudioStatus` válidos e inválidos. `AudioUrls` con estructura completa e incompleta.
-
-- [ ] **TASK-CONTENT-06** — Domain Exceptions
-  - `FlashcardNotFound`, `FlashcardAccessDenied`, `InvalidSubcategory`, `InvalidExampleCount`, `PdfExtractionFailed`.
-  - Todos extienden `DomainError` de shared.
-  - Archivo: `content/domain/exceptions/<name>.ts`.
-
-- [ ] **TASK-CONTENT-07** — Domain Events
-  - `FlashcardCreatedEvent` — `ididntcatchthat.content.flashcard.created`.
-    - Atributos: `flashcardId`, `expression`, `category`, `subcategory`, `examples[]`, `createdBy`.
-  - `FlashcardUpdatedEvent` — `ididntcatchthat.content.flashcard.updated`.
-    - Atributos: `flashcardId`, `changedFields: string[]`, `expression?`, `examples[]?`.
-  - Archivo: `content/domain/events/<name>.event.ts`.
-
-- [ ] **TASK-CONTENT-08** — Entidad `Example`
-  - Campos: `id`, `flashcardId`, `textEn`, `textEs`, `position` (1|2|3).
-  - Factory estática `Example.create(flashcardId, textEn, textEs, position): Example`.
-  - `toPrimitives()` / `fromPrimitives()`.
-  - **Test (RED primero)**: `create` genera id, posición inválida lanza error.
-  - Mother: `ExampleMother.random(flashcardId, position)`.
-
-- [ ] **TASK-CONTENT-09** — Aggregate `Flashcard`
-  - Campos y métodos completos según spec.
-  - `Flashcard.create(...)` → crea instancia con `audioStatus: pending`.
-  - `flashcard.update(fields)` → llama `record(FlashcardUpdatedEvent)` SOLO si cambia `expression` o `examples`.
-  - `flashcard.markAudioGenerating()`, `markAudioReady(urls)`, `markAudioFailed()`.
-  - `fromPrimitives()` / `toPrimitives()`.
-  - **Test (RED primero)**:
-    - `create` produce `audioStatus: pending`, no emite evento.
-    - `update` con `expression` distinta → emite `FlashcardUpdatedEvent`.
-    - `update` con solo `meaning` distinto → NO emite evento.
-    - `markAudioReady` cambia status a `ready`.
-    - `markAudioFailed` cambia status a `failed`.
-    - Más de 3 ejemplos → `InvalidExampleCount`.
-    - 0 ejemplos → `InvalidExampleCount`.
-    - `fromPrimitives` no emite eventos.
-  - Mother: `FlashcardMother.random(overrides?)`, `FlashcardMother.withAudioReady()`, `FlashcardMother.withAudioPending()`.
-
-- [ ] **TASK-CONTENT-10** — Interfaces de repositorio y puertos
-  - `FlashcardRepository` + `FLASHCARD_REPOSITORY` en `content/domain/flashcard.repository.ts`.
-  - `AiExampleGenerator` + `AI_EXAMPLE_GENERATOR` en `content/domain/ai-example-generator.ts`.
-  - `PdfFlashcardExtractor` + `PDF_FLASHCARD_EXTRACTOR` en `content/domain/pdf-flashcard-extractor.ts`.
+- [x] **TASK-CONTENT-01** — Value Object `FlashcardId`
+- [x] **TASK-CONTENT-02** — Value Objects `Expression` y `Meaning`
+- [x] **TASK-CONTENT-03** — Value Object `Category`
+- [x] **TASK-CONTENT-04** — Value Object `Subcategory` (con validación cruzada)
+- [x] **TASK-CONTENT-05** — Value Objects `IpaNotation`, `NativeSpeech`, `AudioStatus`, `AudioUrls`
+- [x] **TASK-CONTENT-06** — Domain Exceptions (18 excepciones)
+- [x] **TASK-CONTENT-07** — Domain Events granulares
+  - `FlashcardCreatedEvent` — atributos: `FlashcardPrimitives` completo
+  - `FlashcardExpressionUpdatedEvent` — atributos: `{ flashcardId, expression }`
+  - `FlashcardMeaningUpdatedEvent` — atributos: `{ flashcardId, meaning }`
+  - `FlashcardAudioGeneratingEvent` — atributos: `{ flashcardId }`
+  - `FlashcardAudioReadyEvent` — atributos: `{ flashcardId, audioUrls }`
+  - `FlashcardAudioFailedEvent` — atributos: `{ flashcardId }`
+- [x] **TASK-CONTENT-08** — Entidad `Example`
+- [x] **TASK-CONTENT-09** — Aggregate `Flashcard`
+  - Campos `public` / `public readonly` — sin getters ni setters
+  - `record()` en cada método del aggregate
+  - `update()` delega en métodos privados `apply*()`
+  - `createdAt`/`updatedAt` en infra (TypeORM)
+- [x] **TASK-CONTENT-10** — Interfaces de repositorio y puertos
 
 ---
 

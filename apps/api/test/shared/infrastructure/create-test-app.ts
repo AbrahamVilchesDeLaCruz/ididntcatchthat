@@ -17,7 +17,7 @@ export async function createTestApp(): Promise<INestApplication<App>> {
   const app = moduleFixture.createNestApplication<INestApplication<App>>();
 
   app.useLogger(false);
-  app.setGlobalPrefix('api/v1', { exclude: ['/health', '/metrics'] });
+  app.setGlobalPrefix('v1', { exclude: ['/health', '/metrics'] });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({

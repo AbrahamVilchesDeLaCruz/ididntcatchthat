@@ -14,10 +14,10 @@ describe('identity/auth GuestAuthPostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /api/v1/auth/guest', () => {
+  describe('POST /v1/auth/guest', () => {
     it('should return 200 with accessToken and deviceId (no body required)', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/guest')
+        .post('/v1/auth/guest')
         .send({})
         .expect(200);
 
@@ -38,7 +38,7 @@ describe('identity/auth GuestAuthPostController (e2e)', () => {
     it('should return 200 with optional guestDeviceId hint in body', async () => {
       // guestDeviceId is an optional hint — the server always generates its own deviceId
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/guest')
+        .post('/v1/auth/guest')
         .send({ guestDeviceId: 'device-e2e-hint-001' })
         .expect(200);
 
@@ -49,7 +49,7 @@ describe('identity/auth GuestAuthPostController (e2e)', () => {
 
     it('should return 422 when unknown fields are sent (forbidNonWhitelisted)', async () => {
       await request(app.getHttpServer())
-        .post('/api/v1/auth/guest')
+        .post('/v1/auth/guest')
         .send({ unknownField: 'value' })
         .expect(422);
     });

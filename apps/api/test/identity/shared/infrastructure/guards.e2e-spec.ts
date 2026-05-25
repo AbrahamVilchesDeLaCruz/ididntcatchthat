@@ -56,7 +56,7 @@ async function createGuardsTestApp(): Promise<INestApplication<App>> {
 
   app.useLogger(false);
 
-  app.setGlobalPrefix('api/v1', {
+  app.setGlobalPrefix('v1', {
     exclude: ['/health', '/metrics'],
   });
   app.use(cookieParser());
@@ -80,11 +80,11 @@ async function registerAndGetToken(
   const nickname = `guard${Date.now()}`.slice(0, 20);
 
   await request(app.getHttpServer())
-    .post('/api/v1/auth/register')
+    .post('/v1/auth/register')
     .send({ email, password: VALID_PASSWORD, nickname });
 
   const loginRes = await request(app.getHttpServer())
-    .post('/api/v1/auth/login')
+    .post('/v1/auth/login')
     .send({ email, password: VALID_PASSWORD });
 
   return (loginRes.body as { accessToken: string }).accessToken;
@@ -106,7 +106,7 @@ describe('identity/auth Guards (e2e)', () => {
   describe('JwtAuthGuard', () => {
     it('should return 401 when no token is provided', async () => {
       await request(app.getHttpServer())
-        .get('/api/v1/test-guards/protected')
+        .get('/v1/test-guards/protected')
         .expect(401);
     });
 
@@ -114,7 +114,7 @@ describe('identity/auth Guards (e2e)', () => {
       const accessToken = await registerAndGetToken(app);
 
       await request(app.getHttpServer())
-        .get('/api/v1/test-guards/protected')
+        .get('/v1/test-guards/protected')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
     });
@@ -125,7 +125,7 @@ describe('identity/auth Guards (e2e)', () => {
       const accessToken = await registerAndGetToken(app);
 
       await request(app.getHttpServer())
-        .get('/api/v1/test-guards/teacher-only')
+        .get('/v1/test-guards/teacher-only')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(403);
     });
@@ -134,7 +134,7 @@ describe('identity/auth Guards (e2e)', () => {
   describe('@Public endpoint', () => {
     it('should return 200 without any token', async () => {
       await request(app.getHttpServer())
-        .get('/api/v1/test-guards/public')
+        .get('/v1/test-guards/public')
         .expect(200);
     });
   });

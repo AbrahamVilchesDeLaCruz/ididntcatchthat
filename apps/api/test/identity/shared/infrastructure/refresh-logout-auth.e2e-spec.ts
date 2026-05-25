@@ -12,11 +12,11 @@ async function registerAndLogin(
   const nickname = `refresh${Date.now()}`.slice(0, 20);
 
   await request(app.getHttpServer())
-    .post('/api/v1/auth/register')
+    .post('/v1/auth/register')
     .send({ email, password: VALID_PASSWORD, nickname });
 
   const loginRes = await request(app.getHttpServer())
-    .post('/api/v1/auth/login')
+    .post('/v1/auth/login')
     .send({ email, password: VALID_PASSWORD });
 
   const setCookie = ([] as string[]).concat(
@@ -43,12 +43,12 @@ describe('identity/auth RefreshAuthPostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /api/v1/auth/refresh', () => {
+  describe('POST /v1/auth/refresh', () => {
     it('should return 200 with new accessToken and rotate the cookie', async () => {
       const { refreshTokenCookie } = await registerAndLogin(app);
 
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
+        .post('/v1/auth/refresh')
         .set('Cookie', refreshTokenCookie)
         .expect(200);
 
@@ -68,30 +68,28 @@ describe('identity/auth RefreshAuthPostController (e2e)', () => {
 
       // First use — succeeds
       await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
+        .post('/v1/auth/refresh')
         .set('Cookie', refreshTokenCookie)
         .expect(200);
 
       // Second use — token already rotated, all tokens revoked
       await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
+        .post('/v1/auth/refresh')
         .set('Cookie', refreshTokenCookie)
         .expect(401);
     });
 
     it('should return 401 when no refresh token cookie is present', async () => {
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
-        .expect(401);
+      await request(app.getHttpServer()).post('/v1/auth/refresh').expect(401);
     });
   });
 
-  describe('POST /api/v1/auth/logout', () => {
+  describe('POST /v1/auth/logout', () => {
     it('should return 204 and clear the cookie', async () => {
       const { accessToken, refreshTokenCookie } = await registerAndLogin(app);
 
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/logout')
+        .post('/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('Cookie', refreshTokenCookie)
         .expect(204);
@@ -114,13 +112,13 @@ describe('identity/auth RefreshAuthPostController (e2e)', () => {
       const { accessToken, refreshTokenCookie } = await registerAndLogin(app);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/logout')
+        .post('/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('Cookie', refreshTokenCookie)
         .expect(204);
 
       await request(app.getHttpServer())
-        .post('/api/v1/auth/refresh')
+        .post('/v1/auth/refresh')
         .set('Cookie', refreshTokenCookie)
         .expect(401);
     });

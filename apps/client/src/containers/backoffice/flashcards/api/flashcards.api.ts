@@ -1,0 +1,152 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/core/api/apiClient';
+import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
+import type {
+  BulkCreateFlashcardApiPayload,
+  BulkCreateFlashcardApiResult,
+  CreateFlashcardApiPayload,
+  FlashcardApiModel,
+  FlashcardCatalogApiModel,
+  FlashcardDraftApiModel,
+  FlashcardsListApiModel,
+  SearchFlashcardsParams,
+  UpdateFlashcardApiPayload,
+} from './flashcards.api-model';
+
+// ─── Query Keys ───────────────────────────────────────────────────────────────
+export const flashcardKeys = {
+  all: ['backoffice', 'flashcards'] as const,
+  lists: () => [...flashcardKeys.all, 'list'] as const,
+  list: (params: SearchFlashcardsParams) =>
+    [...flashcardKeys.lists(), params] as const,
+  detail: (id: string) => [...flashcardKeys.all, 'detail', id] as const,
+  catalog: () => [...flashcardKeys.all, 'catalog'] as const,
+};
+
+// ─── Queries ──────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useFlashcardCatalog = () => {
+  return useQuery({
+    queryKey: flashcardKeys.catalog(),
+    queryFn: async (): Promise<FlashcardCatalogApiModel> => {
+      const res = await apiClient.get<FlashcardCatalogApiModel>(
+        '/flashcards/catalog',
+      );
+      return res.data;
+    },
+    staleTime: Infinity,
+  });
+};
+
+export const useFlashcards = (
+  params: SearchFlashcardsParams = {},
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+) => {
+  return useQuery({
+    queryKey: flashcardKeys.list(params),
+    queryFn: () =>
+      apiClient
+        .get<FlashcardsListApiModel>('/flashcards', { params })
+        .then((res) => res.data),
+    select: mapFlashcardsPage,
+  });
+};
+
+export const useFlashcard = (
+  id: string,
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+) => {
+  return useQuery({
+    queryKey: flashcardKeys.detail(id),
+    queryFn: () =>
+      apiClient
+        .get<FlashcardApiModel>(`/flashcards/${id}`)
+        .then((res) => res.data),
+    select: mapFlashcard,
+    enabled: !!id,
+  });
+};
+
+// ─── Mutations ────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useCreateFlashcard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateFlashcardApiPayload): Promise<void> =>
+      apiClient.post<void>('/flashcards', payload).then((res) => res.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useUpdateFlashcard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateFlashcardApiPayload;
+    }) =>
+      apiClient
+        .patch<FlashcardApiModel>(`/flashcards/${id}`, data)
+        .then((res) => res.data),
+    onSuccess: (_, { id }) => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+      void queryClient.invalidateQueries({
+        queryKey: flashcardKeys.detail(id),
+      });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useDeleteFlashcard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string): Promise<void> =>
+      apiClient.delete<void>(`/flashcards/${id}`).then((res) => res.data),
+    onSuccess: (_, id) => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+      queryClient.removeQueries({ queryKey: flashcardKeys.detail(id) });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useBulkCreateFlashcards = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      payload: BulkCreateFlashcardApiPayload,
+    ): Promise<BulkCreateFlashcardApiResult> =>
+      apiClient
+        .post<BulkCreateFlashcardApiResult>('/flashcards/bulk', payload)
+        .then((res) => res.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useImportPdfFlashcards = () => {
+  return useMutation({
+    mutationFn: (file: File): Promise<FlashcardDraftApiModel[]> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiClient
+        .post<FlashcardDraftApiModel[]>('/flashcards/import/pdf', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then((res) => res.data);
+    },
+  });
+};

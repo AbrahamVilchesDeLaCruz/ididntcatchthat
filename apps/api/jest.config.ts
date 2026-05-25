@@ -72,7 +72,7 @@ const config: Config = {
     'src/shared/domain/logger.ts',
   ],
   coverageDirectory: 'coverage/unit',
-  coverageReporters: ['text', 'lcov', 'html'],
+  coverageReporters: ['text', 'lcov', 'html', 'json'],
   coverageThreshold: {
     global: {
       branches: 90,
