@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FLASHCARD_REPOSITORY } from '@/content/flashcard/domain/flashcard.repository';
 import { PDF_FLASHCARD_EXTRACTOR } from '@/content/flashcard/domain/pdf-flashcard-extractor';
 import { AI_EXAMPLE_GENERATOR } from '@/content/flashcard/domain/ai-example-generator';
+import { AI_PHONETICS_GENERATOR } from '@/content/flashcard/domain/ai-phonetics-generator';
 import { AUDIO_GENERATOR } from '@/content/flashcard/domain/audio-generator';
 import { AUDIO_STORAGE } from '@/content/flashcard/domain/audio-storage';
 import { DOMAIN_EVENT_PUBLISHER } from '@/shared/domain/domain-event-publisher';
 import { DOMAIN_EVENT_CONSUMER } from '@/shared/application/domain-event-consumer';
 import { HANDLERS } from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
+import { Handler } from '@/shared/application/handler';
 
 // Infrastructure — persistence
 import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
@@ -17,6 +19,7 @@ import { TypeOrmFlashcardRepository } from '@/content/flashcard/infrastructure/p
 
 // Infrastructure — AI
 import { DeepSeekAiExampleGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-example-generator';
+import { DeepSeekAiPhoneticsGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-phonetics-generator';
 import { DeepSeekPdfFlashcardExtractor } from '@/content/flashcard/infrastructure/ai/deepseek-pdf-flashcard-extractor';
 
 // Infrastructure — audio
@@ -49,10 +52,14 @@ import { FlashcardUpdater } from '@/content/flashcard/application/update/flashca
 import { PdfFlashcardImporter } from '@/content/flashcard/application/import-pdf/pdf-flashcard-importer';
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
+import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
+import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-phonetics/ai-phonetics-completer';
 import { AiExampleSuggester } from '@/content/flashcard/application/suggest-examples/ai-example-suggester';
 
 // Application — event handlers
-import { GenerateFlashcardAudioOnFlashcardCreated } from '@/content/flashcard/application/event-handlers/generate-flashcard-audio-on-flashcard-created';
+import { GenerateFlashcardExamplesOnFlashcardCreated } from '@/content/flashcard/application/event-handlers/generate-flashcard-examples-on-flashcard-created';
+import { GenerateFlashcardPhoneticsOnFlashcardCreated } from '@/content/flashcard/application/event-handlers/generate-flashcard-phonetics-on-flashcard-created';
+import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/event-handlers/generate-flashcard-audio-on-flashcard-examples-completed';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -67,11 +74,11 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   controllers: [
     CreateFlashcardPostController,
     BulkCreateFlashcardPostController,
+    GetFlashcardCatalogGetController,
     FindFlashcardGetController,
     SearchFlashcardsGetController,
     UpdateFlashcardPatchController,
     ImportPdfFlashcardPostController,
-    GetFlashcardCatalogGetController,
     SuggestExamplesPostController,
   ],
   providers: [
@@ -80,6 +87,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
     // AI ports
     { provide: AI_EXAMPLE_GENERATOR, useClass: DeepSeekAiExampleGenerator },
+    { provide: AI_PHONETICS_GENERATOR, useClass: DeepSeekAiPhoneticsGenerator },
     {
       provide: PDF_FLASHCARD_EXTRACTOR,
       useClass: DeepSeekPdfFlashcardExtractor,
@@ -95,10 +103,21 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: DOMAIN_EVENT_CONSUMER, useExisting: AmqpMessageBus },
 
     // Event handlers
-    GenerateFlashcardAudioOnFlashcardCreated,
+    GenerateFlashcardExamplesOnFlashcardCreated,
+    GenerateFlashcardPhoneticsOnFlashcardCreated,
+    GenerateFlashcardAudioOnFlashcardExamplesCompleted,
     {
       provide: HANDLERS,
-      useExisting: GenerateFlashcardAudioOnFlashcardCreated,
+      useFactory: (
+        h1: GenerateFlashcardExamplesOnFlashcardCreated,
+        h2: GenerateFlashcardPhoneticsOnFlashcardCreated,
+        h3: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+      ): Handler[] => [h1, h2, h3],
+      inject: [
+        GenerateFlashcardExamplesOnFlashcardCreated,
+        GenerateFlashcardPhoneticsOnFlashcardCreated,
+        GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+      ],
     },
     HandlersBootstrapper,
 
@@ -111,6 +130,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     PdfFlashcardImporter,
     FlashcardCatalogQuerier,
     FlashcardAudioGenerator,
+    AiExamplesCompleter,
+    AiPhoneticsCompleter,
     AiExampleSuggester,
 
     // Exception registry

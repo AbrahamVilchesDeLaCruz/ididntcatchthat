@@ -1,16 +1,5 @@
 import { type ReactElement } from 'react';
-
-const CATEGORIES = [
-  'connecting_words_in_speech',
-  'contractions_weak_forms',
-  'discourse_markers',
-  'fillers_hesitation',
-  'intonation_patterns',
-  'linking_words',
-  'phrasal_verbs',
-  'reduced_forms',
-  'sentence_stress',
-];
+import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
 
 const AUDIO_STATUSES = ['pending', 'generating', 'ready', 'failed'] as const;
 type AudioStatus = (typeof AUDIO_STATUSES)[number];
@@ -22,7 +11,11 @@ const AUDIO_STATUS_LABELS: Record<AudioStatus, string> = {
   failed: 'Fallido',
 };
 
+const selectClass =
+  'px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed';
+
 interface FlashcardsToolbarProps {
+  catalog: FlashcardCatalogApiModel | undefined;
   categoryFilter: string | undefined;
   subcategoryFilter: string | undefined;
   audioStatusFilter: string | undefined;
@@ -32,6 +25,7 @@ interface FlashcardsToolbarProps {
 }
 
 export const FlashcardsToolbar = ({
+  catalog,
   categoryFilter,
   subcategoryFilter,
   audioStatusFilter,
@@ -39,11 +33,20 @@ export const FlashcardsToolbar = ({
   onSubcategoryFilter,
   onAudioStatusFilter,
 }: FlashcardsToolbarProps): ReactElement => {
+  const subcategories =
+    catalog?.categories.find((c) => c.value === categoryFilter)
+      ?.subcategories ?? [];
+
   const hasActiveFilters = !!(
     categoryFilter ??
     subcategoryFilter ??
     audioStatusFilter
   );
+
+  const handleCategoryChange = (value: string): void => {
+    onCategoryFilter(value || undefined);
+    onSubcategoryFilter(undefined);
+  };
 
   const handleClearFilters = (): void => {
     onCategoryFilter(undefined);
@@ -61,31 +64,41 @@ export const FlashcardsToolbar = ({
         <select
           id="category-filter"
           value={categoryFilter ?? ''}
-          onChange={(e) => onCategoryFilter(e.target.value || undefined)}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+          onChange={(e) => handleCategoryChange(e.target.value)}
+          className={selectClass}
         >
           <option value="">Todas las categorías</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat.replace(/_/g, ' ')}
+          {catalog?.categories.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.value.replace(/_/g, ' ')}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Subcategory — free text */}
+      {/* Subcategory */}
       <div>
         <label htmlFor="subcategory-filter" className="sr-only">
           Filtrar por subcategoría
         </label>
-        <input
+        <select
           id="subcategory-filter"
-          type="text"
-          placeholder="Subcategoría..."
           value={subcategoryFilter ?? ''}
+          disabled={!categoryFilter}
           onChange={(e) => onSubcategoryFilter(e.target.value || undefined)}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder-gray-500"
-        />
+          className={selectClass}
+        >
+          <option value="">
+            {categoryFilter
+              ? 'Todas las subcategorías'
+              : 'Elegí categoría primero'}
+          </option>
+          {subcategories.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Audio status */}
@@ -97,7 +110,7 @@ export const FlashcardsToolbar = ({
           id="audio-status-filter"
           value={audioStatusFilter ?? ''}
           onChange={(e) => onAudioStatusFilter(e.target.value || undefined)}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+          className={selectClass}
         >
           <option value="">Todos los estados</option>
           {AUDIO_STATUSES.map((status) => (

@@ -2,6 +2,7 @@ import { type ReactElement, useState } from 'react';
 import type { FlashcardFormValues, FlashcardVM } from './flashcards.types';
 import type {
   CreateFlashcardApiPayload,
+  FlashcardCatalogApiModel,
   FlashcardDraftApiModel,
 } from './api/flashcards.api-model';
 import { FlashcardsTable } from './components/FlashcardsTable';
@@ -9,9 +10,11 @@ import { FlashcardFormModal } from './components/FlashcardFormModal';
 import { FlashcardsToolbar } from './components/FlashcardsToolbar';
 import { BulkCreateModal } from './components/BulkCreateModal';
 import { ImportPdfModal } from './components/ImportPdfModal';
+import { FlashcardDetailModal } from './components/FlashcardDetailModal';
 
 interface BackofficeFlashcardsComponentProps {
   flashcards: FlashcardVM[];
+  catalog: FlashcardCatalogApiModel | undefined;
   total: number;
   page: number;
   pageSize: number;
@@ -38,6 +41,7 @@ interface BackofficeFlashcardsComponentProps {
 
 export const BackofficeFlashcardsComponent = ({
   flashcards,
+  catalog,
   total,
   page,
   pageSize,
@@ -64,6 +68,9 @@ export const BackofficeFlashcardsComponent = ({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isImportPdfModalOpen, setIsImportPdfModalOpen] = useState(false);
+  const [viewingFlashcard, setViewingFlashcard] = useState<FlashcardVM | null>(
+    null,
+  );
   const [editingFlashcard, setEditingFlashcard] = useState<FlashcardVM | null>(
     null,
   );
@@ -138,6 +145,7 @@ export const BackofficeFlashcardsComponent = ({
 
       {/* Toolbar */}
       <FlashcardsToolbar
+        catalog={catalog}
         categoryFilter={categoryFilter}
         subcategoryFilter={subcategoryFilter}
         audioStatusFilter={audioStatusFilter}
@@ -150,6 +158,7 @@ export const BackofficeFlashcardsComponent = ({
       <FlashcardsTable
         flashcards={flashcards}
         isLoading={isLoading}
+        onView={setViewingFlashcard}
         onEdit={setEditingFlashcard}
         onDelete={setDeletingId}
       />
@@ -181,10 +190,19 @@ export const BackofficeFlashcardsComponent = ({
         </div>
       )}
 
+      {/* Detail Modal */}
+      {viewingFlashcard && (
+        <FlashcardDetailModal
+          flashcard={viewingFlashcard}
+          onClose={() => setViewingFlashcard(null)}
+        />
+      )}
+
       {/* Create Modal */}
       {isCreateModalOpen && (
         <FlashcardFormModal
           title="Nueva flashcard"
+          catalog={catalog}
           isLoading={isMutating}
           onSubmit={handleCreateSubmit}
           onClose={() => setIsCreateModalOpen(false)}
@@ -195,13 +213,12 @@ export const BackofficeFlashcardsComponent = ({
       {editingFlashcard && (
         <FlashcardFormModal
           title="Editar flashcard"
+          catalog={catalog}
           initialValues={{
             expression: editingFlashcard.expression,
             meaning: editingFlashcard.meaning,
             category: editingFlashcard.category,
             subcategory: editingFlashcard.subcategory,
-            ipaNotation: editingFlashcard.ipaNotation ?? '',
-            nativeSpeech: editingFlashcard.nativeSpeech ?? '',
             examples: editingFlashcard.examples,
           }}
           isLoading={isMutating}

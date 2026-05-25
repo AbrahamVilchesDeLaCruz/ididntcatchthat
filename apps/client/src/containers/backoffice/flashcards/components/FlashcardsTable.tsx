@@ -18,6 +18,7 @@ const AUDIO_STATUS_COLORS: Record<FlashcardVM['audioStatus'], string> = {
 interface FlashcardsTableProps {
   flashcards: FlashcardVM[];
   isLoading: boolean;
+  onView: (flashcard: FlashcardVM) => void;
   onEdit: (flashcard: FlashcardVM) => void;
   onDelete: (id: string) => void;
 }
@@ -25,6 +26,7 @@ interface FlashcardsTableProps {
 export const FlashcardsTable = ({
   flashcards,
   isLoading,
+  onView,
   onEdit,
   onDelete,
 }: FlashcardsTableProps): ReactElement => {
@@ -96,6 +98,13 @@ export const FlashcardsTable = ({
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => onView(fc)}
+                    className="text-xs text-blue-400 hover:text-blue-300 transition px-2 py-1 rounded hover:bg-blue-400/10"
+                  >
+                    Ver
+                  </button>
                   <button
                     type="button"
                     onClick={() => onEdit(fc)}

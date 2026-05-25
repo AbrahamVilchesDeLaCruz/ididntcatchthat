@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { StringValueObject } from '@/shared/domain/string-value-object';
 
 export abstract class UuidValueObject extends StringValueObject {
@@ -9,6 +10,6 @@ export abstract class UuidValueObject extends StringValueObject {
   }
 
   static random(): string {
-    return crypto.randomUUID();
+    return randomUUID();
   }
 }

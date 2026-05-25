@@ -17,6 +17,7 @@ import {
   type AudioStorage,
   AUDIO_STORAGE,
 } from '@/content/flashcard/domain/audio-storage';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
 
 export type GenerateFlashcardAudioRequest = {
@@ -34,6 +35,8 @@ export class FlashcardAudioGenerator {
     private readonly audioGenerator: AudioGenerator,
     @Inject(AUDIO_STORAGE)
     private readonly audioStorage: AudioStorage,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: GenerateFlashcardAudioRequest): Promise<void> {
@@ -48,11 +51,15 @@ export class FlashcardAudioGenerator {
 
     try {
       const accents: AudioAccent[] = ['us', 'uk', 'au'];
-      const expressionBuffers = await Promise.all(
-        accents.map((accent) =>
-          this.audioGenerator.generate(flashcard.expression.value, accent),
-        ),
-      );
+      const expressionBuffers: Buffer[] = [];
+      for (const accent of accents) {
+        expressionBuffers.push(
+          await this.audioGenerator.generate(
+            flashcard.expression.value,
+            accent,
+          ),
+        );
+      }
 
       const examplesText = flashcard.examples.map((e) => e.textEn).join('. ');
       const examplesBuffer = await this.audioGenerator.generate(
@@ -90,8 +97,12 @@ export class FlashcardAudioGenerator {
           examples: { us: examplesUsUrl },
         }),
       );
-    } catch (_e: unknown) {
-      void _e;
+    } catch (e: unknown) {
+      this.logger.error(
+        'FlashcardAudioGenerator failed',
+        e instanceof Error ? e : new Error(String(e)),
+        { flashcardId: request.flashcardId },
+      );
       flashcard.markAudioFailed();
     }
 

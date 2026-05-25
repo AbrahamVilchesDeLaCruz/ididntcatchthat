@@ -7,12 +7,12 @@ import { type AudioStorage } from '@/content/flashcard/domain/audio-storage';
 export class R2AudioStorage implements AudioStorage {
   private readonly client: S3Client;
   private readonly bucket: string;
-  private readonly baseUrl: string;
+  private readonly publicUrl: string;
 
   constructor(private readonly config: ConfigService) {
     const endpoint = this.config.getOrThrow<string>('CLOUD_STORAGE');
     this.bucket = this.config.getOrThrow<string>('CLOUD_STORAGE_BUCKET');
-    this.baseUrl = endpoint;
+    this.publicUrl = this.config.getOrThrow<string>('CLOUD_STORAGE_PUBLIC_URL');
 
     this.client = new S3Client({
       region: 'auto',
@@ -42,6 +42,6 @@ export class R2AudioStorage implements AudioStorage {
       }),
     );
 
-    return `${this.baseUrl}/${key}`;
+    return `${this.publicUrl}/${this.bucket}/${key}`;
   }
 }

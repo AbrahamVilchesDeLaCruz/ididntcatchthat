@@ -13,6 +13,16 @@ export const mapFlashcard = (raw: FlashcardApiModel): FlashcardVM => ({
   ipaNotation: raw.ipaNotation,
   nativeSpeech: raw.nativeSpeech,
   audioStatus: raw.audioStatus,
+  audioUrls: raw.audioUrls
+    ? {
+        expression: {
+          us: raw.audioUrls.expression.us,
+          uk: raw.audioUrls.expression.uk,
+          au: raw.audioUrls.expression.au,
+        },
+        examples: { us: raw.audioUrls.examples.us },
+      }
+    : null,
   examples: raw.examples.map((ex) => ({
     id: ex.id,
     textEn: ex.textEn,

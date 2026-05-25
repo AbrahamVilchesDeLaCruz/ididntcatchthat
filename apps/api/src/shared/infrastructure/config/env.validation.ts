@@ -30,6 +30,7 @@ export const envValidationSchema = Joi.object({
 
   // Cloudflare R2
   CLOUD_STORAGE: Joi.string().uri().required(),
+  CLOUD_STORAGE_PUBLIC_URL: Joi.string().uri().required(),
   CLOUD_STORAGE_ACCESS_KEY_ID: Joi.string().required(),
   CLOUD_STORAGE_SECRET_ACCESS_KEY: Joi.string().required(),
   CLOUD_STORAGE_BUCKET: Joi.string().required(),

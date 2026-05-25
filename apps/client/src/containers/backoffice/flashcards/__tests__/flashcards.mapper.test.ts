@@ -18,6 +18,7 @@ class FlashcardApiModelMother {
       ipaNotation: 'ˈɡɒnə',
       nativeSpeech: 'gonna',
       audioStatus: 'ready',
+      audioUrls: null,
       examples: [
         {
           id: 'ex-001',
@@ -110,6 +111,38 @@ describe('flashcards.mapper', () => {
         const vm = mapFlashcard(raw);
         expect(vm.audioStatus).toBe(status);
       });
+    });
+
+    it('mapea audioUrls cuando la API los devuelve', () => {
+      const raw = FlashcardApiModelMother.create({
+        audioUrls: {
+          expression: {
+            us: 'https://cdn/us.mp3',
+            uk: 'https://cdn/uk.mp3',
+            au: 'https://cdn/au.mp3',
+          },
+          examples: { us: 'https://cdn/ex-us.mp3' },
+        },
+      });
+
+      const vm = mapFlashcard(raw);
+
+      expect(vm.audioUrls).toEqual({
+        expression: {
+          us: 'https://cdn/us.mp3',
+          uk: 'https://cdn/uk.mp3',
+          au: 'https://cdn/au.mp3',
+        },
+        examples: { us: 'https://cdn/ex-us.mp3' },
+      });
+    });
+
+    it('devuelve audioUrls null cuando la API devuelve null', () => {
+      const raw = FlashcardApiModelMother.create({ audioUrls: null });
+
+      const vm = mapFlashcard(raw);
+
+      expect(vm.audioUrls).toBeNull();
     });
   });
 
