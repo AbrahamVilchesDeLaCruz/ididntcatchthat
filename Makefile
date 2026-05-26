@@ -228,6 +228,12 @@ deploy-dev: ## [VPS] Sync dev + build + recreate dev containers
 	git -C $(DEV_DIR) reset --hard origin/dev
 	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml up -d --build
 
+deploy-dev-no-cache: ## [VPS] Sync dev + build sin cache + recreate dev containers
+	git -C $(DEV_DIR) fetch origin
+	git -C $(DEV_DIR) reset --hard origin/dev
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml build --no-cache
+	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml up -d
+
 vps-ps-prod: ## [VPS] Status de containers prod
 	doppler run --config prd --project ididntcatchthat -- docker compose -f $(PROD_DIR)/docker-compose.yml -f $(PROD_DIR)/docker-compose.prod.yml ps
 
