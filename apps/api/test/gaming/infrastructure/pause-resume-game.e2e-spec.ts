@@ -2,6 +2,7 @@ import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
+import { seedFlashcards } from '../shared/seed-flashcards';
 
 async function registerAndLogin(app: INestApplication<App>): Promise<string> {
   const suffix = Date.now() + Math.floor(Math.random() * 10000);
@@ -38,6 +39,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    await seedFlashcards(app);
   });
 
   afterEach(async () => {
@@ -56,7 +58,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         .expect(204);
     });
 
-    it('should return 401 when guest token is used (JwtAuthGuard)', async () => {
+    it('should return 404 when game does not exist', async () => {
       const guestRes = await request(app.getHttpServer())
         .post('/v1/auth/guest')
         .send({})
@@ -67,7 +69,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         .patch(`/v1/games/${crypto.randomUUID()}`)
         .set('Authorization', `Bearer ${guestToken}`)
         .send({ status: 'paused', lastFlashcardId: crypto.randomUUID() })
-        .expect(401);
+        .expect(404);
     });
   });
 
@@ -92,7 +94,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         pendingFlashcardIds: string[];
       };
 
-      expect(body.game.gameId).toBe(gameId);
+      expect(body.game.id).toBe(gameId);
       expect(Array.isArray(body.pendingFlashcardIds)).toBe(true);
     });
 

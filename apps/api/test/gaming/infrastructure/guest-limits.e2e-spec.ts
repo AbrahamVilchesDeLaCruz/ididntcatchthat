@@ -1,7 +1,9 @@
 import { type INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
+import { seedFlashcards } from '../shared/seed-flashcards';
 
 async function getGuestToken(app: INestApplication<App>): Promise<string> {
   const guestRes = await request(app.getHttpServer())
@@ -16,6 +18,10 @@ describe('gaming/game GuestLimitsController (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    // Clean up guest games from previous runs so the daily limit (3) is not pre-exhausted
+    const ds = app.get(DataSource);
+    await ds.query(`DELETE FROM games WHERE user_id IS NULL`);
+    await seedFlashcards(app);
   });
 
   afterEach(async () => {

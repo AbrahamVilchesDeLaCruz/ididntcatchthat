@@ -2,6 +2,7 @@ import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
+import { seedFlashcards } from '../shared/seed-flashcards';
 
 async function registerAndLogin(app: INestApplication<App>): Promise<string> {
   const suffix = Date.now() + Math.floor(Math.random() * 10000);
@@ -38,6 +39,7 @@ describe('gaming/game AbandonGameController (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    await seedFlashcards(app);
   });
 
   afterEach(async () => {

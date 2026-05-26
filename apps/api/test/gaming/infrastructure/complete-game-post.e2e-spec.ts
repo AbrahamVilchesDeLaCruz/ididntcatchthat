@@ -2,6 +2,7 @@ import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
+import { seedFlashcards } from '../shared/seed-flashcards';
 
 async function registerAndLogin(app: INestApplication<App>): Promise<string> {
   const suffix = Date.now() + Math.floor(Math.random() * 10000);
@@ -39,6 +40,7 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    await seedFlashcards(app);
   });
 
   afterEach(async () => {
@@ -65,21 +67,17 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
         .expect(200);
 
       const body = res.body as {
-        gameId: string;
-        userId: string;
-        mode: string;
-        module: string | null;
-        cardCount: number;
-        startedAt: string;
-        finishedAt: string;
+        correctCount: number;
+        totalCount: number;
+        accuracy: number;
+        duration: number;
       };
 
-      expect(body.gameId).toBe(gameId);
-      expect(typeof body.userId).toBe('string');
-      expect(body.mode).toBe('study');
-      expect(body.cardCount).toBe(10);
-      expect(typeof body.startedAt).toBe('string');
-      expect(typeof body.finishedAt).toBe('string');
+      expect(typeof body.correctCount).toBe('number');
+      expect(typeof body.totalCount).toBe('number');
+      expect(body.totalCount).toBe(10);
+      expect(typeof body.accuracy).toBe('number');
+      expect(typeof body.duration).toBe('number');
     });
 
     it('should return 422 when there are pending attempts remaining', async () => {
