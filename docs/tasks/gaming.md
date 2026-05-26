@@ -13,12 +13,12 @@
 
 > TypeScript puro. Sin NestJS, sin TypeORM. Todo testeable sin I/O.
 
-- [ ] **TASK-GAMING-01** — Value Object `GameId`
+- [x] **TASK-GAMING-01** — Value Object `GameId`
   - Extiende `StringValueObject`. UUID v4 válido. Método `GameId.generate()`.
   - **Test (RED primero)**: válido, inválido lanza `GameIdInvalid` (o usar `InvalidArgumentError` shared).
   - Mother: `GameIdMother.random()`, `GameIdMother.create(value)`.
 
-- [ ] **TASK-GAMING-02** — Value Objects enum: `GameMode`, `GameModule`, `CardCount`, `GameStatus`
+- [x] **TASK-GAMING-02** — Value Objects enum: `GameMode`, `GameModule`, `CardCount`, `GameStatus`
   - Cada uno extiende `StringValueObject`. Factory `create(value)` con validación de enum.
   - `GameMode`: `study | game`.
   - `GameModule`: `native_sounds | connecting_words | beautifying_sentences | sounding_native | random`.
@@ -26,14 +26,14 @@
   - `GameStatus`: `in_progress | paused | completed | abandoned`.
   - **Test (RED primero)**: valores válidos e inválidos para cada VO.
 
-- [ ] **TASK-GAMING-03** — Domain Exceptions
+- [x] **TASK-GAMING-03** — Domain Exceptions
   - `GameNotFound`, `GameAccessDenied`, `GameNotInProgress`, `GameNotPaused`.
   - `GameAlreadyFinished`, `GameNotFinished`, `FlashcardNotInGame`.
   - `MaxPausedGamesReached`, `GuestLimitExceeded`.
   - Todos extienden `DomainError` de shared. Sin sufijo `Error` ni `Exception` en el nombre de clase.
   - Archivo: `gaming/domain/exceptions/<name>.ts`.
 
-- [ ] **TASK-GAMING-04** — Domain Events
+- [x] **TASK-GAMING-04** — Domain Events
   - `AttemptRecordedEvent` — `ididntcatchthat.gaming.attempts.attempt.recorded`.
     - Atributos: `gameId`, `userId`, `flashcardId`, `correct`, `mode`, `answeredAt`.
   - `GameCompletedEvent` — `ididntcatchthat.gaming.games.game.completed`.
@@ -44,14 +44,14 @@
     - Atributos: `gameId`, `userId`.
   - Archivo: `gaming/domain/events/<name>.event.ts`.
 
-- [ ] **TASK-GAMING-05** — Entidad `Attempt`
+- [x] **TASK-GAMING-05** — Entidad `Attempt`
   - Campos: `id`, `gameId`, `flashcardId`, `correct`, `answeredAt`.
   - Factory estática `Attempt.create(gameId, flashcardId, correct): Attempt`.
   - `toPrimitives()` y `fromPrimitives()`.
   - **Test (RED primero)**: `create` genera id único, `fromPrimitives` reconstruye sin efectos.
   - Mother: `AttemptMother.random(overrides?)`.
 
-- [ ] **TASK-GAMING-06** — Aggregate `Game`
+- [x] **TASK-GAMING-06** — Aggregate `Game`
   - Campos completos según spec.
   - `Game.start(userId, mode, module, cardCount, flashcardIds): Game` — no emite evento.
   - `game.recordAttempt(flashcardId, correct): void` — valida que `flashcardId ∈ flashcardIds`, lanza `FlashcardNotInGame`. Crea `Attempt` y llama `record(new AttemptRecordedEvent(...))`.
@@ -72,7 +72,7 @@
     - `fromPrimitives` reconstruye sin emitir eventos.
   - Mother: `GameMother.random(overrides?)`, `GameMother.inProgress()`, `GameMother.paused()`, `GameMother.completed()`.
 
-- [ ] **TASK-GAMING-07** — Interfaces de repositorio y puerto
+- [x] **TASK-GAMING-07** — Interfaces de repositorio y puerto
   - `GameRepository` + token `GAME_REPOSITORY` en `gaming/domain/game.repository.ts`.
     - Métodos: `save(game): Promise<void>`, `search(id: GameId): Promise<Game | null>`, `match(criteria: Criteria): Promise<Game[]>`.
   - `FlashcardSelector` + token `FLASHCARD_SELECTOR` en `gaming/domain/flashcard-selector.ts`.
@@ -85,7 +85,7 @@
 > Reciben primitivos. Usan repositorios via interface. Mockeados con `jest-mock-extended`.  
 > **Test PRIMERO en cada use case** — escribir el `.spec.ts` antes de la implementación.
 
-- [ ] **TASK-GAMING-08** — `GameStarter`
+- [x] **TASK-GAMING-08** — `GameStarter`
   - Archivo: `gaming/application/start/game-starter.ts`.
   - Inyecta: `GameRepository`, `FlashcardSelector`.
   - **Test (RED primero)**:
@@ -95,7 +95,7 @@
     - Módulo `null` → llama a `FlashcardSelector.select(null, count)`.
   - Mother: `RequestGameStarterMother.random()`, `RequestGameStarterMother.guest()`.
 
-- [ ] **TASK-GAMING-09** — `AttemptRecorder`
+- [x] **TASK-GAMING-09** — `AttemptRecorder`
   - Archivo: `gaming/application/attempt/attempt-recorder.ts`.
   - Inyecta: `GameRepository`, `DomainEventPublisher`.
   - **Test (RED primero)**:
@@ -106,7 +106,7 @@
     - `flashcardId` inválido → `FlashcardNotInGame`.
   - Mother: `RequestAttemptRecorderMother.random(gameId)`.
 
-- [ ] **TASK-GAMING-10** — `GameCompleter`
+- [x] **TASK-GAMING-10** — `GameCompleter`
   - Archivo: `gaming/application/complete/game-completer.ts`.
   - Inyecta: `GameRepository`, `DomainEventPublisher`.
   - **Test (RED primero)**:
@@ -117,7 +117,7 @@
     - Evento `GameCompletedEvent` publicado.
   - Mother: `RequestGameCompleterMother.random(gameId)`.
 
-- [ ] **TASK-GAMING-11** — `GamePauser`
+- [x] **TASK-GAMING-11** — `GamePauser`
   - Archivo: `gaming/application/pause/game-pauser.ts`.
   - Inyecta: `GameRepository`.
   - **Test (RED primero)**:
@@ -127,7 +127,7 @@
     - Ownership incorrecto → `GameAccessDenied`.
   - Mother: `RequestGamePauserMother.random(gameId)`.
 
-- [ ] **TASK-GAMING-12** — `PausedGamesLister`
+- [x] **TASK-GAMING-12** — `PausedGamesLister`
   - Archivo: `gaming/application/list-paused/paused-games-lister.ts`.
   - Inyecta: `GameRepository`.
   - **Test (RED primero)**:
@@ -135,7 +135,7 @@
     - Sin games pausados → retorna array vacío.
   - Mother: `RequestPausedGamesListerMother.random(userId)`.
 
-- [ ] **TASK-GAMING-13** — `GameResumer`
+- [x] **TASK-GAMING-13** — `GameResumer`
   - Archivo: `gaming/application/resume/game-resumer.ts`.
   - Inyecta: `GameRepository`.
   - **Test (RED primero)**:
@@ -145,7 +145,7 @@
     - Ownership incorrecto → `GameAccessDenied`.
   - Mother: `RequestGameResumerMother.random(gameId)`.
 
-- [ ] **TASK-GAMING-14** — `GameAbandoner`
+- [x] **TASK-GAMING-14** — `GameAbandoner`
   - Archivo: `gaming/application/abandon/game-abandoner.ts`.
   - Inyecta: `GameRepository`.
   - **Test (RED primero)**:
@@ -162,38 +162,38 @@
 
 > NestJS, TypeORM. Cubiertos principalmente por tests E2E.
 
-- [ ] **TASK-GAMING-15** — Migración TypeORM `create-gaming`
+- [x] **TASK-GAMING-15** — Migración TypeORM `create-gaming`
   - Crea tablas `games`, `game_flashcards`, `attempts` con índices y constraints del spec.
   - Constraints: `card_count IN (10, 20, 50)`, FK entre tablas, índices en `games(user_id, status)`.
   - Siguiendo el skill `api-migrations`.
 
-- [ ] **TASK-GAMING-16** — Entidades TypeORM
+- [x] **TASK-GAMING-16** — Entidades TypeORM
   - `GameEntity` — mapea tabla `games`.
   - `AttemptEntity` — mapea tabla `attempts`.
   - `GameFlashcardEntity` — mapea tabla `game_flashcards` (join table con `position`).
   - Solo mapeo DB ↔ objeto plano. Sin lógica. Sufijo `Entity`.
   - En `gaming/infrastructure/persistence/`.
 
-- [ ] **TASK-GAMING-17** — `TypeOrmGameRepository`
+- [x] **TASK-GAMING-17** — `TypeOrmGameRepository`
   - Implementa `GameRepository`.
   - `save()`: upsert de `GameEntity` + insert/update de `AttemptEntity[]` y `GameFlashcardEntity[]`.
   - `search(id)`: join con attempts y game_flashcards.
   - `match(criteria)`: usa `CriteriaConverter` de shared.
   - Mapeo explícito via `Game.fromPrimitives()` y `game.toPrimitives()`.
 
-- [ ] **TASK-GAMING-18** — `TypeOrmFlashcardSelector`
+- [x] **TASK-GAMING-18** — `TypeOrmFlashcardSelector`
   - Implementa `FlashcardSelector`.
   - Consulta `flashcards` filtrada por `category` (si module !== null) y `audio_status = 'ready'`.
   - Devuelve IDs en orden aleatorio (RANDOM() en SQL) limitados a `count`.
   - En `gaming/infrastructure/selectors/`.
 
-- [ ] **TASK-GAMING-19** — Payloads con `class-validator`
+- [x] **TASK-GAMING-19** — Payloads con `class-validator`
   - `StartGamePostPayload`: `mode` (enum), `module?` (enum nullable), `cardCount` (enum 10|20|50).
   - `RecordAttemptPostPayload`: `flashcardId` (UUID), `correct` (boolean).
   - `PatchGamePayload`: `status` (enum: `paused | abandoned`), `lastFlashcardId?` (UUID, required si paused).
   - Cada payload junto a su controller.
 
-- [ ] **TASK-GAMING-20** — Controllers
+- [x] **TASK-GAMING-20** — Controllers
   - `StartGamePostController` → `POST /games` — retorna `201` con `{ gameId, flashcards[] }`.
   - `RecordAttemptPostController` → `POST /games/:id/attempts` — retorna `204`.
   - `CompleteGamePostController` → `POST /games/:id/complete` — retorna `200` con resumen.
@@ -201,10 +201,10 @@
   - `ListPausedGamesGetController` → `GET /games?status=paused` — retorna `200` con lista.
   - `ResumeGameGetController` → `GET /games/:id/resume` — retorna `200` con `{ game, pendingFlashcardIds }`.
 
-- [ ] **TASK-GAMING-21** — Registro de excepciones en `GamingModule`
+- [x] **TASK-GAMING-21** — Registro de excepciones en `GamingModule`
   - Registrar todos los `DomainError` de este BC en `GlobalExceptionRegistry` siguiendo el skill `api-error-handler`.
 
-- [ ] **TASK-GAMING-22** — `GamingModule` NestJS
+- [x] **TASK-GAMING-22** — `GamingModule` NestJS
   - Declara providers con tokens Symbol (`GAME_REPOSITORY`, `FLASHCARD_SELECTOR`).
   - Importa `SharedModule`.
   - Registra controllers.
@@ -217,40 +217,40 @@
 
 > Tests de integración completos. Corren contra DB real (Docker local). Un archivo por flujo.
 
-- [ ] **TASK-GAMING-23** — E2E: Iniciar partida (`start-game.e2e-spec.ts`)
+- [x] **TASK-GAMING-23** — E2E: Iniciar partida (`start-game.e2e-spec.ts`)
   - `POST /games` con user token → 201 + `gameId + flashcards[]`.
   - `POST /games` con guest token → 201.
   - Guest supera límite → 429.
   - Usuario con 5 pausados → 409 con lista.
 
-- [ ] **TASK-GAMING-24** — E2E: Registrar intento (`record-attempt.e2e-spec.ts`)
+- [x] **TASK-GAMING-24** — E2E: Registrar intento (`record-attempt.e2e-spec.ts`)
   - Attempt válido → 204.
   - Game inexistente → 404.
   - Game de otro usuario → 403.
   - Game pausado → 409.
   - Flashcard no pertenece al game → 422.
 
-- [ ] **TASK-GAMING-25** — E2E: Completar partida (`complete-game.e2e-spec.ts`)
+- [x] **TASK-GAMING-25** — E2E: Completar partida (`complete-game.e2e-spec.ts`)
   - Flujo completo (start → attempts → complete) → 200 + resumen.
   - Completar con pendientes → 422.
 
-- [ ] **TASK-GAMING-26** — E2E: Pausar y retomar (`pause-resume-game.e2e-spec.ts`)
+- [x] **TASK-GAMING-26** — E2E: Pausar y retomar (`pause-resume-game.e2e-spec.ts`)
   - Pausar game `in_progress` → 204, status `paused`.
   - Retomar game `paused` → 200 con flashcards pendientes.
   - Retomar game no pausado → 409.
   - Guest intenta pausar → 403.
 
-- [ ] **TASK-GAMING-27** — E2E: Abandonar partida (`abandon-game.e2e-spec.ts`)
+- [x] **TASK-GAMING-27** — E2E: Abandonar partida (`abandon-game.e2e-spec.ts`)
   - Abandonar game `in_progress` → 204.
   - Abandonar game `paused` → 204.
   - Abandonar game `completed` → 409.
 
-- [ ] **TASK-GAMING-28** — E2E: Límite de juegos pausados (`max-paused-games.e2e-spec.ts`)
+- [x] **TASK-GAMING-28** — E2E: Límite de juegos pausados (`max-paused-games.e2e-spec.ts`)
   - Crear 5 games y pausarlos → todos 204.
   - Crear el 6to game → 409 con lista de 5 pausados.
   - Abandonar uno → crear nuevo → 201.
 
-- [ ] **TASK-GAMING-29** — E2E: Límites de guest (`guest-limits.e2e-spec.ts`)
+- [x] **TASK-GAMING-29** — E2E: Límites de guest (`guest-limits.e2e-spec.ts`)
   - 3 partidas de 10 cartas con guest token → ok.
   - 4ta partida → 429 `GuestLimitExceeded`.
   - Guest intenta `cardCount: 20` → ¿validar en dominio o payload? (decidir en implementación).
@@ -259,7 +259,7 @@
 
 ## Bloque 5 — Documentación
 
-- [ ] **TASK-GAMING-30** — Diagramas por feature en `docs/apps/api/gaming/`
+- [x] **TASK-GAMING-30** — Diagramas por feature en `docs/apps/api/gaming/`
   - README con índice de flujos.
   - Por cada flujo (`start/`, `attempt/`, `complete/`, `pause/`, `resume/`, `abandon/`):
     - `sequence.md` — diagrama de secuencia Mermaid.
