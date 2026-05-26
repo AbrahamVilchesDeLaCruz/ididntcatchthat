@@ -8,6 +8,25 @@ export interface LandingTranslations {
     subheadline: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    ctaPlay: string;
+    ctaHowItWorks: string;
+    navBackoffice: string;
+    navLogin: string;
+    navRegister: string;
+  };
+  authGate: {
+    title: string;
+    subtitle: string;
+    login: string;
+    register: string;
+    divider: string;
+    guest: string;
+    close: string;
+  };
+  gameDemo: {
+    title: string;
+    subtitle: string;
+    hoverHint: string;
   };
   problem: {
     sectionLabel: string;
@@ -57,6 +76,45 @@ export interface LandingTranslations {
   };
 }
 
+export interface GameTranslations {
+  config: {
+    title: string;
+    subtitle: string;
+    moduleLabel: string;
+    countLabel: string;
+    ctaStart: string;
+    modules: {
+      random: string;
+      native_sounds: string;
+      connecting_words: string;
+      beautifying_sentences: string;
+      sounding_native: string;
+    };
+  };
+  play: {
+    cardOf: string;
+    correct: string;
+    incorrect: string;
+    hoverToReveal: string;
+    tapToReveal: string;
+    tapToFlipBack: string;
+  };
+  summary: {
+    title: string;
+    subtitleGood: string;
+    subtitleKeepGoing: string;
+    accuracy: string;
+    correct: string;
+    total: string;
+    duration: string;
+    ctaPlayAgain: string;
+    ctaRegister: string;
+    registerTitle: string;
+    registerHint: string;
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
+  game: GameTranslations;
 }

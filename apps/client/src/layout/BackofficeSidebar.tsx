@@ -39,6 +39,15 @@ export const BackofficeSidebar = (): ReactElement => {
         <NavLink to="/backoffice/flashcards" className={navLinkClass}>
           Flashcards
         </NavLink>
+
+        <div className="pt-4">
+          <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+            Game
+          </p>
+          <NavLink to="/game" className={navLinkClass}>
+            🎮 Play
+          </NavLink>
+        </div>
       </nav>
 
       {/* Logout */}
