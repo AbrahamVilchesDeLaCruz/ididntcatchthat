@@ -8,7 +8,7 @@ import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-fl
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
-import { Migration202605260001 } from '../migrations/Migration202605260001';
+import { Migration1779773389320 } from '../migrations/Migration1779773389320';
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -45,7 +45,7 @@ export const AppDataSource = new DataSource({
     Migration202605230526271779506787479,
     Migration202605241854361779641676650,
     Migration202605251200001779720000000,
-    Migration202605260001,
+    Migration1779773389320,
   ],
   migrationsTableName: 'migrations',
   migrationsRun: !isProd, // auto-run on dev/test; in prod use CLI

@@ -8,8 +8,8 @@ import { type MigrationInterface, type QueryRunner } from 'typeorm';
  * - `game_flashcards` stores the ordered set of flashcards for each game
  * - `attempts` records each answer within a game
  */
-export class Migration202605260001 implements MigrationInterface {
-  name = 'Migration202605260001';
+export class Migration1779773389320 implements MigrationInterface {
+  name = 'Migration1779773389320';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
