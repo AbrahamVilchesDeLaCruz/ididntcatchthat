@@ -22,7 +22,7 @@ export interface RegisterPayload {
 }
 
 export interface GuestAuthPayload {
-  timezone?: string;
+  guestDeviceId?: string;
 }
 
 export interface MigrateGuestPayload {

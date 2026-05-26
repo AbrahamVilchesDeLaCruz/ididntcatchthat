@@ -6,6 +6,9 @@ import { LandingView } from '@/views/LandingView';
 import { AuthView } from '@/views/AuthView';
 import { AuthCallbackView } from '@/views/AuthCallbackView';
 import { BackofficeView } from '@/views/BackofficeView';
+import { GameConfigView } from '@/views/GameConfigView';
+import { GameView } from '@/views/GameView';
+import { GameSummaryView } from '@/views/GameSummaryView';
 
 const ProtectedRoute = ({
   children,
@@ -33,6 +36,9 @@ const AppRoutes = (): ReactElement => {
       <Route path="/" element={<LandingView />} />
       <Route path="/auth/callback" element={<AuthCallbackView />} />
       <Route path="/auth/:mode" element={<AuthView />} />
+      <Route path="/game" element={<GameConfigView />} />
+      <Route path="/game/:gameId" element={<GameView />} />
+      <Route path="/game/:gameId/summary" element={<GameSummaryView />} />
       <Route
         path="/backoffice/*"
         element={

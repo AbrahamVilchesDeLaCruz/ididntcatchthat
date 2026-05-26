@@ -5,6 +5,7 @@ import { ObservabilityModule } from './observability/infrastructure/framework/ob
 import { SharedModule } from './shared/infrastructure/framework/shared.module';
 import { IdentityModule } from './identity/shared/infrastructure/framework/identity.module';
 import { ContentModule } from './content/shared/infrastructure/framework/content.module';
+import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { AppDataSource } from './shared/infrastructure/persistence/typeorm/typeorm.config';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 
@@ -20,6 +21,7 @@ import { envValidationSchema } from './shared/infrastructure/config/env.validati
     ObservabilityModule,
     IdentityModule,
     ContentModule,
+    GamingModule,
   ],
 })
 export class AppModule {}

@@ -14,6 +14,7 @@ export const AuthContainer = (): ReactElement => {
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setGuestDeviceId = useAuthStore((s) => s.setGuestDeviceId);
+  const clearGuestDeviceId = useAuthStore((s) => s.clearGuestDeviceId);
   const guestDeviceId = useAuthStore((s) => s.guestDeviceId);
 
   const authMode: AuthMode = mode === 'register' ? 'register' : 'login';
@@ -34,7 +35,7 @@ export const AuthContainer = (): ReactElement => {
   useEffect(() => {
     if (!guestDeviceId) {
       guestAuth(
-        { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        { guestDeviceId: undefined },
         {
           onSuccess: ({ deviceId, accessToken }) => {
             setGuestDeviceId(deviceId);
@@ -52,6 +53,7 @@ export const AuthContainer = (): ReactElement => {
       {
         onSuccess: ({ accessToken }) => {
           setAccessToken(accessToken);
+          clearGuestDeviceId();
           void navigate('/backoffice/flashcards', { replace: true });
         },
       },
@@ -64,6 +66,7 @@ export const AuthContainer = (): ReactElement => {
       {
         onSuccess: ({ accessToken }) => {
           setAccessToken(accessToken);
+          clearGuestDeviceId();
           void navigate('/backoffice/flashcards', { replace: true });
         },
       },

@@ -30,7 +30,9 @@ apiClient.interceptors.response.use(
   }) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isGuest = useAuthStore.getState().guestDeviceId !== null;
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isGuest) {
       originalRequest._retry = true;
       try {
         const res = await axios.post<{ accessToken: string }>(

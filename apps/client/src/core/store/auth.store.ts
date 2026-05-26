@@ -10,6 +10,7 @@ interface AuthState {
 interface AuthActions {
   setAccessToken: (token: string) => void;
   setGuestDeviceId: (deviceId: string) => void;
+  clearGuestDeviceId: () => void;
   logout: () => void;
 }
 
@@ -24,6 +25,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({ accessToken: token, isAuthenticated: true }),
 
       setGuestDeviceId: (deviceId) => set({ guestDeviceId: deviceId }),
+
+      clearGuestDeviceId: () => set({ guestDeviceId: null }),
 
       logout: () => set({ accessToken: null, isAuthenticated: false }),
     }),

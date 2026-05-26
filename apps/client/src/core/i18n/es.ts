@@ -10,6 +10,26 @@ export const es: Translations = {
         'La app que te enseña cómo hablan realmente los nativos — fonética real, connected speech y 3 acentos por expresión.',
       ctaPrimary: 'Avísame cuando esté lista',
       ctaSecondary: 'Cómo funciona',
+      ctaPlay: 'Jugar ahora',
+      ctaHowItWorks: 'Ver cómo funciona',
+      navBackoffice: 'Ir al backoffice →',
+      navLogin: 'Iniciar sesión',
+      navRegister: 'Registrarse',
+    },
+    authGate: {
+      title: '¿Cómo querés jugar?',
+      subtitle:
+        'Accedé para guardar tu progreso o jugá directamente como invitado',
+      login: 'Iniciar sesión',
+      register: 'Crear cuenta gratis',
+      divider: 'o',
+      guest: 'Jugar como invitado →',
+      close: 'Cerrar',
+    },
+    gameDemo: {
+      title: 'Así funciona',
+      subtitle: 'Aprendé pronunciación real con flashcards interactivas',
+      hoverHint: 'Hover para ver →',
     },
     problem: {
       sectionLabel: 'El problema',
@@ -102,6 +122,44 @@ export const es: Translations = {
     },
     footer: {
       tagline: 'En desarrollo',
+    },
+  },
+  game: {
+    config: {
+      title: 'Configurá tu partida',
+      subtitle: 'Elegí un módulo y cuántas cartas querés practicar.',
+      moduleLabel: 'Módulo',
+      countLabel: 'Cartas',
+      ctaStart: 'Empezar partida',
+      modules: {
+        random: 'Mezcla aleatoria',
+        native_sounds: 'Sonidos nativos',
+        connecting_words: 'Conectando palabras',
+        beautifying_sentences: 'Mejorando frases',
+        sounding_native: 'Sonando nativo',
+      },
+    },
+    play: {
+      cardOf: 'de',
+      correct: 'Lo sabía',
+      incorrect: 'No lo sabía',
+      hoverToReveal: 'Hover para revelar',
+      tapToReveal: 'Tocá para revelar',
+      tapToFlipBack: 'Tocá para volver',
+    },
+    summary: {
+      title: '¡Partida terminada!',
+      subtitleGood: '¡Buena sesión! 🎉',
+      subtitleKeepGoing: '¡Seguí practicando, vas a llegar!',
+      accuracy: 'Precisión',
+      correct: 'Correctas',
+      total: 'Total',
+      duration: 'Duración',
+      ctaPlayAgain: 'Jugar de nuevo',
+      ctaRegister: 'Guardar mi progreso',
+      registerTitle: '¿Querés guardar tu progreso?',
+      registerHint:
+        'Jugaste como invitado — tu racha no se guarda. ¡Registrate, es gratis!',
     },
   },
 };
