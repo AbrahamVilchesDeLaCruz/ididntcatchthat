@@ -90,7 +90,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         .expect(200);
 
       const body = res.body as {
-        game: { gameId: string };
+        game: { id: string };
         pendingFlashcardIds: string[];
       };
 

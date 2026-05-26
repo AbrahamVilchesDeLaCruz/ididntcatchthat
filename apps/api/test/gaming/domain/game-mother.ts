@@ -22,8 +22,16 @@ export class GameMother {
     );
   }
 
-  static inProgress(): Game {
-    return GameMother.random();
+  static inProgress(
+    overrides?: Partial<{
+      userId: string | null;
+      mode: string;
+      module: string | null;
+      cardCount: string;
+      flashcardIds: string[];
+    }>,
+  ): Game {
+    return GameMother.random(overrides);
   }
 
   static paused(): Game {

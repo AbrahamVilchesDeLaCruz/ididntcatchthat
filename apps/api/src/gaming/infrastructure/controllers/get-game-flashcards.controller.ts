@@ -1,10 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
-import {
-  GameFlashcardsFetcher,
-  type GameFlashcardDto,
-} from '@/gaming/application/fetch-flashcards/game-flashcards-fetcher';
+import { GameFlashcardsFetcher } from '@/gaming/application/fetch-flashcards/game-flashcards-fetcher';
+import { type GameFlashcardDto } from '@/gaming/domain/game-flashcard-query';
 
 @ApiTags('games')
 @Controller('games')
