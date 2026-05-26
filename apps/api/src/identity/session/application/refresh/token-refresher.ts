@@ -22,6 +22,7 @@ import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type TokenRefresherResult = {
   accessToken: string;
+  refreshTokenId: string;
 };
 
 @Injectable()
@@ -103,6 +104,6 @@ export class TokenRefresher {
 
     this.logger.info('Token refreshed', { userId: user.id.value });
 
-    return { accessToken };
+    return { accessToken, refreshTokenId };
   }
 }

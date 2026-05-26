@@ -54,13 +54,19 @@ describe('identity/application/refresh TokenRefresher', () => {
   it('should return new access token and rotate the session', async () => {
     const session = UserSessionMother.create({ tokenId: params.tokenId });
     const user = UserMother.random({ id: session.ownerId });
+    const expectedRefreshTokenId = UuidMother.random();
 
     sessionRepository.match.mockResolvedValueOnce([session]);
     userRepository.search.mockResolvedValueOnce(user);
+    tokenGenerator.generatePair.mockReturnValue({
+      accessToken: 'new-access-token',
+      refreshTokenId: expectedRefreshTokenId,
+    });
 
     const result = await useCase.execute(params);
 
     expect(result.accessToken).toBe('new-access-token');
+    expect(result.refreshTokenId).toBe(expectedRefreshTokenId);
     // saves revoked old + saves new
     expect(sessionRepository.save).toHaveBeenCalledTimes(2);
     const firstCall = sessionRepository.save.mock.calls[0][0];
