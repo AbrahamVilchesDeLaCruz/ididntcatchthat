@@ -1,19 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-// Domain tokens
 import { FLASHCARD_REPOSITORY } from '@/content/flashcard/domain/flashcard.repository';
 import { PDF_FLASHCARD_EXTRACTOR } from '@/content/flashcard/domain/pdf-flashcard-extractor';
 import { AI_EXAMPLE_GENERATOR } from '@/content/flashcard/domain/ai-example-generator';
 import { AI_PHONETICS_GENERATOR } from '@/content/flashcard/domain/ai-phonetics-generator';
 import { AUDIO_GENERATOR } from '@/content/flashcard/domain/audio-generator';
 import { AUDIO_STORAGE } from '@/content/flashcard/domain/audio-storage';
-import { DOMAIN_EVENT_PUBLISHER } from '@/shared/domain/domain-event-publisher';
-import { DOMAIN_EVENT_CONSUMER } from '@/shared/application/domain-event-consumer';
 import { HANDLERS } from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
 import { Handler } from '@/shared/application/handler';
-
-// Infrastructure — persistence
 import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { TypeOrmFlashcardRepository } from '@/content/flashcard/infrastructure/persistence/typeorm-flashcard.repository';
 
@@ -27,7 +22,6 @@ import { ElevenLabsAudioGenerator } from '@/content/flashcard/infrastructure/aud
 import { R2AudioStorage } from '@/content/flashcard/infrastructure/audio/r2-audio-storage';
 
 // Infrastructure — event bus
-import { AmqpMessageBus } from '@/shared/infrastructure/event-bus/amqp-message-bus';
 import { HandlersBootstrapper } from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
 
 // Infrastructure — controllers
@@ -96,11 +90,6 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     // Audio ports
     { provide: AUDIO_GENERATOR, useClass: ElevenLabsAudioGenerator },
     { provide: AUDIO_STORAGE, useClass: R2AudioStorage },
-
-    // Event bus (AMQP)
-    AmqpMessageBus,
-    { provide: DOMAIN_EVENT_PUBLISHER, useExisting: AmqpMessageBus },
-    { provide: DOMAIN_EVENT_CONSUMER, useExisting: AmqpMessageBus },
 
     // Event handlers
     GenerateFlashcardExamplesOnFlashcardCreated,

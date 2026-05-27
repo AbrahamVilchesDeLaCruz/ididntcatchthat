@@ -7,8 +7,6 @@ import { USER_SESSION_REPOSITORY } from '@/identity/session/domain/user-session.
 import { TOKEN_GENERATOR } from '@/identity/shared/domain/token-generator';
 import { PASSWORD_HASHER } from '@/identity/user/domain/password-hasher';
 import { GUEST_GAME_MIGRATION_REPOSITORY } from '@/identity/user/domain/guest-game-migration.repository';
-import { DOMAIN_EVENT_PUBLISHER } from '@/shared/domain/domain-event-publisher';
-
 // Infrastructure — persistence
 import { UserEntity } from '@/identity/user/infrastructure/persistence/user.entity';
 import { UserSessionEntity } from '@/identity/session/infrastructure/persistence/user-session.entity';
@@ -53,9 +51,6 @@ import { UserSearcher } from '@/identity/user/domain/user-searcher';
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
-// Domain event publisher stub (real implementation pending events infra)
-import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
-
 @Module({
   imports: [
     SharedModule,
@@ -87,7 +82,6 @@ import { NoopDomainEventPublisher } from './noop-domain-event-publisher';
     // Services
     { provide: TOKEN_GENERATOR, useClass: JwtTokenGenerator },
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
-    { provide: DOMAIN_EVENT_PUBLISHER, useClass: NoopDomainEventPublisher },
 
     // Domain services
     NicknameResolver,

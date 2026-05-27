@@ -5,8 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GAME_REPOSITORY } from '@/gaming/domain/game.repository';
 import { FLASHCARD_SELECTOR } from '@/gaming/domain/flashcard-selector';
 import { GAME_FLASHCARD_QUERY } from '@/gaming/domain/game-flashcard-query';
-import { DOMAIN_EVENT_PUBLISHER } from '@/shared/domain/domain-event-publisher';
-
 // Infrastructure — persistence
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
 import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entity';
@@ -29,9 +27,6 @@ import { GetGameFlashcardsController } from '@/gaming/infrastructure/controllers
 
 // Infrastructure — exception registry
 import { GamingExceptionRegistry } from './gaming-exception-registry';
-
-// Infrastructure — framework
-import { NoopDomainEventPublisher } from '@/identity/shared/infrastructure/framework/noop-domain-event-publisher';
 
 // Application — use cases
 import { GameStarter } from '@/gaming/application/start/game-starter';
@@ -72,7 +67,6 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
-    { provide: DOMAIN_EVENT_PUBLISHER, useClass: NoopDomainEventPublisher },
 
     // Use cases
     GameStarter,

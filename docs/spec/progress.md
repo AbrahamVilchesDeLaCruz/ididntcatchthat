@@ -18,10 +18,10 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Casos de uso por actor
 
-| Actor | Caso de uso                          | Endpoint                               |
-| ----- | ------------------------------------ | -------------------------------------- |
-| User  | Ver progreso por módulo              | `GET /progress/modules`                |
-| User  | Ver flashcards más débiles           | `GET /progress/flashcards/weakest`     |
+| Actor | Caso de uso                | Endpoint                           |
+| ----- | -------------------------- | ---------------------------------- |
+| User  | Ver progreso por módulo    | `GET /progress/modules`            |
+| User  | Ver flashcards más débiles | `GET /progress/flashcards/weakest` |
 
 > Ambos endpoints requieren usuario autenticado. No existen equivalentes para guests — el progreso guest no se persiste en este BC.
 
@@ -29,11 +29,11 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Eventos consumidos
 
-| Exchange                                      | BC Emisor | Handler                                                | Idempotencia   |
-| --------------------------------------------- | --------- | ------------------------------------------------------ | -------------- |
-| `idct.gaming.attempts.attempt.recorded`       | Gaming    | `update_flashcard_stats_on_attempt_recorded`           | Natural — UPSERT por `(userId, flashcardId)` |
-| `idct.gaming.games.game.completed`            | Gaming    | `update_module_progress_on_game_completed`             | Natural — recálculo idempotente              |
-| `idct.identity.users.guest_progress.migrated` | Identity  | `import_guest_progress_on_guest_progress_migrated`     | Inbox table — `processed_events`             |
+| Exchange                                      | BC Emisor | Handler                                            | Idempotencia                                 |
+| --------------------------------------------- | --------- | -------------------------------------------------- | -------------------------------------------- |
+| `idct.gaming.attempts.attempt.recorded`       | Gaming    | `update_flashcard_stats_on_attempt_recorded`       | Natural — UPSERT por `(userId, flashcardId)` |
+| `idct.gaming.games.game.completed`            | Gaming    | `update_module_progress_on_game_completed`         | Natural — recálculo idempotente              |
+| `idct.identity.users.guest_progress.migrated` | Identity  | `import_guest_progress_on_guest_progress_migrated` | Inbox table — `processed_events`             |
 
 ### Reglas de procesamiento
 
@@ -46,9 +46,9 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Eventos publicados
 
-| Exchange                                        | Cuándo                                          |
-| ----------------------------------------------- | ----------------------------------------------- |
-| `idct.progress.module_progress.module_level.up` | Cuando `masteryLevel` sube en `ModuleProgress`  |
+| Exchange                                        | Cuándo                                         |
+| ----------------------------------------------- | ---------------------------------------------- |
+| `idct.progress.module_progress.module_level.up` | Cuando `masteryLevel` sube en `ModuleProgress` |
 
 ---
 
@@ -58,30 +58,30 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 PK compuesta: `(user_id, flashcard_id)`.
 
-| Columna         | Tipo      | Notas                                        |
-| --------------- | --------- | -------------------------------------------- |
-| `user_id`       | `uuid FK` |                                              |
-| `flashcard_id`  | `uuid FK` |                                              |
-| `times_studied` | `int`     | Increments en modo `study`                   |
-| `times_played`  | `int`     | Increments en modo `game`                    |
-| `correct_count` | `int`     |                                              |
-| `accuracy_rate` | `decimal` | `correct_count / times_played`, 0–1          |
-| `last_seen_at`  | `timestamp` |                                            |
+| Columna         | Tipo        | Notas                               |
+| --------------- | ----------- | ----------------------------------- |
+| `user_id`       | `uuid FK`   |                                     |
+| `flashcard_id`  | `uuid FK`   |                                     |
+| `times_studied` | `int`       | Increments en modo `study`          |
+| `times_played`  | `int`       | Increments en modo `game`           |
+| `correct_count` | `int`       |                                     |
+| `accuracy_rate` | `decimal`   | `correct_count / times_played`, 0–1 |
+| `last_seen_at`  | `timestamp` |                                     |
 
 ### Tabla `module_progress` (nueva)
 
 Read model materializado. Se recalcula cada vez que llega `GameCompleted` con módulo definido.
 
-| Columna          | Tipo      | Notas                                                     |
-| ---------------- | --------- | --------------------------------------------------------- |
-| `user_id`        | `uuid FK` |                                                           |
-| `module`         | `varchar` | `native_sounds \| connecting_words \| beautifying_sentences \| sounding_native` |
-| `total_attempts` | `int`     | Total de attempts del usuario en este módulo              |
-| `correct_count`  | `int`     |                                                           |
-| `accuracy`       | `decimal` | 0–1                                                       |
-| `mastery_level`  | `int`     | 0–3 (ver fórmula más abajo)                               |
-| `last_played_at` | `timestamp` |                                                         |
-| `updated_at`     | `timestamp` |                                                         |
+| Columna          | Tipo        | Notas                                                                           |
+| ---------------- | ----------- | ------------------------------------------------------------------------------- |
+| `user_id`        | `uuid FK`   |                                                                                 |
+| `module`         | `varchar`   | `native_sounds \| connecting_words \| beautifying_sentences \| sounding_native` |
+| `total_attempts` | `int`       | Total de attempts del usuario en este módulo                                    |
+| `correct_count`  | `int`       |                                                                                 |
+| `accuracy`       | `decimal`   | 0–1                                                                             |
+| `mastery_level`  | `int`       | 0–3 (ver fórmula más abajo)                                                     |
+| `last_played_at` | `timestamp` |                                                                                 |
+| `updated_at`     | `timestamp` |                                                                                 |
 
 PK compuesta: `(user_id, module)`.
 
@@ -89,11 +89,11 @@ PK compuesta: `(user_id, module)`.
 
 Usada solo por el handler `import_guest_progress_on_guest_progress_migrated`.
 
-| Columna      | Tipo        | Notas                           |
-| ------------ | ----------- | ------------------------------- |
-| `event_id`   | `uuid PK`   | ID del evento recibido          |
-| `handler`    | `varchar`   | Nombre del handler              |
-| `processed_at` | `timestamp` |                               |
+| Columna        | Tipo        | Notas                  |
+| -------------- | ----------- | ---------------------- |
+| `event_id`     | `uuid PK`   | ID del evento recibido |
+| `handler`      | `varchar`   | Nombre del handler     |
+| `processed_at` | `timestamp` |                        |
 
 ---
 
@@ -101,12 +101,12 @@ Usada solo por el handler `import_guest_progress_on_guest_progress_migrated`.
 
 Basada en attempts totales del módulo (suma de todos los games de ese módulo) y accuracy global del módulo.
 
-| Nivel | Condición                                          |
-| ----- | -------------------------------------------------- |
-| 0     | `total_attempts < 5`                               |
-| 1     | `total_attempts >= 5` y `accuracy >= 0.50`         |
-| 2     | `total_attempts >= 10` y `accuracy >= 0.70`        |
-| 3     | `total_attempts >= 20` y `accuracy >= 0.85`        |
+| Nivel | Condición                                   |
+| ----- | ------------------------------------------- |
+| 0     | `total_attempts < 5`                        |
+| 1     | `total_attempts >= 5` y `accuracy >= 0.50`  |
+| 2     | `total_attempts >= 10` y `accuracy >= 0.70` |
+| 3     | `total_attempts >= 20` y `accuracy >= 0.85` |
 
 > `studyLevel = 0` fijo en MVP. `combinedLevel = masteryLevel`.
 
