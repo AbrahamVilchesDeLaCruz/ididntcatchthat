@@ -17,7 +17,6 @@ import { TypeOrmUserFlashcardStatsRepository } from '@/progress/infrastructure/p
 import { TypeOrmModuleProgressRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-module-progress.repository';
 import { TypeOrmProcessedEventsRepository } from '@/shared/infrastructure/persistence/inbox/typeorm-processed-events.repository';
 import { TypeOrmGuestAttemptRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-guest-attempt.repository';
-
 // Infrastructure — controllers
 import { GetModulesProgressGetController } from '@/progress/infrastructure/controllers/get-modules-progress-get.controller';
 import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
