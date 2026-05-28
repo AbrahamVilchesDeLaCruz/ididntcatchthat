@@ -1,5 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { type GameRepository } from '@/gaming/domain/game.repository';
+import { type AttemptRepository } from '@/gaming/domain/attempt.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { AttemptRecorder } from '@/gaming/application/attempt/attempt-recorder';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
@@ -7,23 +8,32 @@ import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied'
 import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
 import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-game';
 import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
+import { Attempt } from '@/gaming/domain/attempt';
 import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestAttemptRecorderMother } from './request-attempt-recorder-mother';
 
 describe('gaming/application/attempt AttemptRecorder', () => {
   const gameRepository = mock<GameRepository>();
+  const attemptRepository = mock<AttemptRepository>();
   const publisher = mock<DomainEventPublisher>();
   let recorder: AttemptRecorder;
 
   beforeEach(() => {
     gameRepository.search.mockReset();
     gameRepository.save.mockReset();
+    attemptRepository.save.mockReset();
     publisher.publish.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    recorder = new AttemptRecorder(gameRepository, publisher);
+    gameRepository.save.mockResolvedValue(undefined);
+    attemptRepository.save.mockResolvedValue(undefined);
+    recorder = new AttemptRecorder(
+      gameRepository,
+      attemptRepository,
+      publisher,
+    );
   });
 
-  it('should record an attempt and publish AttemptRecordedEvent', async () => {
+  it('should record an attempt, persist it and publish AttemptRecordedEvent', async () => {
     const game = GameMother.inProgress({ flashcardIds: ['fc-1', 'fc-2'] });
     const primitives = game.toPrimitives();
     const request = RequestAttemptRecorderMother.random(primitives.id, {
@@ -31,9 +41,13 @@ describe('gaming/application/attempt AttemptRecorder', () => {
       userId: primitives.userId,
     });
     gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
 
     await recorder.execute(request);
+
+    expect(attemptRepository.save).toHaveBeenCalledTimes(1);
+    const savedAttempt = attemptRepository.save.mock.calls[0][0];
+    expect(savedAttempt).toBeInstanceOf(Attempt);
+    expect(savedAttempt.flashcardId).toBe('fc-1');
 
     expect(gameRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).toHaveBeenCalledTimes(1);
@@ -46,6 +60,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     const request = RequestAttemptRecorderMother.random();
 
     await expect(recorder.execute(request)).rejects.toThrow(GameNotFound);
+    expect(attemptRepository.save).not.toHaveBeenCalled();
     expect(gameRepository.save).not.toHaveBeenCalled();
   });
 
@@ -54,12 +69,11 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     gameRepository.search.mockResolvedValue(game);
     const request = RequestAttemptRecorderMother.random(
       game.toPrimitives().id,
-      {
-        userId: 'other-user',
-      },
+      { userId: 'other-user' },
     );
 
     await expect(recorder.execute(request)).rejects.toThrow(GameAccessDenied);
+    expect(attemptRepository.save).not.toHaveBeenCalled();
     expect(gameRepository.save).not.toHaveBeenCalled();
   });
 
@@ -73,6 +87,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     });
 
     await expect(recorder.execute(request)).rejects.toThrow(GameNotInProgress);
+    expect(attemptRepository.save).not.toHaveBeenCalled();
     expect(gameRepository.save).not.toHaveBeenCalled();
   });
 
@@ -86,6 +101,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     });
 
     await expect(recorder.execute(request)).rejects.toThrow(FlashcardNotInGame);
+    expect(attemptRepository.save).not.toHaveBeenCalled();
     expect(gameRepository.save).not.toHaveBeenCalled();
   });
 });

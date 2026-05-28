@@ -1,5 +1,15 @@
-import { type AudioUrlsPrimitives } from '@/content/flashcard/domain/audio-urls';
-import { type ExamplePrimitives } from '@/content/flashcard/domain/example';
+export interface GameFlashcardAudioUrls {
+  expression: { us: string; uk: string; au: string };
+  examples: { us: string };
+}
+
+export interface GameFlashcardExample {
+  id: string;
+  flashcardId: string;
+  textEn: string;
+  textEs: string;
+  position: number;
+}
 
 export interface GameFlashcardDto {
   id: string;
@@ -10,8 +20,8 @@ export interface GameFlashcardDto {
   subcategory: string;
   ipaNotation: string | null;
   nativeSpeech: string | null;
-  audioUrls: AudioUrlsPrimitives | null;
-  examples: ExamplePrimitives[];
+  audioUrls: GameFlashcardAudioUrls | null;
+  examples: GameFlashcardExample[];
 }
 
 export interface GameFlashcardQuery {

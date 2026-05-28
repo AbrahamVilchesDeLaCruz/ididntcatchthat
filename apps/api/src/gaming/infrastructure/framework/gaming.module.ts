@@ -3,17 +3,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Domain tokens
 import { GAME_REPOSITORY } from '@/gaming/domain/game.repository';
+import { ATTEMPT_REPOSITORY } from '@/gaming/domain/attempt.repository';
 import { FLASHCARD_SELECTOR } from '@/gaming/domain/flashcard-selector';
 import { GAME_FLASHCARD_QUERY } from '@/gaming/domain/game-flashcard-query';
+
 // Infrastructure — persistence
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
-import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entity';
 import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
 import { TypeOrmGameRepository } from '@/gaming/infrastructure/persistence/typeorm-game.repository';
+import { TypeOrmAttemptRepository } from '@/gaming/infrastructure/persistence/typeorm-attempt.repository';
 import { TypeOrmGameFlashcardQuery } from '@/gaming/infrastructure/persistence/typeorm-game-flashcard-query';
 
 // Infrastructure — selectors
-import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/typeorm-flashcard-selector';
 
 // Infrastructure — controllers
@@ -46,12 +47,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   imports: [
     SharedModule,
     AuthModule,
-    TypeOrmModule.forFeature([
-      GameEntity,
-      AttemptEntity,
-      GameFlashcardEntity,
-      FlashcardEntity,
-    ]),
+    TypeOrmModule.forFeature([GameEntity, GameFlashcardEntity]),
   ],
   controllers: [
     StartGamePostController,
@@ -64,6 +60,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   ],
   providers: [
     // Repositories
+    { provide: ATTEMPT_REPOSITORY, useClass: TypeOrmAttemptRepository },
     { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },

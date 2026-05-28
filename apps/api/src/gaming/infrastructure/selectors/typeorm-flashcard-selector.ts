@@ -1,30 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { type FlashcardSelector } from '@/gaming/domain/flashcard-selector';
 import { type GameModule } from '@/gaming/domain/game-module';
-import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 
 @Injectable()
 export class TypeOrmFlashcardSelector implements FlashcardSelector {
   constructor(
-    @InjectRepository(FlashcardEntity)
-    private readonly repo: Repository<FlashcardEntity>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async select(module: GameModule | null, count: number): Promise<string[]> {
-    const qb = this.repo
-      .createQueryBuilder('f')
-      .select('f.id')
-      .where("f.audio_status = 'ready'");
+    const params: (string | number)[] = ['ready', count];
+    let categoryClause = '';
 
     if (module !== null) {
-      qb.andWhere('f.category = :category', { category: module.value });
+      params.push(module.value);
+      categoryClause = `AND category = $${params.length}`;
     }
 
-    qb.orderBy('RANDOM()').limit(count);
+    const rows = await this.dataSource.query<{ id: string }[]>(
+      `SELECT id
+       FROM flashcards
+       WHERE audio_status = $1
+       ${categoryClause}
+       ORDER BY RANDOM()
+       LIMIT $2`,
+      params,
+    );
 
-    const result = await qb.getRawMany<{ f_id: string }>();
-    return result.map((r) => r.f_id);
+    return rows.map((r) => r.id);
   }
 }
