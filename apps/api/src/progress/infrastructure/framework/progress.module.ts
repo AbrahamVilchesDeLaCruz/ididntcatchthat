@@ -29,8 +29,8 @@ import {
 import { Handler } from '@/shared/application/handler';
 
 // Application — use cases
-import { ModulesProgressGetter } from '@/progress/application/get-modules-progress/modules-progress-getter';
-import { WeakestFlashcardsGetter } from '@/progress/application/get-weakest-flashcards/weakest-flashcards-getter';
+import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
+import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
 
 // Application — event handlers
 import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/handlers/update-flashcard-stats-on-attempt-recorded';
@@ -75,8 +75,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     },
 
     // Use cases
-    ModulesProgressGetter,
-    WeakestFlashcardsGetter,
+    ModuleProgressFinder,
+    WeakestFlashcardSearcher,
 
     // Event handlers
     UpdateFlashcardStatsOnAttemptRecorded,
