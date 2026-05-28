@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@/shared/domain/aggregate-root';
-import { FlashcardId } from './flashcard-id';
+import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { Expression } from './expression';
 import { Meaning } from './meaning';
 import { Category } from './category';

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, type SelectQueryBuilder } from 'typeorm';
 import { Flashcard } from '@/content/flashcard/domain/flashcard';
-import { type FlashcardId } from '@/content/flashcard/domain/flashcard-id';
+import { type FlashcardId } from '@/shared/domain/flashcard-id';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type Criteria } from '@/shared/domain/criteria';
 import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';

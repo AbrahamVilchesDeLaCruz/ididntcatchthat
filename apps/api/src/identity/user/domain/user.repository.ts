@@ -1,6 +1,6 @@
 import { type Criteria } from '@/shared/domain/criteria';
 import { type User } from '@/identity/user/domain/user';
-import { type UserId } from '@/identity/user/domain/user-id';
+import { type UserId } from '@/shared/domain/user-id';
 
 export interface UserRepository {
   match(criteria: Criteria): Promise<User[]>;

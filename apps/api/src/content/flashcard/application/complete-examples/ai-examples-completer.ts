@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { FlashcardId } from '@/content/flashcard/domain/flashcard-id';
+import { FlashcardId } from '@/shared/domain/flashcard-id';
 import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,

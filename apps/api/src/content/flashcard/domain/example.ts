@@ -2,7 +2,7 @@ import { UuidValueObject } from '@/shared/domain/uuid-value-object';
 import { ExamplePositionInvalid } from './exceptions/example-position-invalid';
 import { ExampleTextEnEmpty } from './exceptions/example-text-en-empty';
 import { ExampleTextEsEmpty } from './exceptions/example-text-es-empty';
-import { FlashcardIdInvalid } from './exceptions/flashcard-id-invalid';
+import { FlashcardIdInvalid } from '@/shared/domain/exceptions/flashcard-id-invalid';
 import { ExampleIdInvalid } from './exceptions/example-id-invalid';
 
 export type ExamplePrimitives = {

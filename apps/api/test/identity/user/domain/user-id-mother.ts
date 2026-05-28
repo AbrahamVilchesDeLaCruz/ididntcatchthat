@@ -1,5 +1,5 @@
 import { UuidMother } from '@test/shared/domain/uuid-mother';
-import { UserId } from '@/identity/user/domain/user-id';
+import { UserId } from '@/shared/domain/user-id';
 
 export class UserIdMother {
   static random(): UserId {

@@ -1,55 +1,68 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
-import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import {
   type GameFlashcardQuery,
   type GameFlashcardDto,
+  type GameFlashcardAudioUrls,
+  type GameFlashcardExample,
 } from '@/gaming/domain/game-flashcard-query';
+
+interface FlashcardRow {
+  id: string;
+  position: number;
+  expression: string;
+  meaning: string;
+  category: string;
+  subcategory: string;
+  ipa_notation: string | null;
+  native_speech: string | null;
+  audio_urls: GameFlashcardAudioUrls | null;
+  examples: GameFlashcardExample[] | null;
+}
 
 @Injectable()
 export class TypeOrmGameFlashcardQuery implements GameFlashcardQuery {
   constructor(
-    @InjectRepository(GameFlashcardEntity)
-    private readonly gameFcRepo: Repository<GameFlashcardEntity>,
-    @InjectRepository(FlashcardEntity)
-    private readonly flashcardRepo: Repository<FlashcardEntity>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async findByGameId(gameId: string): Promise<GameFlashcardDto[]> {
-    const gameFlashcards = await this.gameFcRepo.find({
-      where: { gameId },
-      order: { position: 'ASC' },
-    });
+    const rows = await this.dataSource.query<FlashcardRow[]>(
+      `SELECT
+         f.id,
+         gf.position,
+         f.expression,
+         f.meaning,
+         f.category,
+         f.subcategory,
+         f.ipa_notation,
+         f.native_speech,
+         f.audio_urls,
+         (
+           SELECT json_agg(ex ORDER BY ex.position)
+           FROM examples ex
+           WHERE ex.flashcard_id = f.id
+         ) AS examples
+       FROM game_flashcards gf
+       JOIN flashcards f ON f.id = gf.flashcard_id
+       WHERE gf.game_id = $1
+       ORDER BY gf.position ASC`,
+      [gameId],
+    );
 
-    if (gameFlashcards.length === 0) return [];
-
-    const flashcardIds = gameFlashcards.map((gf) => gf.flashcardId);
-    const flashcards = await this.flashcardRepo
-      .createQueryBuilder('f')
-      .where('f.id IN (:...ids)', { ids: flashcardIds })
-      .getMany();
-
-    const flashcardMap = new Map(flashcards.map((f) => [f.id, f]));
-
-    return gameFlashcards
-      .map((gf) => {
-        const f = flashcardMap.get(gf.flashcardId);
-        if (!f) return null;
-        return {
-          id: f.id,
-          position: gf.position,
-          expression: f.expression,
-          meaning: f.meaning,
-          category: f.category,
-          subcategory: f.subcategory,
-          ipaNotation: f.ipaNotation,
-          nativeSpeech: f.nativeSpeech,
-          audioUrls: f.audioUrls,
-          examples: f.examples,
-        };
-      })
-      .filter((f): f is GameFlashcardDto => f !== null);
+    return rows.map((r) => ({
+      id: r.id,
+      position: r.position,
+      expression: r.expression,
+      meaning: r.meaning,
+      category: r.category,
+      subcategory: r.subcategory,
+      ipaNotation: r.ipa_notation,
+      nativeSpeech: r.native_speech,
+      audioUrls: r.audio_urls,
+      examples: r.examples ?? [],
+    }));
   }
 }
