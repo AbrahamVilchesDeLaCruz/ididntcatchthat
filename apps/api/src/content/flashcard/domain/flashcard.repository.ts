@@ -1,6 +1,6 @@
 import { type Criteria } from '@/shared/domain/criteria';
 import { type Flashcard } from './flashcard';
-import { type FlashcardId } from './flashcard-id';
+import { type FlashcardId } from '@/shared/domain/flashcard-id';
 
 export interface FlashcardRepository {
   match(criteria: Criteria): Promise<Flashcard[]>;

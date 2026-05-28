@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@/shared/domain/aggregate-root';
-import { UserId } from '@/identity/user/domain/user-id';
+import { UserId } from '@/shared/domain/user-id';
 import { Email } from '@/identity/user/domain/email';
 import { PasswordHash } from '@/identity/user/domain/password-hash';
 import { Nickname } from '@/identity/user/domain/nickname';

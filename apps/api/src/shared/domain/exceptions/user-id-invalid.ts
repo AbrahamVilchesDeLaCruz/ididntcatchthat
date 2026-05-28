@@ -1,7 +1,7 @@
 import { DomainException } from '@/shared/domain/exceptions/domain-exception';
 
-export class UserIdInvalidException extends DomainException {
+export class UserIdInvalid extends DomainException {
   constructor(value: string) {
-    super(`<${value}> is not a valid UserId`);
+    super(`UserId value <${value}> is not a valid UUID`);
   }
 }

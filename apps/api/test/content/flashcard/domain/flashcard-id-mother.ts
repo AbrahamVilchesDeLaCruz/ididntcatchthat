@@ -1,4 +1,4 @@
-import { FlashcardId } from '@/content/flashcard/domain/flashcard-id';
+import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 export class FlashcardIdMother {

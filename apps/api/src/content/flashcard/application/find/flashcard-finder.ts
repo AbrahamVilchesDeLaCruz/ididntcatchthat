@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
-import { FlashcardId } from '@/content/flashcard/domain/flashcard-id';
+import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
 import {
   type FlashcardRepository,

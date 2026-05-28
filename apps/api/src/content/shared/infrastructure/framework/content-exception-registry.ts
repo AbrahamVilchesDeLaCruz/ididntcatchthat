@@ -11,7 +11,7 @@ import { ExampleTextEsEmpty } from '@/content/flashcard/domain/exceptions/exampl
 import { ExpressionEmpty } from '@/content/flashcard/domain/exceptions/expression-empty';
 import { ExpressionTooLong } from '@/content/flashcard/domain/exceptions/expression-too-long';
 import { FlashcardAccessDenied } from '@/content/flashcard/domain/exceptions/flashcard-access-denied';
-import { FlashcardIdInvalid } from '@/content/flashcard/domain/exceptions/flashcard-id-invalid';
+import { FlashcardIdInvalid } from '@/shared/domain/exceptions/flashcard-id-invalid';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
 import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';
 import { InvalidExampleCount } from '@/content/flashcard/domain/exceptions/invalid-example-count';

@@ -10,7 +10,7 @@ import { UserSessionCompromisedException } from '@/identity/session/domain/excep
 import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-not-found.exception';
 import { EmailInvalidException } from '@/identity/user/domain/exceptions/email-invalid.exception';
 import { NicknameInvalidException } from '@/identity/user/domain/exceptions/nickname-invalid.exception';
-import { UserIdInvalidException } from '@/identity/user/domain/exceptions/user-id-invalid.exception';
+import { UserIdInvalid } from '@/shared/domain/exceptions/user-id-invalid';
 import { UserRoleInvalidException } from '@/identity/user/domain/exceptions/user-role-invalid.exception';
 import { OauthProviderInvalidException } from '@/identity/user/domain/exceptions/oauth-provider-invalid.exception';
 import { PasswordHashEmptyException } from '@/identity/user/domain/exceptions/password-hash-empty.exception';
@@ -32,7 +32,7 @@ export class IdentityExceptionRegistry implements OnModuleInit {
         [UserNotFoundException.name, HttpStatus.NOT_FOUND],
         [EmailInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [NicknameInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
-        [UserIdInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [UserIdInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [UserRoleInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [OauthProviderInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [PasswordHashEmptyException.name, HttpStatus.UNPROCESSABLE_ENTITY],

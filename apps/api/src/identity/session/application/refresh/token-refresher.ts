@@ -17,7 +17,7 @@ import {
   type TokenGenerator,
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
-import { UserId } from '@/identity/user/domain/user-id';
+import { UserId } from '@/shared/domain/user-id';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type TokenRefresherResult = {
