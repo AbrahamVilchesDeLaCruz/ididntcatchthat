@@ -70,9 +70,15 @@ const config: Config = {
     'src/shared/domain/domain-event.ts',
     'src/shared/domain/domain-event-publisher.ts',
     'src/shared/domain/logger.ts',
+    // ─── Exclusiones explícitas ───────────────────────────────────────────────
+    // handler.ts: clase abstracta base para AMQP handlers — init() requiere
+    // un DomainEventConsumer real (AMQP), no es testeable en unit tests.
+    // domain-event-consumer.ts: interfaz sin implementación propia en este scope.
+    '!src/shared/application/handler.ts',
+    '!src/shared/application/domain-event-consumer.ts',
   ],
   coverageDirectory: 'coverage/unit',
-  coverageReporters: ['text', 'lcov', 'html'],
+  coverageReporters: ['text', 'lcov', 'html', 'json'],
   coverageThreshold: {
     global: {
       branches: 90,

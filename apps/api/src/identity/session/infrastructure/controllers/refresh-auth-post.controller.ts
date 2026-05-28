@@ -29,7 +29,8 @@ export class RefreshAuthPostController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const tokenId: string =
-      (req.cookies as Record<string, string>)['refreshToken'] ?? '';
+      (req.cookies as Record<string, string> | undefined)?.['refreshToken'] ??
+      '';
     const fingerprint = this.fingerprintBuilder.fromRequest(
       req.headers['user-agent'] ?? '',
       req.headers['accept-language'] ?? '',
@@ -45,7 +46,7 @@ export class RefreshAuthPostController {
       ip,
     });
 
-    res.cookie('refreshToken', tokenId, {
+    res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

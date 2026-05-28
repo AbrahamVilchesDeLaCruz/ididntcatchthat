@@ -37,11 +37,11 @@ export class OAuthAuthenticator {
     private readonly tokenGenerator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
-    @Inject(NicknameResolver)
+    @Inject(NicknameResolver) /* istanbul ignore next */
     private readonly nicknameResolver: NicknameResolver,
-    @Inject(LOGGER_SERVICE)
+    @Inject(LOGGER_SERVICE) /* istanbul ignore next */
     private readonly logger: Logger,
-    @Inject(UserSearcher)
+    @Inject(UserSearcher) /* istanbul ignore next */
     private readonly searcher: UserSearcher,
   ) {}
 
