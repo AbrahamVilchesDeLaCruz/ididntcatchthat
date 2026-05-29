@@ -5,10 +5,9 @@ import {
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
 import { Criteria } from '@/shared/domain/criteria';
+import { type RequestPausedGamesLister } from './request-paused-games-lister';
 
-export interface RequestPausedGamesLister {
-  userId: string;
-}
+export type { RequestPausedGamesLister };
 
 @Injectable()
 export class PausedGamesLister {
@@ -18,8 +17,10 @@ export class PausedGamesLister {
   ) {}
 
   async execute(request: RequestPausedGamesLister): Promise<GamePrimitives[]> {
+    const { userId } = request;
+
     const criteria = new Criteria([
-      { field: 'userId', operator: '=', value: request.userId },
+      { field: 'userId', operator: '=', value: userId },
       { field: 'status', operator: '=', value: 'paused' },
     ]);
     const games = await this.gameRepository.match(criteria);

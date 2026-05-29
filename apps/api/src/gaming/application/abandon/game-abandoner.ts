@@ -10,11 +10,9 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGameAbandoner } from './request-game-abandoner';
 
-export interface RequestGameAbandoner {
-  gameId: string;
-  userId: string;
-}
+export type { RequestGameAbandoner };
 
 @Injectable()
 export class GameAbandoner {
@@ -26,11 +24,13 @@ export class GameAbandoner {
   ) {}
 
   async execute(request: RequestGameAbandoner): Promise<void> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+    const { gameId, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.gameRepository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.toPrimitives().userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     game.abandon();

@@ -18,6 +18,6 @@ export class GetGameFlashcardsController {
   })
   @ApiResponse({ status: 404, description: 'Game not found' })
   async handler(@Param('gameId') gameId: string): Promise<GameFlashcardDto[]> {
-    return this.fetcher.execute(gameId);
+    return this.fetcher.execute({ gameId });
   }
 }

@@ -10,18 +10,10 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGameCompleter } from './request-game-completer';
+import { type ResponseGameCompleter } from './response-game-completer';
 
-export interface RequestGameCompleter {
-  gameId: string;
-  userId: string | null;
-}
-
-export interface GameSummary {
-  correctCount: number;
-  totalCount: number;
-  accuracy: number;
-  duration: number;
-}
+export type { RequestGameCompleter, ResponseGameCompleter };
 
 @Injectable()
 export class GameCompleter {
@@ -32,12 +24,14 @@ export class GameCompleter {
     private readonly publisher: DomainEventPublisher,
   ) {}
 
-  async execute(request: RequestGameCompleter): Promise<GameSummary> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+  async execute(request: RequestGameCompleter): Promise<ResponseGameCompleter> {
+    const { gameId, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.gameRepository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.toPrimitives().userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     game.complete();

@@ -41,7 +41,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
     gameRepository.search.mockResolvedValueOnce(game);
     flashcardQuery.findByGameId.mockResolvedValueOnce(flashcards);
 
-    const result = await fetcher.execute(gameId);
+    const result = await fetcher.execute({ gameId });
 
     expect(result).toEqual(flashcards);
     expect(flashcardQuery.findByGameId).toHaveBeenCalledWith(gameId);
@@ -51,7 +51,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
     const gameId = UuidMother.random();
     gameRepository.search.mockResolvedValueOnce(null);
 
-    await expect(fetcher.execute(gameId)).rejects.toThrow(GameNotFound);
+    await expect(fetcher.execute({ gameId })).rejects.toThrow(GameNotFound);
     expect(flashcardQuery.findByGameId).not.toHaveBeenCalled();
   });
 
@@ -62,7 +62,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
     gameRepository.search.mockResolvedValueOnce(game);
     flashcardQuery.findByGameId.mockResolvedValueOnce([]);
 
-    const result = await fetcher.execute(gameId);
+    const result = await fetcher.execute({ gameId });
 
     expect(result).toEqual([]);
   });

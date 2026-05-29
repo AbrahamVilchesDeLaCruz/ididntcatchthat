@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { type GamePrimitives } from '@/gaming/domain/game';
 import { GameId } from '@/gaming/domain/game-id';
 import {
   type GameRepository,
@@ -7,16 +6,10 @@ import {
 } from '@/gaming/domain/game.repository';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGameResumer } from './request-game-resumer';
+import { type ResponseGameResumer } from './response-game-resumer';
 
-export interface RequestGameResumer {
-  gameId: string;
-  userId: string;
-}
-
-export interface GameResumerResult {
-  game: GamePrimitives;
-  pendingFlashcardIds: string[];
-}
+export type { RequestGameResumer, ResponseGameResumer };
 
 @Injectable()
 export class GameResumer {
@@ -25,12 +18,14 @@ export class GameResumer {
     private readonly gameRepository: GameRepository,
   ) {}
 
-  async execute(request: RequestGameResumer): Promise<GameResumerResult> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+  async execute(request: RequestGameResumer): Promise<ResponseGameResumer> {
+    const { gameId, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.gameRepository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.toPrimitives().userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     game.resume();

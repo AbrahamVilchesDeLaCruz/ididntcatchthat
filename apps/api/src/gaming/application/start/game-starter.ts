@@ -12,18 +12,10 @@ import {
 import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
 import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
 import { Criteria } from '@/shared/domain/criteria';
+import { type RequestGameStarter } from './request-game-starter';
+import { type ResponseGameStarter } from './response-game-starter';
 
-export interface RequestGameStarter {
-  userId: string | null;
-  mode: string;
-  module: string | null;
-  cardCount: number;
-}
-
-export interface GameStarterResult {
-  gameId: string;
-  flashcardIds: string[];
-}
+export type { RequestGameStarter, ResponseGameStarter };
 
 @Injectable()
 export class GameStarter {
@@ -34,8 +26,10 @@ export class GameStarter {
     private readonly flashcardSelector: FlashcardSelector,
   ) {}
 
-  async execute(request: RequestGameStarter): Promise<GameStarterResult> {
-    if (request.userId === null) {
+  async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
+    const { userId, mode, module, cardCount } = request;
+
+    if (userId === null) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayCriteria = new Criteria([
@@ -49,7 +43,7 @@ export class GameStarter {
       }
     } else {
       const pausedCriteria = new Criteria([
-        { field: 'userId', operator: '=', value: request.userId },
+        { field: 'userId', operator: '=', value: userId },
         { field: 'status', operator: '=', value: 'paused' },
       ]);
       const pausedGames = await this.gameRepository.match(pausedCriteria);
@@ -59,19 +53,17 @@ export class GameStarter {
       }
     }
 
-    const gameModule = request.module
-      ? GameModule.create(request.module)
-      : null;
+    const gameModule = module ? GameModule.create(module) : null;
     const flashcardIds = await this.flashcardSelector.select(
       gameModule,
-      request.cardCount,
+      cardCount,
     );
 
     const game = Game.start(
-      request.userId,
-      request.mode,
-      request.module,
-      String(request.cardCount),
+      userId,
+      mode,
+      module,
+      String(cardCount),
       flashcardIds,
     );
 

@@ -1,9 +1,7 @@
+import { type RequestGameAbandoner } from '@/gaming/application/abandon/game-abandoner';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
-export interface RequestGameAbandoner {
-  gameId: string;
-  userId: string;
-}
+export type { RequestGameAbandoner };
 
 export class RequestGameAbandonerMother {
   static random(

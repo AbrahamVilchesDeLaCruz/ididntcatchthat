@@ -15,13 +15,9 @@ import {
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
+import { type RequestAttemptRecorder } from './request-attempt-recorder';
 
-export interface RequestAttemptRecorder {
-  gameId: string;
-  flashcardId: string;
-  correct: boolean;
-  userId: string | null;
-}
+export type { RequestAttemptRecorder };
 
 @Injectable()
 export class AttemptRecorder {
@@ -35,18 +31,20 @@ export class AttemptRecorder {
   ) {}
 
   async execute(request: RequestAttemptRecorder): Promise<void> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+    const { gameId, flashcardId, correct, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.gameRepository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.toPrimitives().userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     if (game.toPrimitives().status !== 'in_progress') {
-      throw new GameNotInProgress(request.gameId);
+      throw new GameNotInProgress(gameId);
     }
 
-    game.recordAttempt(request.flashcardId, request.correct);
+    game.recordAttempt(flashcardId, correct);
 
     const newAttempt = game.attempts[game.attempts.length - 1];
     await this.attemptRepository.save(newAttempt);

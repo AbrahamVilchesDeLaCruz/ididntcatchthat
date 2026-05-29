@@ -10,6 +10,9 @@ import {
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
 import { GameId } from '@/gaming/domain/game-id';
+import { type RequestGameFlashcardsFetcher } from './request-game-flashcards-fetcher';
+
+export type { RequestGameFlashcardsFetcher };
 
 @Injectable()
 export class GameFlashcardsFetcher {
@@ -20,7 +23,11 @@ export class GameFlashcardsFetcher {
     private readonly flashcardQuery: GameFlashcardQuery,
   ) {}
 
-  async execute(gameId: string): Promise<GameFlashcardDto[]> {
+  async execute(
+    request: RequestGameFlashcardsFetcher,
+  ): Promise<GameFlashcardDto[]> {
+    const { gameId } = request;
+
     const game = await this.gameRepository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 

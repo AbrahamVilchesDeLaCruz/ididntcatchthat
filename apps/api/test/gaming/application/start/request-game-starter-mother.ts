@@ -1,9 +1,6 @@
-export interface RequestGameStarter {
-  userId: string | null;
-  mode: string;
-  module: string | null;
-  cardCount: number;
-}
+import { type RequestGameStarter } from '@/gaming/application/start/game-starter';
+
+export type { RequestGameStarter };
 
 export class RequestGameStarterMother {
   static random(overrides?: Partial<RequestGameStarter>): RequestGameStarter {
