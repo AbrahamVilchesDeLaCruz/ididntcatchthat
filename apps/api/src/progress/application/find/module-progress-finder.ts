@@ -5,10 +5,9 @@ import {
   MODULE_PROGRESS_REPOSITORY,
 } from '@/progress/domain/module-progress.repository';
 import { UserId } from '@/shared/domain/user-id';
+import { type RequestModuleProgressFinder } from './request-module-progress-finder';
 
-export interface RequestModuleProgressFinder {
-  userId: string;
-}
+export type { RequestModuleProgressFinder };
 
 @Injectable()
 export class ModuleProgressFinder {
@@ -17,10 +16,10 @@ export class ModuleProgressFinder {
     private readonly repository: ModuleProgressRepository,
   ) {}
 
-  async execute(
-    request: RequestModuleProgressFinder,
-  ): Promise<ModuleProgressPrimitives[]> {
-    const results = await this.repository.findAll(new UserId(request.userId));
+  async execute({
+    userId,
+  }: RequestModuleProgressFinder): Promise<ModuleProgressPrimitives[]> {
+    const results = await this.repository.findAll(new UserId(userId));
     return results
       .sort((a, b) => b.masteryLevel - a.masteryLevel)
       .map((mp) => mp.toPrimitives());
