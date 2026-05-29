@@ -1,21 +1,11 @@
-import { type ExamplePrimitives } from '@/content/flashcard/domain/example';
+import { type RequestFlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 import { CategoryValue } from '@/content/flashcard/domain/category';
 import { MasteringSoundsSubcategory } from '@/content/flashcard/domain/subcategory-enums';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
 import { ExampleMother } from '@test/content/flashcard/domain/example-mother';
 
-export type RequestFlashcardCreator = {
-  id: string;
-  expression: string;
-  meaning: string;
-  category: string;
-  subcategory: string;
-  ipaNotation: string | null;
-  nativeSpeech: string | null;
-  examples: ExamplePrimitives[];
-  createdBy: string;
-};
+export type { RequestFlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 
 export class RequestFlashcardCreatorMother {
   static random(

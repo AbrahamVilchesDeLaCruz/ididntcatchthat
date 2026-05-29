@@ -2,17 +2,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   type AiExampleGenerator,
   AI_EXAMPLE_GENERATOR,
-  type ExampleDraft,
 } from '@/content/flashcard/domain/ai-example-generator';
+import {
+  type RequestAiExampleSuggester,
+  type ResponseAiExampleSuggester,
+} from './request-ai-example-suggester';
 
-export type AiExampleSuggesterRequest = {
-  expression: string;
-  category: string;
-};
-
-export type AiExampleSuggesterResponse = {
-  examples: ExampleDraft[];
-};
+export type {
+  RequestAiExampleSuggester,
+  ResponseAiExampleSuggester,
+} from './request-ai-example-suggester';
 
 @Injectable()
 export class AiExampleSuggester {
@@ -22,12 +21,10 @@ export class AiExampleSuggester {
   ) {}
 
   async execute(
-    request: AiExampleSuggesterRequest,
-  ): Promise<AiExampleSuggesterResponse> {
-    const examples = await this.generator.generate(
-      request.expression,
-      request.category,
-    );
+    request: RequestAiExampleSuggester,
+  ): Promise<ResponseAiExampleSuggester> {
+    const { expression, category } = request;
+    const examples = await this.generator.generate(expression, category);
     return { examples };
   }
 }

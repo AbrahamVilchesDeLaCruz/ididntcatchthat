@@ -6,8 +6,8 @@ import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-p
 import { FlashcardPhoneticsCompletedEvent } from '@/content/flashcard/domain/events/flashcard-phonetics-completed.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
-import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
+import { RequestAiPhoneticsCompleterMother } from './request-ai-phonetics-completer-mother';
 
 describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter', () => {
   const repository = mock<FlashcardRepository>();
@@ -41,7 +41,11 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
     };
     aiPhoneticsGenerator.generate.mockResolvedValue(draft);
 
-    await completer.execute({ flashcardId: flashcard.id.value });
+    await completer.execute(
+      RequestAiPhoneticsCompleterMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
 
     expect(aiPhoneticsGenerator.generate).toHaveBeenCalledWith(
       flashcard.expression.value,
@@ -58,7 +62,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
   it('should do nothing when flashcard does not exist', async () => {
     repository.search.mockResolvedValue(null);
 
-    await completer.execute({ flashcardId: FlashcardIdMother.random().value });
+    await completer.execute(RequestAiPhoneticsCompleterMother.random());
 
     expect(aiPhoneticsGenerator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();

@@ -1,13 +1,8 @@
-import { type FlashcardUpdateFields } from '@/content/flashcard/domain/flashcard';
+import { type RequestFlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
 import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
-export type RequestFlashcardUpdater = {
-  id: string;
-  requesterId: string;
-  requesterRole: string;
-  fields: FlashcardUpdateFields;
-};
+export type { RequestFlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
 
 export class RequestFlashcardUpdaterMother {
   static random(

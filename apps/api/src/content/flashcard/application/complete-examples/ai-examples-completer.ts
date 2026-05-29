@@ -13,12 +13,11 @@ import {
   AI_EXAMPLE_GENERATOR,
 } from '@/content/flashcard/domain/ai-example-generator';
 import { UuidValueObject } from '@/shared/domain/uuid-value-object';
+import { type RequestAiExamplesCompleter } from './request-ai-examples-completer';
+
+export type { RequestAiExamplesCompleter } from './request-ai-examples-completer';
 
 const MAX_EXAMPLES = 3;
-
-export type AiExamplesCompleterRequest = {
-  flashcardId: string;
-};
 
 @Injectable()
 export class AiExamplesCompleter {
@@ -31,9 +30,11 @@ export class AiExamplesCompleter {
     private readonly aiExampleGenerator: AiExampleGenerator,
   ) {}
 
-  async execute(request: AiExamplesCompleterRequest): Promise<void> {
+  async execute(request: RequestAiExamplesCompleter): Promise<void> {
+    const { flashcardId } = request;
+
     const flashcard = await this.repository.search(
-      new FlashcardId(request.flashcardId),
+      new FlashcardId(flashcardId),
     );
     if (!flashcard) return;
 

@@ -14,32 +14,11 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type RequestFlashcardUpdater } from './request-flashcard-updater';
+
+export type { RequestFlashcardUpdater } from './request-flashcard-updater';
 
 const ADMIN_ROLE = 'admin' as const;
-
-type FlashcardUpdaterExampleDto = {
-  id: string;
-  textEn: string;
-  textEs: string;
-  position: number;
-};
-
-type FlashcardUpdaterFieldsDto = {
-  expression?: string;
-  meaning?: string;
-  category?: string;
-  subcategory?: string;
-  ipaNotation?: string | null;
-  nativeSpeech?: string | null;
-  examples?: FlashcardUpdaterExampleDto[];
-};
-
-export type RequestFlashcardUpdater = {
-  id: string;
-  requesterId: string;
-  requesterRole: string;
-  fields: FlashcardUpdaterFieldsDto;
-};
 
 @Injectable()
 export class FlashcardUpdater {
@@ -53,11 +32,13 @@ export class FlashcardUpdater {
   async execute(
     request: RequestFlashcardUpdater,
   ): Promise<FlashcardPrimitives> {
-    const flashcard = await this.findOrFail(request.id);
+    const { id, requesterId, requesterRole, fields } = request;
 
-    this.ensureAccess(flashcard, request.requesterId, request.requesterRole);
+    const flashcard = await this.findOrFail(id);
 
-    flashcard.update(request.fields);
+    this.ensureAccess(flashcard, requesterId, requesterRole);
+
+    flashcard.update(fields);
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());

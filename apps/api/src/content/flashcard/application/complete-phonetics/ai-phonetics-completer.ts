@@ -12,10 +12,9 @@ import {
   type AiPhoneticsGenerator,
   AI_PHONETICS_GENERATOR,
 } from '@/content/flashcard/domain/ai-phonetics-generator';
+import { type RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
 
-export type AiPhoneticsCompleterRequest = {
-  flashcardId: string;
-};
+export type { RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
 
 @Injectable()
 export class AiPhoneticsCompleter {
@@ -28,9 +27,11 @@ export class AiPhoneticsCompleter {
     private readonly aiPhoneticsGenerator: AiPhoneticsGenerator,
   ) {}
 
-  async execute(request: AiPhoneticsCompleterRequest): Promise<void> {
+  async execute(request: RequestAiPhoneticsCompleter): Promise<void> {
+    const { flashcardId } = request;
+
     const flashcard = await this.repository.search(
-      new FlashcardId(request.flashcardId),
+      new FlashcardId(flashcardId),
     );
     if (!flashcard) return;
 
