@@ -20,7 +20,7 @@ export class UpdateModuleProgressOnGameCompleted extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: UpdateModuleProgress,
+    private readonly progressUpdater: UpdateModuleProgress,
   ) {
     super(consumer);
   }
@@ -28,7 +28,7 @@ export class UpdateModuleProgressOnGameCompleted extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as GameCompletedAttributes;
     if (attrs.module === null) return;
-    await this.useCase.execute({
+    await this.progressUpdater.execute({
       userId: attrs.userId as string,
       module: attrs.module,
     });

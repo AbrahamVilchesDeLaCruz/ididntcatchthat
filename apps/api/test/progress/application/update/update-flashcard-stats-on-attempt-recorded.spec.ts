@@ -8,7 +8,7 @@ import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashc
 
 describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', () => {
   const consumer = mock<DomainEventConsumer>();
-  const useCase = mock<UpdateFlashcardStats>();
+  const statsUpdater = mock<UpdateFlashcardStats>();
   let subscriber: UpdateFlashcardStatsOnAttemptRecorded;
 
   const makeEvent = (overrides?: {
@@ -30,15 +30,18 @@ describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', ()
   };
 
   beforeEach(() => {
-    useCase.execute.mockReset();
-    useCase.execute.mockResolvedValue(undefined);
-    subscriber = new UpdateFlashcardStatsOnAttemptRecorded(consumer, useCase);
+    statsUpdater.execute.mockReset();
+    statsUpdater.execute.mockResolvedValue(undefined);
+    subscriber = new UpdateFlashcardStatsOnAttemptRecorded(
+      consumer,
+      statsUpdater,
+    );
   });
 
   it('should skip when userId is null (guest)', async () => {
     await subscriber.on(makeEvent({ userId: null }));
 
-    expect(useCase.execute).not.toHaveBeenCalled();
+    expect(statsUpdater.execute).not.toHaveBeenCalled();
   });
 
   it('should delegate to use case with event attributes', async () => {
@@ -55,7 +58,7 @@ describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', ()
 
     await subscriber.on(event);
 
-    expect(useCase.execute).toHaveBeenCalledWith({
+    expect(statsUpdater.execute).toHaveBeenCalledWith({
       userId,
       flashcardId,
       correct: true,

@@ -17,12 +17,12 @@ export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: AiPhoneticsCompleter,
+    private readonly phoneticsCompleter: AiPhoneticsCompleter,
   ) {
     super(consumer);
   }
 
   async on(event: DomainEvent): Promise<void> {
-    await this.useCase.execute({ flashcardId: event.aggregateId });
+    await this.phoneticsCompleter.execute({ flashcardId: event.aggregateId });
   }
 }

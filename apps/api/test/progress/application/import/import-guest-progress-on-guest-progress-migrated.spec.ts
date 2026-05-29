@@ -8,15 +8,15 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 describe('progress/application/import ImportGuestProgressOnGuestProgressMigrated', () => {
   const consumer = mock<DomainEventConsumer>();
-  const useCase = mock<ImportGuestProgress>();
+  const importer = mock<ImportGuestProgress>();
   let subscriber: ImportGuestProgressOnGuestProgressMigrated;
 
   beforeEach(() => {
-    useCase.execute.mockReset();
-    useCase.execute.mockResolvedValue(undefined);
+    importer.execute.mockReset();
+    importer.execute.mockResolvedValue(undefined);
     subscriber = new ImportGuestProgressOnGuestProgressMigrated(
       consumer,
-      useCase,
+      importer,
     );
   });
 
@@ -32,7 +32,7 @@ describe('progress/application/import ImportGuestProgressOnGuestProgressMigrated
 
     await subscriber.on(event);
 
-    expect(useCase.execute).toHaveBeenCalledWith({
+    expect(importer.execute).toHaveBeenCalledWith({
       eventId,
       userId,
       guestDeviceId,

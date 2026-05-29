@@ -17,12 +17,12 @@ export class GenerateFlashcardExamplesOnFlashcardCreated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: AiExamplesCompleter,
+    private readonly examplesCompleter: AiExamplesCompleter,
   ) {
     super(consumer);
   }
 
   async on(event: DomainEvent): Promise<void> {
-    await this.useCase.execute({ flashcardId: event.aggregateId });
+    await this.examplesCompleter.execute({ flashcardId: event.aggregateId });
   }
 }

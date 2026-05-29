@@ -18,14 +18,14 @@ export class ImportGuestProgressOnGuestProgressMigrated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: ImportGuestProgress,
+    private readonly importer: ImportGuestProgress,
   ) {
     super(consumer);
   }
 
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as { userId: string; guestDeviceId: string };
-    await this.useCase.execute({
+    await this.importer.execute({
       eventId: event.eventId,
       userId: attrs.userId,
       guestDeviceId: attrs.guestDeviceId,

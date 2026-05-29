@@ -20,7 +20,7 @@ export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: UpdateFlashcardStats,
+    private readonly statsUpdater: UpdateFlashcardStats,
   ) {
     super(consumer);
   }
@@ -28,7 +28,7 @@ export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as AttemptRecordedAttributes;
     if (attrs.userId === null) return;
-    await this.useCase.execute({
+    await this.statsUpdater.execute({
       userId: attrs.userId,
       flashcardId: attrs.flashcardId,
       correct: attrs.correct,

@@ -7,7 +7,7 @@ import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mot
 
 describe('progress/application/update UpdateModuleProgressOnGameCompleted', () => {
   const consumer = mock<DomainEventConsumer>();
-  const useCase = mock<UpdateModuleProgress>();
+  const progressUpdater = mock<UpdateModuleProgress>();
   let subscriber: UpdateModuleProgressOnGameCompleted;
 
   const makeEvent = (overrides?: {
@@ -30,15 +30,18 @@ describe('progress/application/update UpdateModuleProgressOnGameCompleted', () =
   };
 
   beforeEach(() => {
-    useCase.execute.mockReset();
-    useCase.execute.mockResolvedValue(undefined);
-    subscriber = new UpdateModuleProgressOnGameCompleted(consumer, useCase);
+    progressUpdater.execute.mockReset();
+    progressUpdater.execute.mockResolvedValue(undefined);
+    subscriber = new UpdateModuleProgressOnGameCompleted(
+      consumer,
+      progressUpdater,
+    );
   });
 
   it('should skip when module is null (random game)', async () => {
     await subscriber.on(makeEvent({ module: null }));
 
-    expect(useCase.execute).not.toHaveBeenCalled();
+    expect(progressUpdater.execute).not.toHaveBeenCalled();
   });
 
   it('should delegate to use case with userId and module', async () => {
@@ -46,7 +49,7 @@ describe('progress/application/update UpdateModuleProgressOnGameCompleted', () =
 
     await subscriber.on(makeEvent({ userId, module: 'native_sounds' }));
 
-    expect(useCase.execute).toHaveBeenCalledWith({
+    expect(progressUpdater.execute).toHaveBeenCalledWith({
       userId,
       module: 'native_sounds',
     });
