@@ -19,11 +19,10 @@ import {
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestUserAuthenticator } from './request-user-authenticator';
+import { type ResponseUserAuthenticator } from './response-user-authenticator';
 
-export type UserAuthenticatorResult = {
-  accessToken: string;
-  refreshTokenId: string;
-};
+export type { RequestUserAuthenticator, ResponseUserAuthenticator };
 
 @Injectable()
 export class UserAuthenticator {
@@ -40,15 +39,13 @@ export class UserAuthenticator {
     private readonly logger: Logger,
   ) {}
 
-  async execute(params: {
-    email: string;
-    password: string;
-    deviceId: string;
-    fingerprint: string;
-    ip: string;
-  }): Promise<UserAuthenticatorResult> {
+  async execute(
+    request: RequestUserAuthenticator,
+  ): Promise<ResponseUserAuthenticator> {
+    const { email, password, deviceId, fingerprint, ip } = request;
+
     const [user] = await this.userRepository.match(
-      new Criteria([{ field: 'email', operator: '=', value: params.email }]),
+      new Criteria([{ field: 'email', operator: '=', value: email }]),
     );
 
     if (!user) throw new InvalidCredentialsException();
@@ -56,7 +53,7 @@ export class UserAuthenticator {
     if (!user.passwordHash) throw new InvalidCredentialsException();
 
     const valid = await this.passwordHasher.compare(
-      params.password,
+      password,
       user.passwordHash.value,
     );
 
@@ -65,9 +62,9 @@ export class UserAuthenticator {
     const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
-      deviceId: params.deviceId,
-      fingerprint: params.fingerprint,
-      ip: params.ip,
+      deviceId,
+      fingerprint,
+      ip,
       roles: [user.role.value],
     });
 
@@ -75,8 +72,8 @@ export class UserAuthenticator {
       crypto.randomUUID(),
       refreshTokenId,
       user.id.value,
-      params.deviceId,
-      params.fingerprint,
+      deviceId,
+      fingerprint,
     );
 
     await this.sessionRepository.save(session);

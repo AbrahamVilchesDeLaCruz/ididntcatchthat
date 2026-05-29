@@ -37,14 +37,14 @@ export class GoogleCallbackAuthGetController {
     );
     const deviceId = profile.deviceId ?? crypto.randomUUID();
 
-    const result = await this.authenticator.execute(
-      profile.email ?? '',
-      null,
-      profile.email?.split('@')[0] ?? 'user',
+    const result = await this.authenticator.execute({
+      email: profile.email ?? '',
+      avatarUrl: null,
+      displayName: profile.email?.split('@')[0] ?? 'user',
       deviceId,
       fingerprint,
-      ip ?? '',
-    );
+      ip: ip ?? '',
+    });
 
     res.cookie('refreshToken', deviceId, {
       httpOnly: true,

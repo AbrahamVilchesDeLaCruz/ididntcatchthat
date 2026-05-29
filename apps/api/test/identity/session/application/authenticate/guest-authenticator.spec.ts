@@ -3,7 +3,7 @@ import { GuestAuthenticator } from '@/identity/session/application/authenticate/
 import { type UserSessionRepository } from '@/identity/session/domain/user-session.repository';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
-import { GuestAuthenticatorParamsMother } from './guest-authenticator-params.mother';
+import { RequestGuestAuthenticatorMother } from './request-guest-authenticator-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { JestTimers } from '@test/shared/jest-timers';
 
@@ -24,7 +24,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
   afterEach(() => JestTimers.teardown());
 
   it('should return access token and deviceId', async () => {
-    const request = GuestAuthenticatorParamsMother.random();
+    const request = RequestGuestAuthenticatorMother.random();
     const fakeAccessToken = UuidMother.random();
     const fakeRefreshTokenId = UuidMother.random();
 
@@ -41,7 +41,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
   });
 
   it('should persist the session as guest', async () => {
-    const request = GuestAuthenticatorParamsMother.random();
+    const request = RequestGuestAuthenticatorMother.random();
     const fakeRefreshTokenId = UuidMother.random();
 
     tokenGenerator.generateGuest.mockReturnValueOnce({
@@ -60,7 +60,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
   });
 
   it('should call tokenService with fingerprint and ip', async () => {
-    const request = GuestAuthenticatorParamsMother.random();
+    const request = RequestGuestAuthenticatorMother.random();
 
     tokenGenerator.generateGuest.mockReturnValueOnce({
       accessToken: UuidMother.random(),

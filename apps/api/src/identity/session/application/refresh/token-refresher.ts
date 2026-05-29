@@ -19,11 +19,10 @@ import {
 } from '@/identity/shared/domain/token-generator';
 import { UserId } from '@/shared/domain/user-id';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestTokenRefresher } from './request-token-refresher';
+import { type ResponseTokenRefresher } from './response-token-refresher';
 
-export type TokenRefresherResult = {
-  accessToken: string;
-  refreshTokenId: string;
-};
+export type { RequestTokenRefresher, ResponseTokenRefresher };
 
 @Injectable()
 export class TokenRefresher {
@@ -38,22 +37,18 @@ export class TokenRefresher {
     private readonly logger: Logger,
   ) {}
 
-  async execute(params: {
-    tokenId: string;
-    deviceId: string;
-    fingerprint: string;
-    ip: string;
-  }): Promise<TokenRefresherResult> {
+  async execute(
+    request: RequestTokenRefresher,
+  ): Promise<ResponseTokenRefresher> {
+    const { tokenId, deviceId, fingerprint, ip } = request;
+
     const [session] = await this.sessionRepository.match(
-      new Criteria([
-        { field: 'tokenId', operator: '=', value: params.tokenId },
-      ]),
+      new Criteria([{ field: 'tokenId', operator: '=', value: tokenId }]),
     );
 
     if (!session) throw new InvalidRefreshTokenException();
 
     if (session.isRevoked()) {
-      // Token reuse detected — revoke ALL sessions of this owner
       const ownerSessions = await this.sessionRepository.match(
         new Criteria([
           { field: 'ownerId', operator: '=', value: session.ownerId },
@@ -73,22 +68,20 @@ export class TokenRefresher {
 
     if (session.isExpired()) throw new ExpiredRefreshTokenException();
 
-    // Guest sessions cannot be refreshed into a user session
     if (session.isGuest()) throw new InvalidRefreshTokenException();
 
     const user = await this.userRepository.search(new UserId(session.ownerId));
     if (!user) throw new UserNotFoundException(session.ownerId);
 
-    // Rotate: revoke old, issue new
     const revokedSession = session.revoke();
     await this.sessionRepository.save(revokedSession);
 
     const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',
       userId: user.id.value,
-      deviceId: params.deviceId,
-      fingerprint: params.fingerprint,
-      ip: params.ip,
+      deviceId,
+      fingerprint,
+      ip,
       roles: [user.role.value],
     });
 
@@ -96,8 +89,8 @@ export class TokenRefresher {
       crypto.randomUUID(),
       refreshTokenId,
       user.id.value,
-      params.deviceId,
-      params.fingerprint,
+      deviceId,
+      fingerprint,
     );
 
     await this.sessionRepository.save(newSession);

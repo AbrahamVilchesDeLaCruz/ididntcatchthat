@@ -9,11 +9,10 @@ import {
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestGuestAuthenticator } from './request-guest-authenticator';
+import { type ResponseGuestAuthenticator } from './response-guest-authenticator';
 
-export type GuestAuthenticatorResult = {
-  accessToken: string;
-  deviceId: string;
-};
+export type { RequestGuestAuthenticator, ResponseGuestAuthenticator };
 
 @Injectable()
 export class GuestAuthenticator {
@@ -26,23 +25,23 @@ export class GuestAuthenticator {
     private readonly logger: Logger,
   ) {}
 
-  async execute(params: {
-    fingerprint: string;
-    ip: string;
-  }): Promise<GuestAuthenticatorResult> {
+  async execute(
+    request: RequestGuestAuthenticator,
+  ): Promise<ResponseGuestAuthenticator> {
+    const { fingerprint, ip } = request;
     const deviceId = crypto.randomUUID();
 
     const { accessToken, refreshTokenId } = this.tokenGenerator.generateGuest({
       deviceId,
-      fingerprint: params.fingerprint,
-      ip: params.ip,
+      fingerprint,
+      ip,
     });
 
     const session = UserSession.createGuest(
       crypto.randomUUID(),
       refreshTokenId,
       deviceId,
-      params.fingerprint,
+      fingerprint,
     );
 
     await this.sessionRepository.save(session);

@@ -4,6 +4,7 @@ import { type UserSessionRepository } from '@/identity/session/domain/user-sessi
 import { type Logger } from '@/shared/domain/logger';
 import { UserSessionMother } from '@test/identity/session/domain/user-session-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { RequestSessionRevokerMother } from './request-session-revoker-mother';
 
 describe('identity/application/logout SessionRevoker', () => {
   const sessionRepository = mock<UserSessionRepository>();
@@ -39,7 +40,9 @@ describe('identity/application/logout SessionRevoker', () => {
   it('should be idempotent when session does not exist', async () => {
     sessionRepository.match.mockResolvedValueOnce([]);
 
-    await useCase.execute({ tokenId: UuidMother.random() });
+    await useCase.execute(
+      RequestSessionRevokerMother.random({ tokenId: UuidMother.random() }),
+    );
 
     expect(sessionRepository.save).not.toHaveBeenCalled();
   });

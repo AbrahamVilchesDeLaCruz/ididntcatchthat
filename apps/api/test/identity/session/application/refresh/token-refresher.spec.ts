@@ -12,8 +12,8 @@ import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-no
 import { UserSessionMother } from '@test/identity/session/domain/user-session-mother';
 import { UserMother } from '@test/identity/user/domain/user-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
-import { StringMother } from '@test/shared/domain/string-mother';
 import { JestTimers } from '@test/shared/jest-timers';
+import { RequestTokenRefresherMother } from './request-token-refresher-mother';
 
 describe('identity/application/refresh TokenRefresher', () => {
   const sessionRepository = mock<UserSessionRepository>();
@@ -22,12 +22,7 @@ describe('identity/application/refresh TokenRefresher', () => {
   const logger = mock<Logger>();
   let useCase: TokenRefresher;
 
-  const params = {
-    tokenId: UuidMother.random(),
-    deviceId: UuidMother.random(),
-    fingerprint: UuidMother.random(),
-    ip: StringMother.ip(),
-  };
+  const params = RequestTokenRefresherMother.random();
 
   beforeEach(() => {
     JestTimers.setup();
