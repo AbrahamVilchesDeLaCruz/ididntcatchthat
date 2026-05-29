@@ -1,19 +1,19 @@
 import { mock } from 'jest-mock-extended';
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
 import { type FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
-import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/event-handlers/generate-flashcard-audio-on-flashcard-examples-completed';
+import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-completed';
 import { FlashcardExamplesCompletedEvent } from '@/content/flashcard/domain/events/flashcard-examples-completed.event';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 
-describe('content/flashcard/application/event-handlers GenerateFlashcardAudioOnFlashcardExamplesCompleted', () => {
+describe('content/flashcard/application/generate-audio GenerateFlashcardAudioOnFlashcardExamplesCompleted', () => {
   const consumer = mock<DomainEventConsumer>();
   const generator = mock<FlashcardAudioGenerator>();
-  let handler: GenerateFlashcardAudioOnFlashcardExamplesCompleted;
+  let subscriber: GenerateFlashcardAudioOnFlashcardExamplesCompleted;
 
   beforeEach(() => {
     generator.execute.mockReset();
     generator.execute.mockResolvedValue(undefined);
-    handler = new GenerateFlashcardAudioOnFlashcardExamplesCompleted(
+    subscriber = new GenerateFlashcardAudioOnFlashcardExamplesCompleted(
       consumer,
       generator,
     );
@@ -26,7 +26,7 @@ describe('content/flashcard/application/event-handlers GenerateFlashcardAudioOnF
       examples: flashcard.examples.map((e) => e.toPrimitives()),
     });
 
-    await handler.handle(event);
+    await subscriber.on(event);
 
     expect(generator.execute).toHaveBeenCalledWith({
       flashcardId: flashcard.id.value,
@@ -34,6 +34,8 @@ describe('content/flashcard/application/event-handlers GenerateFlashcardAudioOnF
   });
 
   it('should subscribe to FlashcardExamplesCompletedEvent', () => {
-    expect(handler.eventName).toBe(FlashcardExamplesCompletedEvent.EVENT_NAME);
+    expect(subscriber.eventName).toBe(
+      FlashcardExamplesCompletedEvent.EVENT_NAME,
+    );
   });
 });

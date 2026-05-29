@@ -1,53 +1,36 @@
+import { type RequestUpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
 import { mock } from 'jest-mock-extended';
-import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
-import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/handlers/update-flashcard-stats-on-attempt-recorded';
-import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
+import { UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
 
-describe('progress/application/handlers UpdateFlashcardStatsOnAttemptRecorded', () => {
-  const consumer = mock<DomainEventConsumer>();
+describe('progress/application/update UpdateFlashcardStats', () => {
   const repository = mock<UserFlashcardStatsRepository>();
-  let handler: UpdateFlashcardStatsOnAttemptRecorded;
+  let useCase: UpdateFlashcardStats;
 
-  const makeEvent = (overrides?: {
-    userId?: string | null;
+  const makeRequest = (overrides?: {
     mode?: string;
     correct?: boolean;
-  }): AttemptRecordedEvent => {
-    return new AttemptRecordedEvent('game-id', {
-      gameId: 'game-id',
-      userId:
-        overrides?.userId !== undefined
-          ? overrides.userId
-          : ProgressUserIdMother.random().value,
-      flashcardId: ProgressFlashcardIdMother.random().value,
-      correct: overrides?.correct ?? true,
-      mode: overrides?.mode ?? 'game',
-      answeredAt: new Date().toISOString(),
-    });
-  };
+  }): RequestUpdateFlashcardStats => ({
+    userId: ProgressUserIdMother.random().value,
+    flashcardId: ProgressFlashcardIdMother.random().value,
+    correct: overrides?.correct ?? true,
+    mode: overrides?.mode ?? 'game',
+  });
 
   beforeEach(() => {
     repository.search.mockReset();
     repository.save.mockReset();
     repository.save.mockResolvedValue(undefined);
-    handler = new UpdateFlashcardStatsOnAttemptRecorded(consumer, repository);
-  });
-
-  it('should skip when userId is null (guest)', async () => {
-    await handler.handle(makeEvent({ userId: null }));
-
-    expect(repository.search).not.toHaveBeenCalled();
-    expect(repository.save).not.toHaveBeenCalled();
+    useCase = new UpdateFlashcardStats(repository);
   });
 
   it('should create and save new stats when none exist', async () => {
     repository.search.mockResolvedValue(null);
 
-    await handler.handle(makeEvent({ mode: 'game', correct: true }));
+    await useCase.execute(makeRequest({ mode: 'game', correct: true }));
 
     expect(repository.save).toHaveBeenCalledTimes(1);
     const saved = repository.save.mock.calls[0][0];
@@ -60,7 +43,7 @@ describe('progress/application/handlers UpdateFlashcardStatsOnAttemptRecorded', 
     const previousTimesPlayed = existing.timesPlayed;
     repository.search.mockResolvedValue(existing);
 
-    await handler.handle(makeEvent({ mode: 'game', correct: false }));
+    await useCase.execute(makeRequest({ mode: 'game', correct: false }));
 
     expect(repository.save).toHaveBeenCalledTimes(1);
     const saved = repository.save.mock.calls[0][0];
@@ -70,7 +53,7 @@ describe('progress/application/handlers UpdateFlashcardStatsOnAttemptRecorded', 
   it('should call recordStudy when mode is study', async () => {
     repository.search.mockResolvedValue(null);
 
-    await handler.handle(makeEvent({ mode: 'study', correct: true }));
+    await useCase.execute(makeRequest({ mode: 'study', correct: true }));
 
     const saved = repository.save.mock.calls[0][0];
     expect(saved.timesStudied).toBe(1);

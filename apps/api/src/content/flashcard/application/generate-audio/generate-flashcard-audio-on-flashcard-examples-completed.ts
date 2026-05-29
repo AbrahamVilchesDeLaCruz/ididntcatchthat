@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Handler } from '@/shared/application/handler';
+import { Subscriber } from '@/shared/application/subscriber';
 import {
   type DomainEventConsumer,
   DOMAIN_EVENT_CONSUMER,
 } from '@/shared/application/domain-event-consumer';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardExamplesCompletedEvent } from '@/content/flashcard/domain/events/flashcard-examples-completed.event';
-import { FlashcardAudioGenerator } from '../generate-audio/flashcard-audio-generator';
+import { FlashcardAudioGenerator } from './flashcard-audio-generator';
 
 @Injectable()
-export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Handler {
+export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Subscriber {
   readonly queueName =
     'generate_flashcard_audio_on_flashcard_examples_completed';
   readonly eventName = FlashcardExamplesCompletedEvent.EVENT_NAME;
@@ -18,12 +18,12 @@ export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Handler 
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly generator: FlashcardAudioGenerator,
+    private readonly useCase: FlashcardAudioGenerator,
   ) {
     super(consumer);
   }
 
-  async handle(event: DomainEvent): Promise<void> {
-    await this.generator.execute({ flashcardId: event.aggregateId });
+  async on(event: DomainEvent): Promise<void> {
+    await this.useCase.execute({ flashcardId: event.aggregateId });
   }
 }

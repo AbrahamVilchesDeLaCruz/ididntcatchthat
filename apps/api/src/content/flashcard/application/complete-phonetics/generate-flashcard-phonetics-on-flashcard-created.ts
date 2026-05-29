@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Handler } from '@/shared/application/handler';
+import { Subscriber } from '@/shared/application/subscriber';
 import {
   type DomainEventConsumer,
   DOMAIN_EVENT_CONSUMER,
 } from '@/shared/application/domain-event-consumer';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardCreatedEvent } from '@/content/flashcard/domain/events/flashcard-created.event';
-import { AiPhoneticsCompleter } from '../complete-phonetics/ai-phonetics-completer';
+import { AiPhoneticsCompleter } from './ai-phonetics-completer';
 
 @Injectable()
-export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Handler {
+export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Subscriber {
   readonly queueName = 'generate_flashcard_phonetics_on_flashcard_created';
   readonly eventName = FlashcardCreatedEvent.EVENT_NAME;
   readonly exchangeName = FlashcardCreatedEvent.EVENT_NAME;
@@ -17,12 +17,12 @@ export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Handler {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly completer: AiPhoneticsCompleter,
+    private readonly useCase: AiPhoneticsCompleter,
   ) {
     super(consumer);
   }
 
-  async handle(event: DomainEvent): Promise<void> {
-    await this.completer.execute({ flashcardId: event.aggregateId });
+  async on(event: DomainEvent): Promise<void> {
+    await this.useCase.execute({ flashcardId: event.aggregateId });
   }
 }

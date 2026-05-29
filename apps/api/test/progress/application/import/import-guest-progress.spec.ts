@@ -1,35 +1,27 @@
+import { type RequestImportGuestProgress } from '@/progress/application/import/import-guest-progress';
 import { mock } from 'jest-mock-extended';
-import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { type ProcessedEventsRepository } from '@/shared/domain/processed-events.repository';
 import { type GuestAttemptRepository } from '@/progress/domain/guest-attempt.repository';
-import { ImportGuestProgressOnGuestProgressMigrated } from '@/progress/application/handlers/import-guest-progress-on-guest-progress-migrated';
-import { GuestProgressMigratedEvent } from '@/identity/user/domain/events/guest-progress-migrated.event';
+import { ImportGuestProgress } from '@/progress/application/import/import-guest-progress';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
-describe('progress/application/handlers ImportGuestProgressOnGuestProgressMigrated', () => {
-  const consumer = mock<DomainEventConsumer>();
+describe('progress/application/import ImportGuestProgress', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
   const processedRepository = mock<ProcessedEventsRepository>();
   const guestAttemptRepository = mock<GuestAttemptRepository>();
-  let handler: ImportGuestProgressOnGuestProgressMigrated;
+  let useCase: ImportGuestProgress;
 
-  const makeEvent = (
+  const makeRequest = (
     eventId = UuidMother.random(),
-  ): GuestProgressMigratedEvent => {
-    return new GuestProgressMigratedEvent(
-      ProgressUserIdMother.random().value,
-      {
-        userId: ProgressUserIdMother.random().value,
-        deviceId: UuidMother.random(),
-        guestDeviceId: UuidMother.random(),
-      },
-      eventId,
-    );
-  };
+  ): RequestImportGuestProgress => ({
+    eventId,
+    userId: ProgressUserIdMother.random().value,
+    guestDeviceId: UuidMother.random(),
+  });
 
   beforeEach(() => {
     statsRepository.search.mockReset();
@@ -39,8 +31,7 @@ describe('progress/application/handlers ImportGuestProgressOnGuestProgressMigrat
     guestAttemptRepository.findByDeviceId.mockReset();
     statsRepository.save.mockResolvedValue(undefined);
     processedRepository.save.mockResolvedValue(undefined);
-    handler = new ImportGuestProgressOnGuestProgressMigrated(
-      consumer,
+    useCase = new ImportGuestProgress(
       statsRepository,
       processedRepository,
       guestAttemptRepository,
@@ -50,7 +41,7 @@ describe('progress/application/handlers ImportGuestProgressOnGuestProgressMigrat
   it('should skip when event was already processed (idempotency)', async () => {
     processedRepository.exists.mockResolvedValue(true);
 
-    await handler.handle(makeEvent());
+    await useCase.execute(makeRequest());
 
     expect(guestAttemptRepository.findByDeviceId).not.toHaveBeenCalled();
     expect(statsRepository.save).not.toHaveBeenCalled();
@@ -75,7 +66,7 @@ describe('progress/application/handlers ImportGuestProgressOnGuestProgressMigrat
     ]);
     statsRepository.search.mockResolvedValue(null);
 
-    await handler.handle(makeEvent());
+    await useCase.execute(makeRequest());
 
     expect(statsRepository.save).toHaveBeenCalledTimes(2);
     expect(processedRepository.save).toHaveBeenCalledTimes(1);
@@ -96,7 +87,7 @@ describe('progress/application/handlers ImportGuestProgressOnGuestProgressMigrat
     const previousTimesPlayed = existing.timesPlayed;
     statsRepository.search.mockResolvedValue(existing);
 
-    await handler.handle(makeEvent());
+    await useCase.execute(makeRequest());
 
     const saved = statsRepository.save.mock.calls[0][0];
     expect(saved.timesPlayed).toBeGreaterThan(previousTimesPlayed);

@@ -1,18 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Handler } from '@/shared/application/handler';
-import {
-  type DomainEventConsumer,
-  DOMAIN_EVENT_CONSUMER,
-} from '@/shared/application/domain-event-consumer';
-import { type DomainEvent } from '@/shared/domain/domain-event';
-import {
-  type DomainEventPublisher,
-  DOMAIN_EVENT_PUBLISHER,
-} from '@/shared/domain/domain-event-publisher';
-import {
-  GameCompletedEvent,
-  type GameCompletedAttributes,
-} from '@/gaming/domain/events/game-completed.event';
 import {
   type UserFlashcardStatsRepository,
   USER_FLASHCARD_STATS_REPOSITORY,
@@ -21,39 +7,37 @@ import {
   type ModuleProgressRepository,
   MODULE_PROGRESS_REPOSITORY,
 } from '@/progress/domain/module-progress.repository';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
 import { ModuleProgress } from '@/progress/domain/module-progress';
 import { ModuleName } from '@/progress/domain/module-name';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
 import { UserId } from '@/shared/domain/user-id';
+import { type RequestUpdateModuleProgress } from './request-update-module-progress';
+
+export type { RequestUpdateModuleProgress };
 
 @Injectable()
-export class UpdateModuleProgressOnGameCompleted extends Handler {
-  readonly queueName = 'progress.update_module_progress_on_game_completed';
-  readonly eventName = 'ididntcatchthat.gaming.games.game.completed';
-  readonly exchangeName = 'ididntcatchthat.gaming.games.game.completed';
-  readonly domainEvent = GameCompletedEvent;
-
+export class UpdateModuleProgress {
   constructor(
-    @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
     @Inject(USER_FLASHCARD_STATS_REPOSITORY)
     private readonly statsRepository: UserFlashcardStatsRepository,
     @Inject(MODULE_PROGRESS_REPOSITORY)
     private readonly moduleRepository: ModuleProgressRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
-  ) {
-    super(consumer);
-  }
+  ) {}
 
-  async handle(event: DomainEvent): Promise<void> {
-    const attrs = event.attributes as GameCompletedAttributes;
+  async execute({
+    userId,
+    module,
+  }: RequestUpdateModuleProgress): Promise<void> {
+    const uid = new UserId(userId);
+    const mod = ModuleName.create(module);
 
-    if (attrs.module === null) return;
-
-    const userId = new UserId(attrs.userId as string);
-    const module = ModuleName.create(attrs.module);
-
-    const allStats = await this.statsRepository.findByModule(userId, module);
+    const allStats = await this.statsRepository.findByModule(uid, mod);
     const totalAttempts = allStats.reduce((sum, s) => sum + s.timesPlayed, 0);
     const correctCount = allStats.reduce((sum, s) => sum + s.correctCount, 0);
     const accuracy = totalAttempts === 0 ? 0 : correctCount / totalAttempts;
@@ -62,13 +46,13 @@ export class UpdateModuleProgressOnGameCompleted extends Handler {
       accuracy,
     );
 
-    const existing = await this.moduleRepository.findByModule(userId, module);
+    const existing = await this.moduleRepository.findByModule(uid, mod);
     const previousLevel = existing?.masteryLevel ?? -1;
 
     const updatedAt = new Date();
     const mp = ModuleProgress.fromPrimitives({
-      userId: userId.value,
-      module: module.value,
+      userId: uid.value,
+      module: mod.value,
       totalAttempts,
       correctCount,
       accuracy,
@@ -81,9 +65,9 @@ export class UpdateModuleProgressOnGameCompleted extends Handler {
 
     if (newMasteryLevel > previousLevel && previousLevel >= 0) {
       await this.publisher.publish([
-        new ModuleMasteryLevelIncreasedEvent(userId.value, {
-          userId: userId.value,
-          module: module.value,
+        new ModuleMasteryLevelIncreasedEvent(uid.value, {
+          userId: uid.value,
+          module: mod.value,
           previousLevel,
           newLevel: newMasteryLevel,
           occurredAt: updatedAt.toISOString(),

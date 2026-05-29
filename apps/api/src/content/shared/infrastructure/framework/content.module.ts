@@ -7,8 +7,8 @@ import { AI_EXAMPLE_GENERATOR } from '@/content/flashcard/domain/ai-example-gene
 import { AI_PHONETICS_GENERATOR } from '@/content/flashcard/domain/ai-phonetics-generator';
 import { AUDIO_GENERATOR } from '@/content/flashcard/domain/audio-generator';
 import { AUDIO_STORAGE } from '@/content/flashcard/domain/audio-storage';
-import { HANDLERS } from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
-import { Handler } from '@/shared/application/handler';
+import { SUBSCRIBERS } from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
+import { type Subscriber } from '@/shared/application/subscriber';
 import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { TypeOrmFlashcardRepository } from '@/content/flashcard/infrastructure/persistence/typeorm-flashcard.repository';
 
@@ -22,7 +22,7 @@ import { ElevenLabsAudioGenerator } from '@/content/flashcard/infrastructure/aud
 import { R2AudioStorage } from '@/content/flashcard/infrastructure/audio/r2-audio-storage';
 
 // Infrastructure — event bus
-import { HandlersBootstrapper } from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
+import { SubscribersBootstrapper } from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
 
 // Infrastructure — controllers
 import { CreateFlashcardPostController } from '@/content/flashcard/infrastructure/controllers/create-flashcard-post.controller';
@@ -50,10 +50,10 @@ import { AiExamplesCompleter } from '@/content/flashcard/application/complete-ex
 import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-phonetics/ai-phonetics-completer';
 import { AiExampleSuggester } from '@/content/flashcard/application/suggest-examples/ai-example-suggester';
 
-// Application — event handlers
-import { GenerateFlashcardExamplesOnFlashcardCreated } from '@/content/flashcard/application/event-handlers/generate-flashcard-examples-on-flashcard-created';
-import { GenerateFlashcardPhoneticsOnFlashcardCreated } from '@/content/flashcard/application/event-handlers/generate-flashcard-phonetics-on-flashcard-created';
-import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/event-handlers/generate-flashcard-audio-on-flashcard-examples-completed';
+// Application — event subscribers
+import { GenerateFlashcardExamplesOnFlashcardCreated } from '@/content/flashcard/application/complete-examples/generate-flashcard-examples-on-flashcard-created';
+import { GenerateFlashcardPhoneticsOnFlashcardCreated } from '@/content/flashcard/application/complete-phonetics/generate-flashcard-phonetics-on-flashcard-created';
+import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-completed';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -91,24 +91,24 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: AUDIO_GENERATOR, useClass: ElevenLabsAudioGenerator },
     { provide: AUDIO_STORAGE, useClass: R2AudioStorage },
 
-    // Event handlers
+    // Event subscribers
     GenerateFlashcardExamplesOnFlashcardCreated,
     GenerateFlashcardPhoneticsOnFlashcardCreated,
     GenerateFlashcardAudioOnFlashcardExamplesCompleted,
     {
-      provide: HANDLERS,
+      provide: SUBSCRIBERS,
       useFactory: (
-        h1: GenerateFlashcardExamplesOnFlashcardCreated,
-        h2: GenerateFlashcardPhoneticsOnFlashcardCreated,
-        h3: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
-      ): Handler[] => [h1, h2, h3],
+        s1: GenerateFlashcardExamplesOnFlashcardCreated,
+        s2: GenerateFlashcardPhoneticsOnFlashcardCreated,
+        s3: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+      ): Subscriber[] => [s1, s2, s3],
       inject: [
         GenerateFlashcardExamplesOnFlashcardCreated,
         GenerateFlashcardPhoneticsOnFlashcardCreated,
         GenerateFlashcardAudioOnFlashcardExamplesCompleted,
       ],
     },
-    HandlersBootstrapper,
+    SubscribersBootstrapper,
 
     // Use cases
     FlashcardCreator,

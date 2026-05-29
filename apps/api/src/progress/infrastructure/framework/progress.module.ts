@@ -23,19 +23,22 @@ import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/con
 
 // Infrastructure — event bus
 import {
-  HANDLERS,
-  HandlersBootstrapper,
-} from '@/shared/infrastructure/event-bus/handlers-bootstrapper';
-import { Handler } from '@/shared/application/handler';
+  SUBSCRIBERS,
+  SubscribersBootstrapper,
+} from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
+import { type Subscriber } from '@/shared/application/subscriber';
 
 // Application — use cases
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
+import { UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
+import { UpdateModuleProgress } from '@/progress/application/update/update-module-progress';
+import { ImportGuestProgress } from '@/progress/application/import/import-guest-progress';
 
-// Application — event handlers
-import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/handlers/update-flashcard-stats-on-attempt-recorded';
-import { UpdateModuleProgressOnGameCompleted } from '@/progress/application/handlers/update-module-progress-on-game-completed';
-import { ImportGuestProgressOnGuestProgressMigrated } from '@/progress/application/handlers/import-guest-progress-on-guest-progress-migrated';
+// Application — event subscribers
+import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
+import { UpdateModuleProgressOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
+import { ImportGuestProgressOnGuestProgressMigrated } from '@/progress/application/import/import-guest-progress-on-guest-progress-migrated';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -77,25 +80,28 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     // Use cases
     ModuleProgressFinder,
     WeakestFlashcardSearcher,
+    UpdateFlashcardStats,
+    UpdateModuleProgress,
+    ImportGuestProgress,
 
-    // Event handlers
+    // Event subscribers
     UpdateFlashcardStatsOnAttemptRecorded,
     UpdateModuleProgressOnGameCompleted,
     ImportGuestProgressOnGuestProgressMigrated,
     {
-      provide: HANDLERS,
+      provide: SUBSCRIBERS,
       useFactory: (
-        h1: UpdateFlashcardStatsOnAttemptRecorded,
-        h2: UpdateModuleProgressOnGameCompleted,
-        h3: ImportGuestProgressOnGuestProgressMigrated,
-      ): Handler[] => [h1, h2, h3],
+        s1: UpdateFlashcardStatsOnAttemptRecorded,
+        s2: UpdateModuleProgressOnGameCompleted,
+        s3: ImportGuestProgressOnGuestProgressMigrated,
+      ): Subscriber[] => [s1, s2, s3],
       inject: [
         UpdateFlashcardStatsOnAttemptRecorded,
         UpdateModuleProgressOnGameCompleted,
         ImportGuestProgressOnGuestProgressMigrated,
       ],
     },
-    HandlersBootstrapper,
+    SubscribersBootstrapper,
   ],
 })
 export class ProgressModule {}
