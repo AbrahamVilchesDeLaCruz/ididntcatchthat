@@ -161,6 +161,25 @@ export class Game extends AggregateRoot<GamePrimitives> {
     );
   }
 
+  getCompletionStats(): {
+    correctCount: number;
+    totalCount: number;
+    accuracy: number;
+    duration: number;
+  } {
+    const totalCount = this._attempts.length;
+    const correctCount = this._attempts.filter((a) => a.correct).length;
+    const accuracy =
+      totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+    const duration =
+      this._finishedAt && this.startedAt
+        ? Math.round(
+            (this._finishedAt.getTime() - this.startedAt.getTime()) / 1000,
+          )
+        : 0;
+    return { correctCount, totalCount, accuracy, duration };
+  }
+
   pendingFlashcardIds(): string[] {
     const answered = new Set(this._attempts.map((a) => a.flashcardId));
     return this.flashcardIds.filter((id) => !answered.has(id));

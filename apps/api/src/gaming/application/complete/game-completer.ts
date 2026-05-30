@@ -30,7 +30,7 @@ export class GameCompleter {
     const game = await this.gameRepository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
-    if (game.toPrimitives().userId !== userId) {
+    if (game.userId !== userId) {
       throw new GameAccessDenied(gameId);
     }
 
@@ -39,18 +39,6 @@ export class GameCompleter {
     await this.gameRepository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
 
-    const primitives = game.toPrimitives();
-    const totalCount = primitives.attempts.length;
-    const correctCount = primitives.attempts.filter((a) => a.correct).length;
-    const accuracy =
-      totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
-    const duration = primitives.finishedAt
-      ? Math.round(
-          (primitives.finishedAt.getTime() - primitives.startedAt.getTime()) /
-            1000,
-        )
-      : 0;
-
-    return { correctCount, totalCount, accuracy, duration };
+    return game.getCompletionStats();
   }
 }
