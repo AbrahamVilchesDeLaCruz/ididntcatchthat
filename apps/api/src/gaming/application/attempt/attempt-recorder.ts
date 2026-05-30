@@ -36,11 +36,11 @@ export class AttemptRecorder {
     const game = await this.gameRepository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
-    if (game.toPrimitives().userId !== userId) {
+    if (game.userId !== userId) {
       throw new GameAccessDenied(gameId);
     }
 
-    if (game.toPrimitives().status !== 'in_progress') {
+    if (game.status.value !== 'in_progress') {
       throw new GameNotInProgress(gameId);
     }
 
