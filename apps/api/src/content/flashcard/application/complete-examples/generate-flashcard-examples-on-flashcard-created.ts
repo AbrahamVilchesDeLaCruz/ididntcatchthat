@@ -17,6 +17,7 @@ export class GenerateFlashcardExamplesOnFlashcardCreated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(AiExamplesCompleter)
     private readonly examplesCompleter: AiExamplesCompleter,
   ) {
     super(consumer);

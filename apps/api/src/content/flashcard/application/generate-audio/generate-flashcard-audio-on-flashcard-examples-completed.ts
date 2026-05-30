@@ -18,6 +18,7 @@ export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Subscrib
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(FlashcardAudioGenerator)
     private readonly generator: FlashcardAudioGenerator,
   ) {
     super(consumer);

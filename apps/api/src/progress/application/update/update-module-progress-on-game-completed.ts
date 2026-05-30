@@ -20,6 +20,7 @@ export class ModuleProgressUpdaterOnGameCompleted extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(ModuleProgressUpdater)
     private readonly updater: ModuleProgressUpdater,
   ) {
     super(consumer);

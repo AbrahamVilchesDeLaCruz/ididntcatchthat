@@ -54,6 +54,10 @@ const config: Config = {
   collectCoverageFrom: [
     // ─── Application: 100% obligatorio ───────────────────────────────────────
     'src/**/application/**/*.ts',
+    // Request/Response son `type` aliases — TypeScript los borra en compilación.
+    // No hay código ejecutable: excluirlos evita falsos 0% en coverage.
+    '!src/**/application/**/request-*.ts',
+    '!src/**/application/**/response-*.ts',
     // ─── Domain: solo clases con lógica ejercitada desde application ─────────
     // user.ts y refresh-token.ts se ejercitan vía use cases — pero fromPrimitives
     // y toPrimitives son responsabilidad de infrastructure (persistencia).
@@ -75,6 +79,7 @@ const config: Config = {
     // un DomainEventConsumer real (AMQP), no es testeable en unit tests.
     // domain-event-consumer.ts: interfaz sin implementación propia en este scope.
     '!src/shared/application/handler.ts',
+    '!src/shared/application/subscriber.ts',
     '!src/shared/application/domain-event-consumer.ts',
   ],
   coverageDirectory: 'coverage/unit',

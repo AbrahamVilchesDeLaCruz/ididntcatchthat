@@ -20,6 +20,7 @@ export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(FlashcardStatsUpdater)
     private readonly updater: FlashcardStatsUpdater,
   ) {
     super(consumer);

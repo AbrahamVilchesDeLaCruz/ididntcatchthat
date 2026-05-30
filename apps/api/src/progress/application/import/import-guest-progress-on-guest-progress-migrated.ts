@@ -18,6 +18,7 @@ export class GuestProgressImporterOnGuestProgressMigrated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(GuestProgressImporter)
     private readonly importer: GuestProgressImporter,
   ) {
     super(consumer);

@@ -17,6 +17,7 @@ export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(AiPhoneticsCompleter)
     private readonly phoneticsCompleter: AiPhoneticsCompleter,
   ) {
     super(consumer);
