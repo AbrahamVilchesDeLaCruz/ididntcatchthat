@@ -12,6 +12,7 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { type RequestAttemptRecorder } from './request-attempt-recorder';
@@ -27,6 +28,8 @@ export class AttemptRecorder {
     private readonly attemptRepository: AttemptRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestAttemptRecorder): Promise<void> {
@@ -44,5 +47,12 @@ export class AttemptRecorder {
     await this.attemptRepository.save(attempt);
     await this.gameRepository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
+
+    this.logger.info('Attempt recorded', {
+      gameId,
+      flashcardId,
+      correct,
+      userId,
+    });
   }
 }

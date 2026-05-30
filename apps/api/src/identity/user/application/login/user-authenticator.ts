@@ -59,7 +59,10 @@ export class UserAuthenticator {
       user.passwordHash.value,
     );
 
-    if (!valid) throw new InvalidCredentialsException();
+    if (!valid) {
+      this.logger.warn('Failed login attempt — bad password', { email });
+      throw new InvalidCredentialsException();
+    }
 
     const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
       type: 'user',

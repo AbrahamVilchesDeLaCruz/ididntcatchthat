@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { GameCompleter } from '@/gaming/application/complete/game-completer';
@@ -12,14 +13,17 @@ import { RequestGameCompleterMother } from './request-game-completer-mother';
 describe('gaming/application/complete GameCompleter', () => {
   const gameRepository = mock<GameRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let completer: GameCompleter;
 
   beforeEach(() => {
     gameRepository.search.mockReset();
     gameRepository.save.mockReset();
     publisher.publish.mockReset();
+    logger.info.mockReset();
+    logger.warn.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    completer = new GameCompleter(gameRepository, publisher);
+    completer = new GameCompleter(gameRepository, publisher, logger);
   });
 
   it('should complete a game and return summary', async () => {

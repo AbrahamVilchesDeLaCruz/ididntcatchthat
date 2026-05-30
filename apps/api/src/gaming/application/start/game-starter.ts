@@ -12,6 +12,7 @@ import {
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestGameStarter } from './request-game-starter';
 import { type ResponseGameStarter } from './response-game-starter';
 
@@ -24,6 +25,8 @@ export class GameStarter {
     private readonly gameRepository: GameRepository,
     @Inject(FLASHCARD_SELECTOR)
     private readonly flashcardSelector: FlashcardSelector,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
@@ -67,6 +70,14 @@ export class GameStarter {
     );
 
     await this.gameRepository.save(game);
+
+    this.logger.info('Game started', {
+      gameId: game.id.value,
+      userId: userId ?? 'guest',
+      mode,
+      module: module ?? null,
+      cardCount,
+    });
 
     return {
       gameId: game.id.value,
