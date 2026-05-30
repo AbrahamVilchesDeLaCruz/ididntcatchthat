@@ -44,6 +44,12 @@ describe('progress/application/update UpdateModuleProgressOnGameCompleted', () =
     expect(progressUpdater.execute).not.toHaveBeenCalled();
   });
 
+  it('should skip when userId is null (guest game)', async () => {
+    await subscriber.on(makeEvent({ userId: null, module: 'native_sounds' }));
+
+    expect(progressUpdater.execute).not.toHaveBeenCalled();
+  });
+
   it('should delegate to use case with userId and module', async () => {
     const userId = ProgressUserIdMother.random().value;
 

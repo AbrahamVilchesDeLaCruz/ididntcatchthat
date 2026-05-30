@@ -28,8 +28,9 @@ export class UpdateModuleProgressOnGameCompleted extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as GameCompletedAttributes;
     if (attrs.module === null) return;
+    if (attrs.userId === null) return;
     await this.progressUpdater.execute({
-      userId: attrs.userId as string,
+      userId: attrs.userId,
       module: attrs.module,
     });
   }
