@@ -35,7 +35,11 @@ export class GameStarter {
       const todayCriteria = new Criteria([
         { field: 'userId', operator: FilterOperator.EQ, value: null },
         { field: 'startedAt', operator: FilterOperator.GTE, value: today },
-        { field: 'cardCount', operator: FilterOperator.LTE, value: 10 },
+        {
+          field: 'cardCount',
+          operator: FilterOperator.LTE,
+          value: GuestGamePolicy.MAX_CARD_COUNT_FOR_GUEST,
+        },
       ]);
       const todayGames = await this.gameRepository.match(todayCriteria);
       GuestGamePolicy.assertCanStartNewGame(todayGames.length);

@@ -272,7 +272,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     flashcardId: string,
     primitives: ExampleInput[],
   ): Example[] {
-    if (primitives.length > 3) {
+    if (primitives.length > Flashcard.MAX_EXAMPLES) {
       throw new InvalidExampleCount();
     }
     return primitives.map(
