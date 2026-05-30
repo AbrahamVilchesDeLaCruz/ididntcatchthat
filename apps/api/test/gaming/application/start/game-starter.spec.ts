@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type FlashcardSelector } from '@/gaming/domain/flashcard-selector';
 import { GameStarter } from '@/gaming/application/start/game-starter';
@@ -10,13 +11,14 @@ import { RequestGameStarterMother } from './request-game-starter-mother';
 describe('gaming/application/start GameStarter', () => {
   const gameRepository = mock<GameRepository>();
   const flashcardSelector = mock<FlashcardSelector>();
+  const logger = mock<Logger>();
   let starter: GameStarter;
 
   beforeEach(() => {
     gameRepository.save.mockReset();
     gameRepository.match.mockReset();
     flashcardSelector.select.mockReset();
-    starter = new GameStarter(gameRepository, flashcardSelector);
+    starter = new GameStarter(gameRepository, flashcardSelector, logger);
   });
 
   it('should start a game for an authenticated user', async () => {

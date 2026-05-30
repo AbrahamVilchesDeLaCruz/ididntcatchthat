@@ -12,7 +12,7 @@ import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import {
   AiExampleSuggester,
-  type AiExampleSuggesterResponse,
+  type ResponseAiExampleSuggester,
 } from '@/content/flashcard/application/suggest-examples/ai-example-suggester';
 import { SuggestExamplesPostPayload } from './suggest-examples-post.payload';
 
@@ -32,7 +32,7 @@ export class SuggestExamplesPostController {
   @ApiResponse({ status: 422, description: 'Validation error' })
   async handler(
     @Body() body: SuggestExamplesPostPayload,
-  ): Promise<AiExampleSuggesterResponse> {
+  ): Promise<ResponseAiExampleSuggester> {
     return this.suggester.execute({
       expression: body.expression,
       category: body.category,

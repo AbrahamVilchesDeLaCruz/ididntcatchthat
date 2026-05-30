@@ -10,6 +10,7 @@ import { AudioStatus, AudioStatusValue } from './audio-status';
 import { AudioUrls, type AudioUrlsPrimitives } from './audio-urls';
 import { Example, type ExamplePrimitives } from './example';
 import { InvalidExampleCount } from './exceptions/invalid-example-count';
+import { FlashcardAccessDenied } from './exceptions/flashcard-access-denied';
 import { FlashcardCreatedEvent } from './events/flashcard-created.event';
 import { FlashcardExpressionUpdatedEvent } from './events/flashcard-expression-updated.event';
 import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated.event';
@@ -46,20 +47,62 @@ export type FlashcardUpdateFields = {
 };
 
 export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
-  private constructor(
+  public constructor(
     public readonly id: FlashcardId,
-    public expression: Expression,
-    public meaning: Meaning,
-    public category: Category,
-    public subcategory: Subcategory,
-    public ipaNotation: IpaNotation | null,
-    public nativeSpeech: NativeSpeech | null,
-    public audioStatus: AudioStatus,
-    public audioUrls: AudioUrls | null,
-    public examples: Example[],
+    private _expression: Expression,
+    private _meaning: Meaning,
+    private _category: Category,
+    private _subcategory: Subcategory,
+    private _ipaNotation: IpaNotation | null,
+    private _nativeSpeech: NativeSpeech | null,
+    private _audioStatus: AudioStatus,
+    private _audioUrls: AudioUrls | null,
+    private _examples: Example[],
     public readonly createdBy: string,
   ) {
     super();
+  }
+
+  get expression(): Expression {
+    return this._expression;
+  }
+  get meaning(): Meaning {
+    return this._meaning;
+  }
+  get category(): Category {
+    return this._category;
+  }
+  get subcategory(): Subcategory {
+    return this._subcategory;
+  }
+  get ipaNotation(): IpaNotation | null {
+    return this._ipaNotation;
+  }
+  get nativeSpeech(): NativeSpeech | null {
+    return this._nativeSpeech;
+  }
+  get audioStatus(): AudioStatus {
+    return this._audioStatus;
+  }
+  get audioUrls(): AudioUrls | null {
+    return this._audioUrls;
+  }
+  static readonly MAX_EXAMPLES = 3;
+
+  get examples(): Example[] {
+    return [...this._examples];
+  }
+
+  get missingExampleCount(): number {
+    return Math.max(0, Flashcard.MAX_EXAMPLES - this._examples.length);
+  }
+
+  get nextExamplePosition(): 1 | 2 | 3 {
+    return (this._examples.length + 1) as 1 | 2 | 3;
+  }
+
+  get examplesEnglishText(): string {
+    return this._examples.map((e) => e.textEn).join('. ');
   }
 
   static create(
@@ -95,6 +138,11 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     return flashcard;
   }
 
+  assertCanBeModifiedBy(requesterId: string, requesterRole: string): void {
+    if (requesterRole === 'admin') return;
+    if (this.createdBy !== requesterId) throw new FlashcardAccessDenied();
+  }
+
   update(fields: FlashcardUpdateFields): void {
     if (fields.expression !== undefined)
       this.applyExpression(fields.expression);
@@ -109,23 +157,23 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   private applyExpression(value: string): void {
-    if (value === this.expression.value) return;
-    this.expression = new Expression(value);
+    if (value === this._expression.value) return;
+    this._expression = new Expression(value);
     this.record(
       new FlashcardExpressionUpdatedEvent(this.id.value, {
         flashcardId: this.id.value,
-        expression: this.expression.value,
+        expression: this._expression.value,
       }),
     );
   }
 
   private applyMeaning(value: string): void {
-    if (value === this.meaning.value) return;
-    this.meaning = new Meaning(value);
+    if (value === this._meaning.value) return;
+    this._meaning = new Meaning(value);
     this.record(
       new FlashcardMeaningUpdatedEvent(this.id.value, {
         flashcardId: this.id.value,
-        meaning: this.meaning.value,
+        meaning: this._meaning.value,
       }),
     );
   }
@@ -134,37 +182,37 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     categoryValue: string | undefined,
     subcategoryValue: string | undefined,
   ): void {
-    if (categoryValue !== undefined && categoryValue !== this.category.value) {
-      this.category = new Category(categoryValue);
+    if (categoryValue !== undefined && categoryValue !== this._category.value) {
+      this._category = new Category(categoryValue);
       if (subcategoryValue === undefined) {
-        this.subcategory = new Subcategory(
-          this.subcategory.value,
-          this.category,
+        this._subcategory = new Subcategory(
+          this._subcategory.value,
+          this._category,
         );
       }
     }
     if (
       subcategoryValue !== undefined &&
-      subcategoryValue !== this.subcategory.value
+      subcategoryValue !== this._subcategory.value
     ) {
-      this.subcategory = new Subcategory(subcategoryValue, this.category);
+      this._subcategory = new Subcategory(subcategoryValue, this._category);
     }
   }
 
   private applyIpaNotation(value: string | null): void {
-    this.ipaNotation = value !== null ? new IpaNotation(value) : null;
+    this._ipaNotation = value !== null ? new IpaNotation(value) : null;
   }
 
   private applyNativeSpeech(value: string | null): void {
-    this.nativeSpeech = value !== null ? new NativeSpeech(value) : null;
+    this._nativeSpeech = value !== null ? new NativeSpeech(value) : null;
   }
 
   private applyExamples(examples: ExampleInput[]): void {
-    this.examples = Flashcard.buildExamples(this.id.value, examples);
+    this._examples = Flashcard.buildExamples(this.id.value, examples);
   }
 
   markAudioGenerating(): void {
-    this.audioStatus = new AudioStatus(AudioStatusValue.Generating);
+    this._audioStatus = new AudioStatus(AudioStatusValue.Generating);
     this.record(
       new FlashcardAudioGeneratingEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -173,8 +221,8 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   markAudioReady(audioUrls: AudioUrls): void {
-    this.audioStatus = new AudioStatus(AudioStatusValue.Ready);
-    this.audioUrls = audioUrls;
+    this._audioStatus = new AudioStatus(AudioStatusValue.Ready);
+    this._audioUrls = audioUrls;
     this.record(
       new FlashcardAudioReadyEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -184,7 +232,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   markAudioFailed(): void {
-    this.audioStatus = new AudioStatus(AudioStatusValue.Failed);
+    this._audioStatus = new AudioStatus(AudioStatusValue.Failed);
     this.record(
       new FlashcardAudioFailedEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -209,8 +257,8 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   }
 
   completePhonetics(ipaNotation: string, nativeSpeech: string): void {
-    this.ipaNotation = new IpaNotation(ipaNotation);
-    this.nativeSpeech = new NativeSpeech(nativeSpeech);
+    this._ipaNotation = new IpaNotation(ipaNotation);
+    this._nativeSpeech = new NativeSpeech(nativeSpeech);
     this.record(
       new FlashcardPhoneticsCompletedEvent(this.id.value, {
         flashcardId: this.id.value,
@@ -224,7 +272,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     flashcardId: string,
     primitives: ExampleInput[],
   ): Example[] {
-    if (primitives.length > 3) {
+    if (primitives.length > Flashcard.MAX_EXAMPLES) {
       throw new InvalidExampleCount();
     }
     return primitives.map(

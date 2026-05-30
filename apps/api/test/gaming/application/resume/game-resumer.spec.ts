@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { GameResumer } from '@/gaming/application/resume/game-resumer';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
@@ -8,20 +9,21 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestGameResumerMother } from './request-game-resumer-mother';
 
 describe('gaming/application/resume GameResumer', () => {
-  const gameRepository = mock<GameRepository>();
+  const repository = mock<GameRepository>();
+  const logger = mock<Logger>();
   let resumer: GameResumer;
 
   beforeEach(() => {
-    gameRepository.search.mockReset();
-    gameRepository.save.mockReset();
-    resumer = new GameResumer(gameRepository);
+    repository.search.mockReset();
+    repository.save.mockReset();
+    resumer = new GameResumer(repository, logger);
   });
 
   it('should resume a paused game and return pendingFlashcardIds', async () => {
     const game = GameMother.paused();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
 
     const result = await resumer.execute(
       RequestGameResumerMother.random(primitives.id, {
@@ -31,11 +33,11 @@ describe('gaming/application/resume GameResumer', () => {
 
     expect(result.game.status).toBe('in_progress');
     expect(Array.isArray(result.pendingFlashcardIds)).toBe(true);
-    expect(gameRepository.save).toHaveBeenCalledTimes(1);
+    expect(repository.save).toHaveBeenCalledTimes(1);
   });
 
   it('should throw GameNotFound when game does not exist', async () => {
-    gameRepository.search.mockResolvedValue(null);
+    repository.search.mockResolvedValue(null);
 
     await expect(
       resumer.execute(RequestGameResumerMother.random()),
@@ -44,7 +46,7 @@ describe('gaming/application/resume GameResumer', () => {
 
   it('should throw GameAccessDenied when userId does not match', async () => {
     const game = GameMother.paused();
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       resumer.execute(
@@ -58,7 +60,7 @@ describe('gaming/application/resume GameResumer', () => {
   it('should throw GameNotPaused when game is in_progress', async () => {
     const game = GameMother.random();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       resumer.execute(

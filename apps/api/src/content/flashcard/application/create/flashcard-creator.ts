@@ -11,25 +11,10 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestFlashcardCreator } from './request-flashcard-creator';
 
-type ExampleInputDto = {
-  id: string;
-  textEn: string;
-  textEs: string;
-  position: number;
-};
-
-export type RequestFlashcardCreator = {
-  id: string;
-  expression: string;
-  meaning: string;
-  category: string;
-  subcategory: string;
-  ipaNotation: string | null;
-  nativeSpeech: string | null;
-  examples: ExampleInputDto[];
-  createdBy: string;
-};
+export type { RequestFlashcardCreator } from './request-flashcard-creator';
 
 @Injectable()
 export class FlashcardCreator {
@@ -38,25 +23,45 @@ export class FlashcardCreator {
     private readonly repository: FlashcardRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(
     request: RequestFlashcardCreator,
   ): Promise<FlashcardPrimitives> {
+    const {
+      id,
+      expression,
+      meaning,
+      category,
+      subcategory,
+      ipaNotation,
+      nativeSpeech,
+      examples,
+      createdBy,
+    } = request;
+
     const flashcard = Flashcard.create(
-      request.id,
-      request.expression,
-      request.meaning,
-      request.category,
-      request.subcategory,
-      request.ipaNotation,
-      request.nativeSpeech,
-      request.examples.map((e) => ({ ...e, flashcardId: request.id })),
-      request.createdBy,
+      id,
+      expression,
+      meaning,
+      category,
+      subcategory,
+      ipaNotation,
+      nativeSpeech,
+      examples.map((e) => ({ ...e, flashcardId: id })),
+      createdBy,
     );
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard created', {
+      flashcardId: id,
+      expression,
+      createdBy,
+    });
 
     return flashcard.toPrimitives();
   }

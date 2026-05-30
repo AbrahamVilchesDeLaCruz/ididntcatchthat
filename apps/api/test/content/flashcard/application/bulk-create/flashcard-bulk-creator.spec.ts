@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { FlashcardBulkCreator } from '@/content/flashcard/application/bulk-create/flashcard-bulk-creator';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -12,6 +13,7 @@ import { RequestFlashcardBulkCreatorMother } from './request-flashcard-bulk-crea
 describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let creator: FlashcardBulkCreator;
 
   beforeEach(() => {
@@ -23,7 +25,7 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
     publisher.publish.mockResolvedValue(undefined);
     repository.saveAll.mockResolvedValue(undefined);
 
-    creator = new FlashcardBulkCreator(repository, publisher);
+    creator = new FlashcardBulkCreator(repository, publisher, logger);
   });
 
   afterEach(() => JestTimers.teardown());
@@ -31,7 +33,7 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
   it('should save N flashcards and publish N FlashcardCreatedEvents', async () => {
     const request = RequestFlashcardBulkCreatorMother.random(3);
 
-    const result = await creator.execute(request.flashcards);
+    const result = await creator.execute(request);
 
     expect(repository.saveAll).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
@@ -47,11 +49,9 @@ describe('content/flashcard/application/bulk-create FlashcardBulkCreator', () =>
       expression: '',
     });
     const request = RequestFlashcardBulkCreatorMother.random(2);
-    request.flashcards[1] = invalidItem;
+    request[1] = invalidItem;
 
-    await expect(creator.execute(request.flashcards)).rejects.toThrow(
-      ExpressionEmpty,
-    );
+    await expect(creator.execute(request)).rejects.toThrow(ExpressionEmpty);
 
     expect(repository.saveAll).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();

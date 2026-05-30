@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { FlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -16,6 +17,7 @@ import { ConnectingWordsInSpeechSubcategory } from '@/content/flashcard/domain/s
 describe('content/flashcard/application/create FlashcardCreator', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let creator: FlashcardCreator;
 
   beforeEach(() => {
@@ -26,7 +28,7 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
 
-    creator = new FlashcardCreator(repository, publisher);
+    creator = new FlashcardCreator(repository, publisher, logger);
   });
 
   afterEach(() => JestTimers.teardown());
@@ -41,7 +43,10 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
       subcategory: request.subcategory,
       ipaNotation: request.ipaNotation,
       nativeSpeech: request.nativeSpeech,
-      examples: request.examples,
+      examples: request.examples.map((e) => ({
+        ...e,
+        flashcardId: request.id,
+      })),
       createdBy: request.createdBy,
     });
 

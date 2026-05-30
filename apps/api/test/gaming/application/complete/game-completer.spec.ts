@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { GameCompleter } from '@/gaming/application/complete/game-completer';
@@ -10,16 +11,19 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestGameCompleterMother } from './request-game-completer-mother';
 
 describe('gaming/application/complete GameCompleter', () => {
-  const gameRepository = mock<GameRepository>();
+  const repository = mock<GameRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let completer: GameCompleter;
 
   beforeEach(() => {
-    gameRepository.search.mockReset();
-    gameRepository.save.mockReset();
+    repository.search.mockReset();
+    repository.save.mockReset();
     publisher.publish.mockReset();
+    logger.info.mockReset();
+    logger.warn.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    completer = new GameCompleter(gameRepository, publisher);
+    completer = new GameCompleter(repository, publisher, logger);
   });
 
   it('should complete a game and return summary', async () => {
@@ -29,8 +33,8 @@ describe('gaming/application/complete GameCompleter', () => {
     game.recordAttempt('fc-2', false);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
 
     const result = await completer.execute(
       RequestGameCompleterMother.random(primitives.id, {
@@ -42,13 +46,13 @@ describe('gaming/application/complete GameCompleter', () => {
     expect(result.correctCount).toBe(1);
     expect(result.accuracy).toBe(50);
     expect(result.duration).toBeGreaterThanOrEqual(0);
-    expect(gameRepository.save).toHaveBeenCalledTimes(1);
+    expect(repository.save).toHaveBeenCalledTimes(1);
     const events = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(GameCompletedEvent);
   });
 
   it('should throw GameNotFound when game does not exist', async () => {
-    gameRepository.search.mockResolvedValue(null);
+    repository.search.mockResolvedValue(null);
 
     await expect(
       completer.execute(RequestGameCompleterMother.random()),
@@ -57,7 +61,7 @@ describe('gaming/application/complete GameCompleter', () => {
 
   it('should throw GameAccessDenied when userId does not match', async () => {
     const game = GameMother.random({ userId: 'owner' });
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       completer.execute(
@@ -73,7 +77,7 @@ describe('gaming/application/complete GameCompleter', () => {
     game.recordAttempt('fc-1', true);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       completer.execute(
@@ -89,8 +93,8 @@ describe('gaming/application/complete GameCompleter', () => {
     game.recordAttempt('fc-1', true);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
 
     await completer.execute(
       RequestGameCompleterMother.random(primitives.id, {

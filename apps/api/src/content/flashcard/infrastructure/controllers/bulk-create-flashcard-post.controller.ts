@@ -13,7 +13,7 @@ import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { FlashcardBulkCreator } from '@/content/flashcard/application/bulk-create/flashcard-bulk-creator';
-import { type FlashcardBulkCreatorResult } from '@/content/flashcard/application/bulk-create/flashcard-bulk-creator';
+import { type FlashcardBulkCreatorResult } from '@/content/flashcard/application/bulk-create/response-flashcard-bulk-creator';
 import { BulkCreateFlashcardPostPayload } from './bulk-create-flashcard-post.payload';
 
 @ApiTags('flashcards')

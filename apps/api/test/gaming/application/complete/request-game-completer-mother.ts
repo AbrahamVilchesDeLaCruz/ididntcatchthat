@@ -1,9 +1,7 @@
+import { type RequestGameCompleter } from '@/gaming/application/complete/game-completer';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
-export interface RequestGameCompleter {
-  gameId: string;
-  userId: string | null;
-}
+export type { RequestGameCompleter };
 
 export class RequestGameCompleterMother {
   static random(

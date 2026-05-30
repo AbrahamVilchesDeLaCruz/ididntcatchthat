@@ -1,20 +1,24 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
+import { GameModeInvalid } from './exceptions/game-mode-invalid';
 
-const GAME_MODES = ['study', 'game'] as const;
-type GameModeValue = (typeof GAME_MODES)[number];
-
-export class GameModeInvalid extends DomainException {
-  constructor(value: string) {
-    super(
-      `GameMode value <${value}> is invalid. Must be one of: ${GAME_MODES.join(', ')}`,
-    );
-  }
+export enum GameModeValue {
+  Study = 'study',
+  Game = 'game',
 }
 
+const GAME_MODES = Object.values(GameModeValue);
+
 export class GameMode extends StringValueObject {
-  private constructor(value: GameModeValue) {
+  public constructor(value: GameModeValue) {
     super(value);
+  }
+
+  isGame(): boolean {
+    return (this.value as GameModeValue) === GameModeValue.Game;
+  }
+
+  isStudy(): boolean {
+    return (this.value as GameModeValue) === GameModeValue.Study;
   }
 
   static create(value: string): GameMode {

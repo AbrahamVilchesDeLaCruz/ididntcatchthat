@@ -9,21 +9,14 @@ import {
   type FlashcardSelector,
   FLASHCARD_SELECTOR,
 } from '@/gaming/domain/flashcard-selector';
-import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
-import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
-import { Criteria } from '@/shared/domain/criteria';
+import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
+import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestGameStarter } from './request-game-starter';
+import { type ResponseGameStarter } from './response-game-starter';
 
-export interface RequestGameStarter {
-  userId: string | null;
-  mode: string;
-  module: string | null;
-  cardCount: number;
-}
-
-export interface GameStarterResult {
-  gameId: string;
-  flashcardIds: string[];
-}
+export type { RequestGameStarter, ResponseGameStarter };
 
 @Injectable()
 export class GameStarter {
@@ -32,53 +25,62 @@ export class GameStarter {
     private readonly gameRepository: GameRepository,
     @Inject(FLASHCARD_SELECTOR)
     private readonly flashcardSelector: FlashcardSelector,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
-  async execute(request: RequestGameStarter): Promise<GameStarterResult> {
-    if (request.userId === null) {
+  async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
+    const { userId, mode, module, cardCount } = request;
+
+    if (userId === null) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayCriteria = new Criteria([
-        { field: 'userId', operator: '=', value: null },
-        { field: 'startedAt', operator: '>=', value: today },
-        { field: 'cardCount', operator: '<=', value: 10 },
+        { field: 'userId', operator: FilterOperator.EQ, value: null },
+        { field: 'startedAt', operator: FilterOperator.GTE, value: today },
+        {
+          field: 'cardCount',
+          operator: FilterOperator.LTE,
+          value: GuestGamePolicy.MAX_CARD_COUNT_FOR_GUEST,
+        },
       ]);
       const todayGames = await this.gameRepository.match(todayCriteria);
-      if (todayGames.length >= 3) {
-        throw new GuestLimitExceeded();
-      }
+      GuestGamePolicy.assertCanStartNewGame(todayGames.length);
     } else {
       const pausedCriteria = new Criteria([
-        { field: 'userId', operator: '=', value: request.userId },
-        { field: 'status', operator: '=', value: 'paused' },
+        { field: 'userId', operator: FilterOperator.EQ, value: userId },
+        { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
       ]);
       const pausedGames = await this.gameRepository.match(pausedCriteria);
-      if (pausedGames.length >= 5) {
-        const pausedGameIds = pausedGames.map((g) => g.toPrimitives().id);
-        throw new MaxPausedGamesReached(pausedGameIds);
-      }
+      PausedGamePolicy.assertCanPauseAnother(pausedGames);
     }
 
-    const gameModule = request.module
-      ? GameModule.create(request.module)
-      : null;
+    const gameModule = module ? GameModule.create(module) : null;
     const flashcardIds = await this.flashcardSelector.select(
       gameModule,
-      request.cardCount,
+      cardCount,
     );
 
     const game = Game.start(
-      request.userId,
-      request.mode,
-      request.module,
-      String(request.cardCount),
+      userId,
+      mode,
+      module,
+      String(cardCount),
       flashcardIds,
     );
 
     await this.gameRepository.save(game);
 
+    this.logger.info('Game started', {
+      gameId: game.id.value,
+      userId: userId ?? 'guest',
+      mode,
+      module: module ?? null,
+      cardCount,
+    });
+
     return {
-      gameId: game.toPrimitives().id,
+      gameId: game.id.value,
       flashcardIds,
     };
   }

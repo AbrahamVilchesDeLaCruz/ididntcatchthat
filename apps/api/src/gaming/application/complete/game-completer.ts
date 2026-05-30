@@ -8,55 +8,49 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGameCompleter } from './request-game-completer';
+import { type ResponseGameCompleter } from './response-game-completer';
 
-export interface RequestGameCompleter {
-  gameId: string;
-  userId: string | null;
-}
-
-export interface GameSummary {
-  correctCount: number;
-  totalCount: number;
-  accuracy: number;
-  duration: number;
-}
+export type { RequestGameCompleter, ResponseGameCompleter };
 
 @Injectable()
 export class GameCompleter {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
-  async execute(request: RequestGameCompleter): Promise<GameSummary> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+  async execute(request: RequestGameCompleter): Promise<ResponseGameCompleter> {
+    const { gameId, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.repository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     game.complete();
 
-    await this.gameRepository.save(game);
+    await this.repository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
 
-    const primitives = game.toPrimitives();
-    const totalCount = primitives.attempts.length;
-    const correctCount = primitives.attempts.filter((a) => a.correct).length;
-    const accuracy =
-      totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
-    const duration = primitives.finishedAt
-      ? Math.round(
-          (primitives.finishedAt.getTime() - primitives.startedAt.getTime()) /
-            1000,
-        )
-      : 0;
+    const stats = game.completionStats();
 
-    return { correctCount, totalCount, accuracy, duration };
+    this.logger.info('Game completed', {
+      gameId,
+      userId,
+      totalCount: stats.totalCount,
+      correctCount: stats.correctCount,
+    });
+
+    return stats;
   }
 }

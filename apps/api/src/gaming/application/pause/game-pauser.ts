@@ -4,31 +4,35 @@ import {
   type GameRepository,
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGamePauser } from './request-game-pauser';
 
-export interface RequestGamePauser {
-  gameId: string;
-  userId: string;
-  lastFlashcardId: string;
-}
+export type { RequestGamePauser };
 
 @Injectable()
 export class GamePauser {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGamePauser): Promise<void> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+    const { gameId, userId, lastFlashcardId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.repository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
-    game.pause(request.lastFlashcardId);
-    await this.gameRepository.save(game);
+    game.pause(lastFlashcardId);
+    await this.repository.save(game);
+
+    this.logger.info('Game paused', { gameId, userId, lastFlashcardId });
   }
 }

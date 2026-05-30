@@ -1,5 +1,15 @@
 import { UserId } from '@/shared/domain/user-id';
 import { ModuleName } from '@/progress/domain/module-name';
+import { type UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
+
+const MasteryThresholds = {
+  LEVEL_3_ATTEMPTS: 20,
+  LEVEL_3_ACCURACY: 0.85,
+  LEVEL_2_ATTEMPTS: 10,
+  LEVEL_2_ACCURACY: 0.7,
+  LEVEL_1_ATTEMPTS: 5,
+  LEVEL_1_ACCURACY: 0.5,
+} as const;
 
 export type ModuleProgressPrimitives = {
   userId: string;
@@ -10,6 +20,13 @@ export type ModuleProgressPrimitives = {
   masteryLevel: number;
   lastPlayedAt: string;
   updatedAt: string;
+};
+
+export type ModuleProgressComputation = {
+  progress: ModuleProgress;
+  levelIncreased: boolean;
+  newLevel: number;
+  previousLevel: number;
 };
 
 export class ModuleProgress {
@@ -24,10 +41,57 @@ export class ModuleProgress {
     readonly updatedAt: Date,
   ) {}
 
+  static computeFrom(
+    allStats: UserFlashcardStats[],
+    existing: ModuleProgress | null,
+    userId: UserId,
+    module: ModuleName,
+  ): ModuleProgressComputation {
+    const totalAttempts = allStats.reduce((sum, s) => sum + s.timesPlayed, 0);
+    const correctCount = allStats.reduce((sum, s) => sum + s.correctCount, 0);
+    const accuracy = totalAttempts === 0 ? 0 : correctCount / totalAttempts;
+    const newLevel = ModuleProgress.computeMasteryLevel(
+      totalAttempts,
+      accuracy,
+    );
+    const previousLevel = existing?.masteryLevel ?? -1;
+    const now = new Date();
+
+    const progress = new ModuleProgress(
+      userId,
+      module,
+      totalAttempts,
+      correctCount,
+      accuracy,
+      newLevel,
+      now,
+      now,
+    );
+
+    return {
+      progress,
+      levelIncreased: newLevel > previousLevel && previousLevel >= 0,
+      newLevel,
+      previousLevel,
+    };
+  }
+
   static computeMasteryLevel(totalAttempts: number, accuracy: number): number {
-    if (totalAttempts >= 20 && accuracy >= 0.85) return 3;
-    if (totalAttempts >= 10 && accuracy >= 0.7) return 2;
-    if (totalAttempts >= 5 && accuracy >= 0.5) return 1;
+    if (
+      totalAttempts >= MasteryThresholds.LEVEL_3_ATTEMPTS &&
+      accuracy >= MasteryThresholds.LEVEL_3_ACCURACY
+    )
+      return 3;
+    if (
+      totalAttempts >= MasteryThresholds.LEVEL_2_ATTEMPTS &&
+      accuracy >= MasteryThresholds.LEVEL_2_ACCURACY
+    )
+      return 2;
+    if (
+      totalAttempts >= MasteryThresholds.LEVEL_1_ATTEMPTS &&
+      accuracy >= MasteryThresholds.LEVEL_1_ACCURACY
+    )
+      return 1;
     return 0;
   }
 

@@ -12,7 +12,7 @@ import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator
 import { type UserContext } from '@/shared/domain/user-context';
 import {
   GameCompleter,
-  type GameSummary,
+  type ResponseGameCompleter,
 } from '@/gaming/application/complete/game-completer';
 
 @ApiTags('games')
@@ -26,7 +26,7 @@ export class CompleteGamePostController {
   async handler(
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
-  ): Promise<GameSummary> {
+  ): Promise<ResponseGameCompleter> {
     return this.completer.execute({
       gameId: id,
       userId: user.userId ?? null,

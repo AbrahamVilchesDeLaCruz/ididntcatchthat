@@ -132,36 +132,36 @@ graph LR
         C1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
         C2["GameCompleted\nidct.gaming.games.game.completed"]
         C3["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
-        C4["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated"]
+        C4["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated\n⚠️ planned"]
     end
 
     subgraph Progress ["📈 Progress"]
         UFS["UserFlashcardStats\n(Aggregate Root)"]
-        MP["ModuleProgress\n(Read Model)"]
+        MP["ModuleProgress\n(Entity)"]
         UFS --- MP
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
+        E1["ModuleMasteryLevelIncreased\nidct.progress.module_progress.module_mastery_level.increased"]
     end
 
     C1 -->|consume| Progress
     C2 -->|consume| Progress
     C3 -->|consume| Progress
-    C4 -->|consume| Progress
+    C4 -->|consume — planned| Progress
     Progress -->|emite| E1
 ```
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | UPSERT `user_flashcard_stats` — actualiza `times_played`, `correct_count`, `accuracy_rate` |
-| `GameCompleted` | `idct.gaming.games.game.completed` | Recalcula `ModuleProgress` (study/mastery/combined level) |
-| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest |
-| `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Actualiza pronunciation stats en `user_flashcard_stats` |
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Busca o crea `UserFlashcardStats` → `recordPlay()` o `recordStudy()` según `mode` |
+| `GameCompleted` | `idct.gaming.games.game.completed` | Agrega stats del módulo → recalcula `ModuleProgress` (mastery 0–3) |
+| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest (idempotente via inbox) |
+| `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | ⚠️ Planned — actualiza pronunciation stats en `user_flashcard_stats` |
 
 | Evento emitido | Exchange | Trigger |
 |----------------|----------|---------|
-| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Recálculo de `ModuleProgress` detecta subida de nivel |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | `masteryLevel` sube al recalcular `ModuleProgress` |
 
 ---
 
@@ -201,7 +201,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
+        C1["ModuleMasteryLevelIncreased\nidct.progress.module_progress.module_mastery_level.increased"]
     end
 
     subgraph Ranking ["🏆 Ranking"]
@@ -218,7 +218,7 @@ graph LR
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Marca ranking como `dirty` → recomputado en próximo job |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Marca ranking como `dirty` → recomputado en próximo job |
 
 **No emite eventos.** Es un pure read model — solo responde a queries.
 
@@ -239,7 +239,7 @@ graph LR
         C1["UserRegistered\nidct.identity.users.user.registered"]
         C2["StreakUpdated\nidct.identity.streaks.streak.updated"]
         C3["StreakBroken\nidct.identity.streaks.streak.broken"]
-        C4["ModuleLevelUp\nidct.progress.module_progress.module_level.up"]
+        C4["ModuleMasteryLevelIncreased\nidct.progress.module_progress.module_mastery_level.increased"]
     end
 
     subgraph Notification ["🔔 Notification"]
@@ -261,6 +261,6 @@ graph LR
 | `UserRegistered` | `idct.identity.users.user.registered` | Email (Resend) | Siempre |
 | `StreakUpdated` | `idct.identity.streaks.streak.updated` | Toast + Push | Solo si hito (7, 30, 100 días) |
 | `StreakBroken` | `idct.identity.streaks.streak.broken` | Email + Push | Siempre que streak > 0 |
-| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Toast | Siempre |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Toast | Siempre |
 
 **No emite eventos.** Es un pure consumer — solo ejecuta side effects.

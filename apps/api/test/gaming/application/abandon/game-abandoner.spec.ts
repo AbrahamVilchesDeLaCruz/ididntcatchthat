@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { GameAbandoner } from '@/gaming/application/abandon/game-abandoner';
@@ -10,23 +11,24 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestGameAbandonerMother } from './request-game-abandoner-mother';
 
 describe('gaming/application/abandon GameAbandoner', () => {
-  const gameRepository = mock<GameRepository>();
+  const repository = mock<GameRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let abandoner: GameAbandoner;
 
   beforeEach(() => {
-    gameRepository.search.mockReset();
-    gameRepository.save.mockReset();
+    repository.search.mockReset();
+    repository.save.mockReset();
     publisher.publish.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    abandoner = new GameAbandoner(gameRepository, publisher);
+    abandoner = new GameAbandoner(repository, publisher, logger);
   });
 
   it('should abandon an in-progress game and publish event', async () => {
     const game = GameMother.random();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
 
     await abandoner.execute(
       RequestGameAbandonerMother.random(primitives.id, {
@@ -34,7 +36,7 @@ describe('gaming/application/abandon GameAbandoner', () => {
       }),
     );
 
-    expect(gameRepository.save).toHaveBeenCalledTimes(1);
+    expect(repository.save).toHaveBeenCalledTimes(1);
     const events = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(GameAbandonedEvent);
   });
@@ -42,8 +44,8 @@ describe('gaming/application/abandon GameAbandoner', () => {
   it('should abandon a paused game', async () => {
     const game = GameMother.paused();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
-    gameRepository.save.mockResolvedValue(undefined);
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
 
     await abandoner.execute(
       RequestGameAbandonerMother.random(primitives.id, {
@@ -51,11 +53,11 @@ describe('gaming/application/abandon GameAbandoner', () => {
       }),
     );
 
-    expect(gameRepository.save).toHaveBeenCalledTimes(1);
+    expect(repository.save).toHaveBeenCalledTimes(1);
   });
 
   it('should throw GameNotFound when game does not exist', async () => {
-    gameRepository.search.mockResolvedValue(null);
+    repository.search.mockResolvedValue(null);
 
     await expect(
       abandoner.execute(RequestGameAbandonerMother.random()),
@@ -64,7 +66,7 @@ describe('gaming/application/abandon GameAbandoner', () => {
 
   it('should throw GameAccessDenied when userId does not match', async () => {
     const game = GameMother.random({ userId: 'owner' });
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       abandoner.execute(
@@ -78,7 +80,7 @@ describe('gaming/application/abandon GameAbandoner', () => {
   it('should throw GameAlreadyFinished when game is completed', async () => {
     const game = GameMother.completed();
     const primitives = game.toPrimitives();
-    gameRepository.search.mockResolvedValue(game);
+    repository.search.mockResolvedValue(game);
 
     await expect(
       abandoner.execute(

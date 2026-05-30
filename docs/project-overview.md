@@ -132,22 +132,28 @@ Toda la documentación técnica se escribe en Markdown. Los diagramas (arquitect
 **Monolítica modular orientada a dominio** — se descarta microservicios para evitar complejidad operacional innecesaria en el contexto de un TFM, manteniendo la arquitectura escalable y observable.
 
 ```
-Organización por feature (Screaming Architecture):
+Organización por Bounded Context (Screaming Architecture):
 
-flashcards/
-  domain/          ← entidades, value objects, reglas de negocio
-  application/     ← casos de uso, servicios de aplicación
-  infrastructure/  ← repositorios, ORM, adaptadores externos
+content/
+  flashcard/
+    domain/          ← entidades, value objects, reglas de negocio
+    application/     ← casos de uso (create, update, search, generate-audio...)
+    infrastructure/  ← repositorios, ORM, adaptadores externos (ElevenLabs, AI)
 
-audio/
+gaming/
   domain/
   application/
-  infrastructure/  ← ElevenLabs adapter, CDN uploader
+  infrastructure/    ← lógica de juego (start, complete, record attempt)
 
-pronunciation/
+identity/
+  user/
+  session/
+  infrastructure/    ← auth JWT, OAuth Google, guest tokens
+
+progress/
   domain/
-  application/
-  infrastructure/  ← Azure Speech adapter
+  application/       ← subscribers a eventos de gaming
+  infrastructure/    ← estadísticas de usuario, progreso por módulo
 ```
 
 ### Monorepo
@@ -248,7 +254,7 @@ Unit Tests               — lógica de negocio, servicios, casos de uso
 ### Ingeniería
 
 - Clean Architecture
-- Validación tipada con Zod — contratos compartidos frontend/backend
+- Class Validator en backend, Zod en cliente — sin contratos compartidos entre apps
 - ADRs (Architecture Decision Records) para decisiones importantes
 - Structured logging con correlation IDs
 - CI/CD con GitHub Actions
@@ -259,7 +265,7 @@ Unit Tests               — lógica de negocio, servicios, casos de uso
 - Rate limiting
 - Helmet
 - Sanitización y validación de inputs
-- Zod schemas como primera línea de defensa
+- Class Validator (backend) y Zod (cliente) como primera línea de defensa
 
 ---
 

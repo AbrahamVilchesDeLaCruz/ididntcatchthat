@@ -5,7 +5,6 @@ import {
 } from '@/content/flashcard/domain/flashcard';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
-import { FlashcardAccessDenied } from '@/content/flashcard/domain/exceptions/flashcard-access-denied';
 import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
@@ -14,32 +13,10 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestFlashcardUpdater } from './request-flashcard-updater';
 
-const ADMIN_ROLE = 'admin' as const;
-
-type FlashcardUpdaterExampleDto = {
-  id: string;
-  textEn: string;
-  textEs: string;
-  position: number;
-};
-
-type FlashcardUpdaterFieldsDto = {
-  expression?: string;
-  meaning?: string;
-  category?: string;
-  subcategory?: string;
-  ipaNotation?: string | null;
-  nativeSpeech?: string | null;
-  examples?: FlashcardUpdaterExampleDto[];
-};
-
-export type RequestFlashcardUpdater = {
-  id: string;
-  requesterId: string;
-  requesterRole: string;
-  fields: FlashcardUpdaterFieldsDto;
-};
+export type { RequestFlashcardUpdater } from './request-flashcard-updater';
 
 @Injectable()
 export class FlashcardUpdater {
@@ -48,19 +25,28 @@ export class FlashcardUpdater {
     private readonly repository: FlashcardRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(
     request: RequestFlashcardUpdater,
   ): Promise<FlashcardPrimitives> {
-    const flashcard = await this.findOrFail(request.id);
+    const { id, requesterId, requesterRole, fields } = request;
 
-    this.ensureAccess(flashcard, request.requesterId, request.requesterRole);
+    const flashcard = await this.findOrFail(id);
 
-    flashcard.update(request.fields);
+    flashcard.assertCanBeModifiedBy(requesterId, requesterRole);
+    flashcard.update(fields);
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard updated', {
+      flashcardId: id,
+      requesterId,
+      fields: Object.keys(fields),
+    });
 
     return flashcard.toPrimitives();
   }
@@ -69,14 +55,5 @@ export class FlashcardUpdater {
     const flashcard = await this.repository.search(new FlashcardId(id));
     if (!flashcard) throw new FlashcardNotFound();
     return flashcard;
-  }
-
-  private ensureAccess(
-    flashcard: Flashcard,
-    requesterId: string,
-    requesterRole: string,
-  ): void {
-    if (requesterRole === ADMIN_ROLE) return;
-    if (flashcard.createdBy !== requesterId) throw new FlashcardAccessDenied();
   }
 }

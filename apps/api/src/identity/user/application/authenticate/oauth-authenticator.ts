@@ -21,10 +21,10 @@ import {
 import { UserSession } from '@/identity/session/domain/user-session';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserSearcher } from '@/identity/user/domain/user-searcher';
+import { type RequestOAuthAuthenticator } from './request-oauth-authenticator';
+import { type ResponseOAuthAuthenticator } from './response-oauth-authenticator';
 
-export type OAuthAuthenticationResponse = {
-  accessToken: string;
-};
+export type { RequestOAuthAuthenticator, ResponseOAuthAuthenticator };
 
 @Injectable()
 export class OAuthAuthenticator {
@@ -34,7 +34,7 @@ export class OAuthAuthenticator {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(NicknameResolver) /* istanbul ignore next */
@@ -46,13 +46,11 @@ export class OAuthAuthenticator {
   ) {}
 
   async execute(
-    email: string,
-    avatarUrl: string | null,
-    displayName: string,
-    deviceId: string,
-    fingerprint: string,
-    ip: string,
-  ): Promise<OAuthAuthenticationResponse> {
+    request: RequestOAuthAuthenticator,
+  ): Promise<ResponseOAuthAuthenticator> {
+    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
+      request;
+
     let user;
     let isNewUser = false;
     user = await this.searcher.search(email);
@@ -83,12 +81,12 @@ export class OAuthAuthenticator {
 
     this.logUserAuthentication(isNewUser, user, email);
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
-      deviceId: deviceId,
-      fingerprint: fingerprint,
-      ip: ip,
+      deviceId,
+      fingerprint,
+      ip,
       roles: [user.role.value],
     });
 

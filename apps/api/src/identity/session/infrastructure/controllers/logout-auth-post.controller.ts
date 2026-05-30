@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
@@ -17,7 +18,10 @@ import { SessionRevoker } from '@/identity/session/application/logout/session-re
 @ApiTags('auth')
 @Controller('auth')
 export class LogoutAuthPostController {
-  constructor(private readonly revoker: SessionRevoker) {}
+  constructor(
+    private readonly revoker: SessionRevoker,
+    private readonly config: ConfigService,
+  ) {}
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
@@ -36,7 +40,7 @@ export class LogoutAuthPostController {
 
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
     });
   }
