@@ -13,13 +13,25 @@ import { type Logger } from '@/shared/domain/logger';
 import { LOGGER_SERVICE } from '@/shared/domain/logger';
 
 const RETRY_DELAYS = [1000, 5000, 10000];
+const RECONNECT_DELAY_MS = 5000;
+
+type ConsumerRegistration = {
+  queueName: string;
+  eventName: string;
+  exchangeName: string;
+  DomainEventClass: new (...args: unknown[]) => DomainEvent;
+  handler: (event: DomainEvent) => Promise<void>;
+};
 
 @Injectable()
 export class AmqpMessageBus
   implements DomainEventPublisher, DomainEventConsumer, OnModuleDestroy
 {
   private model: ChannelModel | null = null;
+  /** Mutex: prevents concurrent connect() calls from creating two connections */
+  private modelPromise: Promise<ChannelModel> | null = null;
   private channel: Channel | null = null;
+  private readonly registeredConsumers: ConsumerRegistration[] = [];
 
   constructor(
     @Inject(LOGGER_SERVICE) private readonly logger: Logger,
@@ -31,6 +43,7 @@ export class AmqpMessageBus
     await this.model?.close().catch(() => undefined);
     this.channel = null;
     this.model = null;
+    this.modelPromise = null;
   }
 
   // ── Setup ────────────────────────────────────────────────────────────────────
@@ -68,6 +81,13 @@ export class AmqpMessageBus
     DomainEventClass: new (...args: unknown[]) => DomainEvent,
     handler: (event: DomainEvent) => Promise<void>,
   ): Promise<void> {
+    this.registeredConsumers.push({
+      queueName,
+      eventName,
+      exchangeName,
+      DomainEventClass,
+      handler,
+    });
     await this.setupQueues(queueName, exchangeName, eventName);
     const ch = await this.getChannel();
     await ch.prefetch(1);
@@ -91,7 +111,7 @@ export class AmqpMessageBus
         } catch (error) {
           try {
             ch.nack(msg, false, false);
-            await this.handleRetry(msg, error as Error);
+            await this.handleRetry(msg, queueName, error as Error);
           } catch {
             // Channel may have been closed during shutdown.
           }
@@ -134,10 +154,13 @@ export class AmqpMessageBus
 
   // ── Retry & DLQ ──────────────────────────────────────────────────────────────
 
-  private async handleRetry(msg: ConsumeMessage, error: Error): Promise<void> {
+  private async handleRetry(
+    msg: ConsumeMessage,
+    queueName: string,
+    error: Error,
+  ): Promise<void> {
     const retryCount =
       (msg.properties.headers?.retries as number | undefined) ?? 0;
-    const queueName = msg.fields.routingKey;
     const content = msg.content;
 
     if (retryCount < RETRY_DELAYS.length) {
@@ -169,16 +192,55 @@ export class AmqpMessageBus
   // ── Connection ────────────────────────────────────────────────────────────────
 
   private async getModel(): Promise<ChannelModel> {
-    if (!this.model) {
+    if (!this.modelPromise) {
       const uri = this.config.getOrThrow<string>('AMQP_URI');
-      this.model = await connect(uri);
-      this.model.on('close', () => {
-        this.logger.warn('AMQP connection closed');
-        this.model = null;
-        this.channel = null;
-      });
+      this.modelPromise = connect(uri)
+        .then((model) => {
+          this.model = model;
+          model.on('close', () => {
+            this.logger.warn('AMQP connection closed — scheduling reconnect');
+            this.model = null;
+            this.modelPromise = null;
+            this.channel = null;
+            setTimeout(() => {
+              void this.reconnect();
+            }, RECONNECT_DELAY_MS);
+          });
+          model.on('error', (err: Error) => {
+            this.logger.error('AMQP connection error', err, {});
+          });
+          return model;
+        })
+        .catch((err: Error) => {
+          this.modelPromise = null;
+          throw err;
+        });
     }
-    return this.model;
+    return this.modelPromise;
+  }
+
+  private async reconnect(): Promise<void> {
+    this.logger.info('AMQP reconnecting…', {});
+    try {
+      await this.getModel();
+      for (const reg of this.registeredConsumers) {
+        await this.consume(
+          reg.queueName,
+          reg.eventName,
+          reg.exchangeName,
+          reg.DomainEventClass,
+          reg.handler,
+        );
+      }
+      this.logger.info('AMQP reconnected and consumers restored', {
+        consumers: this.registeredConsumers.length,
+      });
+    } catch (err) {
+      this.logger.error('AMQP reconnect failed — retrying', err as Error, {});
+      setTimeout(() => {
+        void this.reconnect();
+      }, RECONNECT_DELAY_MS);
+    }
   }
 
   private async getChannel(): Promise<Channel> {
