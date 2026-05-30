@@ -22,12 +22,12 @@ export class TypeOrmUserSessionRepository implements UserSessionRepository {
   ]);
 
   private readonly allowedOperators: ReadonlySet<FilterOperator> = new Set([
-    '=',
-    '!=',
-    '<',
-    '<=',
-    '>',
-    '>=',
+    FilterOperator.EQ,
+    FilterOperator.NEQ,
+    FilterOperator.LT,
+    FilterOperator.LTE,
+    FilterOperator.GT,
+    FilterOperator.GTE,
   ]);
 
   constructor(

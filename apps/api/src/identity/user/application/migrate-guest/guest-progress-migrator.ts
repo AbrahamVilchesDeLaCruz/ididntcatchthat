@@ -17,7 +17,7 @@ export type { RequestGuestProgressMigrator };
 export class GuestProgressMigrator {
   constructor(
     @Inject(GUEST_GAME_MIGRATION_REPOSITORY)
-    private readonly guestGameMigrationRepository: GuestGameMigrationRepository,
+    private readonly repository: GuestGameMigrationRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -29,7 +29,7 @@ export class GuestProgressMigrator {
 
     if (guestGames.length === 0) return;
 
-    await this.guestGameMigrationRepository.migrateGames(userId, guestGames);
+    await this.repository.migrateGames(userId, guestGames);
 
     await this.publisher.publish([
       new GuestProgressMigratedEvent(userId, {

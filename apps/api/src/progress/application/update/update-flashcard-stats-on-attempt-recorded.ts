@@ -9,10 +9,10 @@ import {
   AttemptRecordedEvent,
   type AttemptRecordedAttributes,
 } from '@/gaming/domain/events/attempt-recorded.event';
-import { UpdateFlashcardStats } from './update-flashcard-stats';
+import { FlashcardStatsUpdater } from './flashcard-stats-updater';
 
 @Injectable()
-export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
+export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
   readonly queueName = 'progress.update_flashcard_stats_on_attempt_recorded';
   readonly eventName = 'ididntcatchthat.gaming.attempts.attempt.recorded';
   readonly exchangeName = 'ididntcatchthat.gaming.attempts.attempt.recorded';
@@ -20,7 +20,7 @@ export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly statsUpdater: UpdateFlashcardStats,
+    private readonly updater: FlashcardStatsUpdater,
   ) {
     super(consumer);
   }
@@ -28,7 +28,7 @@ export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as AttemptRecordedAttributes;
     if (attrs.userId === null) return;
-    await this.statsUpdater.execute({
+    await this.updater.execute({
       userId: attrs.userId,
       flashcardId: attrs.flashcardId,
       correct: attrs.correct,

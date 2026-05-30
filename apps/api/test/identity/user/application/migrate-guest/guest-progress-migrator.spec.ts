@@ -26,7 +26,7 @@ const makeGame = (overrides?: { gameId?: string }): GuestGame => ({
 });
 
 describe('identity/application/migrate-guest GuestProgressMigrator', () => {
-  const guestGameMigrationRepository = mock<GuestGameMigrationRepository>();
+  const repository = mock<GuestGameMigrationRepository>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
   let useCase: GuestProgressMigrator;
@@ -38,16 +38,12 @@ describe('identity/application/migrate-guest GuestProgressMigrator', () => {
   };
 
   beforeEach(() => {
-    guestGameMigrationRepository.migrateGames.mockReset();
+    repository.migrateGames.mockReset();
     publisher.publish.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    guestGameMigrationRepository.migrateGames.mockResolvedValue(undefined);
+    repository.migrateGames.mockResolvedValue(undefined);
 
-    useCase = new GuestProgressMigrator(
-      guestGameMigrationRepository,
-      publisher,
-      logger,
-    );
+    useCase = new GuestProgressMigrator(repository, publisher, logger);
   });
 
   it('should migrate games and emit GuestProgressMigratedEvent', async () => {
@@ -55,10 +51,7 @@ describe('identity/application/migrate-guest GuestProgressMigrator', () => {
 
     await useCase.execute({ ...params, guestGames: games });
 
-    expect(guestGameMigrationRepository.migrateGames).toHaveBeenCalledWith(
-      params.userId,
-      games,
-    );
+    expect(repository.migrateGames).toHaveBeenCalledWith(params.userId, games);
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(GuestProgressMigratedEvent);
@@ -67,7 +60,7 @@ describe('identity/application/migrate-guest GuestProgressMigrator', () => {
   it('should do nothing when guestGames is empty', async () => {
     await useCase.execute({ ...params, guestGames: [] });
 
-    expect(guestGameMigrationRepository.migrateGames).not.toHaveBeenCalled();
+    expect(repository.migrateGames).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 

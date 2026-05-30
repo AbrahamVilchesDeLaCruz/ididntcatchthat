@@ -16,7 +16,7 @@ export type { RequestGameResumer, ResponseGameResumer };
 export class GameResumer {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -24,7 +24,7 @@ export class GameResumer {
   async execute(request: RequestGameResumer): Promise<ResponseGameResumer> {
     const { gameId, userId } = request;
 
-    const game = await this.gameRepository.search(new GameId(gameId));
+    const game = await this.repository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
     if (game.userId !== userId) {
@@ -32,7 +32,7 @@ export class GameResumer {
     }
 
     game.resume();
-    await this.gameRepository.save(game);
+    await this.repository.save(game);
 
     this.logger.info('Game resumed', { gameId, userId });
 

@@ -1,25 +1,25 @@
-import { type RequestImportGuestProgress } from '@/progress/application/import/import-guest-progress';
+import { type RequestGuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { type ProcessedEventsRepository } from '@/shared/domain/processed-events.repository';
 import { type GuestAttemptRepository } from '@/progress/domain/guest-attempt.repository';
-import { ImportGuestProgress } from '@/progress/application/import/import-guest-progress';
+import { GuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
-describe('progress/application/import ImportGuestProgress', () => {
+describe('progress/application/import GuestProgressImporter', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
   const processedRepository = mock<ProcessedEventsRepository>();
   const guestAttemptRepository = mock<GuestAttemptRepository>();
   const logger = mock<Logger>();
-  let importer: ImportGuestProgress;
+  let importer: GuestProgressImporter;
 
   const makeRequest = (
     eventId = UuidMother.random(),
-  ): RequestImportGuestProgress => ({
+  ): RequestGuestProgressImporter => ({
     eventId,
     userId: ProgressUserIdMother.random().value,
     guestDeviceId: UuidMother.random(),
@@ -33,7 +33,7 @@ describe('progress/application/import ImportGuestProgress', () => {
     guestAttemptRepository.findByDeviceId.mockReset();
     statsRepository.save.mockResolvedValue(undefined);
     processedRepository.save.mockResolvedValue(undefined);
-    importer = new ImportGuestProgress(
+    importer = new GuestProgressImporter(
       statsRepository,
       processedRepository,
       guestAttemptRepository,

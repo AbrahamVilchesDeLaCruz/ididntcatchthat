@@ -1,15 +1,15 @@
 import { mock } from 'jest-mock-extended';
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
-import { type UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
-import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
+import { type FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
+import { FlashcardStatsUpdaterOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
 import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
 
-describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', () => {
+describe('progress/application/update FlashcardStatsUpdaterOnAttemptRecorded', () => {
   const consumer = mock<DomainEventConsumer>();
-  const statsUpdater = mock<UpdateFlashcardStats>();
-  let subscriber: UpdateFlashcardStatsOnAttemptRecorded;
+  const updater = mock<FlashcardStatsUpdater>();
+  let subscriber: FlashcardStatsUpdaterOnAttemptRecorded;
 
   const makeEvent = (overrides?: {
     userId?: string | null;
@@ -30,18 +30,15 @@ describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', ()
   };
 
   beforeEach(() => {
-    statsUpdater.execute.mockReset();
-    statsUpdater.execute.mockResolvedValue(undefined);
-    subscriber = new UpdateFlashcardStatsOnAttemptRecorded(
-      consumer,
-      statsUpdater,
-    );
+    updater.execute.mockReset();
+    updater.execute.mockResolvedValue(undefined);
+    subscriber = new FlashcardStatsUpdaterOnAttemptRecorded(consumer, updater);
   });
 
   it('should skip when userId is null (guest)', async () => {
     await subscriber.on(makeEvent({ userId: null }));
 
-    expect(statsUpdater.execute).not.toHaveBeenCalled();
+    expect(updater.execute).not.toHaveBeenCalled();
   });
 
   it('should delegate to use case with event attributes', async () => {
@@ -58,7 +55,7 @@ describe('progress/application/update UpdateFlashcardStatsOnAttemptRecorded', ()
 
     await subscriber.on(event);
 
-    expect(statsUpdater.execute).toHaveBeenCalledWith({
+    expect(updater.execute).toHaveBeenCalledWith({
       userId,
       flashcardId,
       correct: true,

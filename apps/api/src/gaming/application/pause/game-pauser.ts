@@ -15,7 +15,7 @@ export type { RequestGamePauser };
 export class GamePauser {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -23,7 +23,7 @@ export class GamePauser {
   async execute(request: RequestGamePauser): Promise<void> {
     const { gameId, userId, lastFlashcardId } = request;
 
-    const game = await this.gameRepository.search(new GameId(gameId));
+    const game = await this.repository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
     if (game.userId !== userId) {
@@ -31,7 +31,7 @@ export class GamePauser {
     }
 
     game.pause(lastFlashcardId);
-    await this.gameRepository.save(game);
+    await this.repository.save(game);
 
     this.logger.info('Game paused', { gameId, userId, lastFlashcardId });
   }

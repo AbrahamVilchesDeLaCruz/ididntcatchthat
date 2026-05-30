@@ -32,9 +32,9 @@ export class UserAuthenticator {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(PASSWORD_HASHER)
-    private readonly passwordHasher: PasswordHasher,
+    private readonly hasher: PasswordHasher,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -54,17 +54,14 @@ export class UserAuthenticator {
 
     if (!user.passwordHash) throw new InvalidCredentialsException();
 
-    const valid = await this.passwordHasher.compare(
-      password,
-      user.passwordHash.value,
-    );
+    const valid = await this.hasher.compare(password, user.passwordHash.value);
 
     if (!valid) {
       this.logger.warn('Failed login attempt — bad password', { email });
       throw new InvalidCredentialsException();
     }
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId,

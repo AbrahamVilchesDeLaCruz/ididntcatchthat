@@ -1,26 +1,26 @@
-import { type RequestUpdateModuleProgress } from '@/progress/application/update/update-module-progress';
+import { type RequestModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { type ModuleProgressRepository } from '@/progress/domain/module-progress.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
-import { UpdateModuleProgress } from '@/progress/application/update/update-module-progress';
+import { ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
 import { ModuleProgressMother } from '@test/progress/domain/module-progress-mother';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
 
-describe('progress/application/update UpdateModuleProgress', () => {
+describe('progress/application/update ModuleProgressUpdater', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
   const moduleRepository = mock<ModuleProgressRepository>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
-  let updater: UpdateModuleProgress;
+  let updater: ModuleProgressUpdater;
 
   const makeRequest = (overrides?: {
     userId?: string;
     module?: string;
-  }): RequestUpdateModuleProgress => ({
+  }): RequestModuleProgressUpdater => ({
     userId: overrides?.userId ?? ProgressUserIdMother.random().value,
     module: overrides?.module ?? 'native_sounds',
   });
@@ -32,7 +32,7 @@ describe('progress/application/update UpdateModuleProgress', () => {
     publisher.publish.mockReset();
     moduleRepository.save.mockResolvedValue(undefined);
     publisher.publish.mockResolvedValue(undefined);
-    updater = new UpdateModuleProgress(
+    updater = new ModuleProgressUpdater(
       statsRepository,
       moduleRepository,
       publisher,

@@ -32,7 +32,7 @@ export class TokenRefresher {
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -82,7 +82,7 @@ export class TokenRefresher {
     const revokedSession = session.revoke();
     await this.sessionRepository.save(revokedSession);
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId,

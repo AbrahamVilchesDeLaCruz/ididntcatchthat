@@ -1,4 +1,4 @@
-export type RequestUpdateModuleProgress = {
+export type RequestModuleProgressUpdater = {
   userId: string;
   module: string;
 };

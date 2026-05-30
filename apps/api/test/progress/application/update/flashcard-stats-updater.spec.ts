@@ -1,21 +1,21 @@
-import { type RequestUpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
+import { type RequestFlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
-import { UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
+import { FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
 
-describe('progress/application/update UpdateFlashcardStats', () => {
+describe('progress/application/update FlashcardStatsUpdater', () => {
   const repository = mock<UserFlashcardStatsRepository>();
   const logger = mock<Logger>();
-  let updater: UpdateFlashcardStats;
+  let updater: FlashcardStatsUpdater;
 
   const makeRequest = (overrides?: {
     mode?: string;
     correct?: boolean;
-  }): RequestUpdateFlashcardStats => ({
+  }): RequestFlashcardStatsUpdater => ({
     userId: ProgressUserIdMother.random().value,
     flashcardId: ProgressFlashcardIdMother.random().value,
     correct: overrides?.correct ?? true,
@@ -26,7 +26,7 @@ describe('progress/application/update UpdateFlashcardStats', () => {
     repository.search.mockReset();
     repository.save.mockReset();
     repository.save.mockResolvedValue(undefined);
-    updater = new UpdateFlashcardStats(repository, logger);
+    updater = new FlashcardStatsUpdater(repository, logger);
   });
 
   it('should create and save new stats when none exist', async () => {

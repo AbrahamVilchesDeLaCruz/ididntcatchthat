@@ -15,14 +15,14 @@ import { UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
-import { type RequestImportGuestProgress } from './request-import-guest-progress';
+import { type RequestGuestProgressImporter } from './request-import-guest-progress';
 
-export type { RequestImportGuestProgress };
+export type { RequestGuestProgressImporter };
 
-const USE_CASE_NAME = 'ImportGuestProgress';
+const USE_CASE_NAME = 'GuestProgressImporter';
 
 @Injectable()
-export class ImportGuestProgress {
+export class GuestProgressImporter {
   constructor(
     @Inject(USER_FLASHCARD_STATS_REPOSITORY)
     private readonly statsRepository: UserFlashcardStatsRepository,
@@ -38,7 +38,7 @@ export class ImportGuestProgress {
     eventId,
     userId,
     guestDeviceId,
-  }: RequestImportGuestProgress): Promise<void> {
+  }: RequestGuestProgressImporter): Promise<void> {
     const alreadyProcessed = await this.processedRepository.exists(
       eventId,
       USE_CASE_NAME,

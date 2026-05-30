@@ -31,14 +31,14 @@ import { type Subscriber } from '@/shared/application/subscriber';
 // Application — use cases
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
-import { UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
-import { UpdateModuleProgress } from '@/progress/application/update/update-module-progress';
-import { ImportGuestProgress } from '@/progress/application/import/import-guest-progress';
+import { FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
+import { ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
+import { GuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 
 // Application — event subscribers
-import { UpdateFlashcardStatsOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
-import { UpdateModuleProgressOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
-import { ImportGuestProgressOnGuestProgressMigrated } from '@/progress/application/import/import-guest-progress-on-guest-progress-migrated';
+import { FlashcardStatsUpdaterOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
+import { ModuleProgressUpdaterOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
+import { GuestProgressImporterOnGuestProgressMigrated } from '@/progress/application/import/import-guest-progress-on-guest-progress-migrated';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -80,25 +80,25 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     // Use cases
     ModuleProgressFinder,
     WeakestFlashcardSearcher,
-    UpdateFlashcardStats,
-    UpdateModuleProgress,
-    ImportGuestProgress,
+    FlashcardStatsUpdater,
+    ModuleProgressUpdater,
+    GuestProgressImporter,
 
     // Event subscribers
-    UpdateFlashcardStatsOnAttemptRecorded,
-    UpdateModuleProgressOnGameCompleted,
-    ImportGuestProgressOnGuestProgressMigrated,
+    FlashcardStatsUpdaterOnAttemptRecorded,
+    ModuleProgressUpdaterOnGameCompleted,
+    GuestProgressImporterOnGuestProgressMigrated,
     {
       provide: SUBSCRIBERS,
       useFactory: (
-        s1: UpdateFlashcardStatsOnAttemptRecorded,
-        s2: UpdateModuleProgressOnGameCompleted,
-        s3: ImportGuestProgressOnGuestProgressMigrated,
+        s1: FlashcardStatsUpdaterOnAttemptRecorded,
+        s2: ModuleProgressUpdaterOnGameCompleted,
+        s3: GuestProgressImporterOnGuestProgressMigrated,
       ): Subscriber[] => [s1, s2, s3],
       inject: [
-        UpdateFlashcardStatsOnAttemptRecorded,
-        UpdateModuleProgressOnGameCompleted,
-        ImportGuestProgressOnGuestProgressMigrated,
+        FlashcardStatsUpdaterOnAttemptRecorded,
+        ModuleProgressUpdaterOnGameCompleted,
+        GuestProgressImporterOnGuestProgressMigrated,
       ],
     },
     SubscribersBootstrapper,

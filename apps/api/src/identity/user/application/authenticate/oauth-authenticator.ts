@@ -34,7 +34,7 @@ export class OAuthAuthenticator {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(NicknameResolver) /* istanbul ignore next */
@@ -81,7 +81,7 @@ export class OAuthAuthenticator {
 
     this.logUserAuthentication(isNewUser, user, email);
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId,

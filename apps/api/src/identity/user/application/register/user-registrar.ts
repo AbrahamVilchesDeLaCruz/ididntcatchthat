@@ -38,9 +38,9 @@ export class UserRegistrar {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(PASSWORD_HASHER)
-    private readonly passwordHasher: PasswordHasher,
+    private readonly hasher: PasswordHasher,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -68,7 +68,7 @@ export class UserRegistrar {
     if (byNickname.length > 0)
       throw new NicknameAlreadyTakenException(nickname);
 
-    const passwordHash = await this.passwordHasher.hash(password);
+    const passwordHash = await this.hasher.hash(password);
 
     const user = User.register(
       id,
@@ -80,7 +80,7 @@ export class UserRegistrar {
       null,
     );
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
       deviceId,

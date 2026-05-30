@@ -18,7 +18,7 @@ import { RequestTokenRefresherMother } from './request-token-refresher-mother';
 describe('identity/application/refresh TokenRefresher', () => {
   const sessionRepository = mock<UserSessionRepository>();
   const userRepository = mock<UserRepository>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: TokenRefresher;
 
@@ -29,9 +29,9 @@ describe('identity/application/refresh TokenRefresher', () => {
     sessionRepository.match.mockReset();
     sessionRepository.save.mockReset();
     userRepository.search.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    generator.generatePair.mockReset();
 
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -39,7 +39,7 @@ describe('identity/application/refresh TokenRefresher', () => {
     useCase = new TokenRefresher(
       sessionRepository,
       userRepository,
-      tokenGenerator,
+      generator,
       logger,
     );
   });
@@ -53,7 +53,7 @@ describe('identity/application/refresh TokenRefresher', () => {
 
     sessionRepository.match.mockResolvedValueOnce([session]);
     userRepository.search.mockResolvedValueOnce(user);
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: expectedRefreshTokenId,
     });

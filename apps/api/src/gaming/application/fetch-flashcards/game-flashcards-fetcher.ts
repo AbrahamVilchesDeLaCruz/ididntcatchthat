@@ -18,7 +18,7 @@ export type { RequestGameFlashcardsFetcher };
 export class GameFlashcardsFetcher {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(GAME_FLASHCARD_QUERY)
     private readonly flashcardQuery: GameFlashcardQuery,
   ) {}
@@ -28,7 +28,7 @@ export class GameFlashcardsFetcher {
   ): Promise<GameFlashcardDto[]> {
     const { gameId } = request;
 
-    const game = await this.gameRepository.search(new GameId(gameId));
+    const game = await this.repository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
     return this.flashcardQuery.findByGameId(gameId);

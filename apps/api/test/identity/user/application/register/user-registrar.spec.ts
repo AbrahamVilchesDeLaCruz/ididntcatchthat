@@ -20,8 +20,8 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/register UserRegistrar', () => {
   const userRepository = mock<UserRepository>();
   const sessionRepository = mock<UserSessionRepository>();
-  const passwordHasher = mock<PasswordHasher>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const hasher = mock<PasswordHasher>();
+  const generator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
   let useCase: UserRegistrar;
@@ -31,14 +31,14 @@ describe('identity/application/register UserRegistrar', () => {
     userRepository.match.mockReset();
     userRepository.save.mockReset();
     sessionRepository.save.mockReset();
-    passwordHasher.hash.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    hasher.hash.mockReset();
+    generator.generatePair.mockReset();
     publisher.publish.mockReset();
 
     // defaults: no conflicts
     userRepository.match.mockResolvedValue([]);
-    passwordHasher.hash.mockResolvedValue('hashed-password');
-    tokenGenerator.generatePair.mockReturnValue({
+    hasher.hash.mockResolvedValue('hashed-password');
+    generator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -47,8 +47,8 @@ describe('identity/application/register UserRegistrar', () => {
     useCase = new UserRegistrar(
       userRepository,
       sessionRepository,
-      passwordHasher,
-      tokenGenerator,
+      hasher,
+      generator,
       publisher,
       logger,
     );
@@ -74,7 +74,7 @@ describe('identity/application/register UserRegistrar', () => {
 
     await useCase.execute(request);
 
-    expect(passwordHasher.hash).toHaveBeenCalledWith(request.password);
+    expect(hasher.hash).toHaveBeenCalledWith(request.password);
     const savedUser: User = userRepository.save.mock.calls[0][0];
     expect(savedUser.passwordHash?.value).toBe('hashed-password');
   });

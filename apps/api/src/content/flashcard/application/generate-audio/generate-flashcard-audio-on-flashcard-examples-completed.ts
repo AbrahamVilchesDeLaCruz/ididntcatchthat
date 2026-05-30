@@ -18,12 +18,12 @@ export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Subscrib
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly audioGenerator: FlashcardAudioGenerator,
+    private readonly generator: FlashcardAudioGenerator,
   ) {
     super(consumer);
   }
 
   async on(event: DomainEvent): Promise<void> {
-    await this.audioGenerator.execute({ flashcardId: event.aggregateId });
+    await this.generator.execute({ flashcardId: event.aggregateId });
   }
 }

@@ -10,14 +10,14 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
-  const gameRepository = mock<GameRepository>();
+  const repository = mock<GameRepository>();
   const flashcardQuery = mock<GameFlashcardQuery>();
   let fetcher: GameFlashcardsFetcher;
 
   beforeEach(() => {
-    gameRepository.search.mockReset();
+    repository.search.mockReset();
     flashcardQuery.findByGameId.mockReset();
-    fetcher = new GameFlashcardsFetcher(gameRepository, flashcardQuery);
+    fetcher = new GameFlashcardsFetcher(repository, flashcardQuery);
   });
 
   it('should return flashcards for a valid game', async () => {
@@ -38,7 +38,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
       },
     ];
 
-    gameRepository.search.mockResolvedValueOnce(game);
+    repository.search.mockResolvedValueOnce(game);
     flashcardQuery.findByGameId.mockResolvedValueOnce(flashcards);
 
     const result = await fetcher.execute({ gameId });
@@ -49,7 +49,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
 
   it('should throw GameNotFound when game does not exist', async () => {
     const gameId = UuidMother.random();
-    gameRepository.search.mockResolvedValueOnce(null);
+    repository.search.mockResolvedValueOnce(null);
 
     await expect(fetcher.execute({ gameId })).rejects.toThrow(GameNotFound);
     expect(flashcardQuery.findByGameId).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('gaming/application/fetch-flashcards GameFlashcardsFetcher', () => {
     const gameId = UuidMother.random();
     const game = GameMother.random();
 
-    gameRepository.search.mockResolvedValueOnce(game);
+    repository.search.mockResolvedValueOnce(game);
     flashcardQuery.findByGameId.mockResolvedValueOnce([]);
 
     const result = await fetcher.execute({ gameId });

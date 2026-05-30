@@ -26,7 +26,7 @@ export class AiExamplesCompleter {
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_EXAMPLE_GENERATOR)
-    private readonly aiExampleGenerator: AiExampleGenerator,
+    private readonly generator: AiExampleGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -43,7 +43,7 @@ export class AiExamplesCompleter {
     const newExamples =
       missing > 0
         ? (
-            await this.aiExampleGenerator.generate(
+            await this.generator.generate(
               flashcard.expression.value,
               flashcard.category.value,
             )

@@ -7,12 +7,12 @@ import { UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
-import { type RequestUpdateFlashcardStats } from './request-update-flashcard-stats';
+import { type RequestFlashcardStatsUpdater } from './request-update-flashcard-stats';
 
-export type { RequestUpdateFlashcardStats };
+export type { RequestFlashcardStatsUpdater };
 
 @Injectable()
-export class UpdateFlashcardStats {
+export class FlashcardStatsUpdater {
   constructor(
     @Inject(USER_FLASHCARD_STATS_REPOSITORY)
     private readonly repository: UserFlashcardStatsRepository,
@@ -25,7 +25,7 @@ export class UpdateFlashcardStats {
     flashcardId,
     correct,
     mode,
-  }: RequestUpdateFlashcardStats): Promise<void> {
+  }: RequestFlashcardStatsUpdater): Promise<void> {
     const uid = new UserId(userId);
     const fid = new FlashcardId(flashcardId);
 

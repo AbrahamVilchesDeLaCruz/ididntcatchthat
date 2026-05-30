@@ -1,4 +1,4 @@
-export type RequestUpdateFlashcardStats = {
+export type RequestFlashcardStatsUpdater = {
   userId: string;
   flashcardId: string;
   correct: boolean;

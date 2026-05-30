@@ -15,7 +15,7 @@ import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-m
 describe('content/flashcard/application/complete-examples AiExamplesCompleter', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
-  const aiExampleGenerator = mock<AiExampleGenerator>();
+  const generator = mock<AiExampleGenerator>();
   const logger = mock<Logger>();
   let completer: AiExamplesCompleter;
 
@@ -23,7 +23,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     repository.search.mockReset();
     repository.save.mockReset();
     publisher.publish.mockReset();
-    aiExampleGenerator.generate.mockReset();
+    generator.generate.mockReset();
 
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
@@ -31,7 +31,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     completer = new AiExamplesCompleter(
       repository,
       publisher,
-      aiExampleGenerator,
+      generator,
       logger,
     );
   });
@@ -45,7 +45,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
     ];
-    aiExampleGenerator.generate.mockResolvedValue(generated);
+    generator.generate.mockResolvedValue(generated);
 
     await completer.execute(
       RequestAiExamplesCompleterMother.random({
@@ -53,7 +53,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       }),
     );
 
-    expect(aiExampleGenerator.generate).toHaveBeenCalledWith(
+    expect(generator.generate).toHaveBeenCalledWith(
       flashcard.expression.value,
       flashcard.category.value,
     );
@@ -76,7 +76,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
     ];
-    aiExampleGenerator.generate.mockResolvedValue(generated);
+    generator.generate.mockResolvedValue(generated);
 
     await completer.execute(
       RequestAiExamplesCompleterMother.random({
@@ -107,7 +107,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       }),
     );
 
-    expect(aiExampleGenerator.generate).not.toHaveBeenCalled();
+    expect(generator.generate).not.toHaveBeenCalled();
     expect(repository.save).toHaveBeenCalled();
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(FlashcardExamplesCompletedEvent);
@@ -118,7 +118,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
 
     await completer.execute(RequestAiExamplesCompleterMother.random());
 
-    expect(aiExampleGenerator.generate).not.toHaveBeenCalled();
+    expect(generator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });

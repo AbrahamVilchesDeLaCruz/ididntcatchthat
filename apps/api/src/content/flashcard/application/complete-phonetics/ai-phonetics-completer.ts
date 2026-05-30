@@ -25,7 +25,7 @@ export class AiPhoneticsCompleter {
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_PHONETICS_GENERATOR)
-    private readonly aiPhoneticsGenerator: AiPhoneticsGenerator,
+    private readonly generator: AiPhoneticsGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -38,8 +38,9 @@ export class AiPhoneticsCompleter {
     );
     if (!flashcard) return;
 
-    const { ipaNotation, nativeSpeech } =
-      await this.aiPhoneticsGenerator.generate(flashcard.expression.value);
+    const { ipaNotation, nativeSpeech } = await this.generator.generate(
+      flashcard.expression.value,
+    );
 
     flashcard.completePhonetics(ipaNotation, nativeSpeech);
 

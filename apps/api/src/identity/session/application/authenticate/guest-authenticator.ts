@@ -18,9 +18,9 @@ export type { RequestGuestAuthenticator, ResponseGuestAuthenticator };
 export class GuestAuthenticator {
   constructor(
     @Inject(USER_SESSION_REPOSITORY)
-    private readonly sessionRepository: UserSessionRepository,
+    private readonly repository: UserSessionRepository,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -31,7 +31,7 @@ export class GuestAuthenticator {
     const { fingerprint, ip } = request;
     const deviceId = crypto.randomUUID();
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generateGuest({
+    const { accessToken, refreshTokenId } = this.generator.generateGuest({
       deviceId,
       fingerprint,
       ip,
@@ -44,7 +44,7 @@ export class GuestAuthenticator {
       fingerprint,
     );
 
-    await this.sessionRepository.save(session);
+    await this.repository.save(session);
 
     this.logger.info('Guest authenticated', { deviceId });
 

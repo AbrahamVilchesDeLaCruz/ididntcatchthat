@@ -43,7 +43,10 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
       subcategory: request.subcategory,
       ipaNotation: request.ipaNotation,
       nativeSpeech: request.nativeSpeech,
-      examples: request.examples,
+      examples: request.examples.map((e) => ({
+        ...e,
+        flashcardId: request.id,
+      })),
       createdBy: request.createdBy,
     });
 

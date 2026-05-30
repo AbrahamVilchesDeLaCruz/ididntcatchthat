@@ -16,12 +16,12 @@ import { ModuleName } from '@/progress/domain/module-name';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
-import { type RequestUpdateModuleProgress } from './request-update-module-progress';
+import { type RequestModuleProgressUpdater } from './request-update-module-progress';
 
-export type { RequestUpdateModuleProgress };
+export type { RequestModuleProgressUpdater };
 
 @Injectable()
-export class UpdateModuleProgress {
+export class ModuleProgressUpdater {
   constructor(
     @Inject(USER_FLASHCARD_STATS_REPOSITORY)
     private readonly statsRepository: UserFlashcardStatsRepository,
@@ -36,7 +36,7 @@ export class UpdateModuleProgress {
   async execute({
     userId,
     module,
-  }: RequestUpdateModuleProgress): Promise<void> {
+  }: RequestModuleProgressUpdater): Promise<void> {
     const uid = new UserId(userId);
     const mod = ModuleName.create(module);
 

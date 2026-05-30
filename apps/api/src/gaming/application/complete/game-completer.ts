@@ -20,7 +20,7 @@ export type { RequestGameCompleter, ResponseGameCompleter };
 export class GameCompleter {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -30,7 +30,7 @@ export class GameCompleter {
   async execute(request: RequestGameCompleter): Promise<ResponseGameCompleter> {
     const { gameId, userId } = request;
 
-    const game = await this.gameRepository.search(new GameId(gameId));
+    const game = await this.repository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
     if (game.userId !== userId) {
@@ -39,7 +39,7 @@ export class GameCompleter {
 
     game.complete();
 
-    await this.gameRepository.save(game);
+    await this.repository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
 
     const stats = game.completionStats();
@@ -47,7 +47,7 @@ export class GameCompleter {
     this.logger.info('Game completed', {
       gameId,
       userId,
-      totalAttempts: stats.totalAttempts,
+      totalCount: stats.totalCount,
       correctCount: stats.correctCount,
     });
 

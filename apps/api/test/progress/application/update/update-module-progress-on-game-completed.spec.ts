@@ -1,14 +1,14 @@
 import { mock } from 'jest-mock-extended';
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
-import { type UpdateModuleProgress } from '@/progress/application/update/update-module-progress';
-import { UpdateModuleProgressOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
+import { type ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
+import { ModuleProgressUpdaterOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
 import { GameCompletedEvent } from '@/gaming/domain/events/game-completed.event';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 
-describe('progress/application/update UpdateModuleProgressOnGameCompleted', () => {
+describe('progress/application/update ModuleProgressUpdaterOnGameCompleted', () => {
   const consumer = mock<DomainEventConsumer>();
-  const progressUpdater = mock<UpdateModuleProgress>();
-  let subscriber: UpdateModuleProgressOnGameCompleted;
+  const updater = mock<ModuleProgressUpdater>();
+  let subscriber: ModuleProgressUpdaterOnGameCompleted;
 
   const makeEvent = (overrides?: {
     userId?: string | null;
@@ -30,24 +30,21 @@ describe('progress/application/update UpdateModuleProgressOnGameCompleted', () =
   };
 
   beforeEach(() => {
-    progressUpdater.execute.mockReset();
-    progressUpdater.execute.mockResolvedValue(undefined);
-    subscriber = new UpdateModuleProgressOnGameCompleted(
-      consumer,
-      progressUpdater,
-    );
+    updater.execute.mockReset();
+    updater.execute.mockResolvedValue(undefined);
+    subscriber = new ModuleProgressUpdaterOnGameCompleted(consumer, updater);
   });
 
   it('should skip when module is null (random game)', async () => {
     await subscriber.on(makeEvent({ module: null }));
 
-    expect(progressUpdater.execute).not.toHaveBeenCalled();
+    expect(updater.execute).not.toHaveBeenCalled();
   });
 
   it('should skip when userId is null (guest game)', async () => {
     await subscriber.on(makeEvent({ userId: null, module: 'native_sounds' }));
 
-    expect(progressUpdater.execute).not.toHaveBeenCalled();
+    expect(updater.execute).not.toHaveBeenCalled();
   });
 
   it('should delegate to use case with userId and module', async () => {
@@ -55,7 +52,7 @@ describe('progress/application/update UpdateModuleProgressOnGameCompleted', () =
 
     await subscriber.on(makeEvent({ userId, module: 'native_sounds' }));
 
-    expect(progressUpdater.execute).toHaveBeenCalledWith({
+    expect(updater.execute).toHaveBeenCalledWith({
       userId,
       module: 'native_sounds',
     });

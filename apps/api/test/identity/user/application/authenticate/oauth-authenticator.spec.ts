@@ -19,7 +19,7 @@ import { RequestOAuthAuthenticatorMother } from './request-oauth-authenticator-m
 describe('identity/application/google OAuthAuthenticator', () => {
   const userRepository = mock<UserRepository>();
   const sessionRepository = mock<UserSessionRepository>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const generator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const nicknameResolver = mock<NicknameResolver>();
   const logger = mock<Logger>();
@@ -30,12 +30,12 @@ describe('identity/application/google OAuthAuthenticator', () => {
     JestTimers.setup();
     userRepository.save.mockReset();
     sessionRepository.save.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    generator.generatePair.mockReset();
     publisher.publish.mockReset();
     nicknameResolver.resolve.mockReset();
     searcher.search.mockReset();
 
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -45,7 +45,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
     authenticator = new OAuthAuthenticator(
       userRepository,
       sessionRepository,
-      tokenGenerator,
+      generator,
       publisher,
       nicknameResolver,
       logger,

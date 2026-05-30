@@ -13,7 +13,7 @@ export type { RequestPausedGamesLister };
 export class PausedGamesLister {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
   ) {}
 
   async execute(request: RequestPausedGamesLister): Promise<GamePrimitives[]> {
@@ -23,7 +23,7 @@ export class PausedGamesLister {
       { field: 'userId', operator: FilterOperator.EQ, value: userId },
       { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
     ]);
-    const games = await this.gameRepository.match(criteria);
+    const games = await this.repository.match(criteria);
     return games.map((g) => g.toPrimitives());
   }
 }

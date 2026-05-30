@@ -13,7 +13,7 @@ import { RequestAiPhoneticsCompleterMother } from './request-ai-phonetics-comple
 describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
-  const aiPhoneticsGenerator = mock<AiPhoneticsGenerator>();
+  const generator = mock<AiPhoneticsGenerator>();
   const logger = mock<Logger>();
   let completer: AiPhoneticsCompleter;
 
@@ -21,7 +21,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
     repository.search.mockReset();
     repository.save.mockReset();
     publisher.publish.mockReset();
-    aiPhoneticsGenerator.generate.mockReset();
+    generator.generate.mockReset();
 
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
@@ -29,7 +29,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
     completer = new AiPhoneticsCompleter(
       repository,
       publisher,
-      aiPhoneticsGenerator,
+      generator,
       logger,
     );
   });
@@ -42,7 +42,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
       ipaNotation: StringMother.random(),
       nativeSpeech: StringMother.sentence(),
     };
-    aiPhoneticsGenerator.generate.mockResolvedValue(draft);
+    generator.generate.mockResolvedValue(draft);
 
     await completer.execute(
       RequestAiPhoneticsCompleterMother.random({
@@ -50,9 +50,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
       }),
     );
 
-    expect(aiPhoneticsGenerator.generate).toHaveBeenCalledWith(
-      flashcard.expression.value,
-    );
+    expect(generator.generate).toHaveBeenCalledWith(flashcard.expression.value);
     expect(repository.save).toHaveBeenCalled();
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(FlashcardPhoneticsCompletedEvent);
@@ -67,7 +65,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
 
     await completer.execute(RequestAiPhoneticsCompleterMother.random());
 
-    expect(aiPhoneticsGenerator.generate).not.toHaveBeenCalled();
+    expect(generator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });

@@ -51,7 +51,7 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
       id,
       tokenId,
       ownerId,
-      'user',
+      OwnerType.User,
       deviceId,
       fingerprint,
       expiresAt,
@@ -82,7 +82,7 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
       id,
       tokenId,
       deviceId, // guest ownerId === deviceId — explícito, no null
-      'guest',
+      OwnerType.Guest,
       deviceId,
       fingerprint,
       expiresAt,

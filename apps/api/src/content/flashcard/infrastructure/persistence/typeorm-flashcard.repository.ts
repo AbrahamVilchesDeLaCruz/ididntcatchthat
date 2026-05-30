@@ -23,14 +23,13 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
   ]);
 
   private readonly allowedOperators: ReadonlySet<FilterOperator> = new Set([
-    '=',
-    '!=',
-    '<',
-    '<=',
-    '>',
-    '>=',
-    'LIKE',
-    'ILIKE',
+    FilterOperator.EQ,
+    FilterOperator.NEQ,
+    FilterOperator.LT,
+    FilterOperator.LTE,
+    FilterOperator.GT,
+    FilterOperator.GTE,
+    FilterOperator.LIKE,
   ]);
 
   constructor(

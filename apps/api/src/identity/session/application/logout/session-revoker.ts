@@ -13,7 +13,7 @@ export type { RequestSessionRevoker };
 export class SessionRevoker {
   constructor(
     @Inject(USER_SESSION_REPOSITORY)
-    private readonly sessionRepository: UserSessionRepository,
+    private readonly repository: UserSessionRepository,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -21,7 +21,7 @@ export class SessionRevoker {
   async execute(request: RequestSessionRevoker): Promise<void> {
     const { tokenId, userId } = request;
 
-    const [session] = await this.sessionRepository.match(
+    const [session] = await this.repository.match(
       new Criteria([
         { field: 'tokenId', operator: FilterOperator.EQ, value: tokenId },
       ]),
@@ -29,7 +29,7 @@ export class SessionRevoker {
 
     if (!session || session.isRevoked()) return; // idempotent
 
-    await this.sessionRepository.save(session.revoke());
+    await this.repository.save(session.revoke());
 
     this.logger.info('User logged out', {
       userId: userId ?? session.ownerId,
