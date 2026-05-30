@@ -1,5 +1,6 @@
 import { type RequestUpdateModuleProgress } from '@/progress/application/update/update-module-progress';
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { type ModuleProgressRepository } from '@/progress/domain/module-progress.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -13,7 +14,8 @@ describe('progress/application/update UpdateModuleProgress', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
   const moduleRepository = mock<ModuleProgressRepository>();
   const publisher = mock<DomainEventPublisher>();
-  let useCase: UpdateModuleProgress;
+  const logger = mock<Logger>();
+  let updater: UpdateModuleProgress;
 
   const makeRequest = (overrides?: {
     userId?: string;
@@ -30,10 +32,11 @@ describe('progress/application/update UpdateModuleProgress', () => {
     publisher.publish.mockReset();
     moduleRepository.save.mockResolvedValue(undefined);
     publisher.publish.mockResolvedValue(undefined);
-    useCase = new UpdateModuleProgress(
+    updater = new UpdateModuleProgress(
       statsRepository,
       moduleRepository,
       publisher,
+      logger,
     );
   });
 
@@ -43,7 +46,7 @@ describe('progress/application/update UpdateModuleProgress', () => {
     ]);
     moduleRepository.findByModule.mockResolvedValue(null);
 
-    await useCase.execute(makeRequest());
+    await updater.execute(makeRequest());
 
     expect(moduleRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).not.toHaveBeenCalled();
@@ -59,7 +62,7 @@ describe('progress/application/update UpdateModuleProgress', () => {
     const existing = ModuleProgressMother.random({ userId, masteryLevel: 0 });
     moduleRepository.findByModule.mockResolvedValue(existing);
 
-    await useCase.execute(makeRequest({ userId }));
+    await updater.execute(makeRequest({ userId }));
 
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     expect(publisher.publish.mock.calls[0][0][0]).toBeInstanceOf(
@@ -75,7 +78,7 @@ describe('progress/application/update UpdateModuleProgress', () => {
     const existing = ModuleProgressMother.random({ userId, masteryLevel: 0 });
     moduleRepository.findByModule.mockResolvedValue(existing);
 
-    await useCase.execute(makeRequest({ userId }));
+    await updater.execute(makeRequest({ userId }));
 
     expect(moduleRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).not.toHaveBeenCalled();

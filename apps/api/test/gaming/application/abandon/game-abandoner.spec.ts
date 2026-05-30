@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { GameAbandoner } from '@/gaming/application/abandon/game-abandoner';
@@ -12,6 +13,7 @@ import { RequestGameAbandonerMother } from './request-game-abandoner-mother';
 describe('gaming/application/abandon GameAbandoner', () => {
   const gameRepository = mock<GameRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let abandoner: GameAbandoner;
 
   beforeEach(() => {
@@ -19,7 +21,7 @@ describe('gaming/application/abandon GameAbandoner', () => {
     gameRepository.save.mockReset();
     publisher.publish.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    abandoner = new GameAbandoner(gameRepository, publisher);
+    abandoner = new GameAbandoner(gameRepository, publisher, logger);
   });
 
   it('should abandon an in-progress game and publish event', async () => {

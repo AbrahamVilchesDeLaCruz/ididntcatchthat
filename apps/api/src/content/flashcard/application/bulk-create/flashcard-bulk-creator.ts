@@ -9,6 +9,7 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import {
   type RequestFlashcardBulkCreator,
   type RequestFlashcardBulkCreatorItem,
@@ -28,6 +29,8 @@ export class FlashcardBulkCreator {
     private readonly repository: FlashcardRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(
@@ -35,7 +38,6 @@ export class FlashcardBulkCreator {
   ): Promise<FlashcardBulkCreatorResult> {
     if (requests.length === 0) throw new BulkEmptyFlashcards();
 
-    // Build all aggregates first — any domain error aborts the whole batch
     const flashcards = requests.map((req: RequestFlashcardBulkCreatorItem) => {
       const {
         id,
@@ -62,12 +64,12 @@ export class FlashcardBulkCreator {
       );
     });
 
-    // Persist all
     await this.repository.saveAll(flashcards);
 
-    // Collect and publish all events in a single call
     const allEvents = flashcards.flatMap((fc) => fc.pullDomainEvents());
     await this.publisher.publish(allEvents);
+
+    this.logger.info('Flashcards bulk created', { count: flashcards.length });
 
     return {
       created: flashcards.length,

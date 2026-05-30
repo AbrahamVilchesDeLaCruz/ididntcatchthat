@@ -4,6 +4,7 @@ import {
   type GameRepository,
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { type RequestGameResumer } from './request-game-resumer';
@@ -16,6 +17,8 @@ export class GameResumer {
   constructor(
     @Inject(GAME_REPOSITORY)
     private readonly gameRepository: GameRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGameResumer): Promise<ResponseGameResumer> {
@@ -30,6 +33,8 @@ export class GameResumer {
 
     game.resume();
     await this.gameRepository.save(game);
+
+    this.logger.info('Game resumed', { gameId, userId });
 
     return {
       game: game.toPrimitives(),

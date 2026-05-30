@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type AiExampleGenerator } from '@/content/flashcard/domain/ai-example-generator';
@@ -15,7 +16,8 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
   const aiExampleGenerator = mock<AiExampleGenerator>();
-  let useCase: AiExamplesCompleter;
+  const logger = mock<Logger>();
+  let completer: AiExamplesCompleter;
 
   beforeEach(() => {
     repository.search.mockReset();
@@ -26,10 +28,11 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
 
-    useCase = new AiExamplesCompleter(
+    completer = new AiExamplesCompleter(
       repository,
       publisher,
       aiExampleGenerator,
+      logger,
     );
   });
 
@@ -44,7 +47,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     ];
     aiExampleGenerator.generate.mockResolvedValue(generated);
 
-    await useCase.execute(
+    await completer.execute(
       RequestAiExamplesCompleterMother.random({
         flashcardId: flashcard.id.value,
       }),
@@ -75,7 +78,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     ];
     aiExampleGenerator.generate.mockResolvedValue(generated);
 
-    await useCase.execute(
+    await completer.execute(
       RequestAiExamplesCompleterMother.random({
         flashcardId: flashcard.id.value,
       }),
@@ -98,7 +101,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     });
     repository.search.mockResolvedValue(flashcard);
 
-    await useCase.execute(
+    await completer.execute(
       RequestAiExamplesCompleterMother.random({
         flashcardId: flashcard.id.value,
       }),
@@ -113,7 +116,7 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
   it('should do nothing when flashcard does not exist', async () => {
     repository.search.mockResolvedValue(null);
 
-    await useCase.execute(RequestAiExamplesCompleterMother.random());
+    await completer.execute(RequestAiExamplesCompleterMother.random());
 
     expect(aiExampleGenerator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();

@@ -12,6 +12,7 @@ import {
   type AiPhoneticsGenerator,
   AI_PHONETICS_GENERATOR,
 } from '@/content/flashcard/domain/ai-phonetics-generator';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
 
 export type { RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
@@ -25,6 +26,8 @@ export class AiPhoneticsCompleter {
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_PHONETICS_GENERATOR)
     private readonly aiPhoneticsGenerator: AiPhoneticsGenerator,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestAiPhoneticsCompleter): Promise<void> {
@@ -42,5 +45,7 @@ export class AiPhoneticsCompleter {
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard phonetics completed', { flashcardId });
   }
 }

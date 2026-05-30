@@ -1,5 +1,6 @@
 import { type RequestUpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { UpdateFlashcardStats } from '@/progress/application/update/update-flashcard-stats';
 import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-stats-mother';
@@ -8,7 +9,8 @@ import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashc
 
 describe('progress/application/update UpdateFlashcardStats', () => {
   const repository = mock<UserFlashcardStatsRepository>();
-  let useCase: UpdateFlashcardStats;
+  const logger = mock<Logger>();
+  let updater: UpdateFlashcardStats;
 
   const makeRequest = (overrides?: {
     mode?: string;
@@ -24,13 +26,13 @@ describe('progress/application/update UpdateFlashcardStats', () => {
     repository.search.mockReset();
     repository.save.mockReset();
     repository.save.mockResolvedValue(undefined);
-    useCase = new UpdateFlashcardStats(repository);
+    updater = new UpdateFlashcardStats(repository, logger);
   });
 
   it('should create and save new stats when none exist', async () => {
     repository.search.mockResolvedValue(null);
 
-    await useCase.execute(makeRequest({ mode: 'game', correct: true }));
+    await updater.execute(makeRequest({ mode: 'game', correct: true }));
 
     expect(repository.save).toHaveBeenCalledTimes(1);
     const saved = repository.save.mock.calls[0][0];
@@ -43,7 +45,7 @@ describe('progress/application/update UpdateFlashcardStats', () => {
     const previousTimesPlayed = existing.timesPlayed;
     repository.search.mockResolvedValue(existing);
 
-    await useCase.execute(makeRequest({ mode: 'game', correct: false }));
+    await updater.execute(makeRequest({ mode: 'game', correct: false }));
 
     expect(repository.save).toHaveBeenCalledTimes(1);
     const saved = repository.save.mock.calls[0][0];
@@ -53,7 +55,7 @@ describe('progress/application/update UpdateFlashcardStats', () => {
   it('should call recordStudy when mode is study', async () => {
     repository.search.mockResolvedValue(null);
 
-    await useCase.execute(makeRequest({ mode: 'study', correct: true }));
+    await updater.execute(makeRequest({ mode: 'study', correct: true }));
 
     const saved = repository.save.mock.calls[0][0];
     expect(saved.timesStudied).toBe(1);
@@ -63,7 +65,7 @@ describe('progress/application/update UpdateFlashcardStats', () => {
   it('should not affect correctCount or accuracyRate when mode is study', async () => {
     repository.search.mockResolvedValue(null);
 
-    await useCase.execute(makeRequest({ mode: 'study', correct: true }));
+    await updater.execute(makeRequest({ mode: 'study', correct: true }));
 
     const saved = repository.save.mock.calls[0][0];
     expect(saved.correctCount).toBe(0);
@@ -81,7 +83,7 @@ describe('progress/application/update UpdateFlashcardStats', () => {
     });
     repository.search.mockResolvedValue(existing);
 
-    await useCase.execute(makeRequest({ mode: 'game', correct: false }));
+    await updater.execute(makeRequest({ mode: 'game', correct: false }));
 
     const saved = repository.save.mock.calls[0][0];
     expect(saved.accuracyRate).toBeGreaterThanOrEqual(0);

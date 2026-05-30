@@ -13,6 +13,7 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestFlashcardUpdater } from './request-flashcard-updater';
 
 export type { RequestFlashcardUpdater } from './request-flashcard-updater';
@@ -24,6 +25,8 @@ export class FlashcardUpdater {
     private readonly repository: FlashcardRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(
@@ -38,6 +41,12 @@ export class FlashcardUpdater {
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard updated', {
+      flashcardId: id,
+      requesterId,
+      fields: Object.keys(fields),
+    });
 
     return flashcard.toPrimitives();
   }

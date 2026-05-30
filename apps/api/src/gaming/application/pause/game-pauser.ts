@@ -4,6 +4,7 @@ import {
   type GameRepository,
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { type RequestGamePauser } from './request-game-pauser';
@@ -15,6 +16,8 @@ export class GamePauser {
   constructor(
     @Inject(GAME_REPOSITORY)
     private readonly gameRepository: GameRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGamePauser): Promise<void> {
@@ -29,5 +32,7 @@ export class GamePauser {
 
     game.pause(lastFlashcardId);
     await this.gameRepository.save(game);
+
+    this.logger.info('Game paused', { gameId, userId, lastFlashcardId });
   }
 }

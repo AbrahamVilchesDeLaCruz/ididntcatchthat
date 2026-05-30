@@ -12,6 +12,7 @@ import {
   type AiExampleGenerator,
   AI_EXAMPLE_GENERATOR,
 } from '@/content/flashcard/domain/ai-example-generator';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UuidValueObject } from '@/shared/domain/uuid-value-object';
 import { type RequestAiExamplesCompleter } from './request-ai-examples-completer';
 
@@ -26,6 +27,8 @@ export class AiExamplesCompleter {
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_EXAMPLE_GENERATOR)
     private readonly aiExampleGenerator: AiExampleGenerator,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestAiExamplesCompleter): Promise<void> {
@@ -58,5 +61,10 @@ export class AiExamplesCompleter {
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard examples completed', {
+      flashcardId,
+      addedCount: newExamples.length,
+    });
   }
 }

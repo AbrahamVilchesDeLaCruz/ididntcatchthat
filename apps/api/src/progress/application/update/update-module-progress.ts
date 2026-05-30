@@ -14,6 +14,7 @@ import {
 import { ModuleProgress } from '@/progress/domain/module-progress';
 import { ModuleName } from '@/progress/domain/module-name';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { type RequestUpdateModuleProgress } from './request-update-module-progress';
 
@@ -28,6 +29,8 @@ export class UpdateModuleProgress {
     private readonly moduleRepository: ModuleProgressRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute({
@@ -48,6 +51,13 @@ export class UpdateModuleProgress {
     await this.moduleRepository.save(progress);
 
     if (levelIncreased) {
+      this.logger.info('Module mastery level increased', {
+        userId,
+        module,
+        previousLevel,
+        newLevel,
+      });
+
       await this.publisher.publish([
         new ModuleMasteryLevelIncreasedEvent(uid.value, {
           userId: uid.value,

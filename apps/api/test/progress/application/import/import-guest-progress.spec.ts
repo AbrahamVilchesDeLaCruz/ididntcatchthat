@@ -1,5 +1,6 @@
 import { type RequestImportGuestProgress } from '@/progress/application/import/import-guest-progress';
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
 import { type ProcessedEventsRepository } from '@/shared/domain/processed-events.repository';
 import { type GuestAttemptRepository } from '@/progress/domain/guest-attempt.repository';
@@ -13,7 +14,8 @@ describe('progress/application/import ImportGuestProgress', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
   const processedRepository = mock<ProcessedEventsRepository>();
   const guestAttemptRepository = mock<GuestAttemptRepository>();
-  let useCase: ImportGuestProgress;
+  const logger = mock<Logger>();
+  let importer: ImportGuestProgress;
 
   const makeRequest = (
     eventId = UuidMother.random(),
@@ -31,17 +33,18 @@ describe('progress/application/import ImportGuestProgress', () => {
     guestAttemptRepository.findByDeviceId.mockReset();
     statsRepository.save.mockResolvedValue(undefined);
     processedRepository.save.mockResolvedValue(undefined);
-    useCase = new ImportGuestProgress(
+    importer = new ImportGuestProgress(
       statsRepository,
       processedRepository,
       guestAttemptRepository,
+      logger,
     );
   });
 
   it('should skip when event was already processed (idempotency)', async () => {
     processedRepository.exists.mockResolvedValue(true);
 
-    await useCase.execute(makeRequest());
+    await importer.execute(makeRequest());
 
     expect(guestAttemptRepository.findByDeviceId).not.toHaveBeenCalled();
     expect(statsRepository.save).not.toHaveBeenCalled();
@@ -66,7 +69,7 @@ describe('progress/application/import ImportGuestProgress', () => {
     ]);
     statsRepository.search.mockResolvedValue(null);
 
-    await useCase.execute(makeRequest());
+    await importer.execute(makeRequest());
 
     expect(statsRepository.save).toHaveBeenCalledTimes(2);
     expect(processedRepository.save).toHaveBeenCalledTimes(1);
@@ -87,7 +90,7 @@ describe('progress/application/import ImportGuestProgress', () => {
     const previousTimesPlayed = existing.timesPlayed;
     statsRepository.search.mockResolvedValue(existing);
 
-    await useCase.execute(makeRequest());
+    await importer.execute(makeRequest());
 
     const saved = statsRepository.save.mock.calls[0][0];
     expect(saved.timesPlayed).toBeGreaterThan(previousTimesPlayed);

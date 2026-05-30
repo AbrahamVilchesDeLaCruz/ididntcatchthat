@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type AiPhoneticsGenerator } from '@/content/flashcard/domain/ai-phonetics-generator';
@@ -13,6 +14,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
   const aiPhoneticsGenerator = mock<AiPhoneticsGenerator>();
+  const logger = mock<Logger>();
   let completer: AiPhoneticsCompleter;
 
   beforeEach(() => {
@@ -28,6 +30,7 @@ describe('content/flashcard/application/complete-phonetics AiPhoneticsCompleter'
       repository,
       publisher,
       aiPhoneticsGenerator,
+      logger,
     );
   });
 

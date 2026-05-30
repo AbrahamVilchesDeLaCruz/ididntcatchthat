@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { GamePauser } from '@/gaming/application/pause/game-pauser';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
@@ -9,12 +10,13 @@ import { RequestGamePauserMother } from './request-game-pauser-mother';
 
 describe('gaming/application/pause GamePauser', () => {
   const gameRepository = mock<GameRepository>();
+  const logger = mock<Logger>();
   let pauser: GamePauser;
 
   beforeEach(() => {
     gameRepository.search.mockReset();
     gameRepository.save.mockReset();
-    pauser = new GamePauser(gameRepository);
+    pauser = new GamePauser(gameRepository, logger);
   });
 
   it('should pause an in-progress game', async () => {

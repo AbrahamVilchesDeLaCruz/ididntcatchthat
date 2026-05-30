@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { GameResumer } from '@/gaming/application/resume/game-resumer';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
@@ -9,12 +10,13 @@ import { RequestGameResumerMother } from './request-game-resumer-mother';
 
 describe('gaming/application/resume GameResumer', () => {
   const gameRepository = mock<GameRepository>();
+  const logger = mock<Logger>();
   let resumer: GameResumer;
 
   beforeEach(() => {
     gameRepository.search.mockReset();
     gameRepository.save.mockReset();
-    resumer = new GameResumer(gameRepository);
+    resumer = new GameResumer(gameRepository, logger);
   });
 
   it('should resume a paused game and return pendingFlashcardIds', async () => {

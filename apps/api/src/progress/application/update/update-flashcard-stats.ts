@@ -4,6 +4,7 @@ import {
   USER_FLASHCARD_STATS_REPOSITORY,
 } from '@/progress/domain/user-flashcard-stats.repository';
 import { UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { type RequestUpdateFlashcardStats } from './request-update-flashcard-stats';
@@ -15,6 +16,8 @@ export class UpdateFlashcardStats {
   constructor(
     @Inject(USER_FLASHCARD_STATS_REPOSITORY)
     private readonly repository: UserFlashcardStatsRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute({
@@ -36,5 +39,12 @@ export class UpdateFlashcardStats {
     }
 
     await this.repository.save(stats);
+
+    this.logger.info('Flashcard stats updated', {
+      userId,
+      flashcardId,
+      correct,
+      mode,
+    });
   }
 }

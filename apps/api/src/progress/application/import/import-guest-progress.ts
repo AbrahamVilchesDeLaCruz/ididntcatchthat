@@ -12,6 +12,7 @@ import {
   GUEST_ATTEMPT_REPOSITORY,
 } from '@/progress/domain/guest-attempt.repository';
 import { UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { type RequestImportGuestProgress } from './request-import-guest-progress';
@@ -29,6 +30,8 @@ export class ImportGuestProgress {
     private readonly processedRepository: ProcessedEventsRepository,
     @Inject(GUEST_ATTEMPT_REPOSITORY)
     private readonly guestAttemptRepository: GuestAttemptRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute({
@@ -61,5 +64,11 @@ export class ImportGuestProgress {
     }
 
     await this.processedRepository.save(eventId, USE_CASE_NAME);
+
+    this.logger.info('Guest progress imported', {
+      userId,
+      guestDeviceId,
+      attemptsCount: attempts.length,
+    });
   }
 }
