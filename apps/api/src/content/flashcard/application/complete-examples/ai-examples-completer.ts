@@ -17,8 +17,6 @@ import { type RequestAiExamplesCompleter } from './request-ai-examples-completer
 
 export type { RequestAiExamplesCompleter } from './request-ai-examples-completer';
 
-const MAX_EXAMPLES = 3;
-
 @Injectable()
 export class AiExamplesCompleter {
   constructor(
@@ -38,7 +36,7 @@ export class AiExamplesCompleter {
     );
     if (!flashcard) return;
 
-    const missing = MAX_EXAMPLES - flashcard.examples.length;
+    const missing = flashcard.missingExampleCount;
     const newExamples =
       missing > 0
         ? (
@@ -52,7 +50,7 @@ export class AiExamplesCompleter {
               id: UuidValueObject.random(),
               textEn: e.textEn,
               textEs: e.textEs,
-              position: (flashcard.examples.length + i + 1) as 1 | 2 | 3,
+              position: (flashcard.nextExamplePosition + i) as 1 | 2 | 3,
             }))
         : [];
 

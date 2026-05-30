@@ -62,9 +62,8 @@ export class FlashcardAudioGenerator {
         );
       }
 
-      const examplesText = flashcard.examples.map((e) => e.textEn).join('. ');
       const examplesBuffer = await this.audioGenerator.generate(
-        examplesText,
+        flashcard.examplesEnglishText,
         'us',
       );
 

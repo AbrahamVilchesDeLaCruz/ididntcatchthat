@@ -87,8 +87,22 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
   get audioUrls(): AudioUrls | null {
     return this._audioUrls;
   }
+  static readonly MAX_EXAMPLES = 3;
+
   get examples(): Example[] {
     return [...this._examples];
+  }
+
+  get missingExampleCount(): number {
+    return Math.max(0, Flashcard.MAX_EXAMPLES - this._examples.length);
+  }
+
+  get nextExamplePosition(): 1 | 2 | 3 {
+    return (this._examples.length + 1) as 1 | 2 | 3;
+  }
+
+  get examplesEnglishText(): string {
+    return this._examples.map((e) => e.textEn).join('. ');
   }
 
   static create(
