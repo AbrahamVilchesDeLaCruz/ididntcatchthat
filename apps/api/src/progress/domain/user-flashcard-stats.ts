@@ -13,7 +13,7 @@ export type UserFlashcardStatsPrimitives = {
 };
 
 export class UserFlashcardStats extends AggregateRoot<UserFlashcardStatsPrimitives> {
-  private constructor(
+  public constructor(
     readonly userId: UserId,
     readonly flashcardId: FlashcardId,
     private _timesStudied: number,

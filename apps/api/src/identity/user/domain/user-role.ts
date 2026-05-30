@@ -12,7 +12,7 @@ const VALID_ROLES = Object.values(UserRoleValue);
 export class UserRole extends StringValueObject {
   declare readonly value: UserRoleValue;
 
-  private constructor(value: UserRoleValue) {
+  public constructor(value: UserRoleValue) {
     super(value);
   }
 

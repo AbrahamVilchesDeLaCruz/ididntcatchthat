@@ -5,7 +5,7 @@ const CARD_COUNTS = ['10', '20', '50'] as const;
 export type CardCountValue = (typeof CARD_COUNTS)[number];
 
 export class CardCount extends StringValueObject {
-  private constructor(value: CardCountValue) {
+  public constructor(value: CardCountValue) {
     super(value);
   }
 

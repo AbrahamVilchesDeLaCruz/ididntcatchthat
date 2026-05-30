@@ -47,7 +47,7 @@ export type FlashcardUpdateFields = {
 };
 
 export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
-  private constructor(
+  public constructor(
     public readonly id: FlashcardId,
     private _expression: Expression,
     private _meaning: Meaning,

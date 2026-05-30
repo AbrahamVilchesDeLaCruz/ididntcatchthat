@@ -23,7 +23,7 @@ export type UserSessionPrimitives = {
 export class UserSession extends AggregateRoot<UserSessionPrimitives> {
   private static readonly TTL_DAYS = 30;
 
-  private constructor(
+  public constructor(
     readonly id: string,
     readonly tokenId: string,
     readonly ownerId: string,

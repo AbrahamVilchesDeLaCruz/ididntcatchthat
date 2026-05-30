@@ -11,7 +11,7 @@ const MODULE_NAMES = [
 export type ModuleNameValue = (typeof MODULE_NAMES)[number];
 
 export class ModuleName extends StringValueObject {
-  private constructor(value: ModuleNameValue) {
+  public constructor(value: ModuleNameValue) {
     super(value);
   }
 

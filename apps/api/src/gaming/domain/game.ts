@@ -30,7 +30,7 @@ export interface GamePrimitives {
 }
 
 export class Game extends AggregateRoot<GamePrimitives> {
-  private constructor(
+  public constructor(
     readonly id: GameId,
     readonly userId: string | null,
     readonly mode: GameMode,

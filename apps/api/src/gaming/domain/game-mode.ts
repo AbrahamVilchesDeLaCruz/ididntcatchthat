@@ -9,7 +9,7 @@ export enum GameModeValue {
 const GAME_MODES = Object.values(GameModeValue);
 
 export class GameMode extends StringValueObject {
-  private constructor(value: GameModeValue) {
+  public constructor(value: GameModeValue) {
     super(value);
   }
 

@@ -24,7 +24,7 @@ export type UserPrimitives = {
 };
 
 export class User extends AggregateRoot<UserPrimitives> {
-  private constructor(
+  public constructor(
     readonly id: UserId,
     readonly email: Email,
     readonly passwordHash: PasswordHash | null,

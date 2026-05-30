@@ -9,7 +9,7 @@ export interface AttemptPrimitives {
 }
 
 export class Attempt {
-  private constructor(
+  public constructor(
     readonly id: string,
     readonly gameId: string,
     readonly flashcardId: string,
