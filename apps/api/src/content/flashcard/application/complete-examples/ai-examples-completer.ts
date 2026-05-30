@@ -12,13 +12,11 @@ import {
   type AiExampleGenerator,
   AI_EXAMPLE_GENERATOR,
 } from '@/content/flashcard/domain/ai-example-generator';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UuidValueObject } from '@/shared/domain/uuid-value-object';
+import { type RequestAiExamplesCompleter } from './request-ai-examples-completer';
 
-const MAX_EXAMPLES = 3;
-
-export type AiExamplesCompleterRequest = {
-  flashcardId: string;
-};
+export type { RequestAiExamplesCompleter } from './request-ai-examples-completer';
 
 @Injectable()
 export class AiExamplesCompleter {
@@ -28,20 +26,24 @@ export class AiExamplesCompleter {
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_EXAMPLE_GENERATOR)
-    private readonly aiExampleGenerator: AiExampleGenerator,
+    private readonly generator: AiExampleGenerator,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
-  async execute(request: AiExamplesCompleterRequest): Promise<void> {
+  async execute(request: RequestAiExamplesCompleter): Promise<void> {
+    const { flashcardId } = request;
+
     const flashcard = await this.repository.search(
-      new FlashcardId(request.flashcardId),
+      new FlashcardId(flashcardId),
     );
     if (!flashcard) return;
 
-    const missing = MAX_EXAMPLES - flashcard.examples.length;
+    const missing = flashcard.missingExampleCount;
     const newExamples =
       missing > 0
         ? (
-            await this.aiExampleGenerator.generate(
+            await this.generator.generate(
               flashcard.expression.value,
               flashcard.category.value,
             )
@@ -51,7 +53,7 @@ export class AiExamplesCompleter {
               id: UuidValueObject.random(),
               textEn: e.textEn,
               textEs: e.textEs,
-              position: (flashcard.examples.length + i + 1) as 1 | 2 | 3,
+              position: (flashcard.nextExamplePosition + i) as 1 | 2 | 3,
             }))
         : [];
 
@@ -59,5 +61,10 @@ export class AiExamplesCompleter {
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard examples completed', {
+      flashcardId,
+      addedCount: newExamples.length,
+    });
   }
 }

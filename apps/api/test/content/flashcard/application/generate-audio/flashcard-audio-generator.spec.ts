@@ -9,8 +9,8 @@ import { FlashcardAudioReadyEvent } from '@/content/flashcard/domain/events/flas
 import { FlashcardAudioFailedEvent } from '@/content/flashcard/domain/events/flashcard-audio-failed.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
-import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-mother';
 import { ExampleMother } from '@test/content/flashcard/domain/example-mother';
+import { RequestFlashcardAudioGeneratorMother } from './request-flashcard-audio-generator-mother';
 
 describe('content/flashcard/application/generate-audio FlashcardAudioGenerator', () => {
   const repository = mock<FlashcardRepository>();
@@ -48,13 +48,15 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
   });
 
   it('should generate audio for all accents and publish FlashcardAudioReadyEvent', async () => {
-    const flashcardId = FlashcardIdMother.random().value;
     const flashcard = FlashcardMother.random({
-      examples: [ExampleMother.primitives(flashcardId, 1)],
+      examples: [ExampleMother.primitives(undefined, 1)],
     });
     repository.search.mockResolvedValue(flashcard);
+    const request = RequestFlashcardAudioGeneratorMother.random({
+      flashcardId: flashcard.id.value,
+    });
 
-    await generator.execute({ flashcardId: flashcard.id.value });
+    await generator.execute(request);
 
     // 3 accents for expression + 1 for examples = 4 calls
     expect(audioGenerator.generate).toHaveBeenCalledTimes(4);
@@ -71,8 +73,11 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
     audioGenerator.generate.mockRejectedValue(
       new Error('ElevenLabs error: 429'),
     );
+    const request = RequestFlashcardAudioGeneratorMother.random({
+      flashcardId: flashcard.id.value,
+    });
 
-    await generator.execute({ flashcardId: flashcard.id.value });
+    await generator.execute(request);
 
     expect(repository.save).toHaveBeenCalledTimes(2); // markGenerating + markFailed
     const events: DomainEvent[] = publisher.publish.mock.calls[1][0];
@@ -84,8 +89,11 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
     const flashcard = FlashcardMother.random({ examples: [] });
     repository.search.mockResolvedValue(flashcard);
     audioGenerator.generate.mockRejectedValue('string error');
+    const request = RequestFlashcardAudioGeneratorMother.random({
+      flashcardId: flashcard.id.value,
+    });
 
-    await generator.execute({ flashcardId: flashcard.id.value });
+    await generator.execute(request);
 
     expect(repository.save).toHaveBeenCalledTimes(2);
     const events: DomainEvent[] = publisher.publish.mock.calls[1][0];
@@ -95,8 +103,9 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
 
   it('should do nothing when flashcard does not exist', async () => {
     repository.search.mockResolvedValue(null);
+    const request = RequestFlashcardAudioGeneratorMother.random();
 
-    await generator.execute({ flashcardId: FlashcardIdMother.random().value });
+    await generator.execute(request);
 
     expect(audioGenerator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();

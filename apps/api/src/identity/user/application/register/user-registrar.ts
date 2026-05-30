@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/user/domain/user';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { EmailAlreadyTakenException } from '@/identity/user/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/user/domain/exceptions/nickname-already-taken.exception';
 import {
@@ -25,11 +25,10 @@ import {
 } from '@/identity/session/domain/user-session.repository';
 import { UserSession } from '@/identity/session/domain/user-session';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestUserRegistrar } from './request-user-registrar';
+import { type ResponseUserRegistrar } from './response-user-registrar';
 
-export type UserRegistrarResult = {
-  accessToken: string;
-  refreshTokenId: string;
-};
+export type { RequestUserRegistrar, ResponseUserRegistrar };
 
 @Injectable()
 export class UserRegistrar {
@@ -39,57 +38,54 @@ export class UserRegistrar {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(PASSWORD_HASHER)
-    private readonly passwordHasher: PasswordHasher,
+    private readonly hasher: PasswordHasher,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
 
-  async execute(params: {
-    id: string;
-    email: string;
-    password: string;
-    nickname: string;
-    deviceId: string;
-    fingerprint: string;
-    ip: string;
-  }): Promise<UserRegistrarResult> {
+  async execute(request: RequestUserRegistrar): Promise<ResponseUserRegistrar> {
+    const { id, email, password, nickname, deviceId, fingerprint, ip } =
+      request;
+
     const [byEmail, byNickname] = await Promise.all([
       this.userRepository.match(
-        new Criteria([{ field: 'email', operator: '=', value: params.email }]),
+        new Criteria([
+          { field: 'email', operator: FilterOperator.EQ, value: email },
+        ]),
       ),
       this.userRepository.match(
         new Criteria([
-          { field: 'nickname', operator: '=', value: params.nickname },
+          { field: 'nickname', operator: FilterOperator.EQ, value: nickname },
         ]),
       ),
     ]);
 
-    if (byEmail.length > 0) throw new EmailAlreadyTakenException(params.email);
+    if (byEmail.length > 0) throw new EmailAlreadyTakenException(email);
     if (byNickname.length > 0)
-      throw new NicknameAlreadyTakenException(params.nickname);
+      throw new NicknameAlreadyTakenException(nickname);
 
-    const passwordHash = await this.passwordHasher.hash(params.password);
+    const passwordHash = await this.hasher.hash(password);
 
     const user = User.register(
-      params.id,
-      params.email,
+      id,
+      email,
       passwordHash,
-      params.nickname,
+      nickname,
       null,
       'user',
       null,
     );
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
-      deviceId: params.deviceId,
-      fingerprint: params.fingerprint,
-      ip: params.ip,
+      deviceId,
+      fingerprint,
+      ip,
       roles: [user.role.value],
     });
 
@@ -97,8 +93,8 @@ export class UserRegistrar {
       crypto.randomUUID(),
       refreshTokenId,
       user.id.value,
-      params.deviceId,
-      params.fingerprint,
+      deviceId,
+      fingerprint,
     );
 
     await this.userRepository.save(user);
@@ -107,7 +103,7 @@ export class UserRegistrar {
 
     this.logger.info('User registered', {
       userId: user.id.value,
-      email: params.email,
+      email,
     });
 
     return { accessToken, refreshTokenId };

@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type AiExampleGenerator } from '@/content/flashcard/domain/ai-example-generator';
@@ -6,29 +7,32 @@ import { AiExamplesCompleter } from '@/content/flashcard/application/complete-ex
 import { FlashcardExamplesCompletedEvent } from '@/content/flashcard/domain/events/flashcard-examples-completed.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
-import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-mother';
 import { ExampleMother } from '@test/content/flashcard/domain/example-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
+import { RequestAiExamplesCompleterMother } from './request-ai-examples-completer-mother';
+import { FlashcardIdMother } from '@test/content/flashcard/domain/flashcard-id-mother';
 
 describe('content/flashcard/application/complete-examples AiExamplesCompleter', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
-  const aiExampleGenerator = mock<AiExampleGenerator>();
-  let useCase: AiExamplesCompleter;
+  const generator = mock<AiExampleGenerator>();
+  const logger = mock<Logger>();
+  let completer: AiExamplesCompleter;
 
   beforeEach(() => {
     repository.search.mockReset();
     repository.save.mockReset();
     publisher.publish.mockReset();
-    aiExampleGenerator.generate.mockReset();
+    generator.generate.mockReset();
 
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
 
-    useCase = new AiExamplesCompleter(
+    completer = new AiExamplesCompleter(
       repository,
       publisher,
-      aiExampleGenerator,
+      generator,
+      logger,
     );
   });
 
@@ -41,11 +45,15 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
     ];
-    aiExampleGenerator.generate.mockResolvedValue(generated);
+    generator.generate.mockResolvedValue(generated);
 
-    await useCase.execute({ flashcardId: flashcard.id.value });
+    await completer.execute(
+      RequestAiExamplesCompleterMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
 
-    expect(aiExampleGenerator.generate).toHaveBeenCalledWith(
+    expect(generator.generate).toHaveBeenCalledWith(
       flashcard.expression.value,
       flashcard.category.value,
     );
@@ -68,9 +76,13 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
       { textEn: StringMother.sentence(), textEs: StringMother.sentence() },
     ];
-    aiExampleGenerator.generate.mockResolvedValue(generated);
+    generator.generate.mockResolvedValue(generated);
 
-    await useCase.execute({ flashcardId: flashcard.id.value });
+    await completer.execute(
+      RequestAiExamplesCompleterMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
 
     const savedFlashcard = repository.save.mock.calls[0][0];
     expect(savedFlashcard.examples).toHaveLength(3);
@@ -89,9 +101,13 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
     });
     repository.search.mockResolvedValue(flashcard);
 
-    await useCase.execute({ flashcardId: flashcard.id.value });
+    await completer.execute(
+      RequestAiExamplesCompleterMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
 
-    expect(aiExampleGenerator.generate).not.toHaveBeenCalled();
+    expect(generator.generate).not.toHaveBeenCalled();
     expect(repository.save).toHaveBeenCalled();
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(FlashcardExamplesCompletedEvent);
@@ -100,9 +116,9 @@ describe('content/flashcard/application/complete-examples AiExamplesCompleter', 
   it('should do nothing when flashcard does not exist', async () => {
     repository.search.mockResolvedValue(null);
 
-    await useCase.execute({ flashcardId: FlashcardIdMother.random().value });
+    await completer.execute(RequestAiExamplesCompleterMother.random());
 
-    expect(aiExampleGenerator.generate).not.toHaveBeenCalled();
+    expect(generator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });

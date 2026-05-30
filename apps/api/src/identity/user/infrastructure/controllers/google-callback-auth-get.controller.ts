@@ -1,11 +1,13 @@
 import { Controller, Get, Headers, Ip, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { GoogleAuthGuard } from '@/shared/infrastructure/auth/google.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { OAuthAuthenticator } from '@/identity/user/application/authenticate/oauth-authenticator';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
+import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import crypto from 'crypto';
 
 @ApiTags('auth')
@@ -14,6 +16,7 @@ export class GoogleCallbackAuthGetController {
   constructor(
     private readonly authenticator: OAuthAuthenticator,
     private readonly fingerprintBuilder: FingerprintBuilder,
+    private readonly config: ConfigService,
   ) {}
 
   @Get('google/callback')
@@ -37,23 +40,26 @@ export class GoogleCallbackAuthGetController {
     );
     const deviceId = profile.deviceId ?? crypto.randomUUID();
 
-    const result = await this.authenticator.execute(
-      profile.email ?? '',
-      null,
-      profile.email?.split('@')[0] ?? 'user',
+    const result = await this.authenticator.execute({
+      email: profile.email ?? '',
+      avatarUrl: null,
+      displayName: profile.email?.split('@')[0] ?? 'user',
       deviceId,
       fingerprint,
-      ip ?? '',
-    );
+      ip: ip ?? '',
+    });
 
     res.cookie('refreshToken', deviceId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE_MS,
     });
 
-    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:4001';
+    const frontendUrl = this.config.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:4001',
+    );
 
     res.redirect(
       302,

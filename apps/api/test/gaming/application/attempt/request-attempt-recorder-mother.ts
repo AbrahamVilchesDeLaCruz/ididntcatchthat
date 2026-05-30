@@ -1,11 +1,7 @@
+import { type RequestAttemptRecorder } from '@/gaming/application/attempt/attempt-recorder';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
-export interface RequestAttemptRecorder {
-  gameId: string;
-  flashcardId: string;
-  correct: boolean;
-  userId: string | null;
-}
+export type { RequestAttemptRecorder };
 
 export class RequestAttemptRecorderMother {
   static random(

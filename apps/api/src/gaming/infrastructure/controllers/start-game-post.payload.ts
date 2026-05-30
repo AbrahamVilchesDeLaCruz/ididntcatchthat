@@ -1,21 +1,15 @@
 import { IsEnum, IsIn, IsOptional } from 'class-validator';
 
-const GAME_MODES = ['study', 'game'] as const;
-const GAME_MODULES = [
-  'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
-  'random',
-] as const;
+import { GameModeValue } from '@/gaming/domain/game-mode';
+import { GameModuleValue } from '@/gaming/domain/game-module';
 
 export class StartGamePostPayload {
-  @IsEnum(GAME_MODES)
-  mode: string;
+  @IsEnum(GameModeValue)
+  mode: GameModeValue;
 
   @IsOptional()
-  @IsEnum(GAME_MODULES)
-  module?: string;
+  @IsEnum(GameModuleValue)
+  module?: GameModuleValue;
 
   @IsIn([10, 20, 50])
   cardCount: number;

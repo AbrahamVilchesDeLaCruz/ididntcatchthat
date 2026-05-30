@@ -9,7 +9,10 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
+import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { UserRegistrar } from '@/identity/user/application/register/user-registrar';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 import { RegisterAuthPostPayload } from './register-auth-post.payload';
@@ -21,9 +24,11 @@ export class RegisterAuthPostController {
   constructor(
     private readonly registrar: UserRegistrar,
     private readonly fingerprintBuilder: FingerprintBuilder,
+    private readonly config: ConfigService,
   ) {}
 
   @Post('register')
+  @Throttle({ auth: {} })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered' })
@@ -55,9 +60,9 @@ export class RegisterAuthPostController {
 
     res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE_MS,
     });
 
     return { accessToken: result.accessToken };

@@ -1,22 +1,22 @@
-import { UserRole, type UserRoleValue } from '@/identity/user/domain/user-role';
+import { UserRole, UserRoleValue } from '@/identity/user/domain/user-role';
 
 export class UserRoleMother {
   static random(): UserRole {
-    const roles: UserRoleValue[] = ['user', 'teacher', 'admin'];
+    const roles = Object.values(UserRoleValue);
     const value = roles[Math.floor(Math.random() * roles.length)];
     return UserRole.create(value);
   }
 
   static user(): UserRole {
-    return UserRole.create('user');
+    return UserRole.create(UserRoleValue.User);
   }
 
   static teacher(): UserRole {
-    return UserRole.create('teacher');
+    return UserRole.create(UserRoleValue.Teacher);
   }
 
   static admin(): UserRole {
-    return UserRole.create('admin');
+    return UserRole.create(UserRoleValue.Admin);
   }
 
   static invalid(): string {

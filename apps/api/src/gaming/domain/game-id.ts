@@ -1,11 +1,5 @@
 import { UuidValueObject } from '@/shared/domain/uuid-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
-
-export class GameIdInvalid extends DomainException {
-  constructor(value: string) {
-    super(`GameId value <${value}> is not a valid UUID`);
-  }
-}
+import { GameIdInvalid } from './exceptions/game-id-invalid';
 
 export class GameId extends UuidValueObject {
   constructor(value: string) {

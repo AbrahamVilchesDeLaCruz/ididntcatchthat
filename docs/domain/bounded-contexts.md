@@ -28,8 +28,8 @@ graph TB
     Identity -->|StreakBroken| Notification
     Identity -->|GuestProgressMigrated| Progress
 
-    Progress -->|ModuleLevelUp| Notification
-    Progress -->|ModuleLevelUp| Ranking
+    Progress -->|ModuleMasteryLevelIncreased| Notification
+    Progress -->|ModuleMasteryLevelIncreased| Ranking
 
     Pronunciation -->|PronunciationEvaluated| Progress
 ```
@@ -49,8 +49,8 @@ graph TB
 | `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
 | `StreakBroken` | `idct.identity.streaks.streak.broken` | Identity | Notification | Email + push notification |
 | `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Identity | Progress | Importa games + attempts del guest → `user_flashcard_stats` |
-| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Progress | Notification | Toast de logro en app |
-| `ModuleLevelUp` | `idct.progress.module_progress.module_level.up` | Progress | Ranking | Marca ranking como dirty → recomputa en próximo job |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Notification | Toast de logro en app |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Marca ranking como dirty → recomputa en próximo job |
 | `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Pronunciation | Progress | Actualiza pronunciation stats en `user_flashcard_stats` |
 
 ---
@@ -61,3 +61,4 @@ graph TB
 - **Content** se autogestiona el audio — sus eventos son internos al propio BC.
 - **Notification** es un **pure consumer** — nunca emite eventos de dominio, solo ejecuta side effects (email, push, toast).
 - **Progress** es el **hub central** — recibe de Gaming, Pronunciation e Identity, y alimenta a Ranking y Notification.
+- **`ModuleMasteryLevelIncreased`** es el evento que dispara notificaciones y recomputa el ranking al subir de nivel de maestría.

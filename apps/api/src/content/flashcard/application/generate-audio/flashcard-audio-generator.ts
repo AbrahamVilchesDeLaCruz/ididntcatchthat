@@ -19,10 +19,9 @@ import {
 } from '@/content/flashcard/domain/audio-storage';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
+import { type RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
 
-export type GenerateFlashcardAudioRequest = {
-  flashcardId: string;
-};
+export type { RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
 
 @Injectable()
 export class FlashcardAudioGenerator {
@@ -39,9 +38,11 @@ export class FlashcardAudioGenerator {
     private readonly logger: Logger,
   ) {}
 
-  async execute(request: GenerateFlashcardAudioRequest): Promise<void> {
+  async execute(request: RequestFlashcardAudioGenerator): Promise<void> {
+    const { flashcardId } = request;
+
     const flashcard = await this.repository.search(
-      new FlashcardId(request.flashcardId),
+      new FlashcardId(flashcardId),
     );
     if (!flashcard) return;
 
@@ -61,9 +62,8 @@ export class FlashcardAudioGenerator {
         );
       }
 
-      const examplesText = flashcard.examples.map((e) => e.textEn).join('. ');
       const examplesBuffer = await this.audioGenerator.generate(
-        examplesText,
+        flashcard.examplesEnglishText,
         'us',
       );
 
@@ -101,7 +101,7 @@ export class FlashcardAudioGenerator {
       this.logger.error(
         'FlashcardAudioGenerator failed',
         e instanceof Error ? e : new Error(String(e)),
-        { flashcardId: request.flashcardId },
+        { flashcardId },
       );
       flashcard.markAudioFailed();
     }

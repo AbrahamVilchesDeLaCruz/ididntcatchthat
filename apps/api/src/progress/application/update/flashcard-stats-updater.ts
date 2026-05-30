@@ -1,0 +1,50 @@
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  type UserFlashcardStatsRepository,
+  USER_FLASHCARD_STATS_REPOSITORY,
+} from '@/progress/domain/user-flashcard-stats.repository';
+import { UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { UserId } from '@/shared/domain/user-id';
+import { FlashcardId } from '@/shared/domain/flashcard-id';
+import { type RequestFlashcardStatsUpdater } from './request-update-flashcard-stats';
+
+export type { RequestFlashcardStatsUpdater };
+
+@Injectable()
+export class FlashcardStatsUpdater {
+  constructor(
+    @Inject(USER_FLASHCARD_STATS_REPOSITORY)
+    private readonly repository: UserFlashcardStatsRepository,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
+  ) {}
+
+  async execute({
+    userId,
+    flashcardId,
+    correct,
+    mode,
+  }: RequestFlashcardStatsUpdater): Promise<void> {
+    const uid = new UserId(userId);
+    const fid = new FlashcardId(flashcardId);
+
+    let stats = await this.repository.search(uid, fid);
+    stats ??= UserFlashcardStats.create(uid, fid);
+
+    if (mode === 'study') {
+      stats.recordStudy(correct);
+    } else {
+      stats.recordPlay(correct);
+    }
+
+    await this.repository.save(stats);
+
+    this.logger.info('Flashcard stats updated', {
+      userId,
+      flashcardId,
+      correct,
+      mode,
+    });
+  }
+}

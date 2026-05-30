@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { FlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -16,6 +17,7 @@ import { RequestFlashcardUpdaterMother } from './request-flashcard-updater-mothe
 describe('content/flashcard/application/update FlashcardUpdater', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let updater: FlashcardUpdater;
 
   beforeEach(() => {
@@ -35,7 +37,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
       const teacherId = UuidMother.random();
       const flashcard = FlashcardMother.random({ createdBy: teacherId });
       repository.search.mockResolvedValue(flashcard);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       const request = RequestFlashcardUpdaterMother.random({
         id: flashcard.id.value,
@@ -54,7 +56,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
       const teacherId = UuidMother.random();
       const flashcard = FlashcardMother.random({ createdBy: teacherId });
       repository.search.mockResolvedValue(flashcard);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       await updater.execute(
         RequestFlashcardUpdaterMother.random({
@@ -73,7 +75,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
       const teacherId = UuidMother.random();
       const flashcard = FlashcardMother.random({ createdBy: teacherId });
       repository.search.mockResolvedValue(flashcard);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       await updater.execute(
         RequestFlashcardUpdaterMother.random({
@@ -99,7 +101,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
   describe('when flashcard does not exist', () => {
     it('should throw FlashcardNotFound', async () => {
       repository.search.mockResolvedValue(null);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       const request = RequestFlashcardUpdaterMother.random();
 
@@ -116,7 +118,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
         createdBy: UuidMother.random(),
       });
       repository.search.mockResolvedValue(flashcard);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       const request = RequestFlashcardUpdaterMother.random({
         id: flashcard.id.value,
@@ -139,7 +141,7 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
         createdBy: UuidMother.random(),
       });
       repository.search.mockResolvedValue(flashcard);
-      updater = new FlashcardUpdater(repository, publisher);
+      updater = new FlashcardUpdater(repository, publisher, logger);
 
       const request = RequestFlashcardUpdaterMother.random({
         id: flashcard.id.value,

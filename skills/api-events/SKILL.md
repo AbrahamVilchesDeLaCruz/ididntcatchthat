@@ -1,12 +1,12 @@
 ---
 name: api-events
 description: >
-  EventBus interface, DomainEventConsumer, Handler abstract en apps/api/.
-  Trigger: Al definir el EventBus, crear un Handler concreto en application, o entender el flujo de domain events.
+  EventBus interface, DomainEventConsumer, Subscriber abstract en apps/api/.
+  Trigger: Al definir el EventBus, crear un Subscriber concreto en application, o entender el flujo de domain events.
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "2.0"
 ---
 
 # Skill: api-events
@@ -14,7 +14,7 @@ metadata:
 ## When to Use
 
 - Al definir el `EventBus` interface o `DomainEventConsumer` interface
-- Al crear un `Handler` concreto en application
+- Al crear un `Subscriber` concreto en application
 - Al entender el flujo de eventos y la regla de dependencia
 
 ---
@@ -25,17 +25,17 @@ metadata:
 DomainEvent           ← lo que pasó (flashcard.created)
 EventBus              ← interface domain — publica eventos
 DomainEventConsumer   ← interface application — consume eventos
-Handler               ← abstract application — puro, sin NestJS
+Subscriber            ← abstract application — puro, sin NestJS
 AmqpMessageBus        ← infrastructure — implementa ambas interfaces
-HandlersBootstrapper  ← infrastructure — OnModuleInit, arranca handlers
+SubscribersBootstrapper ← infrastructure — OnModuleInit, arranca subscribers
 ```
 
 Regla de dependencia:
 
 ```
 Domain         → DomainEvent, EventBus interface
-Application    → Handler (abstract), DomainEventConsumer interface
-Infrastructure → AmqpMessageBus, HandlersBootstrapper, módulos NestJS
+Application    → Subscriber (abstract), DomainEventConsumer interface
+Infrastructure → AmqpMessageBus, SubscribersBootstrapper, módulos NestJS
 ```
 
 Flujo completo:
@@ -44,10 +44,10 @@ Flujo completo:
 UseCase
   → eventBus.publish(aggregate.pullDomainEvents())
     → AmqpMessageBus.publish() → RabbitMQ exchange
-      → cola del handler
-        → HandlersBootstrapper.onModuleInit() → handler.init()
+      → cola del subscriber
+        → SubscribersBootstrapper.onModuleInit() → subscriber.init()
           → AmqpMessageBus.consume() → setupQueues() automático
-            → handler.handle(event) → UseCase correspondiente
+            → subscriber.on(event) → UseCase correspondiente
 ```
 
 ---
@@ -78,30 +78,34 @@ export interface DomainEventConsumer {
     queueName: string,
     eventName: string,
     exchangeName: string,
-    domainEvent: new (...args: any[]) => DomainEvent,
-    handler: (event: DomainEvent) => Promise<void>,
+    domainEvent: new (...args: never) => DomainEvent,
+    on: (event: DomainEvent) => Promise<void>,
   ): Promise<void>;
 }
 
 export const DOMAIN_EVENT_CONSUMER = Symbol('DomainEventConsumer');
 ```
 
-## Application — Handler abstract
+---
+
+## Application — Subscriber abstract
 
 **Cero imports de NestJS** — clase pura de application:
 
 ```typescript
-// src/shared/application/handler.ts
-import { DomainEvent } from '@shared/domain/domain-event';
-import { DomainEventConsumer } from './domain-event-consumer';
+// src/shared/application/subscriber.ts
+import { type DomainEvent } from '@/shared/domain/domain-event';
+import { type DomainEventConsumer } from './domain-event-consumer';
 
-export abstract class Handler {
+type DomainEventClass = new (...args: never) => DomainEvent;
+
+export abstract class Subscriber {
   abstract get queueName(): string;
   abstract get eventName(): string;
   abstract get exchangeName(): string;
-  abstract get domainEvent(): new (...args: any[]) => DomainEvent;
+  abstract get domainEvent(): DomainEventClass;
 
-  abstract handle(event: DomainEvent): Promise<void>;
+  abstract on(event: DomainEvent): Promise<void>;
 
   constructor(protected readonly consumer: DomainEventConsumer) {}
 
@@ -111,41 +115,91 @@ export abstract class Handler {
       this.eventName,
       this.exchangeName,
       this.domainEvent,
-      this.handle.bind(this),
+      this.on.bind(this),
     );
   }
 }
 ```
 
-## Application — Handler concreto
+> **¿Por qué `never` en `DomainEventClass`?**
+> En TypeScript los parámetros de funciones/constructores son **contravariantes**.
+> `unknown[]` haría fallar a cualquier subclase con parámetros tipados.
+> `never` en posición de parámetro es el supertipo correcto — acepta cualquier
+> firma de constructor sin necesitar `any` ni `eslint-disable`.
+
+---
+
+## Application — Subscriber concreto
+
+El subscriber vive **en la misma carpeta del use case que dispara**, no en una carpeta `subscribers/` propia.
+
+```
+progress/application/
+  update/
+    update-flashcard-stats.ts                        ← use case
+    request-update-flashcard-stats.ts                ← type del request
+    update-flashcard-stats-on-attempt-recorded.ts    ← subscriber
+```
 
 ```typescript
-// src/flashcards/application/event-handlers/create-flashcard-audio-on-flashcard-created.ts
-import { Inject } from '@nestjs/common'; // único import de NestJS — solo para DI
-import { Handler } from '@shared/application/handler';
-import { DomainEventConsumer, DOMAIN_EVENT_CONSUMER } from '@shared/application/domain-event-consumer';
-import { DomainEvent } from '@shared/domain/domain-event';
-import { FlashcardCreatedEvent } from '@flashcards/domain/events/flashcard-created.event';
-import { CreateFlashcardAudioUseCase } from '../create-flashcard-audio.use-case';
+// src/progress/application/update/update-flashcard-stats-on-attempt-recorded.ts
+import { Inject, Injectable } from '@nestjs/common';
+import { Subscriber } from '@/shared/application/subscriber';
+import {
+  type DomainEventConsumer,
+  DOMAIN_EVENT_CONSUMER,
+} from '@/shared/application/domain-event-consumer';
+import { type DomainEvent } from '@/shared/domain/domain-event';
+import {
+  AttemptRecordedEvent,
+  type AttemptRecordedAttributes,
+} from '@/gaming/domain/events/attempt-recorded.event';
+import { UpdateFlashcardStats } from './update-flashcard-stats';
 
-export class CreateFlashcardAudioOnFlashcardCreated extends Handler {
-  readonly queueName    = 'create_flashcard_audio_on_flashcard_created';
-  readonly eventName    = FlashcardCreatedEvent.EVENT_NAME;
-  readonly exchangeName = FlashcardCreatedEvent.EVENT_NAME;
-  readonly domainEvent  = FlashcardCreatedEvent;
+@Injectable()
+export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
+  readonly queueName = 'progress.update_flashcard_stats_on_attempt_recorded';
+  readonly eventName = AttemptRecordedEvent.EVENT_NAME;
+  readonly exchangeName = AttemptRecordedEvent.EVENT_NAME;
+  readonly domainEvent = AttemptRecordedEvent;
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: CreateFlashcardAudioUseCase,
+    private readonly useCase: UpdateFlashcardStats,
   ) {
     super(consumer);
   }
 
-  async handle(event: DomainEvent): Promise<void> {
-    const e = event as FlashcardCreatedEvent;
-    const existing = await this.audioRepo.search(e.flashcardId);
-    if (existing) return; // idempotencia — opción A
-    await this.useCase.execute({ flashcardId: e.flashcardId });
+  async on(event: DomainEvent): Promise<void> {
+    const attrs = event.attributes as AttemptRecordedAttributes;
+    if (attrs.userId === null) return;
+    await this.useCase.execute({
+      userId: attrs.userId,
+      flashcardId: attrs.flashcardId,
+      correct: attrs.correct,
+      mode: attrs.mode,
+    });
+  }
+}
+```
+
+---
+
+## Infrastructure — SubscribersBootstrapper
+
+```typescript
+// src/shared/infrastructure/event-bus/subscribers-bootstrapper.ts
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { type Subscriber } from '@/shared/application/subscriber';
+
+export const SUBSCRIBERS = Symbol('Subscribers');
+
+@Injectable()
+export class SubscribersBootstrapper implements OnModuleInit {
+  constructor(@Inject(SUBSCRIBERS) private readonly subscribers: Subscriber[]) {}
+
+  async onModuleInit(): Promise<void> {
+    await Promise.all(this.subscribers.map((s) => s.init()));
   }
 }
 ```
@@ -155,11 +209,11 @@ export class CreateFlashcardAudioOnFlashcardCreated extends Handler {
 ## Queue Naming
 
 ```
-<acción>_on_<aggregate>_<evento_pasado>
+<bounded-context>.<acción>_on_<evento_pasado>
 
-create_flashcard_audio_on_flashcard_created
-send_welcome_email_on_user_registered
-notify_review_due_on_session_completed
+progress.update_flashcard_stats_on_attempt_recorded
+content.generate_flashcard_audio_on_flashcard_examples_completed
+identity.send_welcome_email_on_user_registered
 ```
 
 Las colas `.retry` y `.dead_letter` se crean automáticamente — ver `api-events-infra`.
@@ -168,9 +222,10 @@ Las colas `.retry` y `.dead_letter` se crean automáticamente — ver `api-event
 
 ## Rules
 
-- `Handler` abstract — **cero imports de `@nestjs/common`**
-- `@Inject` en el constructor del handler concreto es la única excepción permitida
-- `OnModuleInit` vive en infrastructure (`HandlersBootstrapper`) — nunca en application
-- `handle()` siempre llama a un UseCase — sin lógica de negocio propia
+- `Subscriber` abstract — **cero imports de `@nestjs/common`**
+- `@Inject` + `@Injectable` en el subscriber concreto son la única excepción permitida
+- `OnModuleInit` vive en infrastructure (`SubscribersBootstrapper`) — nunca en application
+- `on()` **siempre delega a un UseCase** — sin lógica de negocio propia
+- El subscriber vive **junto al use case que dispara** — nunca en carpeta `subscribers/` independiente
 - `eventBus.publish()` se llama **después** de `repository.save()` — nunca antes
 - Ver implementación de infrastructure: `api-events-infra`

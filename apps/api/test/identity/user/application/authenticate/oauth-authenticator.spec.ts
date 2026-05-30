@@ -14,12 +14,12 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { EmailMother } from '@test/identity/user/domain/email-mother';
 import { JestTimers } from '@test/shared/jest-timers';
 import { type UserSearcher } from '@/identity/user/domain/user-searcher';
-import { OAuthAuthenticatorParamsMother } from './oauth-authenticator-params.mother';
+import { RequestOAuthAuthenticatorMother } from './request-oauth-authenticator-mother';
 
 describe('identity/application/google OAuthAuthenticator', () => {
   const userRepository = mock<UserRepository>();
   const sessionRepository = mock<UserSessionRepository>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const generator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const nicknameResolver = mock<NicknameResolver>();
   const logger = mock<Logger>();
@@ -30,12 +30,12 @@ describe('identity/application/google OAuthAuthenticator', () => {
     JestTimers.setup();
     userRepository.save.mockReset();
     sessionRepository.save.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    generator.generatePair.mockReset();
     publisher.publish.mockReset();
     nicknameResolver.resolve.mockReset();
     searcher.search.mockReset();
 
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -45,7 +45,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
     authenticator = new OAuthAuthenticator(
       userRepository,
       sessionRepository,
-      tokenGenerator,
+      generator,
       publisher,
       nicknameResolver,
       logger,
@@ -56,19 +56,10 @@ describe('identity/application/google OAuthAuthenticator', () => {
   afterEach(() => JestTimers.teardown());
 
   it('should create new user, emit UserRegisteredEvent and return access token', async () => {
-    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
-      OAuthAuthenticatorParamsMother.random();
-
+    const request = RequestOAuthAuthenticatorMother.random();
     searcher.search.mockResolvedValue(null);
 
-    const result = await authenticator.execute(
-      email,
-      avatarUrl,
-      displayName,
-      deviceId,
-      fingerprint,
-      ip,
-    );
+    const result = await authenticator.execute(request);
 
     expect(result.accessToken).toBe('access-token');
     expect(userRepository.save).toHaveBeenCalledTimes(1);
@@ -83,22 +74,14 @@ describe('identity/application/google OAuthAuthenticator', () => {
   it('should return existing user, update avatar and not emit event', async () => {
     const email = EmailMother.random().value;
     const existing = UserMother.random({ email });
-    const { avatarUrl, displayName, deviceId, fingerprint, ip } =
-      OAuthAuthenticatorParamsMother.random({
-        email,
-        avatarUrl: 'https://cdn.example.com/avatar.jpg',
-      });
+    const request = RequestOAuthAuthenticatorMother.random({
+      email,
+      avatarUrl: 'https://cdn.example.com/avatar.jpg',
+    });
 
     searcher.search.mockResolvedValueOnce(existing);
 
-    await authenticator.execute(
-      email,
-      avatarUrl,
-      displayName,
-      deviceId,
-      fingerprint,
-      ip,
-    );
+    await authenticator.execute(request);
 
     expect(publisher.publish).not.toHaveBeenCalled();
     const saved: User = userRepository.save.mock.calls[0][0];
@@ -107,61 +90,40 @@ describe('identity/application/google OAuthAuthenticator', () => {
 
   it('should not emit event for existing user', async () => {
     const existing = UserMother.random();
-    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
-      OAuthAuthenticatorParamsMother.random({ email: existing.email.value });
+    const request = RequestOAuthAuthenticatorMother.random({
+      email: existing.email.value,
+    });
 
     searcher.search.mockResolvedValueOnce(existing);
 
-    await authenticator.execute(
-      email,
-      avatarUrl,
-      displayName,
-      deviceId,
-      fingerprint,
-      ip,
-    );
+    await authenticator.execute(request);
 
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 
   it('should keep existing user unchanged when avatarUrl is null', async () => {
     const existing = UserMother.random();
-    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
-      OAuthAuthenticatorParamsMother.random({
-        email: existing.email.value,
-        avatarUrl: null,
-      });
+    const request = RequestOAuthAuthenticatorMother.random({
+      email: existing.email.value,
+      avatarUrl: null,
+    });
 
     searcher.search.mockResolvedValueOnce(existing);
 
-    await authenticator.execute(
-      email,
-      avatarUrl,
-      displayName,
-      deviceId,
-      fingerprint,
-      ip,
-    );
+    await authenticator.execute(request);
 
     const saved: User = userRepository.save.mock.calls[0][0];
     expect(saved).toBe(existing);
   });
 
   it('should delegate nickname resolution to NicknameResolver', async () => {
-    const { email, avatarUrl, displayName, deviceId, fingerprint, ip } =
-      OAuthAuthenticatorParamsMother.random({ displayName: 'John Doe 123' });
+    const request = RequestOAuthAuthenticatorMother.random({
+      displayName: 'John Doe 123',
+    });
     nicknameResolver.resolve.mockResolvedValue('john-doe-123');
-
     searcher.search.mockResolvedValue(null);
 
-    await authenticator.execute(
-      email,
-      avatarUrl,
-      displayName,
-      deviceId,
-      fingerprint,
-      ip,
-    );
+    await authenticator.execute(request);
 
     expect(nicknameResolver.resolve).toHaveBeenCalledWith('John Doe 123');
     const saved: User = userRepository.save.mock.calls[0][0];

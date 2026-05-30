@@ -8,33 +8,38 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type RequestGameAbandoner } from './request-game-abandoner';
 
-export interface RequestGameAbandoner {
-  gameId: string;
-  userId: string;
-}
+export type { RequestGameAbandoner };
 
 @Injectable()
 export class GameAbandoner {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGameAbandoner): Promise<void> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+    const { gameId, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.repository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
     game.abandon();
-    await this.gameRepository.save(game);
+    await this.repository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
+
+    this.logger.info('Game abandoned', { gameId, userId });
   }
 }

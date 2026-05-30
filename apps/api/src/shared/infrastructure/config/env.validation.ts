@@ -4,12 +4,14 @@ export const envValidationSchema = Joi.object({
   // App
   NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
   PORT: Joi.number().default(3000),
+  FRONTEND_URL: Joi.string().uri().default('http://localhost:4001'),
 
   // Database
   DATABASE_URL: Joi.string().required(),
 
   // Auth
   JWT_SECRET: Joi.string().min(32).required(),
+  JWT_EXPIRES_IN: Joi.string().default('15m'),
 
   // Google OAuth
   GOOGLE_CLIENT_ID: Joi.string().required(),
@@ -34,4 +36,10 @@ export const envValidationSchema = Joi.object({
   CLOUD_STORAGE_ACCESS_KEY_ID: Joi.string().required(),
   CLOUD_STORAGE_SECRET_ACCESS_KEY: Joi.string().required(),
   CLOUD_STORAGE_BUCKET: Joi.string().required(),
+
+  // Observability
+  LOKI_URL: Joi.string().uri().optional(),
+  LOG_LEVEL: Joi.string()
+    .valid('trace', 'debug', 'info', 'warn', 'error', 'fatal')
+    .default('info'),
 });

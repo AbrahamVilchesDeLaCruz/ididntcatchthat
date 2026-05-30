@@ -4,6 +4,7 @@ import {
   type AudioGenerator,
   type AudioAccent,
 } from '@/content/flashcard/domain/audio-generator';
+import { AudioGenerationFailed } from '@/content/flashcard/domain/exceptions/audio-generation-failed';
 
 const VOICE_ID_ENV: Record<AudioAccent, string> = {
   us: 'ELEVENLABS_VOICE_ID_AMERICAN',
@@ -38,9 +39,7 @@ export class ElevenLabsAudioGenerator implements AudioGenerator {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `ElevenLabs error: ${response.status} ${response.statusText}`,
-      );
+      throw new AudioGenerationFailed(response.status, response.statusText);
     }
 
     const arrayBuffer = await response.arrayBuffer();

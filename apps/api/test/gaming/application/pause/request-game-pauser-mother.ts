@@ -1,10 +1,7 @@
+import { type RequestGamePauser } from '@/gaming/application/pause/game-pauser';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
-export interface RequestGamePauser {
-  gameId: string;
-  userId: string;
-  lastFlashcardId: string;
-}
+export type { RequestGamePauser };
 
 export class RequestGamePauserMother {
   static random(

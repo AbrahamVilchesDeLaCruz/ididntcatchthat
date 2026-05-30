@@ -97,68 +97,73 @@ La capa de entrada a la aplicación. Implementa los puertos definidos en el domi
 
 ## Estructura de carpetas
 
+Los Bounded Contexts viven directamente bajo `src/` — no hay ningún wrapper `contexts/`.
+
 ```
 src/
-└── contexts/
-    ├── {bounded-context}/               ← plural  (flashcards, pronunciation)
-    │   ├── {module}/                    ← singular (flashcard, attempt)
-    │   │   ├── application/
-    │   │   │   └── {verb}/              ← acción (create, update, remove, search)
-    │   │   │       ├── {use-case}       ← FlashcardCreator
-    │   │   │       ├── request-{dto}    ← RequestFlashcardCreator (entrada)
-    │   │   │       └── response-{dto}   ← ResponseFlashcardSearcher (salida, si aplica)
-    │   │   ├── domain/
-    │   │   │   ├── events/
-    │   │   │   ├── exceptions/
-    │   │   │   ├── {module}             ← Aggregate Root
-    │   │   │   ├── {module}.repository  ← Puerto
-    │   │   │   ├── {module}-{vo}        ← Value Objects
-    │   │   │   └── {domain-service}
-    │   │   └── infrastructure/
-    │   │       ├── controllers/
-    │   │       ├── persistence/         ← implementación del repository + mappers + modelos
-    │   │       ├── dependency-injection/
-    │   │       ├── exceptions/          ← registro de excepciones del módulo
-    │   │       └── filters/
-    │   └── shared/                      ← shared del bounded context (si tiene múltiples módulos)
-    │       ├── domain/
-    │       ├── application/
-    │       └── infrastructure/
-    ├── shared/                          ← shared global del sistema
-    │   ├── domain/                      ← AggregateRoot base, VO base, interfaces globales (Logger)
-    │   ├── application/
-    │   └── infrastructure/              ← conexión DB, EventBus impl, Criteria, DI container, PinoLogger
-    └── observability/                   ← módulo técnico transversal (no es un BC de dominio)
-        └── infrastructure/
-            ├── controllers/             ← metrics-get.controller.ts
-            ├── metrics.interceptor.ts   ← MetricsInterceptor (prom-client)
-            └── framework/
-                └── observability.module.ts
+├── {bounded-context}/
+├── shared/                          ← shared global del sistema
+│   ├── domain/                      ← AggregateRoot base, VO base, interfaces globales (Logger)
+│   ├── application/                 ← Subscriber base, interfaces de handlers
+│   └── infrastructure/              ← conexión DB, EventBus impl, Criteria, DI container, PinoLogger
+└── observability/                   ← módulo técnico transversal (no es un BC de dominio)
+    └── infrastructure/
+        ├── controllers/             ← metrics-get.controller.ts
+        ├── metrics.interceptor.ts   ← MetricsInterceptor (prom-client)
+        └── framework/
+            └── observability.module.ts
 ```
 
 ### Bounded Context = Módulo (caso simple)
 
-Cuando un Bounded Context tiene un solo concepto, el módulo colapsa en el contexto:
+Cuando un Bounded Context tiene un solo concepto, módulo y contexto colapsan. Ejemplos reales: `gaming/`, `progress/`.
 
 ```
-contexts/
-└── tutorials/                 ← contexto = módulo
+src/
+└── gaming/                    ← contexto = módulo
     ├── application/
+    │   └── {verb}/            ← acción (start, complete, record, update)
+    │       ├── {use-case}     ← GameStarter
+    │       ├── request-{dto}
+    │       └── response-{dto}
     ├── domain/
+    │   ├── events/
+    │   ├── exceptions/
+    │   ├── {aggregate}        ← Aggregate Root
+    │   ├── {aggregate}.repository
+    │   └── {aggregate}-{vo}
     └── infrastructure/
+        ├── controllers/
+        ├── persistence/       ← implementación del repository + mappers + entidades TypeORM
+        ├── selectors/         ← queries de lectura optimizadas (si aplica)
+        └── framework/         ← {bc}.module.ts + {bc}-exception-registry.ts + DI providers
 ```
 
 ### Bounded Context con múltiples módulos
 
+Cuando un BC agrupa varios conceptos cohesionados, cada uno tiene su propio módulo. Ejemplos reales: `content/` (con `flashcard/`), `identity/` (con `user/` y `session/`).
+
 ```
-contexts/
-└── programs/                  ← bounded context (plural)
-    ├── program/               ← módulo (singular)
+src/
+└── content/                         ← bounded context
+    ├── flashcard/                   ← módulo
     │   ├── application/
+    │   │   └── {verb}/
     │   ├── domain/
+    │   │   ├── events/
+    │   │   ├── exceptions/
+    │   │   ├── {aggregate}
+    │   │   ├── {aggregate}.repository
+    │   │   └── {aggregate}-{vo}
     │   └── infrastructure/
-    ├── program-catalog/       ← módulo (singular)
-    └── shared/                ← shared del bounded context
+    │       ├── controllers/
+    │       ├── persistence/
+    │       └── {external-service}/  ← ej: ai/, audio/ (adaptadores de servicios externos)
+    └── shared/                      ← shared del bounded context
+        ├── domain/
+        ├── application/
+        └── infrastructure/
+            └── framework/           ← content.module.ts + content-exception-registry.ts + DI providers
 ```
 
 ---
@@ -167,18 +172,18 @@ contexts/
 
 | Elemento             | Convención                           | Ejemplo                                          |
 | -------------------- | ------------------------------------ | ------------------------------------------------ |
-| Bounded Context      | plural                               | `flashcards/`, `pronunciation/`                  |
-| Módulo               | singular                             | `flashcard/`, `attempt/`                         |
-| Archivos de dominio  | siempre singular                     | `flashcard.ts`, `flashcard-id.ts`                |
-| Use Case             | `{Module}{Verb}`                     | `FlashcardCreator`, `AttemptSearcher`            |
-| Domain Event         | `{Module}{ActionPast}Event`          | `FlashcardCreatedEvent`                          |
-| Domain Exception     | `{Module}{Problem}`                  | `FlashcardNotFound`, `InvalidPronunciationScore` |
-| Repository interface | `{Module}Repository`                 | `FlashcardRepository`                            |
-| Domain Service       | `{Module}{Concern}`                  | `FlashcardExistVerifier`                         |
-| Controller           | `{Verb}{Module}{Protocol}Controller` | `CreateFlashcardHttpController`                  |
-| Repository impl      | `{Tech}{Module}Repository`           | `TypeOrmFlashcardRepository`                     |
-| Mapper               | `{Module}Mapper`                     | `FlashcardMapper`                                |
-| Event Handler        | `{Verb}{Module}On{Event}`            | `CreateAttemptOnFlashcardReviewed`               |
+| Bounded Context      | singular o compuesto                  | `content/`, `gaming/`, `identity/`, `progress/`  |
+| Módulo               | singular                              | `flashcard/`, `user/`, `session/`                |
+| Archivos de dominio  | siempre singular                      | `flashcard.ts`, `flashcard-id.ts`                |
+| Use Case             | `{Module}{Verb}`                      | `FlashcardCreator`, `GameStarter`                |
+| Domain Event         | `{Module}{ActionPast}Event`           | `FlashcardCreatedEvent`, `AttemptRecordedEvent`  |
+| Domain Exception     | `{Module}{Problem}`                   | `FlashcardNotFound`, `GameNotFound`              |
+| Repository interface | `{Module}Repository`                  | `FlashcardRepository`, `GameRepository`          |
+| Domain Service       | `{Module}{Concern}`                   | `FlashcardExistVerifier`                         |
+| Controller           | `{Verb}{Module}{Method}Controller`    | `CreateFlashcardPostController`, `GetGameGetController` |
+| Repository impl      | `{Tech}{Module}Repository`            | `TypeOrmFlashcardRepository`                     |
+| Mapper               | `{Module}Mapper`                      | `FlashcardMapper`                                |
+| Subscriber           | `{Verb}{Module}On{Event}`             | `UpdateFlashcardStatsOnAttemptRecorded`           |
 
 ---
 

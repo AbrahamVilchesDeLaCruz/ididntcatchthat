@@ -1,9 +1,7 @@
+import { type RequestGameResumer } from '@/gaming/application/resume/game-resumer';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
-export interface RequestGameResumer {
-  gameId: string;
-  userId: string;
-}
+export type { RequestGameResumer };
 
 export class RequestGameResumerMother {
   static random(

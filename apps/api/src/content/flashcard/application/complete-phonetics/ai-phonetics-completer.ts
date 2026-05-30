@@ -12,10 +12,10 @@ import {
   type AiPhoneticsGenerator,
   AI_PHONETICS_GENERATOR,
 } from '@/content/flashcard/domain/ai-phonetics-generator';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
 
-export type AiPhoneticsCompleterRequest = {
-  flashcardId: string;
-};
+export type { RequestAiPhoneticsCompleter } from './request-ai-phonetics-completer';
 
 @Injectable()
 export class AiPhoneticsCompleter {
@@ -25,21 +25,28 @@ export class AiPhoneticsCompleter {
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(AI_PHONETICS_GENERATOR)
-    private readonly aiPhoneticsGenerator: AiPhoneticsGenerator,
+    private readonly generator: AiPhoneticsGenerator,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
-  async execute(request: AiPhoneticsCompleterRequest): Promise<void> {
+  async execute(request: RequestAiPhoneticsCompleter): Promise<void> {
+    const { flashcardId } = request;
+
     const flashcard = await this.repository.search(
-      new FlashcardId(request.flashcardId),
+      new FlashcardId(flashcardId),
     );
     if (!flashcard) return;
 
-    const { ipaNotation, nativeSpeech } =
-      await this.aiPhoneticsGenerator.generate(flashcard.expression.value);
+    const { ipaNotation, nativeSpeech } = await this.generator.generate(
+      flashcard.expression.value,
+    );
 
     flashcard.completePhonetics(ipaNotation, nativeSpeech);
 
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard phonetics completed', { flashcardId });
   }
 }

@@ -1,14 +1,18 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
 import { UserRoleInvalidException } from '@/identity/user/domain/exceptions/user-role-invalid.exception';
 
-export type UserRoleValue = 'user' | 'teacher' | 'admin';
+export enum UserRoleValue {
+  User = 'user',
+  Teacher = 'teacher',
+  Admin = 'admin',
+}
 
-const VALID_ROLES: UserRoleValue[] = ['user', 'teacher', 'admin'];
+const VALID_ROLES = Object.values(UserRoleValue);
 
 export class UserRole extends StringValueObject {
   declare readonly value: UserRoleValue;
 
-  private constructor(value: UserRoleValue) {
+  public constructor(value: UserRoleValue) {
     super(value);
   }
 

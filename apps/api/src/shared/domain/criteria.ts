@@ -11,15 +11,16 @@ export class Criteria {
   ) {}
 }
 
-export type FilterOperator =
-  | '='
-  | '!='
-  | '>'
-  | '<'
-  | '>='
-  | '<='
-  | 'LIKE'
-  | 'IN';
+export enum FilterOperator {
+  EQ = '=',
+  NEQ = '!=',
+  GT = '>',
+  LT = '<',
+  GTE = '>=',
+  LTE = '<=',
+  LIKE = 'LIKE',
+  IN = 'IN',
+}
 
 export type Filter = {
   field: string;
@@ -27,7 +28,10 @@ export type Filter = {
   value: unknown;
 };
 
-export type OrderDirection = 'ASC' | 'DESC';
+export enum OrderDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
 
 export type Order = {
   field: string;

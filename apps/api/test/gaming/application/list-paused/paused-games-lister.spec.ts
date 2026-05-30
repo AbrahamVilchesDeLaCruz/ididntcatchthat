@@ -5,17 +5,17 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestPausedGamesListerMother } from './request-paused-games-lister-mother';
 
 describe('gaming/application/list-paused PausedGamesLister', () => {
-  const gameRepository = mock<GameRepository>();
+  const repository = mock<GameRepository>();
   let lister: PausedGamesLister;
 
   beforeEach(() => {
-    gameRepository.match.mockReset();
-    lister = new PausedGamesLister(gameRepository);
+    repository.match.mockReset();
+    lister = new PausedGamesLister(repository);
   });
 
   it('should return paused games for the user', async () => {
     const pausedGames = [GameMother.paused(), GameMother.paused()];
-    gameRepository.match.mockResolvedValue(pausedGames);
+    repository.match.mockResolvedValue(pausedGames);
 
     const result = await lister.execute(
       RequestPausedGamesListerMother.random('user-abc'),
@@ -26,7 +26,7 @@ describe('gaming/application/list-paused PausedGamesLister', () => {
   });
 
   it('should return empty array when no paused games', async () => {
-    gameRepository.match.mockResolvedValue([]);
+    repository.match.mockResolvedValue([]);
 
     const result = await lister.execute(
       RequestPausedGamesListerMother.random('user-abc'),

@@ -5,14 +5,12 @@ import {
   USER_FLASHCARD_STATS_REPOSITORY,
 } from '@/progress/domain/user-flashcard-stats.repository';
 import { UserId } from '@/shared/domain/user-id';
+import { type RequestWeakestFlashcardSearcher } from './request-weakest-flashcard-searcher';
+
+export type { RequestWeakestFlashcardSearcher };
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
-
-export interface RequestWeakestFlashcardSearcher {
-  userId: string;
-  limit?: number;
-}
 
 @Injectable()
 export class WeakestFlashcardSearcher {
@@ -21,13 +19,14 @@ export class WeakestFlashcardSearcher {
     private readonly repository: UserFlashcardStatsRepository,
   ) {}
 
-  async execute(
-    request: RequestWeakestFlashcardSearcher,
-  ): Promise<UserFlashcardStatsPrimitives[]> {
-    const limit = Math.min(request.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
+  async execute({
+    userId,
+    limit,
+  }: RequestWeakestFlashcardSearcher): Promise<UserFlashcardStatsPrimitives[]> {
+    const cappedLimit = Math.min(limit ?? DEFAULT_LIMIT, MAX_LIMIT);
     const stats = await this.repository.findWeakest(
-      new UserId(request.userId),
-      limit,
+      new UserId(userId),
+      cappedLimit,
     );
     return stats.map((s) => s.toPrimitives());
   }

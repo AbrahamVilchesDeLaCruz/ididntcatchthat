@@ -1,31 +1,39 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
+import { GameStatusInvalid } from './exceptions/game-status-invalid';
 
-const GAME_STATUSES = [
-  'in_progress',
-  'paused',
-  'completed',
-  'abandoned',
-] as const;
-type GameStatusValue = (typeof GAME_STATUSES)[number];
-
-export class GameStatusInvalid extends DomainException {
-  constructor(value: string) {
-    super(
-      `GameStatus value <${value}> is invalid. Must be one of: ${GAME_STATUSES.join(', ')}`,
-    );
-  }
+export enum GameStatusValue {
+  InProgress = 'in_progress',
+  Paused = 'paused',
+  Completed = 'completed',
+  Abandoned = 'abandoned',
 }
 
+const GAME_STATUSES = Object.values(GameStatusValue);
+
 export class GameStatus extends StringValueObject {
-  private constructor(value: GameStatusValue) {
+  constructor(value: GameStatusValue) {
+    if (!GAME_STATUSES.includes(value)) {
+      throw new GameStatusInvalid(value);
+    }
     super(value);
   }
 
+  isInProgress(): boolean {
+    return (this.value as GameStatusValue) === GameStatusValue.InProgress;
+  }
+
+  isPaused(): boolean {
+    return (this.value as GameStatusValue) === GameStatusValue.Paused;
+  }
+
+  isFinished(): boolean {
+    return (
+      (this.value as GameStatusValue) === GameStatusValue.Completed ||
+      (this.value as GameStatusValue) === GameStatusValue.Abandoned
+    );
+  }
+
   static create(value: string): GameStatus {
-    if (!GAME_STATUSES.includes(value as GameStatusValue)) {
-      throw new GameStatusInvalid(value);
-    }
     return new GameStatus(value as GameStatusValue);
   }
 }

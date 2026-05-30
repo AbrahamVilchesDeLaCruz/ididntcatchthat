@@ -8,7 +8,7 @@ const VALID_PROVIDERS: OauthProviderValue[] = ['google'];
 export class OauthProvider extends StringValueObject {
   declare readonly value: OauthProviderValue;
 
-  private constructor(value: OauthProviderValue) {
+  public constructor(value: OauthProviderValue) {
     super(value);
   }
 

@@ -12,7 +12,7 @@ import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator
 import { type UserContext } from '@/shared/domain/user-context';
 import {
   GameResumer,
-  type GameResumerResult,
+  type ResponseGameResumer,
 } from '@/gaming/application/resume/game-resumer';
 
 @ApiTags('games')
@@ -26,7 +26,7 @@ export class ResumeGameGetController {
   async handler(
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
-  ): Promise<GameResumerResult> {
+  ): Promise<ResponseGameResumer> {
     return this.resumer.execute({ gameId: id, userId: user.userId! });
   }
 }

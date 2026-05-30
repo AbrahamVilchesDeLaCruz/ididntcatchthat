@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserSession } from '@/identity/session/domain/user-session';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidCredentialsException } from '@/identity/user/domain/exceptions/invalid-credentials.exception';
 import {
   type UserRepository,
@@ -19,11 +19,10 @@ import {
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type RequestUserAuthenticator } from './request-user-authenticator';
+import { type ResponseUserAuthenticator } from './response-user-authenticator';
 
-export type UserAuthenticatorResult = {
-  accessToken: string;
-  refreshTokenId: string;
-};
+export type { RequestUserAuthenticator, ResponseUserAuthenticator };
 
 @Injectable()
 export class UserAuthenticator {
@@ -33,41 +32,41 @@ export class UserAuthenticator {
     @Inject(USER_SESSION_REPOSITORY)
     private readonly sessionRepository: UserSessionRepository,
     @Inject(PASSWORD_HASHER)
-    private readonly passwordHasher: PasswordHasher,
+    private readonly hasher: PasswordHasher,
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly generator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
 
-  async execute(params: {
-    email: string;
-    password: string;
-    deviceId: string;
-    fingerprint: string;
-    ip: string;
-  }): Promise<UserAuthenticatorResult> {
+  async execute(
+    request: RequestUserAuthenticator,
+  ): Promise<ResponseUserAuthenticator> {
+    const { email, password, deviceId, fingerprint, ip } = request;
+
     const [user] = await this.userRepository.match(
-      new Criteria([{ field: 'email', operator: '=', value: params.email }]),
+      new Criteria([
+        { field: 'email', operator: FilterOperator.EQ, value: email },
+      ]),
     );
 
     if (!user) throw new InvalidCredentialsException();
 
     if (!user.passwordHash) throw new InvalidCredentialsException();
 
-    const valid = await this.passwordHasher.compare(
-      params.password,
-      user.passwordHash.value,
-    );
+    const valid = await this.hasher.compare(password, user.passwordHash.value);
 
-    if (!valid) throw new InvalidCredentialsException();
+    if (!valid) {
+      this.logger.warn('Failed login attempt — bad password', { email });
+      throw new InvalidCredentialsException();
+    }
 
-    const { accessToken, refreshTokenId } = this.tokenGenerator.generatePair({
+    const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: 'user',
       userId: user.id.value,
-      deviceId: params.deviceId,
-      fingerprint: params.fingerprint,
-      ip: params.ip,
+      deviceId,
+      fingerprint,
+      ip,
       roles: [user.role.value],
     });
 
@@ -75,8 +74,8 @@ export class UserAuthenticator {
       crypto.randomUUID(),
       refreshTokenId,
       user.id.value,
-      params.deviceId,
-      params.fingerprint,
+      deviceId,
+      fingerprint,
     );
 
     await this.sessionRepository.save(session);

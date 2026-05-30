@@ -14,8 +14,8 @@ import { JestTimers } from '@test/shared/jest-timers';
 describe('identity/application/login UserAuthenticator', () => {
   const userRepository = mock<UserRepository>();
   const sessionRepository = mock<UserSessionRepository>();
-  const passwordHasher = mock<PasswordHasher>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const hasher = mock<PasswordHasher>();
+  const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: UserAuthenticator;
 
@@ -23,10 +23,10 @@ describe('identity/application/login UserAuthenticator', () => {
     JestTimers.setup();
     userRepository.match.mockReset();
     sessionRepository.save.mockReset();
-    passwordHasher.compare.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    hasher.compare.mockReset();
+    generator.generatePair.mockReset();
 
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -34,8 +34,8 @@ describe('identity/application/login UserAuthenticator', () => {
     useCase = new UserAuthenticator(
       userRepository,
       sessionRepository,
-      passwordHasher,
-      tokenGenerator,
+      hasher,
+      generator,
       logger,
     );
   });
@@ -47,7 +47,7 @@ describe('identity/application/login UserAuthenticator', () => {
     const user = UserMother.randomWithPassword(request.email);
 
     userRepository.match.mockResolvedValueOnce([user]);
-    passwordHasher.compare.mockResolvedValueOnce(true);
+    hasher.compare.mockResolvedValueOnce(true);
 
     const result = await useCase.execute(request);
 
@@ -74,7 +74,7 @@ describe('identity/application/login UserAuthenticator', () => {
     const user = UserMother.randomWithPassword(request.email);
 
     userRepository.match.mockResolvedValueOnce([user]);
-    passwordHasher.compare.mockResolvedValueOnce(false);
+    hasher.compare.mockResolvedValueOnce(false);
 
     await expect(useCase.execute(request)).rejects.toThrow(
       InvalidCredentialsException,

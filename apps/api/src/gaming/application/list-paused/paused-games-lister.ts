@@ -4,25 +4,26 @@ import {
   type GameRepository,
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
+import { type RequestPausedGamesLister } from './request-paused-games-lister';
 
-export interface RequestPausedGamesLister {
-  userId: string;
-}
+export type { RequestPausedGamesLister };
 
 @Injectable()
 export class PausedGamesLister {
   constructor(
     @Inject(GAME_REPOSITORY)
-    private readonly gameRepository: GameRepository,
+    private readonly repository: GameRepository,
   ) {}
 
   async execute(request: RequestPausedGamesLister): Promise<GamePrimitives[]> {
+    const { userId } = request;
+
     const criteria = new Criteria([
-      { field: 'userId', operator: '=', value: request.userId },
-      { field: 'status', operator: '=', value: 'paused' },
+      { field: 'userId', operator: FilterOperator.EQ, value: userId },
+      { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
     ]);
-    const games = await this.gameRepository.match(criteria);
+    const games = await this.repository.match(criteria);
     return games.map((g) => g.toPrimitives());
   }
 }

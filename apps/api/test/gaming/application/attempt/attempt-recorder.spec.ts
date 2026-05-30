@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type AttemptRepository } from '@/gaming/domain/attempt.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -16,6 +17,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
   const gameRepository = mock<GameRepository>();
   const attemptRepository = mock<AttemptRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let recorder: AttemptRecorder;
 
   beforeEach(() => {
@@ -23,6 +25,8 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     gameRepository.save.mockReset();
     attemptRepository.save.mockReset();
     publisher.publish.mockReset();
+    logger.info.mockReset();
+    logger.warn.mockReset();
     publisher.publish.mockResolvedValue(undefined);
     gameRepository.save.mockResolvedValue(undefined);
     attemptRepository.save.mockResolvedValue(undefined);
@@ -30,6 +34,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
       gameRepository,
       attemptRepository,
       publisher,
+      logger,
     );
   });
 

@@ -12,31 +12,26 @@ import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-no
 import { UserSessionMother } from '@test/identity/session/domain/user-session-mother';
 import { UserMother } from '@test/identity/user/domain/user-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
-import { StringMother } from '@test/shared/domain/string-mother';
 import { JestTimers } from '@test/shared/jest-timers';
+import { RequestTokenRefresherMother } from './request-token-refresher-mother';
 
 describe('identity/application/refresh TokenRefresher', () => {
   const sessionRepository = mock<UserSessionRepository>();
   const userRepository = mock<UserRepository>();
-  const tokenGenerator = mock<TokenGenerator>();
+  const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   let useCase: TokenRefresher;
 
-  const params = {
-    tokenId: UuidMother.random(),
-    deviceId: UuidMother.random(),
-    fingerprint: UuidMother.random(),
-    ip: StringMother.ip(),
-  };
+  const params = RequestTokenRefresherMother.random();
 
   beforeEach(() => {
     JestTimers.setup();
     sessionRepository.match.mockReset();
     sessionRepository.save.mockReset();
     userRepository.search.mockReset();
-    tokenGenerator.generatePair.mockReset();
+    generator.generatePair.mockReset();
 
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: UuidMother.random(),
     });
@@ -44,7 +39,7 @@ describe('identity/application/refresh TokenRefresher', () => {
     useCase = new TokenRefresher(
       sessionRepository,
       userRepository,
-      tokenGenerator,
+      generator,
       logger,
     );
   });
@@ -58,7 +53,7 @@ describe('identity/application/refresh TokenRefresher', () => {
 
     sessionRepository.match.mockResolvedValueOnce([session]);
     userRepository.search.mockResolvedValueOnce(user);
-    tokenGenerator.generatePair.mockReturnValue({
+    generator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: expectedRefreshTokenId,
     });

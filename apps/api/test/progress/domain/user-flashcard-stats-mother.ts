@@ -40,6 +40,20 @@ export class UserFlashcardStatsMother {
     });
   }
 
+  static create(
+    overrides: Partial<{
+      userId: string;
+      flashcardId: string;
+      timesStudied: number;
+      timesPlayed: number;
+      correctCount: number;
+      accuracyRate: number;
+      lastSeenAt: string;
+    }>,
+  ): UserFlashcardStats {
+    return UserFlashcardStatsMother.random(overrides);
+  }
+
   static withAccuracy(rate: number): UserFlashcardStats {
     const timesPlayed = 10;
     const correctCount = Math.round(timesPlayed * rate);

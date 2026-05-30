@@ -12,16 +12,12 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
-import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
+import { type RequestAttemptRecorder } from './request-attempt-recorder';
 
-export interface RequestAttemptRecorder {
-  gameId: string;
-  flashcardId: string;
-  correct: boolean;
-  userId: string | null;
-}
+export type { RequestAttemptRecorder };
 
 @Injectable()
 export class AttemptRecorder {
@@ -32,25 +28,31 @@ export class AttemptRecorder {
     private readonly attemptRepository: AttemptRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestAttemptRecorder): Promise<void> {
-    const game = await this.gameRepository.search(new GameId(request.gameId));
-    if (!game) throw new GameNotFound(request.gameId);
+    const { gameId, flashcardId, correct, userId } = request;
 
-    if (game.toPrimitives().userId !== request.userId) {
-      throw new GameAccessDenied(request.gameId);
+    const game = await this.gameRepository.search(new GameId(gameId));
+    if (!game) throw new GameNotFound(gameId);
+
+    if (game.userId !== userId) {
+      throw new GameAccessDenied(gameId);
     }
 
-    if (game.toPrimitives().status !== 'in_progress') {
-      throw new GameNotInProgress(request.gameId);
-    }
+    const attempt = game.recordAttempt(flashcardId, correct);
 
-    game.recordAttempt(request.flashcardId, request.correct);
-
-    const newAttempt = game.attempts[game.attempts.length - 1];
-    await this.attemptRepository.save(newAttempt);
+    await this.attemptRepository.save(attempt);
     await this.gameRepository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
+
+    this.logger.info('Attempt recorded', {
+      gameId,
+      flashcardId,
+      correct,
+      userId,
+    });
   }
 }

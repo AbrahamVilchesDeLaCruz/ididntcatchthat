@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  Flashcard,
-  type FlashcardPrimitives,
-} from '@/content/flashcard/domain/flashcard';
+import { Flashcard } from '@/content/flashcard/domain/flashcard';
 import { BulkEmptyFlashcards } from '@/content/flashcard/domain/exceptions/bulk-empty-flashcards';
 import {
   type FlashcardRepository,
@@ -12,23 +9,18 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import {
+  type RequestFlashcardBulkCreator,
+  type RequestFlashcardBulkCreatorItem,
+} from './request-flashcard-bulk-creator';
+import { type FlashcardBulkCreatorResult } from './response-flashcard-bulk-creator';
 
-type FlashcardBulkItem = {
-  id: string;
-  expression: string;
-  meaning: string;
-  category: string;
-  subcategory: string;
-  ipaNotation?: string | null;
-  nativeSpeech?: string | null;
-  examples: { id: string; textEn: string; textEs: string; position: number }[];
-  createdBy: string;
-};
-
-export type FlashcardBulkCreatorResult = {
-  created: number;
-  flashcards: FlashcardPrimitives[];
-};
+export type {
+  RequestFlashcardBulkCreator,
+  RequestFlashcardBulkCreatorItem,
+} from './request-flashcard-bulk-creator';
+export type { FlashcardBulkCreatorResult } from './response-flashcard-bulk-creator';
 
 @Injectable()
 export class FlashcardBulkCreator {
@@ -37,34 +29,47 @@ export class FlashcardBulkCreator {
     private readonly repository: FlashcardRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(
-    requests: FlashcardBulkItem[],
+    requests: RequestFlashcardBulkCreator,
   ): Promise<FlashcardBulkCreatorResult> {
     if (requests.length === 0) throw new BulkEmptyFlashcards();
 
-    // Build all aggregates first — any domain error aborts the whole batch
-    const flashcards = requests.map((req) =>
-      Flashcard.create(
-        req.id,
-        req.expression,
-        req.meaning,
-        req.category,
-        req.subcategory,
-        req.ipaNotation ?? null,
-        req.nativeSpeech ?? null,
-        req.examples,
-        req.createdBy,
-      ),
-    );
+    const flashcards = requests.map((req: RequestFlashcardBulkCreatorItem) => {
+      const {
+        id,
+        expression,
+        meaning,
+        category,
+        subcategory,
+        ipaNotation,
+        nativeSpeech,
+        examples,
+        createdBy,
+      } = req;
 
-    // Persist all
+      return Flashcard.create(
+        id,
+        expression,
+        meaning,
+        category,
+        subcategory,
+        ipaNotation ?? null,
+        nativeSpeech ?? null,
+        examples,
+        createdBy,
+      );
+    });
+
     await this.repository.saveAll(flashcards);
 
-    // Collect and publish all events in a single call
     const allEvents = flashcards.flatMap((fc) => fc.pullDomainEvents());
     await this.publisher.publish(allEvents);
+
+    this.logger.info('Flashcards bulk created', { count: flashcards.length });
 
     return {
       created: flashcards.length,
