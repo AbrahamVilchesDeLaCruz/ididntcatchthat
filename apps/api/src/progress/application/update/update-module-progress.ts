@@ -37,40 +37,24 @@ export class UpdateModuleProgress {
     const uid = new UserId(userId);
     const mod = ModuleName.create(module);
 
-    const allStats = await this.statsRepository.findByModule(uid, mod);
-    const totalAttempts = allStats.reduce((sum, s) => sum + s.timesPlayed, 0);
-    const correctCount = allStats.reduce((sum, s) => sum + s.correctCount, 0);
-    const accuracy = totalAttempts === 0 ? 0 : correctCount / totalAttempts;
-    const newMasteryLevel = ModuleProgress.computeMasteryLevel(
-      totalAttempts,
-      accuracy,
-    );
+    const [allStats, existing] = await Promise.all([
+      this.statsRepository.findByModule(uid, mod),
+      this.moduleRepository.findByModule(uid, mod),
+    ]);
 
-    const existing = await this.moduleRepository.findByModule(uid, mod);
-    const previousLevel = existing?.masteryLevel ?? -1;
+    const { progress, levelIncreased, newLevel, previousLevel } =
+      ModuleProgress.computeFrom(allStats, existing, uid, mod);
 
-    const updatedAt = new Date();
-    const mp = ModuleProgress.fromPrimitives({
-      userId: uid.value,
-      module: mod.value,
-      totalAttempts,
-      correctCount,
-      accuracy,
-      masteryLevel: newMasteryLevel,
-      lastPlayedAt: updatedAt.toISOString(),
-      updatedAt: updatedAt.toISOString(),
-    });
+    await this.moduleRepository.save(progress);
 
-    await this.moduleRepository.save(mp);
-
-    if (newMasteryLevel > previousLevel && previousLevel >= 0) {
+    if (levelIncreased) {
       await this.publisher.publish([
         new ModuleMasteryLevelIncreasedEvent(uid.value, {
           userId: uid.value,
           module: mod.value,
           previousLevel,
-          newLevel: newMasteryLevel,
-          occurredAt: updatedAt.toISOString(),
+          newLevel,
+          occurredAt: progress.updatedAt.toISOString(),
         }),
       ]);
     }
