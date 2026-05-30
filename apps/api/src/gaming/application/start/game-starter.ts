@@ -9,8 +9,8 @@ import {
   type FlashcardSelector,
   FLASHCARD_SELECTOR,
 } from '@/gaming/domain/flashcard-selector';
-import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
-import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
+import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
+import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
 import { Criteria } from '@/shared/domain/criteria';
 import { type RequestGameStarter } from './request-game-starter';
 import { type ResponseGameStarter } from './response-game-starter';
@@ -38,19 +38,14 @@ export class GameStarter {
         { field: 'cardCount', operator: '<=', value: 10 },
       ]);
       const todayGames = await this.gameRepository.match(todayCriteria);
-      if (todayGames.length >= 3) {
-        throw new GuestLimitExceeded();
-      }
+      GuestGamePolicy.assertCanStartNewGame(todayGames.length);
     } else {
       const pausedCriteria = new Criteria([
         { field: 'userId', operator: '=', value: userId },
         { field: 'status', operator: '=', value: 'paused' },
       ]);
       const pausedGames = await this.gameRepository.match(pausedCriteria);
-      if (pausedGames.length >= 5) {
-        const pausedGameIds = pausedGames.map((g) => g.id.value);
-        throw new MaxPausedGamesReached(pausedGameIds);
-      }
+      PausedGamePolicy.assertCanPauseAnother(pausedGames);
     }
 
     const gameModule = module ? GameModule.create(module) : null;
