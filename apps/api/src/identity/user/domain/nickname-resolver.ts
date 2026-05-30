@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import {
   type UserRepository,
   USER_REPOSITORY,
@@ -16,7 +16,9 @@ export class NicknameResolver {
     const candidate = this.sanitize(displayName);
 
     const [existing] = await this.repository.match(
-      new Criteria([{ field: 'nickname', operator: '=', value: candidate }]),
+      new Criteria([
+        { field: 'nickname', operator: FilterOperator.EQ, value: candidate },
+      ]),
     );
 
     if (!existing) return candidate;

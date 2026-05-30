@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@/identity/user/domain/user';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { EmailAlreadyTakenException } from '@/identity/user/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/user/domain/exceptions/nickname-already-taken.exception';
 import {
@@ -53,10 +53,14 @@ export class UserRegistrar {
 
     const [byEmail, byNickname] = await Promise.all([
       this.userRepository.match(
-        new Criteria([{ field: 'email', operator: '=', value: email }]),
+        new Criteria([
+          { field: 'email', operator: FilterOperator.EQ, value: email },
+        ]),
       ),
       this.userRepository.match(
-        new Criteria([{ field: 'nickname', operator: '=', value: nickname }]),
+        new Criteria([
+          { field: 'nickname', operator: FilterOperator.EQ, value: nickname },
+        ]),
       ),
     ]);
 

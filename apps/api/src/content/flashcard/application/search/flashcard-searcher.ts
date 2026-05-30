@@ -1,5 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Criteria, type Filter } from '@/shared/domain/criteria';
+import {
+  Criteria,
+  FilterOperator,
+  type Filter,
+} from '@/shared/domain/criteria';
 import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
@@ -34,11 +38,23 @@ export class FlashcardSearcher {
     const filters: Filter[] = [];
 
     if (category)
-      filters.push({ field: 'category', operator: '=', value: category });
+      filters.push({
+        field: 'category',
+        operator: FilterOperator.EQ,
+        value: category,
+      });
     if (subcategory)
-      filters.push({ field: 'subcategory', operator: '=', value: subcategory });
+      filters.push({
+        field: 'subcategory',
+        operator: FilterOperator.EQ,
+        value: subcategory,
+      });
     if (audioStatus)
-      filters.push({ field: 'audioStatus', operator: '=', value: audioStatus });
+      filters.push({
+        field: 'audioStatus',
+        operator: FilterOperator.EQ,
+        value: audioStatus,
+      });
 
     const criteria = new Criteria(
       filters,

@@ -11,7 +11,7 @@ import {
 } from '@/gaming/domain/flashcard-selector';
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type RequestGameStarter } from './request-game-starter';
 import { type ResponseGameStarter } from './response-game-starter';
 
@@ -33,16 +33,16 @@ export class GameStarter {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayCriteria = new Criteria([
-        { field: 'userId', operator: '=', value: null },
-        { field: 'startedAt', operator: '>=', value: today },
-        { field: 'cardCount', operator: '<=', value: 10 },
+        { field: 'userId', operator: FilterOperator.EQ, value: null },
+        { field: 'startedAt', operator: FilterOperator.GTE, value: today },
+        { field: 'cardCount', operator: FilterOperator.LTE, value: 10 },
       ]);
       const todayGames = await this.gameRepository.match(todayCriteria);
       GuestGamePolicy.assertCanStartNewGame(todayGames.length);
     } else {
       const pausedCriteria = new Criteria([
-        { field: 'userId', operator: '=', value: userId },
-        { field: 'status', operator: '=', value: 'paused' },
+        { field: 'userId', operator: FilterOperator.EQ, value: userId },
+        { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
       ]);
       const pausedGames = await this.gameRepository.match(pausedCriteria);
       PausedGamePolicy.assertCanPauseAnother(pausedGames);

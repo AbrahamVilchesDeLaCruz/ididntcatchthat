@@ -4,7 +4,7 @@ import { Repository, type SelectQueryBuilder } from 'typeorm';
 import { Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type FlashcardId } from '@/shared/domain/flashcard-id';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
-import { type Criteria } from '@/shared/domain/criteria';
+import { type Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';
 import { FlashcardEntity } from './flashcard.entity';
 
@@ -22,7 +22,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
     'createdBy',
   ]);
 
-  private readonly allowedOperators: ReadonlySet<string> = new Set([
+  private readonly allowedOperators: ReadonlySet<FilterOperator> = new Set([
     '=',
     '!=',
     '<',

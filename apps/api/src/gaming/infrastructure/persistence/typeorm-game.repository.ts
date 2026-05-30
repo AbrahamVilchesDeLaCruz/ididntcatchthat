@@ -8,7 +8,7 @@ import {
   type AttemptRepository,
   ATTEMPT_REPOSITORY,
 } from '@/gaming/domain/attempt.repository';
-import { type Criteria } from '@/shared/domain/criteria';
+import { type Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { GameEntity } from './game.entity';
 import { GameFlashcardEntity } from './game-flashcard.entity';
 
@@ -74,7 +74,7 @@ export class TypeOrmGameRepository implements GameRepository {
     for (const filter of criteria.filters) {
       const param = `p_${filter.field}`;
       if (filter.value === null) {
-        if (filter.operator === '=') {
+        if (filter.operator === FilterOperator.EQ) {
           qb.andWhere(`g.${filter.field} IS NULL`);
         } else {
           qb.andWhere(`g.${filter.field} IS NOT NULL`);

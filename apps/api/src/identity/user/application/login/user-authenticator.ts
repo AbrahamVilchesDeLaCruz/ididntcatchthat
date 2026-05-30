@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserSession } from '@/identity/session/domain/user-session';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidCredentialsException } from '@/identity/user/domain/exceptions/invalid-credentials.exception';
 import {
   type UserRepository,
@@ -45,7 +45,9 @@ export class UserAuthenticator {
     const { email, password, deviceId, fingerprint, ip } = request;
 
     const [user] = await this.userRepository.match(
-      new Criteria([{ field: 'email', operator: '=', value: email }]),
+      new Criteria([
+        { field: 'email', operator: FilterOperator.EQ, value: email },
+      ]),
     );
 
     if (!user) throw new InvalidCredentialsException();

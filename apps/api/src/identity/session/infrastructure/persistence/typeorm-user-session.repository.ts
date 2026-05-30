@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserSession } from '@/identity/session/domain/user-session';
 import { type UserSessionRepository } from '@/identity/session/domain/user-session.repository';
-import { type Criteria } from '@/shared/domain/criteria';
+import { type Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidCriteriaField } from '@/identity/session/domain/exceptions/invalid-criteria-field';
 import { UserSessionEntity } from './user-session.entity';
 
@@ -21,7 +21,7 @@ export class TypeOrmUserSessionRepository implements UserSessionRepository {
     'createdAt',
   ]);
 
-  private readonly allowedOperators: ReadonlySet<string> = new Set([
+  private readonly allowedOperators: ReadonlySet<FilterOperator> = new Set([
     '=',
     '!=',
     '<',

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserSession } from '@/identity/session/domain/user-session';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidRefreshTokenException } from '@/identity/session/domain/exceptions/invalid-refresh-token.exception';
 import { ExpiredRefreshTokenException } from '@/identity/session/domain/exceptions/expired-refresh-token.exception';
 import { UserSessionCompromisedException } from '@/identity/session/domain/exceptions/user-session-compromised.exception';
@@ -43,7 +43,9 @@ export class TokenRefresher {
     const { tokenId, deviceId, fingerprint, ip } = request;
 
     const [session] = await this.sessionRepository.match(
-      new Criteria([{ field: 'tokenId', operator: '=', value: tokenId }]),
+      new Criteria([
+        { field: 'tokenId', operator: FilterOperator.EQ, value: tokenId },
+      ]),
     );
 
     if (!session) throw new InvalidRefreshTokenException();
@@ -51,7 +53,11 @@ export class TokenRefresher {
     if (session.isRevoked()) {
       const ownerSessions = await this.sessionRepository.match(
         new Criteria([
-          { field: 'ownerId', operator: '=', value: session.ownerId },
+          {
+            field: 'ownerId',
+            operator: FilterOperator.EQ,
+            value: session.ownerId,
+          },
         ]),
       );
       await Promise.all(

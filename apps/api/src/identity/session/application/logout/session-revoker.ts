@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import {
   type UserSessionRepository,
   USER_SESSION_REPOSITORY,
@@ -22,7 +22,9 @@ export class SessionRevoker {
     const { tokenId, userId } = request;
 
     const [session] = await this.sessionRepository.match(
-      new Criteria([{ field: 'tokenId', operator: '=', value: tokenId }]),
+      new Criteria([
+        { field: 'tokenId', operator: FilterOperator.EQ, value: tokenId },
+      ]),
     );
 
     if (!session || session.isRevoked()) return; // idempotent

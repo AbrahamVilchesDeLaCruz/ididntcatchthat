@@ -4,7 +4,7 @@ import {
   type GameRepository,
   GAME_REPOSITORY,
 } from '@/gaming/domain/game.repository';
-import { Criteria } from '@/shared/domain/criteria';
+import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type RequestPausedGamesLister } from './request-paused-games-lister';
 
 export type { RequestPausedGamesLister };
@@ -20,8 +20,8 @@ export class PausedGamesLister {
     const { userId } = request;
 
     const criteria = new Criteria([
-      { field: 'userId', operator: '=', value: userId },
-      { field: 'status', operator: '=', value: 'paused' },
+      { field: 'userId', operator: FilterOperator.EQ, value: userId },
+      { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
     ]);
     const games = await this.gameRepository.match(criteria);
     return games.map((g) => g.toPrimitives());
