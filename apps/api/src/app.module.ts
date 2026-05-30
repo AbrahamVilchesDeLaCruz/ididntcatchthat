@@ -25,11 +25,13 @@ import { envValidationSchema } from './shared/infrastructure/config/env.validati
         name: 'default',
         ttl: 60_000, // 1 minute window
         limit: 100, // 100 req/min global — generous for normal use
+        skipIf: (): boolean => process.env.NODE_ENV === 'test',
       },
       {
         name: 'auth',
         ttl: 60_000, // 1 minute window
         limit: 10, // 10 req/min for auth endpoints — prevents brute force
+        skipIf: (): boolean => process.env.NODE_ENV === 'test',
       },
     ]),
     SharedModule,
