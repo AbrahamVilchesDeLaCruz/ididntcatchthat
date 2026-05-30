@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { GuestAuthenticator } from '@/identity/session/application/authenticate/guest-authenticator';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 import { GuestAuthPostPayload } from './guest-auth-post.payload';
@@ -23,6 +24,7 @@ export class GuestAuthPostController {
   ) {}
 
   @Post('guest')
+  @Throttle({ auth: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Obtain a guest token' })
   @ApiResponse({ status: 200, description: 'Guest token issued' })

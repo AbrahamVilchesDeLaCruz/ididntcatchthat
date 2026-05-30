@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { TokenRefresher } from '@/identity/session/application/refresh/token-refresher';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 
@@ -20,6 +21,7 @@ export class RefreshAuthPostController {
   ) {}
 
   @Post('refresh')
+  @Throttle({ auth: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token using refresh token cookie' })
   @ApiResponse({ status: 200, description: 'New access token issued' })

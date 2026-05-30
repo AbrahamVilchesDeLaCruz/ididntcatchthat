@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { UserRegistrar } from '@/identity/user/application/register/user-registrar';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 import { RegisterAuthPostPayload } from './register-auth-post.payload';
@@ -24,6 +25,7 @@ export class RegisterAuthPostController {
   ) {}
 
   @Post('register')
+  @Throttle({ auth: {} })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered' })

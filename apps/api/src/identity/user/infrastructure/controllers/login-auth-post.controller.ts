@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { UserAuthenticator } from '@/identity/user/application/login/user-authenticator';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 import { LoginAuthPostPayload } from './login-auth-post.payload';
@@ -24,6 +25,7 @@ export class LoginAuthPostController {
   ) {}
 
   @Post('login')
+  @Throttle({ auth: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful' })
