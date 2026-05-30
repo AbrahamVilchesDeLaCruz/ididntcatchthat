@@ -14,7 +14,6 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
-import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
 import { type RequestAttemptRecorder } from './request-attempt-recorder';
 
 export type { RequestAttemptRecorder };
@@ -40,14 +39,9 @@ export class AttemptRecorder {
       throw new GameAccessDenied(gameId);
     }
 
-    if (game.status.value !== 'in_progress') {
-      throw new GameNotInProgress(gameId);
-    }
+    const attempt = game.recordAttempt(flashcardId, correct);
 
-    game.recordAttempt(flashcardId, correct);
-
-    const newAttempt = game.attempts[game.attempts.length - 1];
-    await this.attemptRepository.save(newAttempt);
+    await this.attemptRepository.save(attempt);
     await this.gameRepository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
   }

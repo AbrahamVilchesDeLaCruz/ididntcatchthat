@@ -84,7 +84,10 @@ export class Game extends AggregateRoot<GamePrimitives> {
     );
   }
 
-  recordAttempt(flashcardId: string, correct: boolean): void {
+  recordAttempt(flashcardId: string, correct: boolean): Attempt {
+    if (this._status.value !== 'in_progress') {
+      throw new GameNotInProgress(this.id.value);
+    }
     if (!this.flashcardIds.includes(flashcardId)) {
       throw new FlashcardNotInGame(flashcardId, this.id.value);
     }
@@ -100,6 +103,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
         answeredAt: attempt.answeredAt.toISOString(),
       }),
     );
+    return attempt;
   }
 
   pause(lastFlashcardId: string): void {
