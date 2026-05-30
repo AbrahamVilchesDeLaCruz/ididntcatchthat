@@ -5,7 +5,6 @@ import {
 } from '@/content/flashcard/domain/flashcard';
 import { FlashcardId } from '@/shared/domain/flashcard-id';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
-import { FlashcardAccessDenied } from '@/content/flashcard/domain/exceptions/flashcard-access-denied';
 import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
@@ -17,8 +16,6 @@ import {
 import { type RequestFlashcardUpdater } from './request-flashcard-updater';
 
 export type { RequestFlashcardUpdater } from './request-flashcard-updater';
-
-const ADMIN_ROLE = 'admin' as const;
 
 @Injectable()
 export class FlashcardUpdater {
@@ -36,8 +33,7 @@ export class FlashcardUpdater {
 
     const flashcard = await this.findOrFail(id);
 
-    this.ensureAccess(flashcard, requesterId, requesterRole);
-
+    flashcard.assertCanBeModifiedBy(requesterId, requesterRole);
     flashcard.update(fields);
 
     await this.repository.save(flashcard);
@@ -50,14 +46,5 @@ export class FlashcardUpdater {
     const flashcard = await this.repository.search(new FlashcardId(id));
     if (!flashcard) throw new FlashcardNotFound();
     return flashcard;
-  }
-
-  private ensureAccess(
-    flashcard: Flashcard,
-    requesterId: string,
-    requesterRole: string,
-  ): void {
-    if (requesterRole === ADMIN_ROLE) return;
-    if (flashcard.createdBy !== requesterId) throw new FlashcardAccessDenied();
   }
 }

@@ -10,6 +10,7 @@ import { AudioStatus, AudioStatusValue } from './audio-status';
 import { AudioUrls, type AudioUrlsPrimitives } from './audio-urls';
 import { Example, type ExamplePrimitives } from './example';
 import { InvalidExampleCount } from './exceptions/invalid-example-count';
+import { FlashcardAccessDenied } from './exceptions/flashcard-access-denied';
 import { FlashcardCreatedEvent } from './events/flashcard-created.event';
 import { FlashcardExpressionUpdatedEvent } from './events/flashcard-expression-updated.event';
 import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated.event';
@@ -121,6 +122,11 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     );
 
     return flashcard;
+  }
+
+  assertCanBeModifiedBy(requesterId: string, requesterRole: string): void {
+    if (requesterRole === 'admin') return;
+    if (this.createdBy !== requesterId) throw new FlashcardAccessDenied();
   }
 
   update(fields: FlashcardUpdateFields): void {
