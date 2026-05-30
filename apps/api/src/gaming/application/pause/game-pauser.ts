@@ -23,7 +23,7 @@ export class GamePauser {
     const game = await this.gameRepository.search(new GameId(gameId));
     if (!game) throw new GameNotFound(gameId);
 
-    if (game.toPrimitives().userId !== userId) {
+    if (game.userId !== userId) {
       throw new GameAccessDenied(gameId);
     }
 

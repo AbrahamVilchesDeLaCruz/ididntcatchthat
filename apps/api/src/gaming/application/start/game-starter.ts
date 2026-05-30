@@ -48,7 +48,7 @@ export class GameStarter {
       ]);
       const pausedGames = await this.gameRepository.match(pausedCriteria);
       if (pausedGames.length >= 5) {
-        const pausedGameIds = pausedGames.map((g) => g.toPrimitives().id);
+        const pausedGameIds = pausedGames.map((g) => g.id.value);
         throw new MaxPausedGamesReached(pausedGameIds);
       }
     }
@@ -70,7 +70,7 @@ export class GameStarter {
     await this.gameRepository.save(game);
 
     return {
-      gameId: game.toPrimitives().id,
+      gameId: game.id.value,
       flashcardIds,
     };
   }
