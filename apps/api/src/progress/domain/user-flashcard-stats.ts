@@ -45,9 +45,10 @@ export class UserFlashcardStats extends AggregateRoot<UserFlashcardStatsPrimitiv
     return new UserFlashcardStats(userId, flashcardId, 0, 0, 0, 0, new Date());
   }
 
-  recordStudy(correct: boolean): void {
+  recordStudy(_correct: boolean): void {
     this._timesStudied++;
-    if (correct) this._correctCount++;
+    // correctCount and accuracyRate are game-mode only (domain rule #5).
+    // Study mode self-evaluation does not affect accuracy stats.
     this._lastSeenAt = new Date();
   }
 

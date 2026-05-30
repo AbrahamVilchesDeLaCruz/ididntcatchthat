@@ -29,7 +29,7 @@ graph TB
 
     subgraph Progress ["📈 Progress"]
         UserFlashcardStats["UserFlashcardStats (Aggregate Root)\n─────────────────\nuserId: UserId\nflashcardId: FlashcardId\ntimesStudied: number\ntimesPlayed: number\ncorrectCount: number\naccuracyRate: number\nlastSeenAt: Date"]
-        ModuleProgress["ModuleProgress (Read Model)\n─────────────────\nuserId: UserId\nmodule: Module\nstudyLevel: Level\nmasteryLevel: Level\ncombinedLevel: Level"]
+        ModuleProgress["ModuleProgress (Entity)\n─────────────────\nuserId: UserId\nmodule: ModuleName\ntotalAttempts: number\ncorrectCount: number\naccuracy: number\nmasteryLevel: 0|1|2|3\nlastPlayedAt: Date\nupdatedAt: Date"]
     end
 
     subgraph Pronunciation ["🎤 Pronunciation"]
