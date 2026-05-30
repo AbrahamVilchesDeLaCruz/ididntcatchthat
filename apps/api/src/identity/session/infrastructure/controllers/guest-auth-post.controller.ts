@@ -9,6 +9,8 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
+import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { GuestAuthenticator } from '@/identity/session/application/authenticate/guest-authenticator';
@@ -21,6 +23,7 @@ export class GuestAuthPostController {
   constructor(
     private readonly authenticator: GuestAuthenticator,
     private readonly fingerprintBuilder: FingerprintBuilder,
+    private readonly config: ConfigService,
   ) {}
 
   @Post('guest')
@@ -48,9 +51,9 @@ export class GuestAuthPostController {
 
     res.cookie('refreshToken', result.deviceId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE_MS,
     });
 
     return { accessToken: result.accessToken, deviceId: result.deviceId };

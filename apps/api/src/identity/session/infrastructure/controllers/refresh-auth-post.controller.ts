@@ -7,6 +7,8 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
+import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { TokenRefresher } from '@/identity/session/application/refresh/token-refresher';
@@ -18,6 +20,7 @@ export class RefreshAuthPostController {
   constructor(
     private readonly refresher: TokenRefresher,
     private readonly fingerprintBuilder: FingerprintBuilder,
+    private readonly config: ConfigService,
   ) {}
 
   @Post('refresh')
@@ -50,9 +53,9 @@ export class RefreshAuthPostController {
 
     res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE_MS,
     });
 
     return { accessToken: result.accessToken };
