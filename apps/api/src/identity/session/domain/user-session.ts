@@ -3,7 +3,10 @@ import { SessionStartedEvent } from '@/identity/session/domain/events/session-st
 import { SessionRevokedEvent } from '@/identity/session/domain/events/session-revoked.event';
 import { SessionRotatedEvent } from '@/identity/session/domain/events/session-rotated.event';
 
-export type OwnerType = 'user' | 'guest';
+export enum OwnerType {
+  User = 'user',
+  Guest = 'guest',
+}
 
 export type UserSessionPrimitives = {
   id: string;
@@ -57,7 +60,11 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
     );
 
     session.record(
-      new SessionStartedEvent(id, { ownerId, ownerType: 'user', deviceId }),
+      new SessionStartedEvent(id, {
+        ownerId,
+        ownerType: OwnerType.User,
+        deviceId,
+      }),
     );
     return session;
   }
@@ -86,7 +93,7 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
     session.record(
       new SessionStartedEvent(id, {
         ownerId: deviceId,
-        ownerType: 'guest',
+        ownerType: OwnerType.Guest,
         deviceId,
       }),
     );
@@ -130,7 +137,7 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
   }
 
   isGuest(): boolean {
-    return this.ownerType === 'guest';
+    return this.ownerType === OwnerType.Guest;
   }
 
   revoke(): UserSession {

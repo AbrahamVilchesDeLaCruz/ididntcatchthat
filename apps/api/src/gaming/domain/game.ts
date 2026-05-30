@@ -3,7 +3,7 @@ import { GameId } from './game-id';
 import { GameMode } from './game-mode';
 import { GameModule } from './game-module';
 import { CardCount } from './card-count';
-import { GameStatus } from './game-status';
+import { GameStatus, GameStatusValue } from './game-status';
 import { Attempt, type AttemptPrimitives } from './attempt';
 import { AttemptRecordedEvent } from './events/attempt-recorded.event';
 import { GameCompletedEvent } from './events/game-completed.event';
@@ -75,7 +75,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       GameMode.create(mode),
       module ? GameModule.create(module) : null,
       CardCount.create(cardCount),
-      GameStatus.create('in_progress'),
+      GameStatus.create(GameStatusValue.InProgress),
       flashcardIds,
       null,
       new Date(),
@@ -85,7 +85,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
   }
 
   recordAttempt(flashcardId: string, correct: boolean): Attempt {
-    if (this._status.value !== 'in_progress') {
+    if (!this._status.isInProgress()) {
       throw new GameNotInProgress(this.id.value);
     }
     if (!this.flashcardIds.includes(flashcardId)) {
@@ -107,10 +107,10 @@ export class Game extends AggregateRoot<GamePrimitives> {
   }
 
   pause(lastFlashcardId: string): void {
-    if (this._status.value !== 'in_progress') {
+    if (!this._status.isInProgress()) {
       throw new GameNotInProgress(this.id.value);
     }
-    this._status = GameStatus.create('paused');
+    this._status = GameStatus.create(GameStatusValue.Paused);
     this._lastFlashcardId = lastFlashcardId;
     this.record(
       new GamePausedEvent(this.id.value, {
@@ -122,10 +122,10 @@ export class Game extends AggregateRoot<GamePrimitives> {
   }
 
   resume(): void {
-    if (this._status.value !== 'paused') {
+    if (!this._status.isPaused()) {
       throw new GameNotPaused(this.id.value);
     }
-    this._status = GameStatus.create('in_progress');
+    this._status = GameStatus.create(GameStatusValue.InProgress);
   }
 
   complete(): void {
@@ -135,7 +135,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     }
     const finishedAt = new Date();
     this._finishedAt = finishedAt;
-    this._status = GameStatus.create('completed');
+    this._status = GameStatus.create(GameStatusValue.Completed);
     this.record(
       new GameCompletedEvent(this.id.value, {
         gameId: this.id.value,
@@ -150,13 +150,10 @@ export class Game extends AggregateRoot<GamePrimitives> {
   }
 
   abandon(): void {
-    if (
-      this._status.value === 'completed' ||
-      this._status.value === 'abandoned'
-    ) {
+    if (this._status.isFinished()) {
       throw new GameAlreadyFinished(this.id.value);
     }
-    this._status = GameStatus.create('abandoned');
+    this._status = GameStatus.create(GameStatusValue.Abandoned);
     this.record(
       new GameAbandonedEvent(this.id.value, {
         gameId: this.id.value,

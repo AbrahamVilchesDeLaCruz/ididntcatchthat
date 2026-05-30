@@ -1,14 +1,15 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
 import { GameModuleInvalid } from './exceptions/game-module-invalid';
 
-const GAME_MODULES = [
-  'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
-  'random',
-] as const;
-export type GameModuleValue = (typeof GAME_MODULES)[number];
+export enum GameModuleValue {
+  NativeSounds = 'native_sounds',
+  ConnectingWords = 'connecting_words',
+  BeautifyingSentences = 'beautifying_sentences',
+  SoundingNative = 'sounding_native',
+  Random = 'random',
+}
+
+const GAME_MODULES = Object.values(GameModuleValue);
 
 export class GameModule extends StringValueObject {
   private constructor(value: GameModuleValue) {

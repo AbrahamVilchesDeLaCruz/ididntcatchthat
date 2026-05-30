@@ -1,3 +1,4 @@
+import { type OwnerType } from '@/identity/session/domain/user-session';
 import {
   DomainEvent,
   type DomainEventAttributes,
@@ -5,7 +6,7 @@ import {
 
 export type SessionRevokedAttributes = {
   ownerId: string;
-  ownerType: 'user' | 'guest';
+  ownerType: OwnerType;
 };
 
 export class SessionRevokedEvent extends DomainEvent {

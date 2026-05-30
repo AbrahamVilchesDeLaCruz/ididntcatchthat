@@ -1,3 +1,4 @@
+import { OwnerType } from '@/identity/session/domain/user-session';
 import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user_sessions')
@@ -12,7 +13,7 @@ export class UserSessionEntity {
   ownerId: string;
 
   @Column({ name: 'owner_type', type: 'varchar', length: 10 })
-  ownerType: 'user' | 'guest';
+  ownerType: OwnerType;
 
   @Column({ name: 'device_id' })
   deviceId: string;
