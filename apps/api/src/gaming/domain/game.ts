@@ -161,7 +161,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     );
   }
 
-  getCompletionStats(): {
+  completionStats(): {
     correctCount: number;
     totalCount: number;
     accuracy: number;

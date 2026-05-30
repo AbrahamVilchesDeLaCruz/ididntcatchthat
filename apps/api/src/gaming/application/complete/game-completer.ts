@@ -39,6 +39,6 @@ export class GameCompleter {
     await this.gameRepository.save(game);
     await this.publisher.publish(game.pullDomainEvents());
 
-    return game.getCompletionStats();
+    return game.completionStats();
   }
 }
