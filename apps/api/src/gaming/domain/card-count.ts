@@ -1,16 +1,8 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
+import { CardCountInvalid } from './exceptions/card-count-invalid';
 
 const CARD_COUNTS = ['10', '20', '50'] as const;
-type CardCountValue = (typeof CARD_COUNTS)[number];
-
-export class CardCountInvalid extends DomainException {
-  constructor(value: string) {
-    super(
-      `CardCount value <${value}> is invalid. Must be one of: ${CARD_COUNTS.join(', ')}`,
-    );
-  }
-}
+export type CardCountValue = (typeof CARD_COUNTS)[number];
 
 export class CardCount extends StringValueObject {
   private constructor(value: CardCountValue) {

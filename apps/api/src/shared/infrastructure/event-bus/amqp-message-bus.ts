@@ -11,6 +11,7 @@ import { type DomainEventPublisher } from '@/shared/domain/domain-event-publishe
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
 import { type Logger } from '@/shared/domain/logger';
 import { LOGGER_SERVICE } from '@/shared/domain/logger';
+import { InvalidEventPayload } from '@/shared/domain/exceptions/invalid-event-payload';
 
 const RETRY_DELAYS = [1000, 5000, 10000];
 const RECONNECT_DELAY_MS = 5000;
@@ -259,9 +260,7 @@ export class AmqpMessageBus
     message: Record<string, unknown>,
   ): DomainEvent {
     if (!message.data) {
-      throw new Error(
-        `Invalid domain event payload: ${JSON.stringify(message)}`,
-      );
+      throw new InvalidEventPayload(JSON.stringify(message));
     }
     return new DomainEventClass(
       message.aggregateId,

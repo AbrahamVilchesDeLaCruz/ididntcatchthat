@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
+import { GameModuleInvalid } from './exceptions/game-module-invalid';
 
 const GAME_MODULES = [
   'native_sounds',
@@ -8,15 +8,7 @@ const GAME_MODULES = [
   'sounding_native',
   'random',
 ] as const;
-type GameModuleValue = (typeof GAME_MODULES)[number];
-
-export class GameModuleInvalid extends DomainException {
-  constructor(value: string) {
-    super(
-      `GameModule value <${value}> is invalid. Must be one of: ${GAME_MODULES.join(', ')}`,
-    );
-  }
-}
+export type GameModuleValue = (typeof GAME_MODULES)[number];
 
 export class GameModule extends StringValueObject {
   private constructor(value: GameModuleValue) {

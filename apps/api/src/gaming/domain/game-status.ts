@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { DomainException } from '@/shared/domain/exceptions/domain-exception';
+import { GameStatusInvalid } from './exceptions/game-status-invalid';
 
 const GAME_STATUSES = [
   'in_progress',
@@ -7,15 +7,7 @@ const GAME_STATUSES = [
   'completed',
   'abandoned',
 ] as const;
-type GameStatusValue = (typeof GAME_STATUSES)[number];
-
-export class GameStatusInvalid extends DomainException {
-  constructor(value: string) {
-    super(
-      `GameStatus value <${value}> is invalid. Must be one of: ${GAME_STATUSES.join(', ')}`,
-    );
-  }
-}
+export type GameStatusValue = (typeof GAME_STATUSES)[number];
 
 export class GameStatus extends StringValueObject {
   private constructor(value: GameStatusValue) {
