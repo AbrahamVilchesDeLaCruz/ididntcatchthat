@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/common/components/ui/table';
 import type { MetricVM } from '../observability.types';
 
 const METRICS_OF_INTEREST = [

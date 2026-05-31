@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/common/components/ui/table';
 import type { WeakFlashcardVM } from '../stats.types';
 
 interface WeakFlashcardsTableProps {
