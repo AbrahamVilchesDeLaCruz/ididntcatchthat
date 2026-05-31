@@ -171,5 +171,67 @@ describe('AuthComponent', () => {
         password: 'password123',
       });
     });
+
+    it('no llama onRegister si la validación falla (campos vacíos)', () => {
+      const onRegister = vi.fn();
+      const { container } = render(
+        <AuthComponent
+          {...defaultProps}
+          mode="register"
+          onRegister={onRegister}
+        />,
+      );
+
+      // Submit sin rellenar nada
+      fireEvent.submit(container.querySelector('form')!);
+
+      expect(onRegister).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('validación fallida en login', () => {
+    it('no llama onLogin si la validación falla (campos vacíos)', () => {
+      const onLogin = vi.fn();
+      const { container } = render(
+        <AuthComponent {...defaultProps} onLogin={onLogin} />,
+      );
+
+      fireEvent.submit(container.querySelector('form')!);
+
+      expect(onLogin).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('show/hide password', () => {
+    it('toggle muestra y oculta el campo contraseña en login', () => {
+      render(<AuthComponent {...defaultProps} />);
+
+      const input = screen.getByLabelText(/contraseña/i);
+      expect(input).toHaveAttribute('type', 'password');
+
+      fireEvent.click(screen.getByRole('button', { name: /mostrar/i }));
+      expect(input).toHaveAttribute('type', 'text');
+
+      fireEvent.click(screen.getByRole('button', { name: /ocultar/i }));
+      expect(input).toHaveAttribute('type', 'password');
+    });
+
+    it('toggle muestra y oculta el campo contraseña en register', () => {
+      render(<AuthComponent {...defaultProps} mode="register" />);
+
+      const input = screen.getByLabelText(/contraseña/i);
+      expect(input).toHaveAttribute('type', 'password');
+
+      fireEvent.click(screen.getByRole('button', { name: /mostrar/i }));
+      expect(input).toHaveAttribute('type', 'text');
+    });
+  });
+
+  describe('Google OAuth loading', () => {
+    it('muestra "Redirigiendo…" cuando isGoogleLoading es true', () => {
+      render(<AuthComponent {...defaultProps} isGoogleLoading={true} />);
+
+      expect(screen.getByText(/redirigiendo/i)).toBeInTheDocument();
+    });
   });
 });

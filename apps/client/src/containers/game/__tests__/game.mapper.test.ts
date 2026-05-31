@@ -1,8 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { mapFlashcardForGame, mapGameSummary } from '../game.mapper';
+import {
+  mapFlashcardForGame,
+  mapGameSummary,
+  mapResumeGame,
+} from '../game.mapper';
 import type {
   FlashcardGameApiModel,
   GameSummaryApiModel,
+  ResumeGameApiResponse,
 } from '../api/game.api-model';
 
 describe('game/mapFlashcardForGame', () => {
@@ -77,5 +82,32 @@ describe('game/mapGameSummary', () => {
     expect(vm.totalCount).toBe(10);
     expect(vm.accuracy).toBe(0.8);
     expect(vm.duration).toBe(120);
+  });
+});
+
+describe('game/mapResumeGame', () => {
+  it('maps a resume game api response to a ResumeGameVM', () => {
+    const raw: ResumeGameApiResponse = {
+      game: {
+        id: 'game-1',
+        userId: 'user-1',
+        mode: 'normal',
+        module: null,
+        cardCount: '10',
+        status: 'paused',
+        flashcardIds: ['fc-1', 'fc-2', 'fc-3', 'fc-4'],
+        lastFlashcardId: 'fc-3',
+        startedAt: '2024-01-01T00:00:00Z',
+        finishedAt: null,
+        attempts: [],
+      },
+      pendingFlashcardIds: ['fc-3', 'fc-4'],
+    };
+
+    const vm = mapResumeGame(raw);
+
+    expect(vm.gameId).toBe('game-1');
+    expect(vm.lastFlashcardId).toBe('fc-3');
+    expect(vm.pendingFlashcardIds).toEqual(['fc-3', 'fc-4']);
   });
 });
