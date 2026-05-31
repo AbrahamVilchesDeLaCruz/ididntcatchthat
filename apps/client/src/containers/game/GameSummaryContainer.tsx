@@ -27,6 +27,10 @@ export const GameSummaryContainer = (): ReactElement => {
     void navigate('/game');
   };
 
+  const handleViewStats = (): void => {
+    void navigate('/stats');
+  };
+
   const handleRegister = (): void => {
     void navigate('/auth/register');
   };
@@ -36,6 +40,7 @@ export const GameSummaryContainer = (): ReactElement => {
       summary={summary}
       isGuest={isGuest}
       onPlayAgain={handlePlayAgain}
+      onViewStats={handleViewStats}
       onRegister={handleRegister}
     />
   );

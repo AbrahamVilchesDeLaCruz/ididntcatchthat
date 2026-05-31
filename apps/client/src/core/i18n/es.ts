@@ -13,6 +13,8 @@ export const es: Translations = {
       ctaPlay: 'Jugar ahora',
       ctaHowItWorks: 'Ver cómo funciona',
       navBackoffice: 'Ir al backoffice →',
+      navStats: 'Mis estadísticas →',
+      navDashboard: 'Dashboard →',
       navLogin: 'Iniciar sesión',
       navRegister: 'Registrarse',
     },
@@ -156,6 +158,7 @@ export const es: Translations = {
       total: 'Total',
       duration: 'Duración',
       ctaPlayAgain: 'Jugar de nuevo',
+      ctaViewStats: 'Ver mis estadísticas →',
       ctaRegister: 'Guardar mi progreso',
       registerTitle: '¿Querés guardar tu progreso?',
       registerHint:
