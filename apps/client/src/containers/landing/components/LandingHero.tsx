@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useAuthStore } from '@/core/store/auth.store';
 
 interface LandingHeroProps {
@@ -12,6 +13,13 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   const { t, locale, toggleLocale } = useI18n();
   const h = t.landing.hero;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { canAccessBackoffice } = useCurrentUser();
+
+  const authNavLink = isAuthenticated
+    ? canAccessBackoffice
+      ? { to: '/backoffice/flashcards', label: h.navDashboard }
+      : { to: '/stats', label: h.navStats }
+    : null;
 
   return (
     <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 py-20 text-center">
@@ -25,12 +33,12 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
 
       {/* Top bar — language toggle + auth links */}
       <div className="absolute right-5 top-5 z-10 flex items-center gap-3">
-        {isAuthenticated ? (
+        {authNavLink ? (
           <Link
-            to="/backoffice/flashcards"
+            to={authNavLink.to}
             className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
           >
-            {h.navBackoffice}
+            {authNavLink.label}
           </Link>
         ) : (
           <>
