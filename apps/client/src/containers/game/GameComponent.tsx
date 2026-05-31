@@ -48,7 +48,7 @@ export const GameComponent = ({
 
   if (isLoading || !flashcard) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[var(--color-bg-base)]">
+      <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-base)]">
         <div className="size-8 animate-spin rounded-full border-2 border-[var(--color-brand)] border-t-transparent" />
       </div>
     );
@@ -58,7 +58,7 @@ export const GameComponent = ({
   const audioUrls = flashcard.audioUrls;
 
   return (
-    <div className="flex min-h-svh flex-col bg-[var(--color-bg-base)]">
+    <div className="flex flex-1 flex-col bg-[var(--color-bg-base)]">
       {/* Progress bar */}
       <div className="h-1 w-full bg-[var(--color-bg-elevated)]">
         <div

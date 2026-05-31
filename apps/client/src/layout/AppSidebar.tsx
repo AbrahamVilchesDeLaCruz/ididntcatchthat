@@ -48,7 +48,17 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto">
-        {/* User stats — user, teacher, admin */}
+        {/* Juego — siempre visible */}
+        <div className="mb-2">
+          <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+            Juego
+          </p>
+          <NavLink to="/game" className={navLinkClass} onClick={onNavigate}>
+            🎮 Jugar
+          </NavLink>
+        </div>
+
+        {/* Mi progreso — user, teacher, admin */}
         {(isUser || isAdmin || canAccessBackoffice) && (
           <div className="mb-2">
             <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
@@ -59,16 +69,6 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
             </NavLink>
           </div>
         )}
-
-        {/* Game */}
-        <div className="mb-2">
-          <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
-            Juego
-          </p>
-          <NavLink to="/game" className={navLinkClass} onClick={onNavigate}>
-            🎮 Jugar
-          </NavLink>
-        </div>
 
         {/* Backoffice — teacher + admin */}
         {canAccessBackoffice && (
@@ -122,7 +122,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
   );
 };
 
-export const BackofficeSidebar = (): ReactElement => {
+export const AppSidebar = (): ReactElement => {
   const [open, setOpen] = useState(false);
 
   return (
