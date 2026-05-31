@@ -5,10 +5,15 @@ import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
 import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entity';
 import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
+import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
+import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
+import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
 import { Migration1779773389320 } from '../migrations/Migration1779773389320';
+import { Migration202605281913001779988354467 } from '../migrations/Migration202605281913001779988354467';
+import { Migration202605281913201779988375165 } from '../migrations/Migration202605281913201779988375165';
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -40,12 +45,17 @@ export const AppDataSource = new DataSource({
     GameEntity,
     AttemptEntity,
     GameFlashcardEntity,
+    UserFlashcardStatsEntity,
+    ModuleProgressEntity,
+    ProcessedEventEntity,
   ],
   migrations: [
     Migration202605230526271779506787479,
     Migration202605241854361779641676650,
     Migration202605251200001779720000000,
     Migration1779773389320,
+    Migration202605281913001779988354467,
+    Migration202605281913201779988375165,
   ],
   migrationsTableName: 'migrations',
   migrationsRun: !isProd, // auto-run on dev/test; in prod use CLI
