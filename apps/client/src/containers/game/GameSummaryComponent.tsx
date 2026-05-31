@@ -7,6 +7,7 @@ interface GameSummaryComponentProps {
   isGuest: boolean;
   onPlayAgain: () => void;
   onRegister: () => void;
+  onViewStats: () => void;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -27,6 +28,7 @@ export const GameSummaryComponent = ({
   isGuest,
   onPlayAgain,
   onRegister,
+  onViewStats,
 }: GameSummaryComponentProps): ReactElement => {
   const { t } = useI18n();
   const gs = t.game.summary;
@@ -35,7 +37,7 @@ export const GameSummaryComponent = ({
   const emoji = getAccuracyEmoji(accuracyPct);
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
+    <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
       {/* Title */}
       <div className="mb-2 text-5xl">{emoji}</div>
       <h1 className="mb-2 text-3xl font-bold text-[var(--color-text-primary)]">
@@ -94,6 +96,13 @@ export const GameSummaryComponent = ({
             className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
           >
             {gs.ctaPlayAgain}
+          </button>
+          {/* Ver estadísticas — secundario */}
+          <button
+            onClick={onViewStats}
+            className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          >
+            {gs.ctaViewStats}
           </button>
         </div>
       )}

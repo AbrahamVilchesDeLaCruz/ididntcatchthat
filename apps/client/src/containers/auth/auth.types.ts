@@ -10,3 +10,14 @@ export interface RegisterFormValues {
   password: string;
   nickname: string;
 }
+
+export interface LoginFieldErrors {
+  email?: string;
+  password?: string;
+}
+
+export interface RegisterFieldErrors {
+  email?: string;
+  password?: string;
+  nickname?: string;
+}

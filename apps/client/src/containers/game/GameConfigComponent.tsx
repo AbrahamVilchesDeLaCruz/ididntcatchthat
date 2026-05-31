@@ -34,7 +34,7 @@ export const GameConfigComponent = ({
   const gc = t.game.config;
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
+    <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
       {/* Header */}
       <div className="mb-10 text-center">
         <h1 className="mb-2 text-3xl font-bold text-[var(--color-text-primary)]">

@@ -11,6 +11,8 @@ export interface LandingTranslations {
     ctaPlay: string;
     ctaHowItWorks: string;
     navBackoffice: string;
+    navStats: string;
+    navDashboard: string;
     navLogin: string;
     navRegister: string;
   };
@@ -108,6 +110,7 @@ export interface GameTranslations {
     total: string;
     duration: string;
     ctaPlayAgain: string;
+    ctaViewStats: string;
     ctaRegister: string;
     registerTitle: string;
     registerHint: string;

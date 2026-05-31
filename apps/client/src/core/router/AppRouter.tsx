@@ -1,24 +1,16 @@
 import { type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { useAuthStore } from '@/core/store/auth.store';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
+import { AppShell } from '@/common/layout/AppShell';
+import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
 import { AuthView } from '@/views/AuthView';
 import { AuthCallbackView } from '@/views/AuthCallbackView';
 import { BackofficeView } from '@/views/BackofficeView';
+import { StatsView } from '@/views/StatsView';
 import { GameConfigView } from '@/views/GameConfigView';
 import { GameView } from '@/views/GameView';
 import { GameSummaryView } from '@/views/GameSummaryView';
-
-const ProtectedRoute = ({
-  children,
-}: {
-  children: ReactElement;
-}): ReactElement => {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
-  return children;
-};
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
@@ -33,20 +25,25 @@ const AppRoutes = (): ReactElement => {
 
   return (
     <Routes>
+      {/* ── Standalone (sin shell) ─────────────────────────────────────────── */}
       <Route path="/" element={<LandingView />} />
       <Route path="/auth/callback" element={<AuthCallbackView />} />
       <Route path="/auth/:mode" element={<AuthView />} />
-      <Route path="/game" element={<GameConfigView />} />
-      <Route path="/game/:gameId" element={<GameView />} />
-      <Route path="/game/:gameId/summary" element={<GameSummaryView />} />
-      <Route
-        path="/backoffice/*"
-        element={
-          <ProtectedRoute>
-            <BackofficeView />
-          </ProtectedRoute>
-        }
-      />
+
+      {/* ── Game shell (topbar slim, sin sidebar, público) ─────────────────── */}
+      <Route element={<GameShell />}>
+        <Route path="/game" element={<GameConfigView />} />
+        <Route path="/game/:gameId" element={<GameView />} />
+        <Route path="/game/:gameId/summary" element={<GameSummaryView />} />
+      </Route>
+
+      {/* ── App shell (sidebar, protegido — redirige a /auth/login) ────────── */}
+      <Route element={<AppShell />}>
+        <Route path="/stats" element={<StatsView />} />
+        <Route path="/backoffice/*" element={<BackofficeView />} />
+      </Route>
+
+      {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

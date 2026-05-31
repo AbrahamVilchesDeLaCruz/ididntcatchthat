@@ -1,13 +1,13 @@
 packages:
   - 'apps/*'
 
+allowBuilds:
+  '@nestjs/core': true
+  '@scarf/scarf': true
+  msw: true
+
 onlyBuiltDependencies:
   - '@nestjs/core'
   - 'unrs-resolver'
   - 'esbuild'
-
-allowBuilds:
-  '@nestjs/core': true
-  unrs-resolver: true
-  esbuild: true
-  '@scarf/scarf': true
+  - 'msw'

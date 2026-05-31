@@ -1,11 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { type Logger, LOGGER_SERVICE } from './shared/domain/logger';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+
+  // ─── Cookie parser ─────────────────────────────────────────────────────────
+  // Required to read httpOnly cookies (refreshToken) in controllers via req.cookies
+  app.use(cookieParser());
 
   // ─── CORS ──────────────────────────────────────────────────────────────────
   // CORS_ORIGIN: comma-separated list of allowed origins.

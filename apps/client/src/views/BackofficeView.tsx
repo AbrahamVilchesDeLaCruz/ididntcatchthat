@@ -1,21 +1,31 @@
 import { type ReactElement } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { BackofficeSidebar } from '@/layout/BackofficeSidebar';
 import { BackofficeFlashcardsContainer } from '@/containers/backoffice/flashcards';
+import { BackofficeGamesContainer } from '@/containers/backoffice/games';
+import { BackofficeObservabilityContainer } from '@/containers/backoffice/observability';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 
 export const BackofficeView = (): ReactElement => {
+  const { canAccessBackoffice } = useCurrentUser();
+
   return (
-    <div className="flex min-h-svh bg-[var(--color-bg-base)]">
-      <BackofficeSidebar />
-      <main className="flex-1 p-8">
-        <Routes>
-          <Route
-            path="flashcards"
-            element={<BackofficeFlashcardsContainer />}
-          />
-          <Route path="*" element={<Navigate to="flashcards" replace />} />
-        </Routes>
-      </main>
-    </div>
+    <Routes>
+      <Route path="flashcards" element={<BackofficeFlashcardsContainer />} />
+      <Route path="games" element={<BackofficeGamesContainer />} />
+      <Route
+        path="observability"
+        element={<BackofficeObservabilityContainer />}
+      />
+      <Route
+        path="*"
+        element={
+          canAccessBackoffice ? (
+            <Navigate to="flashcards" replace />
+          ) : (
+            <Navigate to="/stats" replace />
+          )
+        }
+      />
+    </Routes>
   );
 };
