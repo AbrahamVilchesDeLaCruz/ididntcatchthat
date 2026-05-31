@@ -26,7 +26,9 @@ import { ListPausedGamesGetController } from '@/gaming/infrastructure/controller
 import { ResumeGameGetController } from '@/gaming/infrastructure/controllers/resume-game-get.controller';
 import { GetGameFlashcardsController } from '@/gaming/infrastructure/controllers/get-game-flashcards.controller';
 import { GamesStatsGetController } from '@/gaming/infrastructure/controllers/games-stats-get.controller';
-import { GamesStatsQuery } from '@/gaming/infrastructure/persistence/games-stats-query';
+import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
+import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
+import { GameStatsRetriever } from '@/gaming/application/stats/game-stats-retriever';
 
 // Infrastructure — exception registry
 import { GamingExceptionRegistry } from './gaming-exception-registry';
@@ -69,9 +71,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
 
     // Queries
-    GamesStatsQuery,
+    { provide: GAME_STATS_QUERY, useClass: TypeOrmGameStatsQuery },
 
     // Use cases
+    GameStatsRetriever,
     GameStarter,
     AttemptRecorder,
     GameCompleter,

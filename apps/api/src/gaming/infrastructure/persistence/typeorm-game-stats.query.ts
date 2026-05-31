@@ -1,30 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-
-export interface GameStatsByModule {
-  module: string | null;
-  totalGames: number;
-  completedGames: number;
-  avgAccuracy: number;
-}
-
-export interface GamesStatsSummary {
-  totalGames: number;
-  completedGames: number;
-  avgAccuracy: number;
-  totalAttempts: number;
-  byModule: GameStatsByModule[];
-}
+import { type GameStatsQuery } from '@/gaming/application/stats/game-stats.query';
+import { type ResponseGameStatsRetriever } from '@/gaming/application/stats/response-game-stats-retriever';
 
 @Injectable()
-export class GamesStatsQuery {
+export class TypeOrmGameStatsQuery implements GameStatsQuery {
   constructor(
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
 
-  async execute(): Promise<GamesStatsSummary> {
+  async execute(): Promise<ResponseGameStatsRetriever> {
     const [totals] = await this.dataSource.query<
       { total: string; completed: string; avg_accuracy: string }[]
     >(`

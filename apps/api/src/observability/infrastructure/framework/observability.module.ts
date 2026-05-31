@@ -6,6 +6,9 @@ import { MetricsSummaryGetController } from '../controllers/metrics-summary-get.
 import { MetricsInterceptor } from './metrics.interceptor';
 import { METRICS_REGISTRY } from './metrics-registry.token';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
+import { METRICS_SUMMARY_QUERY } from '@/observability/application/summary/metrics-summary.query';
+import { PrometheusMetricsSummaryQuery } from '@/observability/infrastructure/prometheus-metrics-summary.query';
+import { MetricsSummaryRetriever } from '@/observability/application/summary/metrics-summary-retriever';
 
 @Module({
   imports: [AuthModule],
@@ -25,6 +28,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
         new MetricsInterceptor(registry),
       inject: [METRICS_REGISTRY],
     },
+    // Queries
+    { provide: METRICS_SUMMARY_QUERY, useClass: PrometheusMetricsSummaryQuery },
+    // Use cases
+    MetricsSummaryRetriever,
   ],
   exports: [METRICS_REGISTRY],
 })
