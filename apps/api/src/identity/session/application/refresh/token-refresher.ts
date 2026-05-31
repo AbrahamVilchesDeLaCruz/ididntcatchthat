@@ -83,7 +83,7 @@ export class TokenRefresher {
     await this.sessionRepository.save(revokedSession);
 
     const { accessToken, refreshTokenId } = this.generator.generatePair({
-      type: 'user',
+      type: user.role.value,
       userId: user.id.value,
       deviceId,
       fingerprint,
