@@ -80,9 +80,7 @@ export const AuthLoginForm = ({
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
-            aria-label={
-              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-            }
+            aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
           >
             {showPassword ? (
               <svg
