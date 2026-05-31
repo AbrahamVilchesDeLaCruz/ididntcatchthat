@@ -6,6 +6,9 @@ services:
     image: ididntcatchthat-api:dev
     ports:
       - "3001:3000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
@@ -42,6 +45,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   # ─── Observability ───────────────────────────────────────────────────────────
 
