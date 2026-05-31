@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { AppSidebar } from '@/layout/AppSidebar';
+import { AppSidebar } from '@/common/layout/AppSidebar';
 
 /**
  * Layout route for authenticated app pages (stats, backoffice).

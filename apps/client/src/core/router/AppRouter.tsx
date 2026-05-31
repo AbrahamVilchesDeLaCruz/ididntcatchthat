@@ -1,8 +1,8 @@
 import { type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
-import { AppShell } from '@/layout/AppShell';
-import { GameShell } from '@/layout/GameShell';
+import { AppShell } from '@/common/layout/AppShell';
+import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
 import { AuthView } from '@/views/AuthView';
 import { AuthCallbackView } from '@/views/AuthCallbackView';

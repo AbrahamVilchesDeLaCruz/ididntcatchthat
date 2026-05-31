@@ -4,8 +4,12 @@ import { Menu } from 'lucide-react';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useLogout } from '@/containers/auth/api';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from '@/common/components/ui/sheet';
+import { Button } from '@/common/components/ui/button';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
