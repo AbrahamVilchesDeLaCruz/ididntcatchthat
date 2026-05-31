@@ -6,11 +6,13 @@ import type { LoginFormValues, RegisterFormValues } from '../auth.types';
 const defaultProps = {
   mode: 'login' as const,
   isLoading: false,
+  isGoogleLoading: false,
   error: null,
   onLogin: vi.fn(),
   onRegister: vi.fn(),
   onModeChange: vi.fn(),
   onGoogleLogin: vi.fn(),
+  onClearError: vi.fn(),
 };
 
 describe('AuthComponent', () => {
