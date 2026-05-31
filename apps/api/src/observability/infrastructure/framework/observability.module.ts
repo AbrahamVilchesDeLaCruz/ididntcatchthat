@@ -2,11 +2,14 @@ import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { Registry } from 'prom-client';
 import { MetricsGetController } from '../controllers/metrics-get.controller';
+import { MetricsSummaryGetController } from '../controllers/metrics-summary-get.controller';
 import { MetricsInterceptor } from './metrics.interceptor';
 import { METRICS_REGISTRY } from './metrics-registry.token';
+import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
 @Module({
-  controllers: [MetricsGetController],
+  imports: [AuthModule],
+  controllers: [MetricsGetController, MetricsSummaryGetController],
   providers: [
     {
       provide: METRICS_REGISTRY,
