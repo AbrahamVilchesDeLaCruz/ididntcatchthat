@@ -5,6 +5,7 @@ import type {
   ModuleProgressApiModel,
   WeakFlashcardApiModel,
 } from './stats.api-model';
+import type { ModuleProgressVM, WeakFlashcardVM } from '../stats.types';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 export const statsKeys = {
@@ -17,11 +18,12 @@ export const statsKeys = {
 export const useModuleProgress = () => {
   return useQuery({
     queryKey: statsKeys.modules,
-    queryFn: () =>
-      apiClient
-        .get<ModuleProgressApiModel[]>('/progress/modules')
-        .then((res) => res.data),
-    select: (data) => data.map(mapModuleProgress),
+    queryFn: async (): Promise<ModuleProgressVM[]> => {
+      const res = await apiClient.get<{ data: ModuleProgressApiModel[] }>(
+        '/progress/modules',
+      );
+      return res.data.data.map(mapModuleProgress);
+    },
   });
 };
 
@@ -29,10 +31,11 @@ export const useModuleProgress = () => {
 export const useWeakestFlashcards = () => {
   return useQuery({
     queryKey: statsKeys.weakest,
-    queryFn: () =>
-      apiClient
-        .get<WeakFlashcardApiModel[]>('/progress/flashcards/weakest')
-        .then((res) => res.data),
-    select: (data) => data.map(mapWeakFlashcard),
+    queryFn: async (): Promise<WeakFlashcardVM[]> => {
+      const res = await apiClient.get<{ data: WeakFlashcardApiModel[] }>(
+        '/progress/flashcards/weakest',
+      );
+      return res.data.data.map(mapWeakFlashcard);
+    },
   });
 };

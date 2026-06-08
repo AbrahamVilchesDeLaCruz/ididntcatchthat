@@ -11,7 +11,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
-import { type UserFlashcardStatsPrimitives } from '@/progress/domain/user-flashcard-stats';
+import { type WeakestFlashcardDto } from '@/progress/domain/weakest-flashcard.query';
 import { GetWeakestFlashcardsGetQuery } from './get-weakest-flashcards-get.query';
 
 @ApiTags('progress')
@@ -25,7 +25,7 @@ export class GetWeakestFlashcardsGetController {
   async handler(
     @CurrentUser() user: UserContext,
     @Query() query: GetWeakestFlashcardsGetQuery,
-  ): Promise<{ data: UserFlashcardStatsPrimitives[] }> {
+  ): Promise<{ data: WeakestFlashcardDto[] }> {
     const data = await this.searcher.execute({
       userId: user.userId!,
       limit: query.limit,

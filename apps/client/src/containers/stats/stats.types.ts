@@ -10,6 +10,7 @@ export interface ModuleProgressVM {
 
 export interface WeakFlashcardVM {
   flashcardId: string;
+  expression: string;
   module: string;
   errorCount: number;
   lastAttemptAt: Date;

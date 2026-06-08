@@ -20,7 +20,7 @@ export const WeakFlashcardsTable = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Flashcard ID</TableHead>
+          <TableHead>Expresión</TableHead>
           <TableHead>Módulo</TableHead>
           <TableHead>Errores</TableHead>
           <TableHead>Último intento</TableHead>
@@ -39,8 +39,8 @@ export const WeakFlashcardsTable = ({
         ) : (
           data.map((item) => (
             <TableRow key={item.flashcardId}>
-              <TableCell className="font-mono text-xs text-[var(--color-text-secondary)]">
-                {item.flashcardId}
+              <TableCell className="text-[var(--color-text-primary)]">
+                {item.expression}
               </TableCell>
               <TableCell>{item.module}</TableCell>
               <TableCell>
