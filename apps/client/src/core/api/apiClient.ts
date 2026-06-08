@@ -45,8 +45,10 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch {
+        // Refresh failed — clear auth state and let React Router redirect
         useAuthStore.getState().logout();
-        window.location.href = '/auth/login';
+        // Use replace to avoid adding a broken entry to browser history
+        window.location.replace('/auth/login');
       }
     }
 

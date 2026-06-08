@@ -1,8 +1,9 @@
-import { type ReactElement } from 'react';
-import type { RegisterFormValues } from '../auth.types';
+import { useState, type ReactElement } from 'react';
+import type { RegisterFormValues, RegisterFieldErrors } from '../auth.types';
 
 interface AuthRegisterFormProps {
   values: RegisterFormValues;
+  fieldErrors: RegisterFieldErrors;
   isLoading: boolean;
   onFieldChange: (field: keyof RegisterFormValues, value: string) => void;
   onSubmit: () => void;
@@ -10,17 +11,24 @@ interface AuthRegisterFormProps {
 
 export const AuthRegisterForm = ({
   values,
+  fieldErrors,
   isLoading,
   onFieldChange,
   onSubmit,
 }: AuthRegisterFormProps): ReactElement => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     onSubmit();
   };
 
+  const isDisabled =
+    isLoading || !values.email || !values.password || !values.nickname;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Nickname */}
       <div>
         <label
           htmlFor="nickname"
@@ -32,16 +40,26 @@ export const AuthRegisterForm = ({
           id="nickname"
           type="text"
           autoComplete="username"
-          required
-          minLength={3}
-          maxLength={30}
+          autoFocus
           value={values.nickname}
           onChange={(e) => onFieldChange('nickname', e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition"
+          className={`w-full px-4 py-2.5 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+            fieldErrors.nickname
+              ? 'border-red-500/60 focus:ring-red-500/30'
+              : 'border-white/10 focus:ring-white/20'
+          }`}
           placeholder="tu_nickname"
         />
+        {fieldErrors.nickname ? (
+          <p className="mt-1 text-xs text-red-400">{fieldErrors.nickname}</p>
+        ) : (
+          <p className="mt-1 text-xs text-gray-500">
+            3–30 caracteres. Solo letras, números y guiones bajos.
+          </p>
+        )}
       </div>
 
+      {/* Email */}
       <div>
         <label
           htmlFor="reg-email"
@@ -53,14 +71,21 @@ export const AuthRegisterForm = ({
           id="reg-email"
           type="email"
           autoComplete="email"
-          required
           value={values.email}
           onChange={(e) => onFieldChange('email', e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition"
+          className={`w-full px-4 py-2.5 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+            fieldErrors.email
+              ? 'border-red-500/60 focus:ring-red-500/30'
+              : 'border-white/10 focus:ring-white/20'
+          }`}
           placeholder="tu@email.com"
         />
+        {fieldErrors.email && (
+          <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+        )}
       </div>
 
+      {/* Password */}
       <div>
         <label
           htmlFor="reg-password"
@@ -68,25 +93,82 @@ export const AuthRegisterForm = ({
         >
           Contraseña
         </label>
-        <input
-          id="reg-password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          value={values.password}
-          onChange={(e) => onFieldChange('password', e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition"
-          placeholder="Mínimo 8 caracteres"
-        />
+        <div className="relative">
+          <input
+            id="reg-password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            value={values.password}
+            onChange={(e) => onFieldChange('password', e.target.value)}
+            className={`w-full px-4 py-2.5 pr-10 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+              fieldErrors.password
+                ? 'border-red-500/60 focus:ring-red-500/30'
+                : 'border-white/10 focus:ring-white/20'
+            }`}
+            placeholder="Mínimo 8 caracteres"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+            aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
+          >
+            {showPassword ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
+        {fieldErrors.password && (
+          <p className="mt-1 text-xs text-red-400">{fieldErrors.password}</p>
+        )}
       </div>
 
       <button
         type="submit"
-        disabled={isLoading}
-        className="w-full py-2.5 px-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        disabled={isDisabled}
+        className="w-full py-2.5 px-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
       >
-        {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+            Creando cuenta…
+          </span>
+        ) : (
+          'Crear cuenta'
+        )}
       </button>
     </form>
   );

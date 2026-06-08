@@ -84,4 +84,18 @@ describe('useAuthBootstrap', () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().accessToken).toBeNull();
   });
+
+  it('hace logout del guest cuando recarga (tiene guestDeviceId pero no accessToken)', () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      accessToken: null,
+      guestDeviceId: 'device-abc',
+    });
+
+    renderHook(() => useAuthBootstrap());
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().guestDeviceId).toBe('device-abc');
+    expect(mockedAxios.post).not.toHaveBeenCalled();
+  });
 });

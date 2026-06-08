@@ -1,10 +1,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type UserType = 'guest' | 'user' | 'teacher' | 'admin';
+
+interface JwtPayload {
+  type?: UserType;
+  userId?: string;
+  roles?: string[];
+}
+
+function decodeJwt(token: string): JwtPayload {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(decoded) as JwtPayload;
+  } catch {
+    return {};
+  }
+}
+
 interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
   guestDeviceId: string | null;
+  userType: UserType | null;
+  userId: string | null;
+  roles: string[];
 }
 
 interface AuthActions {
@@ -20,15 +41,33 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       accessToken: null,
       isAuthenticated: false,
       guestDeviceId: null,
+      userType: null,
+      userId: null,
+      roles: [],
 
-      setAccessToken: (token) =>
-        set({ accessToken: token, isAuthenticated: true }),
+      setAccessToken: (token) => {
+        const { type, userId, roles } = decodeJwt(token);
+        set({
+          accessToken: token,
+          isAuthenticated: true,
+          userType: type ?? null,
+          userId: userId ?? null,
+          roles: roles ?? [],
+        });
+      },
 
       setGuestDeviceId: (deviceId) => set({ guestDeviceId: deviceId }),
 
       clearGuestDeviceId: () => set({ guestDeviceId: null }),
 
-      logout: () => set({ accessToken: null, isAuthenticated: false }),
+      logout: () =>
+        set({
+          accessToken: null,
+          isAuthenticated: false,
+          userType: null,
+          userId: null,
+          roles: [],
+        }),
     }),
     {
       name: 'auth-storage',

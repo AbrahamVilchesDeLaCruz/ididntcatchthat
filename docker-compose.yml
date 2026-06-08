@@ -8,6 +8,9 @@ services:
     image: ididntcatchthat-api:local
     container_name: ididntcatchthat-api
     restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   client:
     build:
@@ -30,6 +33,12 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   # ─── Observability ───────────────────────────────────────────────────────────
 

@@ -82,7 +82,7 @@ export class OAuthAuthenticator {
     this.logUserAuthentication(isNewUser, user, email);
 
     const { accessToken, refreshTokenId } = this.generator.generatePair({
-      type: 'user',
+      type: user.role.value,
       userId: user.id.value,
       deviceId,
       fingerprint,
