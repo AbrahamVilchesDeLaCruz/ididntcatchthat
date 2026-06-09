@@ -19,8 +19,9 @@ export function mapModuleProgress(
 export function mapWeakFlashcard(raw: WeakFlashcardApiModel): WeakFlashcardVM {
   return {
     flashcardId: raw.flashcardId,
+    expression: raw.expression,
     module: raw.module,
     errorCount: raw.errorCount,
-    lastAttemptAt: new Date(raw.lastAttemptAt),
+    lastAttemptAt: new Date(raw.lastSeenAt),
   };
 }
