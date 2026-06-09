@@ -6,6 +6,7 @@ import { USER_FLASHCARD_STATS_REPOSITORY } from '@/progress/domain/user-flashcar
 import { MODULE_PROGRESS_REPOSITORY } from '@/progress/domain/module-progress.repository';
 import { PROCESSED_EVENTS_REPOSITORY } from '@/shared/domain/processed-events.repository';
 import { GUEST_ATTEMPT_REPOSITORY } from '@/progress/domain/guest-attempt.repository';
+import { WEAKEST_FLASHCARD_QUERY } from '@/progress/domain/weakest-flashcard.query';
 
 // Infrastructure — entities
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
@@ -17,6 +18,7 @@ import { TypeOrmUserFlashcardStatsRepository } from '@/progress/infrastructure/p
 import { TypeOrmModuleProgressRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-module-progress.repository';
 import { TypeOrmProcessedEventsRepository } from '@/shared/infrastructure/persistence/inbox/typeorm-processed-events.repository';
 import { TypeOrmGuestAttemptRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-guest-attempt.repository';
+import { TypeOrmWeakestFlashcardQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-weakest-flashcard.query';
 // Infrastructure — controllers
 import { GetModulesProgressGetController } from '@/progress/infrastructure/controllers/get-modules-progress-get.controller';
 import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
@@ -75,6 +77,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     {
       provide: GUEST_ATTEMPT_REPOSITORY,
       useClass: TypeOrmGuestAttemptRepository,
+    },
+    {
+      provide: WEAKEST_FLASHCARD_QUERY,
+      useClass: TypeOrmWeakestFlashcardQuery,
     },
 
     // Use cases

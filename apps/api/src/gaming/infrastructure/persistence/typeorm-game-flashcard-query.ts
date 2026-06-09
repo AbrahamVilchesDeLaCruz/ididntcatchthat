@@ -40,11 +40,7 @@ export class TypeOrmGameFlashcardQuery implements GameFlashcardQuery {
          f.ipa_notation,
          f.native_speech,
          f.audio_urls,
-         (
-           SELECT json_agg(ex ORDER BY ex.position)
-           FROM examples ex
-           WHERE ex.flashcard_id = f.id
-         ) AS examples
+         f.examples AS examples
        FROM game_flashcards gf
        JOIN flashcards f ON f.id = gf.flashcard_id
        WHERE gf.game_id = $1

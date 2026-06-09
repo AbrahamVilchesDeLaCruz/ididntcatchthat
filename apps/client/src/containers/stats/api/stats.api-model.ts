@@ -11,7 +11,8 @@ export interface ModuleProgressApiModel {
 
 export interface WeakFlashcardApiModel {
   flashcardId: string;
+  expression: string;
   module: string;
   errorCount: number;
-  lastAttemptAt: string;
+  lastSeenAt: string;
 }

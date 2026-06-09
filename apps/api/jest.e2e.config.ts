@@ -23,6 +23,7 @@ const config: Config = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
   },
   testEnvironment: 'node',
   // Load .env.test before any NestJS module is bootstrapped
