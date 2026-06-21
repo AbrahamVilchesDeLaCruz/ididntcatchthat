@@ -8,6 +8,7 @@ import { AuthView } from '@/views/AuthView';
 import { AuthCallbackView } from '@/views/AuthCallbackView';
 import { BackofficeView } from '@/views/BackofficeView';
 import { StatsView } from '@/views/StatsView';
+import { RankingView } from '@/views/RankingView';
 import { GameConfigView } from '@/views/GameConfigView';
 import { GameView } from '@/views/GameView';
 import { GameSummaryView } from '@/views/GameSummaryView';
@@ -40,6 +41,7 @@ const AppRoutes = (): ReactElement => {
       {/* ── App shell (sidebar, protegido — redirige a /auth/login) ────────── */}
       <Route element={<AppShell />}>
         <Route path="/stats" element={<StatsView />} />
+        <Route path="/ranking" element={<RankingView />} />
         <Route path="/backoffice/*" element={<BackofficeView />} />
       </Route>
 

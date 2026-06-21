@@ -164,4 +164,57 @@ export const en: Translations = {
         "You played as a guest — your streak won't be saved. Sign up, it's free!",
     },
   },
+  ranking: {
+    title: 'Ranking',
+    subtitle: 'Compete with other players and control your public visibility',
+    profile: {
+      title: 'Your ranking profile',
+      showNickname: 'Show my nickname in rankings',
+      nicknamePlaceholder: 'Public nickname',
+      save: 'Save preferences',
+      saving: 'Saving...',
+      saved: 'Preferences saved',
+      saveError: 'Could not save preferences',
+    },
+    filters: {
+      type: 'Ranking type',
+      period: 'Period',
+      module: 'Module',
+    },
+    types: {
+      most_active: 'Most active',
+      most_accurate: 'Most accurate',
+      top_scorer: 'Top scorers',
+      best_streak: 'Best streak',
+      module_master: 'Module masters',
+    },
+    periods: {
+      weekly: 'Weekly',
+      monthly: 'Monthly',
+      all_time: 'All time',
+    },
+    table: {
+      rank: '#',
+      player: 'Player',
+      score: 'Score',
+      you: 'You',
+    },
+    scoreUnits: {
+      most_active: 'games',
+      most_accurate: 'accuracy',
+      top_scorer: 'correct',
+      best_streak: 'days',
+      module_master: 'level',
+    },
+    loading: 'Loading ranking...',
+    error: 'Failed to load ranking. Please try again.',
+    empty: 'No players in this ranking yet.',
+    emptyOptInHint: 'Enable "Show my nickname" and save your preferences.',
+    emptyMostActiveHint: 'Only completed Game-mode sessions count (not Study).',
+    outsideTopHint:
+      'You are ranked but outside the top 10. Your position is shown below.',
+    yourPosition: 'Your position',
+    periodIgnoredHint:
+      'This ranking ignores the period filter — showing all-time data.',
+  },
 };
