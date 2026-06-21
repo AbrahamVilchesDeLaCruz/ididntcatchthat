@@ -1,6 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { mapWeakFlashcard } from '../stats.mapper';
+import { mapModuleProgress, mapWeakFlashcard } from '../stats.mapper';
 import type { WeakFlashcardApiModel } from '../api/stats.api-model';
+import type { ModuleProgressApiModel } from '../api/stats.api-model';
+
+describe('stats/mapModuleProgress', () => {
+  it('maps accuracy from 0–1 API scale to 0–100 display scale', () => {
+    const raw: ModuleProgressApiModel = {
+      userId: 'user-1',
+      module: 'connected_speech',
+      totalAttempts: 20,
+      correctCount: 15,
+      accuracy: 0.75,
+      masteryLevel: 2,
+    };
+
+    const vm = mapModuleProgress(raw);
+
+    expect(vm.accuracy).toBe(75);
+    expect(vm.masteryLevel).toBe(2);
+  });
+});
 
 describe('stats/mapWeakFlashcard', () => {
   it('maps weakest flashcard api model including expression', () => {
