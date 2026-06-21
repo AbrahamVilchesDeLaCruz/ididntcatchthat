@@ -20,7 +20,7 @@ import { TypeOrmProcessedEventsRepository } from '@/shared/infrastructure/persis
 import { TypeOrmGuestAttemptRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-guest-attempt.repository';
 import { TypeOrmWeakestFlashcardQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-weakest-flashcard.query';
 // Infrastructure — controllers
-import { GetModulesProgressGetController } from '@/progress/infrastructure/controllers/get-modules-progress-get.controller';
+import { SearchModulesProgressGetController } from '@/progress/infrastructure/controllers/search-modules-progress-get.controller';
 import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
 
 // Infrastructure — event bus
@@ -57,7 +57,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     ]),
   ],
   controllers: [
-    GetModulesProgressGetController,
+    SearchModulesProgressGetController,
     GetWeakestFlashcardsGetController,
   ],
   providers: [

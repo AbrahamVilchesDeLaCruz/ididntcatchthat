@@ -15,7 +15,7 @@ import { type ModuleProgressPrimitives } from '@/progress/domain/module-progress
 @ApiTags('progress')
 @Controller('progress')
 @UseGuards(JwtAuthGuard)
-export class GetModulesProgressGetController {
+export class SearchModulesProgressGetController {
   constructor(private readonly finder: ModuleProgressFinder) {}
 
   @Get('modules')
@@ -24,6 +24,7 @@ export class GetModulesProgressGetController {
     @CurrentUser() user: UserContext,
   ): Promise<{ data: ModuleProgressPrimitives[] }> {
     const data = await this.finder.execute({ userId: user.userId! });
+
     return { data };
   }
 }
