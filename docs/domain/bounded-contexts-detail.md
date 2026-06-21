@@ -196,36 +196,45 @@ graph LR
 
 ## 🏆 Ranking
 
-**Responsabilidad**: Mantener rankings materializados para lectura eficiente.
+**Responsabilidad**: Mantener la proyección `ranking_user_scores` para lectura eficiente de tablas de clasificación.
 
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["ModuleMasteryLevelIncreased\nidct.progress.module_progress.module_mastery_level.increased"]
+        C1["GameCompleted"]
+        C2["AttemptRecorded"]
+        C3["StreakUpdated"]
+        C4["ModuleMasteryLevelIncreased"]
     end
 
     subgraph Ranking ["🏆 Ranking"]
-        RC["RankingCache\n(Read Model)"]
+        U["RankingUpdater"]
+        Agg["Ranking (aggregate)"]
+        Repo["RankingRepository"]
+        Sel["RankingSelector"]
+        RS["ranking_user_scores"]
     end
 
-    subgraph Job ["Scheduled Job"]
-        J1["RankingRecomputeJob\n(periódico)"]
-    end
-
-    C1 -->|marca dirty| Ranking
-    J1 -->|recomputa| RC
+    C1 --> U
+    C2 --> U
+    C3 --> U
+    C4 --> U
+    U --> Agg
+    Agg --> Repo
+    Repo -->|UPSERT| RS
+    Sel -->|SELECT + RANK| RS
 ```
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Marca ranking como `dirty` → recomputado en próximo job |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | `most_active` +1 / recount ventanas |
+| `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | `top_scorer` +1 si acierto; `most_accurate` recalculado |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | `best_streak` = racha actual |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | `module_master` = nivel del módulo |
 
-**No emite eventos.** Es un pure read model — solo responde a queries.
+**No emite eventos.** Es un pure consumer — la lectura es `SELECT` sobre la proyección.
 
-Fuentes de datos para el cálculo:
-- `user_flashcard_stats` → accuracy, flashcards acertadas, module level
-- `games` → partidas jugadas
-- `users` → streak actual
+Write-time usa queries scoped al usuario (o incrementos) — no hay recomputo global ni job cron.
 
 ---
 
