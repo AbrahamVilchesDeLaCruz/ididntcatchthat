@@ -27,14 +27,14 @@ describe('progress/update-module-progress (e2e)', () => {
     const { gameId, flashcardIds } = await startGame(app, token, {
       mode: 'game',
       module: 'native_sounds',
-      cardCount: 5,
+      cardCount: 10,
     });
 
     for (let i = 0; i < flashcardIds.length; i++) {
       await request(app.getHttpServer())
         .post(`/v1/games/${gameId}/attempts`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ flashcardId: flashcardIds[i], correct: i < 3 })
+        .send({ flashcardId: flashcardIds[i], correct: i < 5 })
         .expect(204);
     }
 
@@ -61,6 +61,6 @@ describe('progress/update-module-progress (e2e)', () => {
 
     expect(entry).toBeDefined();
     expect(entry!.masteryLevel).toBe(1);
-    expect(entry!.totalAttempts).toBe(5);
+    expect(entry!.totalAttempts).toBe(10);
   });
 });

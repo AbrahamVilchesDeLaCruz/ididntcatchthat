@@ -125,6 +125,27 @@ export class AmqpMessageBus
 
   // ── Publish ──────────────────────────────────────────────────────────────────
 
+  /**
+   * Invokes registered in-process handlers without publishing to RabbitMQ.
+   * Used by E2E tests to avoid flaky cross-BC async delivery in CI.
+   */
+  async dispatchInProcess(events: DomainEvent[]): Promise<void> {
+    for (const event of events) {
+      const eventName = event.eventName();
+      for (const reg of this.registeredConsumers) {
+        if (reg.eventName !== eventName) continue;
+
+        const domainEvent = this.instantiateDomainEvent(reg.DomainEventClass, {
+          aggregateId: event.aggregateId,
+          eventId: event.eventId,
+          occurredOn: event.occurredOn.toISOString(),
+          data: event.attributes,
+        });
+        await reg.handler(domainEvent);
+      }
+    }
+  }
+
   async publish(events: DomainEvent[]): Promise<void> {
     const ch = await this.getChannel();
 
