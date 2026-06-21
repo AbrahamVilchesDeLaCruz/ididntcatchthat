@@ -6,8 +6,8 @@ import { createAdminToken } from '../../shared/infrastructure/create-admin-token
 
 const BASE_PAYLOAD = {
   meaning: 'Test meaning',
-  category: 'native_sounds',
-  subcategory: 'TEST',
+  category: 'mastering_sounds',
+  subcategory: 'STOP_T',
   ipaNotation: 'tɛst',
   nativeSpeech: null,
   examples: [],
@@ -35,8 +35,11 @@ export async function seedNativeSoundsFlashcards(
   }
 
   const ds = app.get(DataSource);
+  // Content API stores mastering_sounds; gaming module filter expects native_sounds.
   await ds.query(
-    `UPDATE flashcards SET audio_status = 'ready' WHERE id = ANY($1)`,
+    `UPDATE flashcards
+     SET audio_status = 'ready', category = 'native_sounds'
+     WHERE id = ANY($1)`,
     [ids],
   );
 

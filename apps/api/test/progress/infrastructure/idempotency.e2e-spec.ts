@@ -4,7 +4,6 @@ import { DataSource } from 'typeorm';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
 import { GuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 import { seedNativeSoundsFlashcards } from '../shared/seed-native-sounds-flashcards';
-import { UuidMother } from '@test/shared/domain/uuid-mother';
 
 describe('progress/idempotency (e2e)', () => {
   let app: INestApplication<App>;
@@ -20,10 +19,10 @@ describe('progress/idempotency (e2e)', () => {
 
   it('should import guest progress only once for the same eventId', async () => {
     const ds = app.get(DataSource);
-    const userId = UuidMother.random();
-    const guestDeviceId = UuidMother.random();
-    const eventId = UuidMother.random();
-    const gameId = UuidMother.random();
+    const userId = crypto.randomUUID();
+    const guestDeviceId = crypto.randomUUID();
+    const eventId = crypto.randomUUID();
+    const gameId = crypto.randomUUID();
     const flashcardRows = await ds.query<{ id: string }[]>(
       `SELECT id FROM flashcards LIMIT 2`,
     );
@@ -39,7 +38,7 @@ describe('progress/idempotency (e2e)', () => {
       await ds.query(
         `INSERT INTO attempts (id, game_id, flashcard_id, correct, answered_at)
          VALUES ($1, $2, $3, false, NOW())`,
-        [UuidMother.random(), gameId, flashcardId],
+        [crypto.randomUUID(), gameId, flashcardId],
       );
     }
 
