@@ -31,6 +31,8 @@ import { LogoutAuthPostController } from '@/identity/session/infrastructure/cont
 import { GoogleAuthGetController } from '@/identity/user/infrastructure/controllers/google-auth-get.controller';
 import { GoogleCallbackAuthGetController } from '@/identity/user/infrastructure/controllers/google-callback-auth-get.controller';
 import { MigrateGuestAuthPostController } from '@/identity/user/infrastructure/controllers/migrate-guest-auth-post.controller';
+import { UpdateRankingProfilePatchController } from '@/identity/user/infrastructure/controllers/update-ranking-profile-patch.controller';
+import { GetRankingProfileGetController } from '@/identity/user/infrastructure/controllers/get-ranking-profile-get.controller';
 
 // Infrastructure — exception registry
 import { IdentityExceptionRegistry } from './identity-exception-registry';
@@ -46,6 +48,8 @@ import { GuestProgressMigrator } from '@/identity/user/application/migrate-guest
 import { StreakUpdater } from '@/identity/user/application/update-streak/streak-updater';
 import { StreakUpdaterOnGameCompleted } from '@/identity/user/application/update-streak/update-streak-on-game-completed';
 import { StreakBrokenCronJob } from '@/identity/user/application/update-streak/streak-broken-cron.job';
+import { RankingProfileUpdater } from '@/identity/user/application/update-profile/ranking-profile-updater';
+import { RankingProfileFinder } from '@/identity/user/application/update-profile/ranking-profile-finder';
 import {
   SUBSCRIBERS,
   SubscribersBootstrapper,
@@ -59,11 +63,13 @@ import { UserSearcher } from '@/identity/user/domain/user-searcher';
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
+import { RankingModule } from '@/ranking/infrastructure/framework/ranking.module';
 
 @Module({
   imports: [
     SharedModule,
     AuthModule,
+    RankingModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
   ],
@@ -76,6 +82,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     GoogleAuthGetController,
     GoogleCallbackAuthGetController,
     MigrateGuestAuthPostController,
+    GetRankingProfileGetController,
+    UpdateRankingProfilePatchController,
   ],
   providers: [
     // Repositories
@@ -111,6 +119,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     StreakUpdater,
     StreakUpdaterOnGameCompleted,
     StreakBrokenCronJob,
+    RankingProfileUpdater,
+    RankingProfileFinder,
     {
       provide: SUBSCRIBERS,
       useFactory: (handler: StreakUpdaterOnGameCompleted): Subscriber[] => [

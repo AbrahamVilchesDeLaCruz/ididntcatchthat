@@ -9,6 +9,7 @@ import { IdentityModule } from './identity/shared/infrastructure/framework/ident
 import { ContentModule } from './content/shared/infrastructure/framework/content.module';
 import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { ProgressModule } from './progress/infrastructure/framework/progress.module';
+import { RankingModule } from './ranking/infrastructure/framework/ranking.module';
 import { AppDataSource } from './shared/infrastructure/persistence/typeorm/typeorm.config';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 
@@ -40,6 +41,7 @@ import { envValidationSchema } from './shared/infrastructure/config/env.validati
     ContentModule,
     GamingModule,
     ProgressModule,
+    RankingModule,
   ],
   providers: [
     {
