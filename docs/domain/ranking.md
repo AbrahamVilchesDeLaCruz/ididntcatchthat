@@ -4,7 +4,7 @@
 
 ## Filosofía
 
-El sistema de ranking está diseñado para que **cada tipo de jugador tenga hueco** — no solo el que más juega o el que más acierta. Múltiples tablas especializadas garantizan que la gamificación sea inclusiva y motive distintos perfiles de usuario.
+El sistema de ranking está diseñado para que **cada tipo de jugador tenga hueco** — no solo el que más juega o el que más acierta. Múltiples rankings especializados garantizan que la gamificación sea inclusiva y motive distintos perfiles de usuario.
 
 ---
 
@@ -12,14 +12,16 @@ El sistema de ranking está diseñado para que **cada tipo de jugador tenga huec
 
 ### Por ámbito
 
-- **Global** — todos los módulos mezclados
-- **Por módulo** — Native Sounds · Connecting Words · Beautifying Sentences · Sounding Native
+- **Global** — todos los módulos mezclados (`module = global`)
+- **Por módulo** — Native Sounds · Connecting Words · Beautifying Sentences · Sounding Native (solo `module_master`)
 
 ### Por período
 
-- **Semanal**
-- **Mensual**
-- **All-time**
+- **Semanal** — ventana móvil de 7 días
+- **Mensual** — ventana móvil de 30 días
+- **All-time** — histórico completo
+
+`best_streak` y `module_master` solo usan all-time.
 
 ### Por métrica (múltiples rankings)
 
@@ -29,9 +31,7 @@ El sistema de ranking está diseñado para que **cada tipo de jugador tenga huec
 | Most Accurate | Accuracy rate (% aciertos)     | El jugador preciso   |
 | Top Scorer    | Flashcards acertadas (volumen) | El jugador prolífico |
 | Best Streak   | Racha de días activos          | El jugador habitual  |
-| Module Master | Combined level por módulo      | El especialista      |
-
-Esto da hueco a distintos perfiles: el que juega mucho, el que acierta mucho, el constante, el especialista en un módulo.
+| Module Master | Mastery level por módulo       | El especialista      |
 
 ---
 
@@ -39,23 +39,24 @@ Esto da hueco a distintos perfiles: el que juega mucho, el que acierta mucho, el
 
 - Aparecer en rankings es **opt-in** — por defecto el usuario NO aparece.
 - El usuario activa `show_in_ranking` en su perfil y elige un **nickname** público.
-- Si desactiva la opción, desaparece de todos los rankings inmediatamente.
+- Si desactiva la opción, se eliminan sus filas de `ranking_user_scores` inmediatamente.
+- Si activa opt-in, se hace **backfill** de sus scores históricos en la proyección.
 
 ---
 
-## Cálculo
+## Cálculo — proyección incremental
 
-Los rankings se calculan desde `user_flashcard_stats` y la tabla de `games`:
+Los rankings **no se recalculan globalmente**. Cada evento actualiza solo las filas del usuario afectado en `ranking_user_scores`:
 
-| Métrica              | Fuente                                    |
-| -------------------- | ----------------------------------------- |
-| Partidas jugadas     | `COUNT(games) WHERE mode = game`          |
-| Accuracy rate        | `AVG(user_flashcard_stats.accuracy_rate)` |
-| Flashcards acertadas | `SUM(user_flashcard_stats.correct_count)` |
-| Streak               | `users.current_streak`                    |
-| Combined level       | `study_level + mastery_level` por módulo  |
+| Métrica              | Trigger                         | Actualización                          |
+| -------------------- | ------------------------------- | -------------------------------------- |
+| Partidas jugadas     | `GameCompleted` (mode = game)   | +1 all_time; recount weekly/monthly    |
+| Accuracy rate        | `AttemptRecorded` (mode = game) | AVG scoped al usuario en ventana       |
+| Flashcards acertadas | `AttemptRecorded` (correct)     | +1 por acierto en modo juego           |
+| Streak               | `StreakUpdated`                 | `score = current_streak`               |
+| Module mastery       | `ModuleMasteryLevelIncreased`   | `score = mastery_level` del módulo     |
 
-Los rankings **no se calculan en tiempo real** — se recomputan periódicamente (job programado) para no impactar el rendimiento en lectura. El dato mostrado puede tener un desfase de minutos.
+La lectura calcula el rank con `RANK() OVER (ORDER BY score DESC)` sobre la proyección — sin JOIN masivos en `games` ni `user_flashcard_stats`.
 
 ---
 
@@ -66,12 +67,32 @@ sequenceDiagram
     actor U as Usuario
     participant FE as Frontend
     participant API as API
-    participant DB as Database
+    participant DB as ranking_user_scores
 
     U->>FE: Abre sección Ranking
-    FE->>API: GET /rankings?type=most_accurate&period=weekly&module=native_sounds
-    API->>DB: SELECT desde rankings_cache (materializada)
-    DB-->>API: top N usuarios con nickname + score
-    API-->>FE: rankings[]
+    FE->>API: GET /rankings?type=most_accurate&period=weekly
+    API->>DB: SELECT top N ORDER BY score DESC
+    DB-->>API: entries con rank calculado
+    API-->>FE: entries + currentUser
     FE->>U: Muestra tabla + posición del usuario actual
+```
+
+---
+
+## Diagrama de secuencia — actualización por evento
+
+```mermaid
+sequenceDiagram
+    participant G as Gaming / Identity / Progress
+    participant Bus as Event Bus
+    participant H as Ranking Handler
+    participant U as RankingUpdater
+    participant R as RankingRepository
+    participant DB as ranking_user_scores
+
+    G->>Bus: DomainEvent
+    Bus->>H: on(event)
+    H->>U: recordGameCompleted / recordAttempt / …
+    U->>R: search → Ranking.applyScore → save
+    R->>DB: UPSERT score (solo ese user_id)
 ```

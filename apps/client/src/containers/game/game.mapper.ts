@@ -39,7 +39,8 @@ export const mapFlashcardForGame = (
 export const mapGameSummary = (raw: GameSummaryApiModel): GameSummaryVM => ({
   correctCount: raw.correctCount,
   totalCount: raw.totalCount,
-  accuracy: raw.accuracy,
+  // API returns accuracy as 0–100; VM uses 0–1 for display helpers.
+  accuracy: raw.accuracy / 100,
   duration: raw.duration,
 });
 

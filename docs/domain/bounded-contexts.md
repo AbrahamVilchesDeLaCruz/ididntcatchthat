@@ -13,7 +13,7 @@ graph TB
     Gaming["🎮 Gaming\n─────────────\nGame\nAttempt"]
     Progress["📈 Progress\n─────────────\nUserFlashcardStats\nModuleProgress"]
     Pronunciation["🎤 Pronunciation\n─────────────\nPronunciationAttempt"]
-    Ranking["🏆 Ranking\n─────────────\nRankingCache"]
+    Ranking["🏆 Ranking\n─────────────\nRanking\nRankingEntry"]
     Notification["🔔 Notification\n─────────────\nEmailJob\nPushJob"]
 
     Gaming -->|AttemptRecorded| Progress
@@ -43,22 +43,25 @@ graph TB
 | `FlashcardCreated` | `idct.content.flashcard.created` | Content | Content (interno) | Trigger audio pipeline async (×4 archivos) |
 | `FlashcardUpdated` | `idct.content.flashcard.updated` | Content | Content (interno) | Regenera audio si cambió `expression` o `examples` |
 | `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Gaming | Progress | Actualiza `user_flashcard_stats` en write-time |
+| `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Ranking | Actualiza `most_accurate` y `top_scorer` vía aggregate `Ranking` |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (study/mastery/combined level) |
-| `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Ranking | Actualiza `most_active` vía aggregate `Ranking` |
 | `UserRegistered` | `idct.identity.users.user.registered` | Identity | Notification | Envía email de bienvenida (Resend) |
 | `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Ranking | Actualiza `best_streak` vía aggregate `Ranking` |
 | `StreakBroken` | `idct.identity.streaks.streak.broken` | Identity | Notification | Email + push notification |
 | `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Identity | Progress | Importa games + attempts del guest → `user_flashcard_stats` |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Notification | Toast de logro en app |
-| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Marca ranking como dirty → recomputa en próximo job |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Actualiza `module_master` vía aggregate `Ranking` |
 | `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Pronunciation | Progress | Actualiza pronunciation stats en `user_flashcard_stats` |
 
 ---
 
 ## Dirección de dependencias
 
-- **Ranking** es un **pure read model** — solo lee de Progress y Gaming, nunca emite eventos.
+- **Ranking** es un **pure consumer** con **proyección incremental** — consume eventos de Gaming, Identity y Progress; persiste scores vía aggregate `Ranking` en `ranking_user_scores`; la lectura usa `RankingSelector`; nunca emite eventos.
 - **Content** se autogestiona el audio — sus eventos son internos al propio BC.
 - **Notification** es un **pure consumer** — nunca emite eventos de dominio, solo ejecuta side effects (email, push, toast).
 - **Progress** es el **hub central** — recibe de Gaming, Pronunciation e Identity, y alimenta a Ranking y Notification.
-- **`ModuleMasteryLevelIncreased`** es el evento que dispara notificaciones y recomputa el ranking al subir de nivel de maestría.
+- **`ModuleMasteryLevelIncreased`** dispara notificaciones y actualiza el ranking de maestros del módulo vía aggregate `Ranking`.

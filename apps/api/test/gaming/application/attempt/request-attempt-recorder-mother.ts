@@ -1,5 +1,8 @@
 import { type RequestAttemptRecorder } from '@/gaming/application/attempt/attempt-recorder';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
+import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
+import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { BooleanMother } from '@test/shared/domain/boolean-mother';
 
 export type { RequestAttemptRecorder };
 
@@ -10,9 +13,9 @@ export class RequestAttemptRecorderMother {
   ): RequestAttemptRecorder {
     return {
       gameId: gameId ?? GameIdMother.random().value,
-      flashcardId: 'fc-1',
-      correct: true,
-      userId: 'user-123',
+      flashcardId: UuidMother.random(),
+      correct: BooleanMother.random(),
+      userId: UserIdMother.random().value,
       ...overrides,
     };
   }

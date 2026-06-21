@@ -7,6 +7,7 @@ import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entit
 import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
 import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
+import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typeorm/ranking-user-score.entity';
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
@@ -14,6 +15,9 @@ import { Migration202605251200001779720000000 } from '../migrations/Migration202
 import { Migration1779773389320 } from '../migrations/Migration1779773389320';
 import { Migration202605281913001779988354467 } from '../migrations/Migration202605281913001779988354467';
 import { Migration202605281913201779988375165 } from '../migrations/Migration202605281913201779988375165';
+import { Migration202606200410001779990000001 } from '../migrations/Migration202606200410001779990000001';
+import { Migration202606200519001779990000002 } from '../migrations/Migration202606200519001779990000002';
+import { Migration202606200600001779990000003 } from '../migrations/Migration202606200600001779990000003';
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -47,6 +51,7 @@ export const AppDataSource = new DataSource({
     GameFlashcardEntity,
     UserFlashcardStatsEntity,
     ModuleProgressEntity,
+    RankingUserScoreEntity,
     ProcessedEventEntity,
   ],
   migrations: [
@@ -56,6 +61,9 @@ export const AppDataSource = new DataSource({
     Migration1779773389320,
     Migration202605281913001779988354467,
     Migration202605281913201779988375165,
+    Migration202606200410001779990000001,
+    Migration202606200519001779990000002,
+    Migration202606200600001779990000003,
   ],
   migrationsTableName: 'migrations',
   migrationsRun: !isProd, // auto-run on dev/test; in prod use CLI

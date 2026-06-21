@@ -71,6 +71,13 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
             <NavLink to="/stats" className={navLinkClass} onClick={onNavigate}>
               📊 Estadísticas
             </NavLink>
+            <NavLink
+              to="/ranking"
+              className={navLinkClass}
+              onClick={onNavigate}
+            >
+              🏆 Ranking
+            </NavLink>
           </div>
         )}
 

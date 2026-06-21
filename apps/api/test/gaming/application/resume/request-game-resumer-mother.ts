@@ -1,5 +1,6 @@
 import { type RequestGameResumer } from '@/gaming/application/resume/game-resumer';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
+import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 
 export type { RequestGameResumer };
 
@@ -10,7 +11,7 @@ export class RequestGameResumerMother {
   ): RequestGameResumer {
     return {
       gameId: gameId ?? GameIdMother.random().value,
-      userId: 'user-123',
+      userId: UserIdMother.random().value,
       ...overrides,
     };
   }

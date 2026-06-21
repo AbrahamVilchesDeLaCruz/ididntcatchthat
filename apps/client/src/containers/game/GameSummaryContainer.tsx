@@ -1,7 +1,12 @@
-import { type ReactElement } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { type ReactElement, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { GameSummaryComponent } from './GameSummaryComponent';
+import {
+  clearGameSummary,
+  resolveGameSummary,
+  saveGameSummary,
+} from './game-summary.storage';
 import type { GameSummaryVM } from './game.types';
 
 interface LocationState {
@@ -9,6 +14,7 @@ interface LocationState {
 }
 
 export const GameSummaryContainer = (): ReactElement => {
+  const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -16,14 +22,16 @@ export const GameSummaryContainer = (): ReactElement => {
   const isGuest = isAuthenticated && guestDeviceId !== null;
   const state = (location.state as LocationState | null) ?? {};
 
-  const summary: GameSummaryVM = state.summary ?? {
-    correctCount: 0,
-    totalCount: 0,
-    accuracy: 0,
-    duration: 0,
-  };
+  const summary: GameSummaryVM = resolveGameSummary(gameId, state.summary);
+
+  useEffect(() => {
+    if (gameId && state.summary) {
+      saveGameSummary(gameId, state.summary);
+    }
+  }, [gameId, state.summary]);
 
   const handlePlayAgain = (): void => {
+    if (gameId) clearGameSummary(gameId);
     void navigate('/game');
   };
 

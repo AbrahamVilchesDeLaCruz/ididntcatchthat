@@ -6,6 +6,8 @@ import { Nickname } from '@/identity/user/domain/nickname';
 import { UserRole } from '@/identity/user/domain/user-role';
 import { OauthProvider } from '@/identity/user/domain/oauth-provider';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
+import { StreakUpdatedEvent } from '@/identity/user/domain/events/streak-updated.event';
+import { StreakBrokenEvent } from '@/identity/user/domain/events/streak-broken.event';
 
 export type UserPrimitives = {
   id: string;
@@ -97,6 +99,81 @@ export class User extends AggregateRoot<UserPrimitives> {
       ...this.toPrimitives(),
       avatarUrl,
     });
+  }
+
+  updateRankingPreferences(showInRanking: boolean, nickname: string): User {
+    return User.fromPrimitives({
+      ...this.toPrimitives(),
+      showInRanking,
+      nickname: new Nickname(nickname).value,
+      updatedAt: new Date(),
+    });
+  }
+
+  recordDailyActivity(activityDate: Date): User {
+    const dayStart = (date: Date): Date =>
+      new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    const activityDay = dayStart(activityDate);
+    const previousStreak = this.currentStreak;
+
+    if (
+      this.lastActivityDate &&
+      dayStart(this.lastActivityDate).getTime() === activityDay.getTime()
+    ) {
+      return this;
+    }
+
+    let newStreak = 1;
+    if (this.lastActivityDate) {
+      const lastDay = dayStart(this.lastActivityDate);
+      const diffDays = Math.round(
+        (activityDay.getTime() - lastDay.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      newStreak = diffDays === 1 ? this.currentStreak + 1 : 1;
+    }
+
+    const user = User.fromPrimitives({
+      ...this.toPrimitives(),
+      currentStreak: newStreak,
+      longestStreak: Math.max(this.longestStreak, newStreak),
+      lastActivityDate: activityDay,
+      updatedAt: new Date(),
+    });
+
+    if (newStreak !== previousStreak) {
+      user.record(
+        new StreakUpdatedEvent(user.id.value, {
+          userId: user.id.value,
+          previousStreak,
+          newStreak,
+          occurredAt: activityDate.toISOString(),
+        }),
+      );
+    }
+
+    return user;
+  }
+
+  breakStreak(now: Date): User {
+    if (this.currentStreak === 0) return this;
+
+    const brokenStreak = this.currentStreak;
+    const user = User.fromPrimitives({
+      ...this.toPrimitives(),
+      currentStreak: 0,
+      updatedAt: now,
+    });
+
+    user.record(
+      new StreakBrokenEvent(user.id.value, {
+        userId: user.id.value,
+        brokenStreak,
+        occurredAt: now.toISOString(),
+      }),
+    );
+
+    return user;
   }
 
   toPrimitives(): UserPrimitives {

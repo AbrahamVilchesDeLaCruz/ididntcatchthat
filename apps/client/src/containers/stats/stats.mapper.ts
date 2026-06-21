@@ -11,7 +11,8 @@ export function mapModuleProgress(
     module: raw.module,
     totalAttempts: raw.totalAttempts,
     correctCount: raw.correctCount,
-    accuracy: raw.accuracy,
+    // API stores 0–1; chart displays 0–100%.
+    accuracy: raw.accuracy * 100,
     masteryLevel: raw.masteryLevel,
   };
 }

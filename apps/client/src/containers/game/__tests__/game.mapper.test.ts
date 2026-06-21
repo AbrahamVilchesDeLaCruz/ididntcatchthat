@@ -72,7 +72,7 @@ describe('game/mapGameSummary', () => {
     const raw: GameSummaryApiModel = {
       correctCount: 8,
       totalCount: 10,
-      accuracy: 0.8,
+      accuracy: 80,
       duration: 120,
     };
 

@@ -117,7 +117,57 @@ export interface GameTranslations {
   };
 }
 
+export interface RankingTranslations {
+  title: string;
+  subtitle: string;
+  profile: {
+    title: string;
+    showNickname: string;
+    nicknamePlaceholder: string;
+    save: string;
+    saving: string;
+    saved: string;
+    saveError: string;
+  };
+  filters: {
+    type: string;
+    period: string;
+    module: string;
+  };
+  types: Record<
+    | 'most_active'
+    | 'most_accurate'
+    | 'top_scorer'
+    | 'best_streak'
+    | 'module_master',
+    string
+  >;
+  periods: Record<'weekly' | 'monthly' | 'all_time', string>;
+  table: {
+    rank: string;
+    player: string;
+    score: string;
+    you: string;
+  };
+  scoreUnits: {
+    most_active: string;
+    most_accurate: string;
+    top_scorer: string;
+    best_streak: string;
+    module_master: string;
+  };
+  loading: string;
+  error: string;
+  empty: string;
+  emptyOptInHint: string;
+  emptyMostActiveHint: string;
+  outsideTopHint: string;
+  yourPosition: string;
+  periodIgnoredHint: string;
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
+  ranking: RankingTranslations;
 }
