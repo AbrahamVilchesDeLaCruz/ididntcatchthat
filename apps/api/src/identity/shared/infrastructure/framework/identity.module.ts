@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 // Domain tokens
 import { USER_REPOSITORY } from '@/identity/user/domain/user.repository';
@@ -42,6 +43,14 @@ import { TokenRefresher } from '@/identity/session/application/refresh/token-ref
 import { SessionRevoker } from '@/identity/session/application/logout/session-revoker';
 import { OAuthAuthenticator } from '@/identity/user/application/authenticate/oauth-authenticator';
 import { GuestProgressMigrator } from '@/identity/user/application/migrate-guest/guest-progress-migrator';
+import { StreakUpdater } from '@/identity/user/application/update-streak/streak-updater';
+import { StreakUpdaterOnGameCompleted } from '@/identity/user/application/update-streak/update-streak-on-game-completed';
+import { StreakBrokenCronJob } from '@/identity/user/application/update-streak/streak-broken-cron.job';
+import {
+  SUBSCRIBERS,
+  SubscribersBootstrapper,
+} from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
+import { type Subscriber } from '@/shared/application/subscriber';
 
 // Domain services
 import { NicknameResolver } from '@/identity/user/domain/nickname-resolver';
@@ -55,6 +64,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   imports: [
     SharedModule,
     AuthModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
   ],
   controllers: [
@@ -98,6 +108,17 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     SessionRevoker,
     OAuthAuthenticator,
     GuestProgressMigrator,
+    StreakUpdater,
+    StreakUpdaterOnGameCompleted,
+    StreakBrokenCronJob,
+    {
+      provide: SUBSCRIBERS,
+      useFactory: (handler: StreakUpdaterOnGameCompleted): Subscriber[] => [
+        handler,
+      ],
+      inject: [StreakUpdaterOnGameCompleted],
+    },
+    SubscribersBootstrapper,
 
     // Exception registry
     IdentityExceptionRegistry,
