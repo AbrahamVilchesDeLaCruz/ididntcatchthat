@@ -1,5 +1,6 @@
 import { type RequestGameAbandoner } from '@/gaming/application/abandon/game-abandoner';
 import { GameIdMother } from '@test/gaming/domain/game-id-mother';
+import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 
 export type { RequestGameAbandoner };
 
@@ -10,7 +11,7 @@ export class RequestGameAbandonerMother {
   ): RequestGameAbandoner {
     return {
       gameId: gameId ?? GameIdMother.random().value,
-      userId: 'user-123',
+      userId: UserIdMother.random().value,
       ...overrides,
     };
   }
