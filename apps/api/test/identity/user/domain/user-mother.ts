@@ -1,7 +1,8 @@
 import { User } from '@/identity/user/domain/user';
-import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 import { EmailMother } from '@test/identity/user/domain/email-mother';
 import { NicknameMother } from '@test/identity/user/domain/nickname-mother';
+import { DateMother } from '@test/shared/domain/date-mother';
 
 export class UserMother {
   /**
@@ -14,21 +15,25 @@ export class UserMother {
       email: string;
       nickname: string;
       avatarUrl: string | null;
+      currentStreak: number;
+      longestStreak: number;
+      lastActivityDate: Date | null;
+      showInRanking: boolean;
     }>,
   ): User {
-    const now = new Date();
+    const now = DateMother.recent();
     return User.fromPrimitives({
-      id: overrides?.id ?? UuidMother.random(),
+      id: overrides?.id ?? UserIdMother.random().value,
       email: overrides?.email ?? EmailMother.random().value,
       passwordHash: null,
       nickname: overrides?.nickname ?? NicknameMother.random().value,
       avatarUrl: overrides?.avatarUrl ?? null,
       role: 'user',
       oauthProvider: null,
-      showInRanking: true,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastActivityDate: null,
+      showInRanking: overrides?.showInRanking ?? true,
+      currentStreak: overrides?.currentStreak ?? 0,
+      longestStreak: overrides?.longestStreak ?? overrides?.currentStreak ?? 0,
+      lastActivityDate: overrides?.lastActivityDate ?? null,
       createdAt: now,
       updatedAt: now,
     });
@@ -38,9 +43,9 @@ export class UserMother {
    * Creates a persisted user with a hashed password.
    */
   static randomWithPassword(email?: string): User {
-    const now = new Date();
+    const now = DateMother.recent();
     return User.fromPrimitives({
-      id: UuidMother.random(),
+      id: UserIdMother.random().value,
       email: email ?? EmailMother.random().value,
       passwordHash: 'hashed-password',
       nickname: NicknameMother.random().value,

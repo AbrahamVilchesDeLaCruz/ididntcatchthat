@@ -37,7 +37,8 @@ graph TB
     end
 
     subgraph Ranking ["🏆 Ranking"]
-        RankingCache["RankingCache (Read Model)\n─────────────────\ntype: RankingType\nperiod: RankingPeriod\nmodule: Module | null\nentries: RankingEntry[]\ncomputedAt: Date"]
+        RankingAgg["Ranking (Aggregate Root)\n─────────────────\nuserId: UserId\ntype: RankingType\nperiod: RankingPeriod\nperiodBucket: string\nmodule: string\nnickname: Nickname\nscore: number"]
+        RankingEntry["RankingEntry (Read Model)\n─────────────────\nrank: number\nuserId: UserId\nnickname: Nickname\nscore: number"]
     end
 
     User -->|owns| Game
@@ -45,8 +46,7 @@ graph TB
     User -->|owns| PronunciationAttempt
     UserFlashcardStats -->|references| Flashcard
     ModuleProgress -->|derived from| UserFlashcardStats
-    RankingCache -->|derived from| UserFlashcardStats
-    RankingCache -->|derived from| Game
+    RankingAgg -->|persisted in| RankingEntry
 ```
 
 ---

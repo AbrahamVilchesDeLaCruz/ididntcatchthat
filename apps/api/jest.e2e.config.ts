@@ -26,6 +26,7 @@ const config: Config = {
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
   testEnvironment: 'node',
+  testTimeout: process.env.CI === 'true' ? 120_000 : 30_000,
   // Load .env.test before any NestJS module is bootstrapped
   setupFiles: ['<rootDir>/test/setup-env.ts'],
   // ─── Coverage ───────────────────────────────────────────────────────────────

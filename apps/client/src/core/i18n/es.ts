@@ -165,4 +165,59 @@ export const es: Translations = {
         'Jugaste como invitado — tu racha no se guarda. ¡Registrate, es gratis!',
     },
   },
+  ranking: {
+    title: 'Ranking',
+    subtitle: 'Compite con otros jugadores y controla tu visibilidad pública',
+    profile: {
+      title: 'Tu perfil en el ranking',
+      showNickname: 'Mostrar mi nickname en los rankings',
+      nicknamePlaceholder: 'Nickname público',
+      save: 'Guardar preferencias',
+      saving: 'Guardando...',
+      saved: 'Preferencias guardadas',
+      saveError: 'No se pudieron guardar las preferencias',
+    },
+    filters: {
+      type: 'Tipo de ranking',
+      period: 'Período',
+      module: 'Módulo',
+    },
+    types: {
+      most_active: 'Más activos',
+      most_accurate: 'Más precisos',
+      top_scorer: 'Top scorers',
+      best_streak: 'Mejor racha',
+      module_master: 'Maestros del módulo',
+    },
+    periods: {
+      weekly: 'Semanal',
+      monthly: 'Mensual',
+      all_time: 'Histórico',
+    },
+    table: {
+      rank: '#',
+      player: 'Jugador',
+      score: 'Puntuación',
+      you: 'Tú',
+    },
+    scoreUnits: {
+      most_active: 'partidas',
+      most_accurate: 'precisión',
+      top_scorer: 'aciertos',
+      best_streak: 'días',
+      module_master: 'nivel',
+    },
+    loading: 'Cargando ranking...',
+    error: 'Error al cargar el ranking. Intentalo de nuevo.',
+    empty: 'Todavía no hay jugadores en este ranking.',
+    emptyOptInHint:
+      'Activa "Mostrar mi nickname" y pulsa Guardar preferencias.',
+    emptyMostActiveHint:
+      'Cuentan partidas en modo Juego completadas (no Estudio).',
+    outsideTopHint:
+      'Estás en el ranking pero fuera del top 10. Tu posición aparece abajo.',
+    yourPosition: 'Tu posición',
+    periodIgnoredHint:
+      'Este ranking no usa filtro de período — muestra datos históricos.',
+  },
 };

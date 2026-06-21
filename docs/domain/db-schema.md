@@ -95,13 +95,15 @@ erDiagram
         timestamp created_at
     }
 
-    rankings_cache {
-        uuid id PK
-        varchar type "most_active|most_accurate|top_scorer|best_streak|module_master"
-        varchar period "weekly|monthly|all_time"
-        varchar module "nullable"
-        jsonb entries "[ { userId, nickname, avatarUrl, score, position } ]"
-        timestamp computed_at
+    ranking_user_scores {
+        uuid user_id PK
+        varchar type
+        varchar period
+        varchar period_bucket
+        varchar module
+        varchar nickname
+        decimal score
+        timestamp updated_at
     }
 
     users ||--o{ games : "plays"
@@ -166,12 +168,14 @@ erDiagram
 - `phonemes` es jsonb: `[{ "text": "Red", "correct": true }, { "text": "and", "correct": false }]`.
 - `score` es 0-100 (Azure Speech devuelve este rango).
 
-### `rankings_cache`
+### `ranking_user_scores`
 
-- Read model materializado — no se calcula en tiempo real.
-- `entries` es jsonb con el snapshot del ranking en el momento de computación.
-- Se recomputa periódicamente (job programado).
-- `module` es null para rankings globales.
+- Tabla de persistencia del aggregate `Ranking` — una fila por `(user_id, type, period, period_bucket, module)`.
+- Se actualiza en write-time vía `RankingUpdater` → `RankingRepository.save()`.
+- El **rank** (posición) no se almacena; se calcula en lectura con `RANK() OVER (ORDER BY score DESC)`.
+- `period_bucket`: `all` para all_time, `rolling` para ventanas móviles weekly/monthly.
+- `module` es `global` para rankings globales; nombre de módulo para `module_master`.
+- Solo existen filas de usuarios con `show_in_ranking = true` (o que lo activaron y tienen backfill).
 
 ---
 
@@ -190,8 +194,13 @@ CREATE INDEX idx_ufs_flashcard ON user_flashcard_stats(flashcard_id);
 -- Attempts por game (retoma de partida)
 CREATE INDEX idx_attempts_game ON attempts(game_id);
 
--- Ranking por tipo + período
-CREATE INDEX idx_rankings_type_period ON rankings_cache(type, period, module);
+-- Leaderboard por tipo + período (lectura GET /rankings)
+CREATE INDEX idx_ranking_user_scores_leaderboard
+  ON ranking_user_scores(type, period, period_bucket, module, score DESC);
+
+-- Posición del usuario fuera del top N
+CREATE INDEX idx_ranking_user_scores_user_lookup
+  ON ranking_user_scores(type, period, period_bucket, module, user_id);
 
 -- Flashcards por categoría (selección de cartas para un game)
 CREATE INDEX idx_flashcards_category ON flashcards(category, subcategory);

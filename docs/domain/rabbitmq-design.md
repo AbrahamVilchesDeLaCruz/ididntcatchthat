@@ -41,8 +41,11 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | `idct.identity.streaks.streak.updated`          | Identity      | Notification  | `notify_streak_milestone_on_streak_updated`             |
 | `idct.identity.streaks.streak.broken`           | Identity      | Notification  | `notify_streak_broken_on_streak_broken`                 |
 | `idct.identity.users.guest_progress.migrated`   | Identity      | Progress      | `import_guest_progress_on_guest_progress_migrated`      |
-| `idct.progress.module_progress.module_level.up` | Progress      | Notification  | `notify_level_up_on_module_level_up`                    |
-| `idct.progress.module_progress.module_level.up` | Progress      | Ranking       | `recompute_ranking_on_module_level_up`                  |
+| `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Notification  | `notify_level_up_on_module_mastery_level_increased`     |
+| `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Ranking       | `update_ranking_on_module_mastery_level_increased`      |
+| `ididntcatchthat.gaming.games.game.completed`                  | Gaming        | Ranking       | `update_ranking_on_game_completed`                      |
+| `ididntcatchthat.gaming.attempts.attempt.recorded`             | Gaming        | Ranking       | `update_ranking_on_attempt_recorded`                    |
+| `idct.identity.streaks.streak.updated`                         | Identity      | Ranking       | `update_ranking_on_streak_updated`                      |
 | `idct.pronunciation.attempt.evaluated`          | Pronunciation | Progress      | `update_pronunciation_stats_on_pronunciation_evaluated` |
 
 > Nota: `idct.gaming.games.game.completed` tiene **dos handlers** suscritos — uno en Progress y otro en Identity. Cada handler tiene su propia cola con binding al mismo exchange.
@@ -149,10 +152,33 @@ notify_level_up_on_module_level_up.dead_letter
 ### 📈 Progress → 🏆 Ranking
 
 ```
-# ModuleLevelUp → marca ranking como dirty
-recompute_ranking_on_module_level_up
-recompute_ranking_on_module_level_up.retry
-recompute_ranking_on_module_level_up.dead_letter
+# ModuleMasteryLevelIncreased → actualiza module_master en proyección
+ranking.update_ranking_on_module_mastery_level_increased
+ranking.update_ranking_on_module_mastery_level_increased.retry
+ranking.update_ranking_on_module_mastery_level_increased.dead_letter
+```
+
+### 🎮 Gaming → 🏆 Ranking
+
+```
+# GameCompleted → actualiza most_active
+ranking.update_ranking_on_game_completed
+ranking.update_ranking_on_game_completed.retry
+ranking.update_ranking_on_game_completed.dead_letter
+
+# AttemptRecorded → actualiza most_accurate y top_scorer
+ranking.update_ranking_on_attempt_recorded
+ranking.update_ranking_on_attempt_recorded.retry
+ranking.update_ranking_on_attempt_recorded.dead_letter
+```
+
+### 👤 Identity → 🏆 Ranking
+
+```
+# StreakUpdated → actualiza best_streak
+ranking.update_ranking_on_streak_updated
+ranking.update_ranking_on_streak_updated.retry
+ranking.update_ranking_on_streak_updated.dead_letter
 ```
 
 ### 🎤 Pronunciation → 📈 Progress
@@ -193,7 +219,10 @@ El TTL es **por mensaje** (header `expiration`), no por cola — permite backoff
 | `notify_streak_broken_on_streak_broken`                 | Opción A — natural | Verificable por fecha                                |
 | `import_guest_progress_on_guest_progress_migrated`      | Opción B — Inbox   | Bulk insert con efectos no trivialmente verificables |
 | `notify_level_up_on_module_level_up`                    | Opción A — natural | Verificable por nivel actual                         |
-| `recompute_ranking_on_module_level_up`                  | Opción A — natural | Recomputar es idempotente                            |
+| `update_ranking_on_module_mastery_level_increased`      | Opción A — natural | `RankingRepository.save` es idempotente por PK compuesta |
+| `update_ranking_on_game_completed`                      | Opción A — natural | Increment / recount scoped al usuario vía aggregate      |
+| `update_ranking_on_attempt_recorded`                    | Opción A — natural | `applyScore` / `incrementScore` scoped al usuario        |
+| `update_ranking_on_streak_updated`                      | Opción A — natural | `applyScore` idempotente                                 |
 | `update_pronunciation_stats_on_pronunciation_evaluated` | Opción A — natural | UPSERT idempotente                                   |
 
 ---
@@ -281,12 +310,27 @@ flowchart TD
     end
 
     subgraph Progress_Ranking ["📈 Progress → 🏆 Ranking"]
-        ML_EX2["idct.progress.module_progress.module_level.up"]
-        RK_Q["recompute_ranking\n_on_module_level_up"]
+        ML_EX2["module_mastery_level.increased"]
+        RK_Q["update_ranking_on\n_module_mastery_level_increased"]
         RK_R["...retry"]
         RK_D["...dead_letter"]
         ML_EX2 --> RK_Q --> RK_R --> RK_Q
         RK_Q -- agota --> RK_D
+    end
+
+    subgraph Gaming_Ranking ["🎮 Gaming → 🏆 Ranking"]
+        GC_EX2["game.completed"]
+        AR_EX["attempt.recorded"]
+        GC_Q["update_ranking_on_game_completed"]
+        AR_Q["update_ranking_on_attempt_recorded"]
+        GC_EX2 --> GC_Q
+        AR_EX --> AR_Q
+    end
+
+    subgraph Identity_Ranking ["👤 Identity → 🏆 Ranking"]
+        SU_EX["streak.updated"]
+        SU_Q["update_ranking_on_streak_updated"]
+        SU_EX --> SU_Q
     end
 
     subgraph Pronunciation_Progress ["🎤 Pronunciation → 📈 Progress"]
@@ -314,8 +358,11 @@ flowchart TD
 | 7   | `notify_streak_milestone_on_streak_updated`             |  ✅   |     ✅      |
 | 8   | `notify_streak_broken_on_streak_broken`                 |  ✅   |     ✅      |
 | 9   | `import_guest_progress_on_guest_progress_migrated`      |  ✅   |     ✅      |
-| 10  | `notify_level_up_on_module_level_up`                    |  ✅   |     ✅      |
-| 11  | `recompute_ranking_on_module_level_up`                  |  ✅   |     ✅      |
-| 12  | `update_pronunciation_stats_on_pronunciation_evaluated` |  ✅   |     ✅      |
+| 10  | `notify_level_up_on_module_mastery_level_increased`     |  ✅   |     ✅      |
+| 11  | `update_ranking_on_module_mastery_level_increased`      |  ✅   |     ✅      |
+| 12  | `update_ranking_on_game_completed`                      |  ✅   |     ✅      |
+| 13  | `update_ranking_on_attempt_recorded`                    |  ✅   |     ✅      |
+| 14  | `update_ranking_on_streak_updated`                      |  ✅   |     ✅      |
+| 15  | `update_pronunciation_stats_on_pronunciation_evaluated` |  ✅   |     ✅      |
 
-**12 handlers × 3 colas = 36 colas en total.**
+**15 handlers × 3 colas = 45 colas en total.**
