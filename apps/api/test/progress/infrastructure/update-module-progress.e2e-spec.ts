@@ -7,6 +7,7 @@ import {
   registerAndLogin,
   startGame,
   waitForModuleMasteryLevel,
+  waitForUserFlashcardStatsCount,
 } from '../shared/progress-e2e.helpers';
 
 describe('progress/update-module-progress (e2e)', () => {
@@ -36,6 +37,8 @@ describe('progress/update-module-progress (e2e)', () => {
         .send({ flashcardId: flashcardIds[i], correct: i < 3 })
         .expect(204);
     }
+
+    await waitForUserFlashcardStatsCount(app, token, flashcardIds.length);
 
     await request(app.getHttpServer())
       .post(`/v1/games/${gameId}/complete`)

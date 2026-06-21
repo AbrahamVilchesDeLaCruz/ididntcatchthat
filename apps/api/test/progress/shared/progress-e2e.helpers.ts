@@ -64,7 +64,8 @@ export async function waitUntil(
   predicate: () => Promise<boolean>,
   options?: { timeoutMs?: number; intervalMs?: number },
 ): Promise<void> {
-  const timeoutMs = options?.timeoutMs ?? 10_000;
+  const defaultTimeout = process.env.CI === 'true' ? 60_000 : 10_000;
+  const timeoutMs = options?.timeoutMs ?? defaultTimeout;
   const intervalMs = options?.intervalMs ?? 200;
   const deadline = Date.now() + timeoutMs;
 
@@ -74,6 +75,22 @@ export async function waitUntil(
   }
 
   throw new Error('waitUntil timed out');
+}
+
+export async function waitForUserFlashcardStatsCount(
+  app: INestApplication<App>,
+  token: string,
+  minCount: number,
+): Promise<void> {
+  await waitUntil(async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/progress/flashcards/weakest')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const data = (res.body as { data: unknown[] }).data;
+    return data.length >= minCount;
+  });
 }
 
 export async function waitForWeakestFlashcard(
