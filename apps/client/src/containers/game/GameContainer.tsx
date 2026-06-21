@@ -6,6 +6,7 @@ import {
   useCompleteGame,
 } from './api/game.api';
 import { GameComponent } from './GameComponent';
+import { saveGameSummary } from './game-summary.storage';
 import type { GameSummaryVM } from './game.types';
 
 interface LocationState {
@@ -24,7 +25,7 @@ export const GameContainer = (): ReactElement => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const { data: flashcards = [], isLoading } = useGameFlashcards(gameId ?? '');
-  const { mutate: recordAttempt } = useRecordAttempt(gameId ?? '');
+  const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
 
   // If no flashcardIds in state, redirect back to config
@@ -44,31 +45,39 @@ export const GameContainer = (): ReactElement => {
   const handleAnswer = (correct: boolean): void => {
     if (!currentFlashcard) return;
 
-    // Fire & forget — does not block UI
-    recordAttempt({ flashcardId: currentFlashcard.id, correct });
-
     const isLast = currentIndex === flashcards.length - 1;
 
-    if (isLast) {
-      completeGame(gameId ?? '', {
-        onSuccess: (summary: GameSummaryVM) => {
-          void navigate(`/game/${gameId ?? ''}/summary`, {
-            state: { summary },
-            replace: true,
-          });
-        },
-        onError: () => {
+    const afterAttemptRecorded = (): void => {
+      if (isLast) {
+        completeGame(gameId ?? '', {
+          onSuccess: (summary: GameSummaryVM) => {
+            if (gameId) saveGameSummary(gameId, summary);
+            void navigate(`/game/${gameId ?? ''}/summary`, {
+              state: { summary },
+              replace: true,
+            });
+          },
+          onError: () => {
+            void navigate(`/game/${gameId ?? ''}/summary`, { replace: true });
+          },
+        });
+      } else {
+        // Reset flip first, advance index on next frame so the card
+        // transition starts from the front face
+        setIsFlipped(false);
+        requestAnimationFrame(() => {
+          setCurrentIndex((prev) => prev + 1);
+        });
+      }
+    };
+
+    void recordAttempt({ flashcardId: currentFlashcard.id, correct })
+      .then(() => afterAttemptRecorded())
+      .catch(() => {
+        if (isLast) {
           void navigate(`/game/${gameId ?? ''}/summary`, { replace: true });
-        },
+        }
       });
-    } else {
-      // Reset flip first, advance index on next frame so the card
-      // transition starts from the front face
-      setIsFlipped(false);
-      requestAnimationFrame(() => {
-        setCurrentIndex((prev) => prev + 1);
-      });
-    }
   };
 
   return (
