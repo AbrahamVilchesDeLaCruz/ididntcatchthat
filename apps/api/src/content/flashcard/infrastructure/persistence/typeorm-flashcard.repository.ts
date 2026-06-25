@@ -7,6 +7,8 @@ import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.r
 import { type Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidCriteriaField } from '@/content/flashcard/domain/exceptions/invalid-criteria-field';
 import { FlashcardEntity } from './flashcard.entity';
+import { normalizeStoredExamples } from './normalize-stored-examples';
+import { resolveLegacyTaxonomy } from './legacy-taxonomy-map';
 
 @Injectable()
 export class TypeOrmFlashcardRepository implements FlashcardRepository {
@@ -97,17 +99,22 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
   }
 
   private toDomain(entity: FlashcardEntity): Flashcard {
+    const { category, subcategory } = resolveLegacyTaxonomy(
+      entity.category,
+      entity.subcategory,
+    );
+
     return Flashcard.fromPrimitives({
       id: entity.id,
       expression: entity.expression,
       meaning: entity.meaning,
-      category: entity.category,
-      subcategory: entity.subcategory,
+      category,
+      subcategory,
       ipaNotation: entity.ipaNotation,
       nativeSpeech: entity.nativeSpeech,
       audioStatus: entity.audioStatus,
       audioUrls: entity.audioUrls,
-      examples: entity.examples,
+      examples: normalizeStoredExamples(entity.id, entity.examples),
       createdBy: entity.createdBy,
     });
   }
