@@ -15,7 +15,9 @@ RUN pnpm install --frozen-lockfile
 COPY apps/client/ ./apps/client/
 COPY tsconfig.json ./
 
-RUN pnpm --filter @ididntcatchthat/client build
+# Never bake an absolute API URL — nginx proxies /api/v1 to the api service.
+# Doppler may inject VITE_API_URL during `make up`; clear it for this step.
+RUN VITE_API_URL= VITE_API_PROXY_TARGET= pnpm --filter @ididntcatchthat/client build
 
 # ─── Stage 2: runtime (nginx) ────────────────────────────────────────────────
 FROM nginx:alpine AS runtime
