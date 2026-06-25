@@ -14,9 +14,13 @@ export class R2AudioStorage implements AudioStorage {
     this.bucket = this.config.getOrThrow<string>('CLOUD_STORAGE_BUCKET');
     this.publicUrl = this.config.getOrThrow<string>('CLOUD_STORAGE_PUBLIC_URL');
 
+    const isLocalEndpoint =
+      endpoint.includes('localhost') || endpoint.includes('127.0.0.1');
+
     this.client = new S3Client({
       region: 'auto',
       endpoint,
+      forcePathStyle: isLocalEndpoint,
       credentials: {
         accessKeyId: this.config.getOrThrow<string>(
           'CLOUD_STORAGE_ACCESS_KEY_ID',

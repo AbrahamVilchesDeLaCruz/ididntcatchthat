@@ -1,120 +1,449 @@
-# ididntcatchthat.com
+<p align="center">
+  <img src="apps/client/public/logo.idct-removebg-preview.png" alt="ididntcatchthat logo" width="140" />
+</p>
 
-> Aprende a entender y sonar como un nativo — fonética real, connected speech y expresiones que no se enseñan en clase.
+<h1 align="center">ididntcatchthat.com</h1>
 
-![CI](https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/actions/workflows/ci.yml/badge.svg)
+<p align="center">
+  <strong>Aprende a entender y sonar como un nativo</strong><br/>
+  Fonética real · Connected speech · Expresiones que no se enseñan en clase
+</p>
+
+<p align="center">
+  <a href="https://ididntcatchthat.com"><img src="https://img.shields.io/badge/🚀_Producción-ididntcatchthat.com-863bff?style=for-the-badge" alt="Producción" /></a>
+  &nbsp;
+  <a href="https://dev.ididntcatchthat.com"><img src="https://img.shields.io/badge/🧪_Dev-dev.ididntcatchthat.com-47bfff?style=for-the-badge" alt="Entorno dev" /></a>
+</p>
+
+<p align="center">
+  <img src="https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/actions/workflows/ci.yml/badge.svg" alt="CI" />
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/pnpm-%3E%3D9-F69220?logo=pnpm&logoColor=white" alt="pnpm" />
+  <img src="https://img.shields.io/badge/License-Apache--2.0-blue?logo=apache&logoColor=white" alt="License" />
+</p>
+
+<p align="center">
+  <a href="./docs/project-overview.md">📖 Documentación completa</a>
+  &nbsp;·&nbsp;
+  <a href="http://localhost:3001/docs">📋 Swagger (local)</a>
+  &nbsp;·&nbsp;
+  <a href="./docs/adr/">🏛️ ADRs</a>
+</p>
 
 ---
 
-## ¿Qué es esto?
+## 📖 Descripción general
 
-Un juego web de aprendizaje de inglés centrado en cómo los nativos realmente hablan. Desarrollado como Trabajo de Fin de Máster (TFM).
+**ididntcatchthat.com** es una plataforma gamificada de aprendizaje de inglés centrada en cómo los nativos realmente hablan. Desarrollada como **Trabajo de Fin de Máster (TFM)**, ataca el problema de ese momento en el que un nativo habla y simplemente no entiendes nada.
 
-→ [Ver descripción completa del proyecto](./docs/project-overview.md)
+A diferencia de apps mainstream que priorizan vocabulario y gramática, este proyecto se enfoca en tres áreas clave:
+
+| | Área | Qué cubre |
+|:-:|------|-----------|
+| 🎙️ | **Fonética real** | Los 23 sonidos del inglés, con énfasis en los problemáticos para hispanohablantes |
+| 🔗 | **Connected speech** | Cómo cambian los sonidos al conectar palabras (Flap T, linking, reduction…) |
+| 💬 | **Expresiones nativas** | Vocabulario coloquial que realmente usan los nativos en conversación |
+
+Cada expresión puede escucharse en **tres acentos** 🇺🇸 🇬🇧 🇦🇺 con audio de calidad generado por síntesis de voz profesional.
+
+### 🌐 Demos desplegadas
+
+| Entorno | URL | Descripción |
+|:-------:|:---:|-------------|
+| 🟢 **Prod** | [ididntcatchthat.com](https://ididntcatchthat.com) | TFM desplegado en entorno real |
+| 🔵 **Dev** | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) | Entorno de integración y pruebas |
 
 ---
 
-## Requisitos previos
+## 🛠️ Stack tecnológico
 
-- [Node.js](https://nodejs.org/) >= 20
-- [pnpm](https://pnpm.io/) >= 9
-- [Docker](https://www.docker.com/) + Docker Compose
-- [Doppler CLI](https://docs.doppler.com/docs/cli) — gestión de secrets
-- [Make](https://www.gnu.org/software/make/)
+### Frontend
+
+<p>
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/TanStack_Query-FF4154?logo=reactquery&logoColor=white" alt="TanStack Query" />
+  <img src="https://img.shields.io/badge/Zustand-443?logo=redux&logoColor=white" alt="Zustand" />
+  <img src="https://img.shields.io/badge/Zod-3E63DD?logo=zod&logoColor=white" alt="Zod" />
+</p>
+
+### Backend
+
+<p>
+  <img src="https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/TypeORM-FE0902?logo=typeorm&logoColor=white" alt="TypeORM" />
+  <img src="https://img.shields.io/badge/Class_Validator-555?logo=npm&logoColor=white" alt="Class Validator" />
+  <img src="https://img.shields.io/badge/pino-logs-FF6B35?logo=pino&logoColor=white" alt="pino" />
+  <img src="https://img.shields.io/badge/OpenAPI-Swagger-85EA2D?logo=swagger&logoColor=black" alt="Swagger" />
+</p>
+
+### Datos, CDN e infra
+
+<p>
+  <img src="https://img.shields.io/badge/PostgreSQL-Aiven-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Cloudflare-CDN-F38020?logo=cloudflare&logoColor=white" alt="Cloudflare" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/Doppler-secrets-1B1B1D?logo=doppler&logoColor=white" alt="Doppler" />
+  <img src="https://img.shields.io/badge/VPS-self--hosted-555?logo=linux&logoColor=white" alt="VPS" />
+</p>
+
+### Testing
+
+<p>
+  <img src="https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white" alt="Jest" />
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white" alt="Playwright" />
+  <img src="https://img.shields.io/badge/MSW-FF6C37?logo=mockserviceworker&logoColor=white" alt="MSW" />
+  <img src="https://img.shields.io/badge/RTL-Testing_Library-E33332?logo=testinglibrary&logoColor=white" alt="RTL" />
+</p>
+
+### Observabilidad
+
+<p>
+  <img src="https://img.shields.io/badge/OpenTelemetry-000?logo=opentelemetry&logoColor=white" alt="OpenTelemetry" />
+  <img src="https://img.shields.io/badge/Prometheus-E6522C?logo=prometheus&logoColor=white" alt="Prometheus" />
+  <img src="https://img.shields.io/badge/Grafana-F46800?logo=grafana&logoColor=white" alt="Grafana" />
+  <img src="https://img.shields.io/badge/Loki-F46800?logo=grafana&logoColor=white" alt="Loki" />
+</p>
+
+### IA en el desarrollo
+
+<p>
+  <img src="https://img.shields.io/badge/Cursor-IDE_+_agentes-000000?logo=cursor&logoColor=white" alt="Cursor" />
+  <img src="https://img.shields.io/badge/Claude-agentes-CC785C?logo=anthropic&logoColor=white" alt="Claude" />
+  <img src="https://img.shields.io/badge/GitHub_Copilot-asistencia-000?logo=githubcopilot&logoColor=white" alt="Copilot" />
+</p>
+
+Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` y `AGENTS.md`), apoyado por Claude y GitHub Copilot en scaffolding, tests, revisión y documentación.
+
+### IA en el producto
+
+<p>
+  <img src="https://img.shields.io/badge/DeepSeek-ejemplos_+_fonética-0066FF?style=flat-square" alt="DeepSeek" />
+  <img src="https://img.shields.io/badge/ElevenLabs-síntesis_de_voz-000?logo=elevenlabs&logoColor=white" alt="ElevenLabs" />
+  <img src="https://img.shields.io/badge/Azure_Speech-pronunciación-0078D4?logo=microsoftazure&logoColor=white" alt="Azure Speech" />
+</p>
+
+- **DeepSeek** — genera **ejemplos bilingües** (EN/ES) y **notas fonéticas** (IPA, native speech) al crear o completar flashcards en backoffice.
+- **ElevenLabs** — síntesis de voz en 3 acentos (offline, pipeline de audio → CDN).
+- **Azure Speech** — evaluación de pronunciación en tiempo real (bonus de puntos).
 
 ---
 
-## Levantar el proyecto
+## ⚡ Instalación y ejecución
+
+### 📋 Requisitos previos
+
+<p>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/pnpm-%3E%3D9-F69220?logo=pnpm&logoColor=white" alt="pnpm" />
+  <img src="https://img.shields.io/badge/Docker-required-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Doppler_CLI-secrets-1B1B1D?logo=doppler&logoColor=white" alt="Doppler" />
+  <img src="https://img.shields.io/badge/Make-build-654FF0?logo=gnu&logoColor=white" alt="Make" />
+</p>
+
+### 🚀 Arrancar el proyecto (desarrollo con Doppler)
+
+Requiere acceso a Doppler y servicios externos (Aiven, R2, ElevenLabs…).
 
 ```bash
-# Instalar dependencias
 pnpm install
-
-# Dev servers sin Docker (API + Client con hot-reload)
-make dev
-
-# O con Docker (todos los servicios: API, Client, Prometheus, Grafana, Loki)
-make up
+make dev          # API :3000 + Client :5173 (hot-reload)
+# o
+make up           # Docker completo (:3001 / :4001)
 ```
 
-La app estará disponible en:
+### 🎓 Evaluación local (sin Doppler ni servicios de pago)
 
-| Servicio    | URL                        |
-| ----------- | -------------------------- |
-| Frontend    | http://localhost:4001       |
-| Backend API | http://localhost:3001       |
-| Swagger     | http://localhost:3001/docs  |
-| Grafana     | http://localhost:3002       |
-| Prometheus  | http://localhost:9090       |
+Para clonar el repo y ejecutarlo **sin cuentas externas** (tribunal, profesor, evaluación):
+
+```bash
+pnpm install
+make local-setup   # copia .env.local.example → .env.local
+make local-up      # Postgres + RabbitMQ + MinIO en Docker
+make local-seed    # migraciones + usuario demo + flashcards
+make local-dev     # API :3000 + Client :5173
+```
+
+| Recurso | Valor |
+|---------|-------|
+| Frontend | http://localhost:5173 |
+| API | http://localhost:3000 |
+| Swagger | http://localhost:3000/docs |
+| MinIO console | http://localhost:9001 (`localminio` / `localminio`) |
+| Usuario demo | `demo@local.dev` / `DemoLocal123!` (admin) |
+
+**Limitaciones en local:** Google OAuth no funciona (usar email/password o modo guest). Audio de flashcards seed usa URLs de demo públicas; nuevos audios van a MinIO (S3 local). Demo completa desplegada: [ididntcatchthat.com](https://ididntcatchthat.com).
+
+Guía extendida → [docs/local-development.md](./docs/local-development.md)
+
+### 🖥️ Puertos por perfil
+
+| Servicio | Perfil `local` | Perfil Doppler Docker (`make up`) | Tests E2E |
+|----------|----------------|-------------------------------------|-----------|
+| Frontend | :5173 | :4001 | — |
+| API | :3000 | :3001 | :3000 |
+| Postgres | :5434 | Aiven (remoto) | :5433 |
+| RabbitMQ | :5674 | :5672 | :5673 |
+| MinIO | :9000 / :9001 | — (R2 prod) | — |
+
+### ⌨️ Comandos útiles
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm lint` | ESLint en api + client |
+| `pnpm test` | Unit tests en api + client |
+| `pnpm test:e2e` | E2E tests en api + client |
+| `pnpm test:all` | Unit + E2E en api + client |
+| `make local-up` | Infra local Docker (Postgres, RabbitMQ, MinIO) |
+| `make local-seed` | Migraciones + datos demo |
+| `make local-dev` | API + Client sin Doppler |
+| `make down` | Parar todos los servicios Docker |
+| `make deploy-dev` | Deploy a VPS — entorno dev |
+| `make deploy-prod` | Deploy a VPS — entorno prod |
 
 ---
 
-## Estructura del monorepo
+## 🏗️ Estructuración del proyecto
+
+Monorepo con separación clara entre frontend y backend, organizado por **bounded contexts** en el backend y **pods** en el cliente.
 
 ```
 ididntcatchthat/
 ├── apps/
-│   ├── client/       ← Frontend (React + Vite + TailwindCSS)
-│   └── api/          ← Backend (NestJS + Clean Architecture)
-├── docs/             ← Documentación del proyecto y ADRs
-├── infra/            ← Configs de Prometheus, Grafana, Loki
-├── skills/           ← AI agent skills (instrucciones para agentes IA)
-├── prompts/          ← Prompts usados durante el desarrollo con IA
-├── .github/          ← GitHub Actions workflows
-├── Makefile          ← Comandos de desarrollo y despliegue
+│   ├── api/              ← 🟢 Backend NestJS (Clean Architecture + DDD)
+│   │   └── src/
+│   │       ├── content/      ← 📚 Flashcards, módulos, pipeline de audio
+│   │       ├── gaming/       ← 🎮 Partidas, intentos, mecánica de juego
+│   │       ├── identity/     ← 🔐 Auth JWT, OAuth Google, sesiones, guests
+│   │       └── progress/     ← 📈 Estadísticas, streaks, ranking
+│   └── client/           ← 🔵 Frontend React (Pods + Container/Presentational)
+│       └── src/
+│           ├── containers/   ← Pods por dominio (gaming, flashcards…)
+│           ├── core/         ← Router, auth, API client, providers
+│           ├── common/       ← Componentes UI reutilizables
+│           └── views/        ← Páginas que componen layout + pods
+├── docs/                 ← 📖 Documentación, ADRs, specs y diagramas Mermaid
+├── infra/                ← 📊 Configs de Prometheus, Grafana, Loki
+├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
+├── prompts/              ← 💬 Prompts usados durante el desarrollo con IA
+├── .github/              ← ⚙️ GitHub Actions (CI/CD)
+├── Makefile              ← 🛠️ Comandos de desarrollo y despliegue
 └── README.md
+```
+
+### 🧱 Arquitectura backend
+
+Organización por **Screaming Architecture** con capas Clean Architecture en cada bounded context:
+
+```
+{context}/{aggregate}/
+├── domain/           ← Entidades, value objects, reglas de negocio
+├── application/      ← Casos de uso, domain services, subscribers
+└── infrastructure/   ← Controllers, TypeORM, adaptadores externos
 ```
 
 ---
 
-## Comandos disponibles
+## ✨ Funcionalidades
 
-### Raíz del monorepo
+<table>
+<tr>
+<td width="50%" valign="top">
 
-| Comando           | Descripción                                      |
-| ----------------- | ------------------------------------------------ |
-| `pnpm install`    | Instala dependencias en todos los workspaces     |
-| `pnpm lint`       | ESLint en api + client                           |
-| `pnpm test`       | Unit tests en api + client                       |
-| `pnpm test:e2e`   | E2E tests en api + client                        |
-| `pnpm test:all`   | Unit + E2E en api + client                       |
-| `pnpm test:ci`    | Tests + coverage en modo CI (GitHub Actions)     |
+### 🃏 Aprendizaje con flashcards
 
-### Make (Docker + VPS)
+- Unidad básica: la **flashcard** (expresión, fonema o construcción)
+- **Auto-evaluación** al estilo Anki
+- **Vista de detalle** con significado, ejemplos y notas fonéticas
+- **Audio en 3 acentos** servido desde CDN
 
-| Comando              | Descripción                                          |
-| -------------------- | ---------------------------------------------------- |
-| `make up`            | Build + levantar todos los servicios (dev, Docker)   |
-| `make down`          | Parar todos los servicios                            |
-| `make dev`           | Dev servers sin Docker (API + Client con Doppler)    |
-| `make dev-api`       | Solo API en modo desarrollo                          |
-| `make dev-client`    | Solo Client en modo desarrollo                       |
-| `make obs-up`        | Levantar stack de observabilidad (Prometheus + Grafana + Loki) |
-| `make tunnel-dev`    | SSH tunnel a observabilidad de dev en VPS            |
-| `make tunnel-prod`   | SSH tunnel a observabilidad de prod en VPS           |
-| `make deploy-dev`    | Deploy a VPS — entorno dev                           |
-| `make deploy-prod`   | Deploy a VPS — entorno prod                          |
+### 📚 Módulos de contenido
+
+| Módulo | Foco |
+|--------|------|
+| 🎵 Native Sounds | 23 fonemas del inglés |
+| 🔗 Connecting Words | Linking, reduction, Flap T… |
+| ✨ Beautifying Sentences | Conectores y fluidez |
+| 🗣️ Sounding Native | Expresiones coloquiales |
+
+</td>
+<td width="50%" valign="top">
+
+### 🎮 Gaming y gamificación
+
+- Modos **juego** y **estudio**
+- Partidas de 10 / 20 / 50 flashcards
+- **Streaks**, accuracy, ranking y logros
+- **Bonus de pronunciación** con Azure Speech
+
+### 🔐 Auth y acceso
+
+- Email/password + **OAuth Google**
+- Modo **guest** sin registro
+- Migración guest → usuario registrado
+- Roles: guest, user, teacher, admin
+
+### 🎧 Backoffice y audio
+
+- Panel de administración de flashcards
+- Pipeline **DeepSeek** (ejemplos + fonética) + **ElevenLabs** (×3 voces)
+- CDN para reproducción de baja latencia
+
+</td>
+</tr>
+</table>
+
+### 📊 Observabilidad
+
+<p>
+  <img src="https://img.shields.io/badge/métricas_técnicas-latencia_+_errores-E6522C?logo=prometheus&logoColor=white" alt="Métricas técnicas" />
+  <img src="https://img.shields.io/badge/métricas_negocio-retención_+_accuracy-F46800?logo=grafana&logoColor=white" alt="Métricas negocio" />
+  <img src="https://img.shields.io/badge/logs-centralizados-Loki-F46800?logo=grafana&logoColor=white" alt="Loki" />
+</p>
 
 ---
 
-## Stack
+## 🎓 Cumplimiento de los objetivos del máster
 
-**Frontend** — React 19, TypeScript, Vite, TailwindCSS, TanStack Query, Zustand, Zod  
-**Backend** — NestJS, TypeScript, TypeORM, Class Validator, pino  
-**Base de datos** — PostgreSQL en [Aiven](https://aiven.io/) (managed)  
-**CDN** — [Cloudflare](https://www.cloudflare.com/) (archivos de audio)  
-**Testing** — Vitest, Jest, Playwright  
-**Observabilidad** — Prometheus, Grafana, Loki, pino-loki  
-**Secrets** — [Doppler](https://doppler.com/)  
-**Infra** — VPS, Docker, GitHub Actions  
+Este TFM demuestra las competencias trabajadas a lo largo del máster, con evidencia concreta en el repositorio y en las demos desplegadas.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/🔍_Análisis-domain_+_ADRs-863bff?style=flat-square" alt="Análisis" />
+  <img src="https://img.shields.io/badge/📐_Diseño-Clean_Arch_+_DDD-47bfff?style=flat-square" alt="Diseño" />
+  <img src="https://img.shields.io/badge/⚙️_Implementación-fullstack_desplegado-7e14ff?style=flat-square" alt="Implementación" />
+  <img src="https://img.shields.io/badge/✅_Buenas_prácticas-TDD_+_CI-22c55e?style=flat-square" alt="Buenas prácticas" />
+  <img src="https://img.shields.io/badge/🧪_Testing-pirámide_completa-f59e0b?style=flat-square" alt="Testing" />
+  <img src="https://img.shields.io/badge/🔒_Seguridad-OWASP_+_JWT-ef4444?style=flat-square" alt="Seguridad" />
+  <img src="https://img.shields.io/badge/🤖_LLMs_+_IA-estratégico-CC785C?style=flat-square" alt="LLMs" />
+</p>
+
+<details open>
+<summary><strong>🔍 Análisis</strong></summary>
+<br/>
+
+- **Problema real identificado**: la brecha entre el inglés de clase y el inglés hablado por nativos
+- **Propuesta de valor diferenciada** → [project-overview](./docs/project-overview.md)
+- **Modelo de dominio** previo a implementar → [domain-model](./docs/domain/domain-model.md) · [game-mechanics](./docs/domain/game-mechanics.md) · [auth-guest](./docs/domain/auth-guest.md)
+- **22 ADRs** con contexto, alternativas y consecuencias → [docs/adr/](./docs/adr/)
+
+</details>
+
+<details>
+<summary><strong>📐 Diseño</strong></summary>
+<br/>
+
+- **Clean Architecture + DDD** con bounded contexts: `content`, `gaming`, `identity`, `progress`
+- **Frontend por pods** Container/Presentational → [frontend-architecture](./docs/frontend-architecture.md)
+- **Diagramas Mermaid** embebidos en la documentación
+- **OpenAPI/Swagger** + validación dual Class Validator + Zod
+- **Entornos** local / dev / prod → [deployment](./docs/deployment.md)
+
+</details>
+
+<details>
+<summary><strong>⚙️ Implementación</strong></summary>
+<br/>
+
+- Monorepo **TypeScript end-to-end** (`apps/api` + `apps/client`)
+- Casos de uso explícitos + repositorios como interfaces en domain
+- **Domain Events** y Event Bus entre bounded contexts
+- Pipeline **DeepSeek** (contenido) + **ElevenLabs** (audio) → CDN + Azure Speech en tiempo real
+- **CI/CD** GitHub Actions + Docker + Makefile + VPS
+- Desplegado en [ididntcatchthat.com](https://ididntcatchthat.com) y [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com)
+
+</details>
+
+<details>
+<summary><strong>✅ Buenas prácticas</strong></summary>
+<br/>
+
+- Conventional Commits + Husky (lint-staged, commitlint)
+- ESLint + Prettier + TypeScript estricto
+- **TDD** Red → Green → Refactor para features nuevas
+- Skills de agentes IA en `skills/`
+- Container (datos) vs Component (UI pura)
+- Inyección de dependencias con tokens Symbol
+
+</details>
+
+<details>
+<summary><strong>🧪 Testing</strong></summary>
+<br/>
+
+```
+        ▲
+       /E\     E2E (Playwright) — flujos de juego, auth, navegación
+      /───\
+     / Int \   Integration — repos, APIs externas, módulos NestJS
+    /───────\
+   /  Unit   \ Unit — dominio, casos de uso, hooks, componentes
+  /───────────\
+```
+
+- Backend: Jest + jest-mock-extended + Object Mothers
+- Frontend: Vitest + RTL + MSW
+- Coverage cliente: **80 %** branches / functions / lines / statements
+- CI ejecuta tests en cada PR
+
+</details>
+
+<details>
+<summary><strong>🔒 Seguridad</strong></summary>
+<br/>
+
+<p>
+  <img src="https://img.shields.io/badge/JWT-access_+_refresh-000?logo=jsonwebtokens&logoColor=white" alt="JWT" />
+  <img src="https://img.shields.io/badge/OAuth-Google-4285F4?logo=google&logoColor=white" alt="OAuth" />
+  <img src="https://img.shields.io/badge/Helmet-HTTP_headers-000?logo=nginx&logoColor=white" alt="Helmet" />
+  <img src="https://img.shields.io/badge/Rate_limiting-activo-ef4444?logo=shield&logoColor=white" alt="Rate limiting" />
+  <img src="https://img.shields.io/badge/Doppler-no_secrets_en_repo-1B1B1D?logo=doppler&logoColor=white" alt="Doppler" />
+</p>
+
+- Cookies httpOnly para refresh tokens
+- Tokens guest en memoria (no localStorage)
+- Validación de inputs en backend y cliente
+- Guards, voters y `@CurrentUser` por rol
+
+</details>
+
+<details>
+<summary><strong>🤖 LLMs e IA</strong></summary>
+<br/>
+
+| Ámbito | Uso |
+|--------|-----|
+| 🛠️ **Desarrollo** | **Cursor** (IDE + agentes), skills en `skills/`/`AGENTS.md`, Claude y Copilot |
+| 📚 **Producto (contenido)** | **DeepSeek** — ejemplos bilingües y fonética (IPA, native speech) al crear flashcards |
+| 🎙️ **Producto (audio)** | ElevenLabs al crear flashcards (offline, ×3 acentos) |
+| 🗣️ **Producto (voz)** | Azure Speech en tiempo real (bonus de puntos) |
+| 📝 **Metodología** | Prompts en `prompts/`, skills reutilizables en `skills/` |
+
+> La IA no actúa en el flujo principal del juego: el contenido es **curado** en backoffice (DeepSeek + ElevenLabs), no generado dinámicamente durante la partida.
+
+</details>
 
 ---
 
-## Documentación
+## 📚 Documentación adicional
 
-- [Project Overview](./docs/project-overview.md) — qué es, por qué existe, decisiones de producto
-- [ADRs](./docs/adr/) — Architecture Decision Records (22 decisiones documentadas)
-- [Observability](./docs/observability.md) — setup de Prometheus, Grafana y Loki
-- [Grafana Guide](./docs/grafana.md) — queries PromQL y LogQL, alertas
-- [Deployment](./docs/deployment.md) — variables de entorno, secrets, deploy al VPS
-- [Swagger](http://localhost:3001/docs) — contrato de API (solo en local/dev)
+| | Recurso | Descripción |
+|:-:|---------|-------------|
+| 📖 | [Project Overview](./docs/project-overview.md) | Qué es, por qué existe, decisiones de producto |
+| 🏛️ | [ADRs](./docs/adr/) | Architecture Decision Records |
+| 📊 | [Observability](./docs/observability.md) | Prometheus, Grafana y Loki |
+| 📈 | [Grafana Guide](./docs/grafana.md) | PromQL, LogQL y alertas |
+| 🚀 | [Deployment](./docs/deployment.md) | Env vars, secrets, deploy al VPS |
+| 📋 | [Swagger](http://localhost:3001/docs) | Contrato de API (local/dev) |
+
+---
+
+<p align="center">
+  <img src="apps/client/public/favicon.svg" alt="" width="32" />
+  <br/><br/>
+  <em>El foco no es solo que funcione — es que esté <strong>bien construido</strong> y <strong>bien razonado</strong>.</em>
+</p>
