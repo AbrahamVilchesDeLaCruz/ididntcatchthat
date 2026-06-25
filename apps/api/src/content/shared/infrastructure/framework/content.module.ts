@@ -4,10 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FLASHCARD_REPOSITORY } from '@/content/flashcard/domain/flashcard.repository';
 import {
-  PDF_FLASHCARD_EXTRACTOR,
-  type PdfFlashcardExtractor,
-} from '@/content/flashcard/domain/pdf-flashcard-extractor';
-import {
   AI_EXAMPLE_GENERATOR,
   type AiExampleGenerator,
 } from '@/content/flashcard/domain/ai-example-generator';
@@ -15,6 +11,10 @@ import {
   AI_PHONETICS_GENERATOR,
   type AiPhoneticsGenerator,
 } from '@/content/flashcard/domain/ai-phonetics-generator';
+import {
+  FLASHCARD_DRAFT_GENERATOR,
+  type FlashcardDraftGeneratorPort,
+} from '@/content/flashcard/domain/flashcard-draft-generator';
 import {
   AUDIO_GENERATOR,
   type AudioGenerator,
@@ -28,10 +28,10 @@ import { TypeOrmFlashcardRepository } from '@/content/flashcard/infrastructure/p
 // Infrastructure — AI
 import { DeepSeekAiExampleGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-example-generator';
 import { DeepSeekAiPhoneticsGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-phonetics-generator';
-import { DeepSeekPdfFlashcardExtractor } from '@/content/flashcard/infrastructure/ai/deepseek-pdf-flashcard-extractor';
+import { DeepSeekFlashcardDraftGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-flashcard-draft-generator';
 import { StubAiExampleGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-ai-example-generator';
 import { StubAiPhoneticsGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-ai-phonetics-generator';
-import { StubPdfFlashcardExtractor } from '@/content/flashcard/infrastructure/adapters/local/stub-pdf-flashcard-extractor';
+import { StubFlashcardDraftGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-flashcard-draft-generator';
 
 // Infrastructure — audio
 import { ElevenLabsAudioGenerator } from '@/content/flashcard/infrastructure/audio/elevenlabs-audio-generator';
@@ -48,9 +48,9 @@ import { BulkCreateFlashcardPostController } from '@/content/flashcard/infrastru
 import { FindFlashcardGetController } from '@/content/flashcard/infrastructure/controllers/find-flashcard-get.controller';
 import { SearchFlashcardsGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcards-get.controller';
 import { UpdateFlashcardPatchController } from '@/content/flashcard/infrastructure/controllers/update-flashcard-patch.controller';
-import { ImportPdfFlashcardPostController } from '@/content/flashcard/infrastructure/controllers/import-pdf-flashcard-post.controller';
 import { GetFlashcardCatalogGetController } from '@/content/flashcard/infrastructure/controllers/get-flashcard-catalog-get.controller';
 import { SuggestExamplesPostController } from '@/content/flashcard/infrastructure/controllers/suggest-examples-post.controller';
+import { GenerateFlashcardsPostController } from '@/content/flashcard/infrastructure/controllers/generate-flashcards-post.controller';
 
 // Infrastructure — exception registry
 import { ContentExceptionRegistry } from './content-exception-registry';
@@ -61,12 +61,12 @@ import { FlashcardBulkCreator } from '@/content/flashcard/application/bulk-creat
 import { FlashcardFinder } from '@/content/flashcard/application/find/flashcard-finder';
 import { FlashcardSearcher } from '@/content/flashcard/application/search/flashcard-searcher';
 import { FlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
-import { PdfFlashcardImporter } from '@/content/flashcard/application/import-pdf/pdf-flashcard-importer';
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
 import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-phonetics/ai-phonetics-completer';
 import { AiExampleSuggester } from '@/content/flashcard/application/suggest-examples/ai-example-suggester';
+import { AiFlashcardDraftGenerator } from '@/content/flashcard/application/generate-drafts/ai-flashcard-draft-generator';
 
 // Application — event subscribers
 import { GenerateFlashcardExamplesOnFlashcardCreated } from '@/content/flashcard/application/complete-examples/generate-flashcard-examples-on-flashcard-created';
@@ -90,8 +90,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     FindFlashcardGetController,
     SearchFlashcardsGetController,
     UpdateFlashcardPatchController,
-    ImportPdfFlashcardPostController,
     SuggestExamplesPostController,
+    GenerateFlashcardsPostController,
   ],
   providers: [
     // Repositories
@@ -115,11 +115,11 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
       inject: [ConfigService],
     },
     {
-      provide: PDF_FLASHCARD_EXTRACTOR,
-      useFactory: (config: ConfigService): PdfFlashcardExtractor =>
+      provide: FLASHCARD_DRAFT_GENERATOR,
+      useFactory: (config: ConfigService): FlashcardDraftGeneratorPort =>
         useStubAdapters(config)
-          ? new StubPdfFlashcardExtractor()
-          : new DeepSeekPdfFlashcardExtractor(config),
+          ? new StubFlashcardDraftGenerator()
+          : new DeepSeekFlashcardDraftGenerator(config),
       inject: [ConfigService],
     },
 
@@ -159,12 +159,12 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     FlashcardFinder,
     FlashcardSearcher,
     FlashcardUpdater,
-    PdfFlashcardImporter,
     FlashcardCatalogQuerier,
     FlashcardAudioGenerator,
     AiExamplesCompleter,
     AiPhoneticsCompleter,
     AiExampleSuggester,
+    AiFlashcardDraftGenerator,
 
     // Exception registry
     ContentExceptionRegistry,
