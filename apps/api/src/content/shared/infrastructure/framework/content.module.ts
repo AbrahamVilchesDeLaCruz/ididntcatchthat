@@ -1,11 +1,24 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FLASHCARD_REPOSITORY } from '@/content/flashcard/domain/flashcard.repository';
-import { PDF_FLASHCARD_EXTRACTOR } from '@/content/flashcard/domain/pdf-flashcard-extractor';
-import { AI_EXAMPLE_GENERATOR } from '@/content/flashcard/domain/ai-example-generator';
-import { AI_PHONETICS_GENERATOR } from '@/content/flashcard/domain/ai-phonetics-generator';
-import { AUDIO_GENERATOR } from '@/content/flashcard/domain/audio-generator';
+import {
+  PDF_FLASHCARD_EXTRACTOR,
+  type PdfFlashcardExtractor,
+} from '@/content/flashcard/domain/pdf-flashcard-extractor';
+import {
+  AI_EXAMPLE_GENERATOR,
+  type AiExampleGenerator,
+} from '@/content/flashcard/domain/ai-example-generator';
+import {
+  AI_PHONETICS_GENERATOR,
+  type AiPhoneticsGenerator,
+} from '@/content/flashcard/domain/ai-phonetics-generator';
+import {
+  AUDIO_GENERATOR,
+  type AudioGenerator,
+} from '@/content/flashcard/domain/audio-generator';
 import { AUDIO_STORAGE } from '@/content/flashcard/domain/audio-storage';
 import { SUBSCRIBERS } from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
 import { type Subscriber } from '@/shared/application/subscriber';
@@ -16,10 +29,15 @@ import { TypeOrmFlashcardRepository } from '@/content/flashcard/infrastructure/p
 import { DeepSeekAiExampleGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-example-generator';
 import { DeepSeekAiPhoneticsGenerator } from '@/content/flashcard/infrastructure/ai/deepseek-ai-phonetics-generator';
 import { DeepSeekPdfFlashcardExtractor } from '@/content/flashcard/infrastructure/ai/deepseek-pdf-flashcard-extractor';
+import { StubAiExampleGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-ai-example-generator';
+import { StubAiPhoneticsGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-ai-phonetics-generator';
+import { StubPdfFlashcardExtractor } from '@/content/flashcard/infrastructure/adapters/local/stub-pdf-flashcard-extractor';
 
 // Infrastructure — audio
 import { ElevenLabsAudioGenerator } from '@/content/flashcard/infrastructure/audio/elevenlabs-audio-generator';
 import { R2AudioStorage } from '@/content/flashcard/infrastructure/audio/r2-audio-storage';
+import { StubAudioGenerator } from '@/content/flashcard/infrastructure/adapters/local/stub-audio-generator';
+import { useStubAdapters } from '@/shared/infrastructure/config/use-stub-adapters';
 
 // Infrastructure — event bus
 import { SubscribersBootstrapper } from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
@@ -80,15 +98,40 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: FLASHCARD_REPOSITORY, useClass: TypeOrmFlashcardRepository },
 
     // AI ports
-    { provide: AI_EXAMPLE_GENERATOR, useClass: DeepSeekAiExampleGenerator },
-    { provide: AI_PHONETICS_GENERATOR, useClass: DeepSeekAiPhoneticsGenerator },
+    {
+      provide: AI_EXAMPLE_GENERATOR,
+      useFactory: (config: ConfigService): AiExampleGenerator =>
+        useStubAdapters(config)
+          ? new StubAiExampleGenerator()
+          : new DeepSeekAiExampleGenerator(config),
+      inject: [ConfigService],
+    },
+    {
+      provide: AI_PHONETICS_GENERATOR,
+      useFactory: (config: ConfigService): AiPhoneticsGenerator =>
+        useStubAdapters(config)
+          ? new StubAiPhoneticsGenerator()
+          : new DeepSeekAiPhoneticsGenerator(config),
+      inject: [ConfigService],
+    },
     {
       provide: PDF_FLASHCARD_EXTRACTOR,
-      useClass: DeepSeekPdfFlashcardExtractor,
+      useFactory: (config: ConfigService): PdfFlashcardExtractor =>
+        useStubAdapters(config)
+          ? new StubPdfFlashcardExtractor()
+          : new DeepSeekPdfFlashcardExtractor(config),
+      inject: [ConfigService],
     },
 
-    // Audio ports
-    { provide: AUDIO_GENERATOR, useClass: ElevenLabsAudioGenerator },
+    // Audio ports — R2AudioStorage targets MinIO when CLOUD_STORAGE is localhost
+    {
+      provide: AUDIO_GENERATOR,
+      useFactory: (config: ConfigService): AudioGenerator =>
+        useStubAdapters(config)
+          ? new StubAudioGenerator()
+          : new ElevenLabsAudioGenerator(config),
+      inject: [ConfigService],
+    },
     { provide: AUDIO_STORAGE, useClass: R2AudioStorage },
 
     // Event subscribers

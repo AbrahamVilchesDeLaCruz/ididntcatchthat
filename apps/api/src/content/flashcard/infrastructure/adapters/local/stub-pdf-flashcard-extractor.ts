@@ -6,7 +6,7 @@ import {
 
 @Injectable()
 export class StubPdfFlashcardExtractor implements PdfFlashcardExtractor {
-  async extract(_pdfBuffer: Buffer): Promise<FlashcardDraft[]> {
+  extract(_pdfBuffer: Buffer): Promise<FlashcardDraft[]> {
     return Promise.resolve([]);
   }
 }
