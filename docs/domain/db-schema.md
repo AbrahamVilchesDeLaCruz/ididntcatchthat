@@ -30,7 +30,7 @@ erDiagram
         uuid id PK
         varchar expression
         varchar meaning
-        varchar category "native_sounds|connecting_words|beautifying_sentences|sounding_native"
+        varchar category "native_sounds|connected_speech|flow_connectors|real_talk"
         varchar subcategory
         varchar ipa_notation "nullable"
         varchar native_speech "nullable"

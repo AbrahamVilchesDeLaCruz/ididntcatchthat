@@ -24,7 +24,7 @@ graph TD
     subgraph Progress ["📈 Progress"]
         UFS["UserFlashcardStats\n(Aggregate Root)\n─────────────────\nuserId + flashcardId\ntimesStudied\ntimesPlayed\ncorrectCount\naccuracyRate\nlastSeenAt"]
         MP["ModuleProgress\n(Entity)\n─────────────────\nuserId + module\ntotalAttempts\ncorrectCount\naccuracy\nmasteryLevel 0–3\nlastPlayedAt"]
-        MN["ModuleName\n(Value Object)\n─────────────────\nnative_sounds\nconnecting_words\nbeautifying_sentences\nsounding_native"]
+        MN["ModuleName\n(Value Object)\n─────────────────\nnative_sounds\nconnected_speech\nflow_connectors\nreal_talk"]
         MP --> MN
     end
 ```
@@ -81,7 +81,7 @@ Progreso agregado de un usuario en un módulo temático. PK compuesta `(userId, 
 Enum de módulos válidos del sistema. Falla en construcción si el valor no pertenece al conjunto.
 
 ```
-native_sounds | connecting_words | beautifying_sentences | sounding_native
+native_sounds | connected_speech | flow_connectors | real_talk
 ```
 
 ---

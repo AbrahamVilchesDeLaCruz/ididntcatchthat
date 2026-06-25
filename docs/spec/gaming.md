@@ -37,7 +37,7 @@ StringValueObject (shared)
   ├── GameId       — UUID v4, generate()
   ├── AttemptId    — UUID v4, generate()
   ├── GameMode     — enum: study | game
-  ├── GameModule   — enum: native_sounds | connecting_words | beautifying_sentences | sounding_native | random
+  ├── GameModule   — enum: native_sounds | connected_speech | flow_connectors | real_talk | random
   ├── CardCount    — enum: 10 | 20 | 50
   └── GameStatus   — enum: in_progress | paused | completed | abandoned
 ```
