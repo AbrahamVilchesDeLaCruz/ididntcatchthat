@@ -5,9 +5,9 @@ import type { GameModule } from './api/game.api-model';
 const MODULES: GameModule[] = [
   'random',
   'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
 ];
 
 const CARD_COUNTS = [10, 20, 50] as const;

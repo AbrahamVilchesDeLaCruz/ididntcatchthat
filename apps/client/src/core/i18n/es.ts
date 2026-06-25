@@ -47,7 +47,7 @@ export const es: Translations = {
       exampleLabel: 'Connected speech — ejemplo',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
-      exampleTag: 'Flap T',
+      exampleTag: 'T suave',
     },
     howItWorks: {
       sectionLabel: 'Cómo funciona',
@@ -94,20 +94,20 @@ export const es: Translations = {
             'Domina los 23 fonemas del inglés. Foco en los que más cuestan a los hispanohablantes.',
         },
         {
-          title: 'Conectando palabras',
-          tag: 'Connected Speech',
+          title: 'Habla conectada',
+          tag: 'Enlace y reducción',
           description:
-            'Escucha cómo los sonidos se transforman y fusionan cuando los nativos hablan a velocidad real.',
+            'Escucha cómo cambian y fusionan los sonidos a velocidad real — gonna, enlace, elisión.',
         },
         {
-          title: 'Mejorando frases',
+          title: 'Fluidez y conectores',
           tag: 'Fluidez',
           description:
             'Conectores y estructuras para sonar fluido, no robótico.',
         },
         {
-          title: 'Sonando nativo',
-          tag: 'Expresiones',
+          title: 'Inglés de calle',
+          tag: 'Inglés cotidiano',
           description:
             'El vocabulario informal que usan los nativos cada día — y que nunca te enseñaron en clase.',
         },
@@ -136,9 +136,9 @@ export const es: Translations = {
       modules: {
         random: 'Mezcla aleatoria',
         native_sounds: 'Sonidos nativos',
-        connecting_words: 'Conectando palabras',
-        beautifying_sentences: 'Mejorando frases',
-        sounding_native: 'Sonando nativo',
+        connected_speech: 'Habla conectada',
+        flow_connectors: 'Fluidez y conectores',
+        real_talk: 'Inglés de calle',
       },
     },
     play: {

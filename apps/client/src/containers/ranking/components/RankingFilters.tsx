@@ -27,9 +27,9 @@ const PERIODS: RankingPeriod[] = ['weekly', 'monthly', 'all_time'];
 
 const MODULES: RankingModule[] = [
   'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
 ];
 
 const pillClass = (active: boolean): string =>
