@@ -1,5 +1,6 @@
 .PHONY: up up-prod down down-prod restart restart-prod build rebuild \
         dev dev-api dev-client \
+        local-up local-down local-wait local-setup local-seed local-dev local-dev-api local-dev-client \
         logs logs-api logs-client ps \
         obs-up obs-down obs-logs \
         tunnel-dev tunnel-prod \
@@ -20,6 +21,10 @@ COMPOSE       = docker compose
 COMPOSE_DEV   = doppler run --config dev  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
 COMPOSE_PROD  = doppler run --config prd  -- $(COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml
 COMPOSE_TEST  = $(COMPOSE) -f docker-compose.test.yml
+COMPOSE_LOCAL = $(COMPOSE) -f docker-compose.local.yml
+
+API_DIR   = apps/api
+CLIENT_DIR = apps/client
 
 PROD_DIR = /opt/ididntcatchthat
 DEV_DIR  = /opt/ididntcatchthat-dev
@@ -86,6 +91,41 @@ dev-api: ## Start api dev server with Doppler (no Docker)
 
 dev-client: ## Start client dev server with Doppler (no Docker)
 	doppler run -- pnpm --filter @ididntcatchthat/client dev
+
+# ─── Local profile (no Doppler, no paid services) ─────────────────────────────
+
+local-up: ## Start local infra (Postgres :5434, RabbitMQ :5674, MinIO :9000)
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) up -d postgres rabbitmq minio --wait
+	$(COMPOSE_LOCAL) --profile init up minio-init --no-deps
+
+local-down: ## Stop local infra
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) --profile init down
+	$(COMPOSE_LOCAL) down
+
+local-wait: ## Wait until local infra is healthy
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) up -d postgres rabbitmq minio --wait
+
+local-setup: ## Copy .env.local.example → .env.local (api + client) if missing
+	@test -f $(API_DIR)/.env.local || cp $(API_DIR)/.env.local.example $(API_DIR)/.env.local
+	@test -f $(CLIENT_DIR)/.env.local || cp $(CLIENT_DIR)/.env.local.example $(CLIENT_DIR)/.env.local
+	@echo "✅ Local env files ready ($(API_DIR)/.env.local, $(CLIENT_DIR)/.env.local)"
+
+local-seed: local-wait ## Run migrations + demo seed against local Postgres
+	@pnpm --filter @ididntcatchthat/api seed:local
+
+local-dev-api: ## Start API with .env.local (no Doppler)
+	@pnpm --filter @ididntcatchthat/api start:dev
+
+local-dev-client: ## Start client with .env.local (no Doppler)
+	@pnpm --filter @ididntcatchthat/client dev
+
+local-dev: local-up local-setup ## Start infra + api + client dev servers (no Doppler)
+	@echo "🚀 Starting API (:3000) and Client (:5173) with local profile..."
+	@pnpm --filter @ididntcatchthat/api start:dev & \
+	pnpm --filter @ididntcatchthat/client dev
 
 # ─── Build ────────────────────────────────────────────────────────────────────
 

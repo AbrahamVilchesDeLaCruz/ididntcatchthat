@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { join } from 'node:path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -10,17 +11,23 @@ import { ContentModule } from './content/shared/infrastructure/framework/content
 import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { ProgressModule } from './progress/infrastructure/framework/progress.module';
 import { RankingModule } from './ranking/infrastructure/framework/ranking.module';
-import { AppDataSource } from './shared/infrastructure/persistence/typeorm/typeorm.config';
+import { buildTypeOrmDataSourceOptions } from './shared/infrastructure/persistence/typeorm/typeorm-data-source-options';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [
+        join(process.cwd(), '.env.local'),
+        join(process.cwd(), '.env'),
+      ],
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
     }),
-    TypeOrmModule.forRoot(AppDataSource.options),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => buildTypeOrmDataSourceOptions(),
+    }),
     ThrottlerModule.forRoot([
       {
         name: 'default',

@@ -14,15 +14,31 @@ El proyecto necesita una estrategia clara para gestionar múltiples entornos (lo
 
 ## Decision
 
-### Tres entornos
+### Cuatro entornos
 
 | Entorno | Quién lo usa | Base de datos | Secrets |
 |---|---|---|---|
+| `local` | Evaluación / tribunal / clone sin cuentas | PostgreSQL + MinIO en Docker (`:5434`) | `.env.local` (ver [local-development.md](../local-development.md)) |
 | `dev` | Desarrollador en local | Aiven dev | Doppler `dev` |
 | `test` | GitHub Actions (CI) | PostgreSQL en Docker (runner) | Doppler `test` |
 | `prod` | VPS de producción | Aiven prod | Doppler `prod` |
 
-### Local — dev
+### Perfil local (evaluación sin Doppler)
+
+Autocontenido para quien clona el repo sin acceso a servicios de pago:
+
+```bash
+make local-setup && make local-up && make local-seed && make local-dev
+```
+
+- Postgres + RabbitMQ + MinIO en Docker
+- Stubs para ElevenLabs / DeepSeek (`USE_STUB_ADAPTERS=true`)
+- MinIO sustituye R2 (mismo adapter S3)
+- Seed idempotente con usuario `demo@local.dev`
+
+Ver guía: [docs/local-development.md](../local-development.md)
+
+### Local — dev (Doppler)
 
 El desarrollador trabaja con hot-reload directo via pnpm. Docker solo orquesta `api` y `client` para validar builds de producción. La DB vive en Aiven dev — no hay postgres en Docker local.
 
@@ -71,8 +87,11 @@ Todo contenedorizado via Docker Compose. Los secrets llegan a los contenedores v
 
 ## Alternatives Considered
 
-### PostgreSQL en Docker también en local
-Más aislado pero añade fricción al onboarding y divergencia potencial con Aiven. Descartado — Aiven dev es suficiente y más realista.
+### PostgreSQL en Docker también en local (perfil `local`)
+Añadido como **perfil opcional** para evaluación del TFM — no reemplaza el flujo Doppler+Aiven del desarrollador principal. Coexiste con `dev`.
+
+### PostgreSQL en Docker también en local (dev diario)
+Más aislado pero añade fricción al onboarding y divergencia potencial con Aiven. Descartado para dev diario — Aiven dev es suficiente y más realista.
 
 ### Un solo entorno de DB para CI y dev
 Riesgo de contaminación de datos entre runs de CI y trabajo de dev. Descartado.

@@ -1,33 +1,9 @@
 import { DataSource } from 'typeorm';
-import { UserEntity } from '../../../../identity/user/infrastructure/persistence/user.entity';
-import { UserSessionEntity } from '../../../../identity/session/infrastructure/persistence/user-session.entity';
-import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
-import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
+import { buildTypeOrmDataSourceOptions } from './typeorm-data-source-options';
 
-const isProd = process.env.NODE_ENV === 'production';
-const isTest = process.env.NODE_ENV === 'test';
-const dbUrl = new URL(
-  process.env.DATABASE_URL ?? 'postgres://localhost/defaultdb',
+export const AppDataSource = new DataSource(
+  buildTypeOrmDataSourceOptions({
+    migrationsRun: false,
+    logging: process.env.NODE_ENV !== 'production',
+  }),
 );
-
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: dbUrl.hostname,
-  port: parseInt(dbUrl.port || '5432', 10),
-  username: dbUrl.username,
-  password: dbUrl.password,
-  database: dbUrl.pathname.replace('/', ''),
-  ssl: isProd
-    ? { rejectUnauthorized: true }
-    : isTest
-      ? false
-      : { rejectUnauthorized: false },
-  entities: [UserEntity, UserSessionEntity],
-  migrations: [
-    Migration202605230526271779506787479,
-    Migration202605241854361779641676650,
-  ],
-  migrationsTableName: 'migrations',
-  synchronize: false,
-  logging: !isProd,
-});
