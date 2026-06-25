@@ -1,4 +1,8 @@
 import { useAuthStore, type UserType } from '@/core/store/auth.store';
+import {
+  canAccessBackofficeFromRoles,
+  canManageFlashcardsFromRoles,
+} from '@/core/auth/resolveUserRole';
 
 export interface CurrentUser {
   userId: string | null;
@@ -9,6 +13,7 @@ export interface CurrentUser {
   isTeacher: boolean;
   isAdmin: boolean;
   canAccessBackoffice: boolean;
+  canManageFlashcards: boolean;
   canAccessObservability: boolean;
 }
 
@@ -17,15 +22,20 @@ export function useCurrentUser(): CurrentUser {
   const userId = useAuthStore((s) => s.userId);
   const roles = useAuthStore((s) => s.roles);
 
+  const isAdmin = roles.includes('admin');
+  const isTeacher = roles.includes('teacher');
+  const isUser = roles.includes('user') && !isAdmin && !isTeacher;
+
   return {
     userId,
     userType,
     roles,
     isGuest: userType === 'guest',
-    isUser: userType === 'user',
-    isTeacher: userType === 'teacher',
-    isAdmin: userType === 'admin',
-    canAccessBackoffice: userType === 'teacher' || userType === 'admin',
-    canAccessObservability: userType === 'admin',
+    isUser,
+    isTeacher,
+    isAdmin,
+    canAccessBackoffice: canAccessBackofficeFromRoles(roles),
+    canManageFlashcards: canManageFlashcardsFromRoles(roles),
+    canAccessObservability: isAdmin,
   };
 }

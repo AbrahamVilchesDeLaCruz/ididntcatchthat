@@ -1,23 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  decodeAccessTokenPayload,
+  resolveUserType,
+} from '@/core/auth/resolveUserRole';
 
 export type UserType = 'guest' | 'user' | 'teacher' | 'admin';
-
-interface JwtPayload {
-  type?: UserType;
-  userId?: string;
-  roles?: string[];
-}
-
-function decodeJwt(token: string): JwtPayload {
-  try {
-    const payload = token.split('.')[1];
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(decoded) as JwtPayload;
-  } catch {
-    return {};
-  }
-}
 
 interface AuthState {
   accessToken: string | null;
@@ -46,13 +34,14 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       roles: [],
 
       setAccessToken: (token) => {
-        const { type, userId, roles } = decodeJwt(token);
+        const payload = decodeAccessTokenPayload(token);
+        const roles = payload.roles ?? [];
         set({
           accessToken: token,
           isAuthenticated: true,
-          userType: type ?? null,
-          userId: userId ?? null,
-          roles: roles ?? [],
+          userType: resolveUserType(payload.type, roles),
+          userId: payload.userId ?? null,
+          roles,
         });
       },
 
@@ -77,7 +66,18 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         isAuthenticated: state.isAuthenticated,
         // guestDeviceId sí se persiste para identificar al guest entre recargas
         guestDeviceId: state.guestDeviceId,
+        // roles/userType NO se persisten — vienen del JWT vivo o del refresh;
+        // persistirlos dejaba permisos admin stale tras cambiar de cuenta.
       }),
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<AuthState> | undefined;
+        return {
+          ...current,
+          isAuthenticated: saved?.isAuthenticated ?? false,
+          guestDeviceId: saved?.guestDeviceId ?? null,
+          // Ignorar roles/userType/userId legacy en localStorage
+        };
+      },
     },
   ),
 );

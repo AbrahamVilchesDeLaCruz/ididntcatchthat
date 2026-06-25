@@ -2,7 +2,7 @@ import { type ReactElement } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useAuthStore } from '@/core/store/auth.store';
-import { useCurrentUser } from '@/core/auth/useCurrentUser';
+import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
 
 /**
  * Layout route for game pages (/game, /game/:id, /game/:id/summary).
@@ -14,7 +14,7 @@ import { useCurrentUser } from '@/core/auth/useCurrentUser';
 export const GameShell = (): ReactElement => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { canAccessBackoffice } = useCurrentUser();
+  const roles = useAuthStore((s) => s.roles);
 
   const handleBack = (): void => {
     if (window.history.length > 1) {
@@ -26,9 +26,13 @@ export const GameShell = (): ReactElement => {
   };
 
   const appLink = isAuthenticated
-    ? canAccessBackoffice
-      ? { to: '/backoffice/flashcards', label: 'Dashboard' }
-      : { to: '/stats', label: 'Mis estadísticas' }
+    ? {
+        to: getAuthenticatedHomePathFromRoles(roles),
+        label:
+          roles.includes('admin') || roles.includes('teacher')
+            ? 'Dashboard'
+            : 'Mis estadísticas',
+      }
     : null;
 
   return (
