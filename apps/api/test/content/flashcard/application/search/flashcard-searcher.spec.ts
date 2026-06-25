@@ -3,7 +3,7 @@ import { FlashcardSearcher } from '@/content/flashcard/application/search/flashc
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { MasteringSoundsSubcategory } from '@/content/flashcard/domain/subcategory-enums';
+import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
 import { AudioStatusValue } from '@/content/flashcard/domain/audio-status';
 
 describe('content/flashcard/application/search FlashcardSearcher', () => {
@@ -34,23 +34,23 @@ describe('content/flashcard/application/search FlashcardSearcher', () => {
 
   it('should filter by category when provided', async () => {
     const flashcards = [
-      FlashcardMother.random({ category: CategoryValue.MasteringSounds }),
+      FlashcardMother.random({ category: CategoryValue.NativeSounds }),
     ];
     repository.match.mockResolvedValue(flashcards);
     repository.count.mockResolvedValue(1);
 
     const result = await searcher.execute({
-      category: CategoryValue.MasteringSounds,
+      category: CategoryValue.NativeSounds,
       page: 1,
       pageSize: 10,
     });
 
-    expect(result.data[0].category).toBe(CategoryValue.MasteringSounds);
+    expect(result.data[0].category).toBe(CategoryValue.NativeSounds);
 
     const criteria = repository.match.mock.calls[0][0];
     const categoryFilter = criteria.filters.find((f) => f.field === 'category');
     expect(categoryFilter).toBeDefined();
-    expect(categoryFilter?.value).toBe(CategoryValue.MasteringSounds);
+    expect(categoryFilter?.value).toBe(CategoryValue.NativeSounds);
   });
 
   it('should apply page and pageSize to criteria', async () => {
@@ -61,7 +61,7 @@ describe('content/flashcard/application/search FlashcardSearcher', () => {
 
     const criteria = repository.match.mock.calls[0][0];
     expect(criteria.limit).toBe(5);
-    expect(criteria.offset).toBe(5); // (page-1) * pageSize
+    expect(criteria.offset).toBe(5);
   });
 
   it('should filter by subcategory when provided', async () => {
@@ -69,7 +69,7 @@ describe('content/flashcard/application/search FlashcardSearcher', () => {
     repository.count.mockResolvedValue(0);
 
     await searcher.execute({
-      subcategory: MasteringSoundsSubcategory.FLAP_T_PARTY_CITY,
+      subcategory: NativeSoundsSubcategory.VVacation,
       page: 1,
       pageSize: 10,
     });
@@ -78,9 +78,7 @@ describe('content/flashcard/application/search FlashcardSearcher', () => {
     const subcategoryFilter = criteria.filters.find(
       (f) => f.field === 'subcategory',
     );
-    expect(subcategoryFilter?.value).toBe(
-      MasteringSoundsSubcategory.FLAP_T_PARTY_CITY,
-    );
+    expect(subcategoryFilter?.value).toBe(NativeSoundsSubcategory.VVacation);
   });
 
   it('should use default page=1 and pageSize=20 when not provided', async () => {
