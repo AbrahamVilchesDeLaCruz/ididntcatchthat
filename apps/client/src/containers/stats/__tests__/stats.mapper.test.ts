@@ -27,6 +27,8 @@ describe('stats/mapWeakFlashcard', () => {
       flashcardId: 'fc-1',
       expression: 'gonna',
       module: 'connected_speech',
+      category: 'connected_speech',
+      subcategory: 'informal_going_to',
       errorCount: 6,
       lastSeenAt: '2026-02-01T10:00:00.000Z',
     };
@@ -46,6 +48,8 @@ describe('stats/mapWeakFlashcard', () => {
       flashcardId: 'fc-2',
       expression: 'wanna',
       module: 'connected_speech',
+      category: 'connected_speech',
+      subcategory: 'informal_want_to',
       errorCount: 2,
       lastSeenAt: '2026-03-01T10:00:00.000Z',
     };
