@@ -1,4 +1,4 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -8,20 +8,38 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useI18n } from '@/core/i18n';
 import type { ModuleProgressVM } from '../stats.types';
+import type { GameModule } from '@/containers/game/api/game.api-model';
 
 interface ModuleProgressChartProps {
   data: ModuleProgressVM[];
+  onCategoryClick?: (category: string) => void;
 }
+
+type ChartRow = ModuleProgressVM & { moduleLabel: string };
 
 export const ModuleProgressChart = ({
   data,
+  onCategoryClick,
 }: ModuleProgressChartProps): ReactElement => {
+  const { t } = useI18n();
+
+  const chartData = useMemo<ChartRow[]>(
+    () =>
+      data.map((row) => ({
+        ...row,
+        moduleLabel:
+          t.game.config.modules[row.module as GameModule] ?? row.module,
+      })),
+    [data, t],
+  );
+
   return (
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
+          data={chartData}
           margin={{ top: 8, right: 16, left: 0, bottom: 8 }}
         >
           <CartesianGrid
@@ -29,7 +47,7 @@ export const ModuleProgressChart = ({
             stroke="rgba(255,255,255,0.08)"
           />
           <XAxis
-            dataKey="module"
+            dataKey="moduleLabel"
             tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
             axisLine={false}
             tickLine={false}
@@ -58,6 +76,13 @@ export const ModuleProgressChart = ({
             dataKey="accuracy"
             fill="var(--color-brand)"
             radius={[4, 4, 0, 0]}
+            cursor={onCategoryClick ? 'pointer' : undefined}
+            onClick={(_barData, index) => {
+              const row = chartData[index];
+              if (row?.module && onCategoryClick) {
+                onCategoryClick(row.module);
+              }
+            }}
           />
         </BarChart>
       </ResponsiveContainer>

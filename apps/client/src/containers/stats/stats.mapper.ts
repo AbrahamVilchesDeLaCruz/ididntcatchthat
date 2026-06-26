@@ -21,7 +21,9 @@ export function mapWeakFlashcard(raw: WeakFlashcardApiModel): WeakFlashcardVM {
   return {
     flashcardId: raw.flashcardId,
     expression: raw.expression,
-    module: raw.module,
+    module: raw.category ?? raw.module,
+    category: raw.category ?? raw.module,
+    subcategory: raw.subcategory,
     errorCount: raw.errorCount,
     lastAttemptAt: new Date(raw.lastSeenAt),
   };
