@@ -1,11 +1,15 @@
 import { type ReactElement, useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/core/store/auth.store';
 import {
   useGameFlashcards,
   useRecordAttempt,
   useCompleteGame,
+  usePatchGame,
 } from './api/game.api';
 import { GameComponent } from './GameComponent';
+import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
+import { useGameSession } from './hooks/useGameSession';
 import { saveGameSummary } from './game-summary.storage';
 import type { GameSummaryVM } from './game.types';
 
@@ -18,16 +22,17 @@ export const GameContainer = (): ReactElement => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state as LocationState | null) ?? {};
+  const userType = useAuthStore((s) => s.userType);
 
   const hasFlashcardIds = (state.flashcardIds ?? []).length > 0;
+  const canPause = userType !== null && userType !== 'guest';
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
 
   const { data: flashcards = [], isLoading } = useGameFlashcards(gameId ?? '');
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
+  const { mutate: patchGame, isPending: isPausing } = usePatchGame();
 
   useEffect(() => {
     if (!hasFlashcardIds) {
@@ -36,18 +41,12 @@ export const GameContainer = (): ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const currentFlashcard = flashcards[currentIndex] ?? null;
-
   const navigateToSummary = (summary: GameSummaryVM): void => {
     if (gameId) saveGameSummary(gameId, summary);
     void navigate(`/game/${gameId ?? ''}/summary`, {
       state: { summary },
       replace: true,
     });
-  };
-
-  const handleFlip = (): void => {
-    setIsFlipped((prev) => !prev);
   };
 
   const runCompleteGame = (): void => {
@@ -63,27 +62,38 @@ export const GameContainer = (): ReactElement => {
     });
   };
 
+  const session = useGameSession({
+    flashcards,
+    onOriginalQueueComplete: runCompleteGame,
+  });
+
   const handleAnswer = (correct: boolean): void => {
-    if (!currentFlashcard) return;
+    const flashcard = session.currentFlashcard;
+    if (!flashcard) return;
 
-    const isLast = currentIndex === flashcards.length - 1;
-
-    const afterAttemptRecorded = (): void => {
-      if (isLast) {
-        runCompleteGame();
-      } else {
-        setIsFlipped(false);
-        requestAnimationFrame(() => {
-          setCurrentIndex((prev) => prev + 1);
-        });
-      }
-    };
-
-    void recordAttempt({ flashcardId: currentFlashcard.id, correct })
-      .then(() => afterAttemptRecorded())
+    void recordAttempt({ flashcardId: flashcard.id, correct })
+      .then(() => session.recordAnswer(correct))
       .catch(() => {
         setCompleteError('No se pudo registrar la respuesta. Reintenta.');
       });
+  };
+
+  const handlePause = (): void => {
+    if (!gameId || !session.currentFlashcard || !canPause) return;
+    patchGame(
+      {
+        gameId,
+        payload: {
+          status: 'paused',
+          lastFlashcardId: session.currentFlashcard.id,
+        },
+      },
+      {
+        onSuccess: () => {
+          void navigate('/game');
+        },
+      },
+    );
   };
 
   if (completeError) {
@@ -95,11 +105,8 @@ export const GameContainer = (): ReactElement => {
         <button
           type="button"
           onClick={() => {
-            if (currentIndex === flashcards.length - 1) {
-              runCompleteGame();
-            } else {
-              setCompleteError(null);
-            }
+            setCompleteError(null);
+            runCompleteGame();
           }}
           className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
         >
@@ -110,14 +117,25 @@ export const GameContainer = (): ReactElement => {
   }
 
   return (
-    <GameComponent
-      flashcard={currentFlashcard}
-      isLoading={isLoading || isCompleting}
-      isFlipped={isFlipped}
-      currentIndex={currentIndex}
-      totalCount={flashcards.length}
-      onFlip={handleFlip}
-      onAnswer={handleAnswer}
-    />
+    <>
+      {session.phase === 'repeat-prompt' && (
+        <RepeatWrongAnswersModal
+          count={session.wrongCount}
+          onAccept={session.acceptRepeatWrong}
+          onDecline={session.declineRepeatWrong}
+        />
+      )}
+      <GameComponent
+        flashcard={session.currentFlashcard}
+        isLoading={isLoading || isCompleting || isPausing}
+        isFlipped={session.isFlipped}
+        currentIndex={session.currentIndex}
+        totalCount={session.totalCount}
+        canPause={canPause}
+        onFlip={session.toggleFlip}
+        onAnswer={handleAnswer}
+        onPause={handlePause}
+      />
+    </>
   );
 };
