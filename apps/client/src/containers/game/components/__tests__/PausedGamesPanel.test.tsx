@@ -52,6 +52,59 @@ describe('PausedGamesPanel', () => {
     expect(onContinue).toHaveBeenCalledWith('game-1');
   });
 
+  it('shows random module label when module is null', () => {
+    renderPanel({
+      games: [{ ...pausedGame, module: null }],
+    });
+
+    expect(screen.getByText('Random')).toBeInTheDocument();
+  });
+
+  it('calls onAbandon after confirmation', () => {
+    const onAbandon = vi.fn();
+    renderPanel({ onAbandon });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abandon' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Abandon this game?' }));
+
+    expect(onAbandon).toHaveBeenCalledWith('game-1');
+  });
+
+  it('cancels abandon confirmation', () => {
+    renderPanel();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abandon' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Continue' }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders subcategory label from catalog', () => {
+    renderPanel({
+      games: [{ ...pausedGame, subcategory: 't_soft_between_vowels' }],
+      catalog: {
+        categories: [
+          {
+            value: 'native_sounds',
+            label: { en: 'Native Sounds', es: 'Sonidos nativos' },
+            subcategories: [
+              {
+                value: 't_soft_between_vowels',
+                label: { en: 'Soft T', es: 'T suave' },
+                description: { en: '', es: '' },
+                anchorExamples: [],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(screen.getByText(/Soft T/)).toBeInTheDocument();
+  });
+
   it('returns null when there are no paused games', () => {
     const { container } = renderPanel({ games: [] });
     expect(container).toBeEmptyDOMElement();

@@ -52,4 +52,38 @@ describe('GameComponent', () => {
     const micButton = screen.getByRole('button', { name: /Coming soon/i });
     expect(micButton).toBeDisabled();
   });
+
+  it('shows IPA and native speech controls on the back', () => {
+    render(
+      <GameComponent
+        flashcard={flashcard}
+        isLoading={false}
+        isFlipped
+        currentIndex={0}
+        totalCount={5}
+        onFlip={vi.fn()}
+        onAnswer={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('/həˈloʊ/')).toBeInTheDocument();
+    expect(screen.getByText('Listen native')).toBeInTheDocument();
+    expect(screen.getByText('Listen to example')).toBeInTheDocument();
+  });
+
+  it('shows loading spinner when flashcard is not ready', () => {
+    const { container } = render(
+      <GameComponent
+        flashcard={null}
+        isLoading
+        isFlipped={false}
+        currentIndex={0}
+        totalCount={5}
+        onFlip={vi.fn()}
+        onAnswer={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  });
 });

@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { type ReactElement } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WeakFlashcardsTable } from '../WeakFlashcardsTable';
+import { flashcardCatalogKeys } from '@/core/api/flashcard-catalog.api';
 
 const renderTable = (ui: ReactElement): ReturnType<typeof render> => {
   const queryClient = new QueryClient({
@@ -63,5 +64,74 @@ describe('WeakFlashcardsTable', () => {
     );
 
     expect(screen.queryByText('hidden')).not.toBeInTheDocument();
+  });
+
+  it('shows module-specific empty state when filtered category has no weak cards', () => {
+    renderTable(
+      <WeakFlashcardsTable data={[]} selectedCategory="native_sounds" />,
+    );
+
+    expect(screen.getByText('No errors in this module!')).toBeInTheDocument();
+  });
+
+  it('calls onPractice when practice button is clicked', () => {
+    const onPractice = vi.fn();
+    const item = {
+      flashcardId: 'fc-1',
+      expression: 'gonna',
+      module: 'connected_speech',
+      category: 'connected_speech',
+      subcategory: 'informal_going_to',
+      errorCount: 3,
+      lastAttemptAt: new Date('2026-01-01T00:00:00.000Z'),
+    };
+
+    renderTable(<WeakFlashcardsTable data={[item]} onPractice={onPractice} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Practice' }));
+
+    expect(onPractice).toHaveBeenCalledWith(item);
+  });
+
+  it('uses catalog labels for subcategories when available', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    queryClient.setQueryData(flashcardCatalogKeys.catalog(), {
+      categories: [
+        {
+          value: 'connected_speech',
+          label: { en: 'Connected Speech', es: 'Habla conectada' },
+          subcategories: [
+            {
+              value: 'informal_going_to',
+              label: { en: 'Going to', es: 'Going to' },
+              description: { en: '', es: '' },
+              anchorExamples: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WeakFlashcardsTable
+          data={[
+            {
+              flashcardId: 'fc-1',
+              expression: 'gonna',
+              module: 'connected_speech',
+              category: 'connected_speech',
+              subcategory: 'informal_going_to',
+              errorCount: 2,
+              lastAttemptAt: new Date('2026-01-01T00:00:00.000Z'),
+            },
+          ]}
+        />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText('Going to')).toBeInTheDocument();
   });
 });

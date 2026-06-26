@@ -57,6 +57,31 @@ describe('GameConfigComponent', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows guest error screen with retry action', () => {
+    const onGuestRetry = vi.fn();
+    render(
+      <GameConfigComponent
+        {...defaultProps}
+        guestError
+        onGuestRetry={onGuestRetry}
+      />,
+    );
+
+    expect(
+      screen.getByText('We could not start the guest game.'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(onGuestRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows paused saved banner when enabled', () => {
+    render(<GameConfigComponent {...defaultProps} pausedSavedBanner />);
+
+    expect(
+      screen.getByText('Game saved. You can resume it anytime.'),
+    ).toBeInTheDocument();
+  });
+
   it('calls onSubcategoryChange when a subcategory is selected', () => {
     const onSubcategoryChange = vi.fn();
     render(
