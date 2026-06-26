@@ -30,9 +30,13 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
       headers: Record<string, string>;
     };
-    response?: { status: number };
+    response?: {
+      status: number;
+      data?: { message?: string; errorType?: string };
+    };
   }) => {
     const originalRequest = error.config;
+    const responseData = error.response?.data;
 
     const isGuest = useAuthStore.getState().guestDeviceId !== null;
 
@@ -57,12 +61,12 @@ apiClient.interceptors.response.use(
     return Promise.reject(
       new ApiRequestError(
         String(
-          (error.response?.data as { message?: string } | undefined)?.message ??
+          responseData?.message ??
             (error as { message?: string }).message ??
             'Request failed',
         ),
         error.response?.status ?? 0,
-        (error.response?.data as { errorType?: string } | undefined)?.errorType,
+        responseData?.errorType,
       ),
     );
   },
