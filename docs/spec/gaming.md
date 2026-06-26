@@ -251,6 +251,7 @@ export const FLASHCARD_SELECTOR = Symbol('FlashcardSelector');
 | `POST`  | `/games`                | `GameStarter`        | Bearer (any)      |
 | `POST`  | `/games/:id/attempts`   | `AttemptRecorder`    | Bearer (any)      |
 | `POST`  | `/games/:id/complete`   | `GameCompleter`      | Bearer (any)      |
+| `GET`   | `/games/:id/summary`    | `GameSummaryFinder`  | Bearer (any)      |
 | `PATCH` | `/games/:id`            | `GamePauser` / `GameAbandoner` | Bearer (user) |
 | `GET`   | `/games`                | `PausedGamesLister`  | Bearer (user)     |
 | `GET`   | `/games/:id/resume`     | `GameResumer`        | Bearer (user)     |

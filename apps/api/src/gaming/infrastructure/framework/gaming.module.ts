@@ -21,6 +21,7 @@ import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/type
 import { StartGamePostController } from '@/gaming/infrastructure/controllers/start-game-post.controller';
 import { RecordAttemptPostController } from '@/gaming/infrastructure/controllers/record-attempt-post.controller';
 import { CompleteGamePostController } from '@/gaming/infrastructure/controllers/complete-game-post.controller';
+import { GetGameSummaryGetController } from '@/gaming/infrastructure/controllers/get-game-summary-get.controller';
 import { PatchGameController } from '@/gaming/infrastructure/controllers/patch-game.controller';
 import { ListPausedGamesGetController } from '@/gaming/infrastructure/controllers/list-paused-games-get.controller';
 import { ResumeGameGetController } from '@/gaming/infrastructure/controllers/resume-game-get.controller';
@@ -37,6 +38,7 @@ import { GamingExceptionRegistry } from './gaming-exception-registry';
 import { GameStarter } from '@/gaming/application/start/game-starter';
 import { AttemptRecorder } from '@/gaming/application/attempt/attempt-recorder';
 import { GameCompleter } from '@/gaming/application/complete/game-completer';
+import { GameSummaryFinder } from '@/gaming/application/summary/game-summary-finder';
 import { GamePauser } from '@/gaming/application/pause/game-pauser';
 import { PausedGamesLister } from '@/gaming/application/list-paused/paused-games-lister';
 import { GameResumer } from '@/gaming/application/resume/game-resumer';
@@ -57,6 +59,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     StartGamePostController,
     RecordAttemptPostController,
     CompleteGamePostController,
+    GetGameSummaryGetController,
     PatchGameController,
     ListPausedGamesGetController,
     ResumeGameGetController,
@@ -78,6 +81,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     GameStarter,
     AttemptRecorder,
     GameCompleter,
+    GameSummaryFinder,
     GamePauser,
     PausedGamesLister,
     GameResumer,

@@ -31,6 +31,7 @@ export const gameKeys = {
   flashcards: (gameId: string) =>
     [...gameKeys.all, 'flashcards', gameId] as const,
   resume: (gameId: string) => [...gameKeys.all, 'resume', gameId] as const,
+  summary: (gameId: string) => [...gameKeys.all, 'summary', gameId] as const,
 };
 
 // ─── Start game ───────────────────────────────────────────────────────────────
@@ -73,6 +74,24 @@ export const useCompleteGame = (): UseMutationResult<
       );
       return mapGameSummary(res.data);
     },
+  });
+};
+
+// ─── Fetch game summary (recovery when navigation state is missing) ─────────────
+export const useGameSummary = (
+  gameId: string,
+  enabled: boolean,
+): UseQueryResult<GameSummaryVM> => {
+  return useQuery({
+    queryKey: gameKeys.summary(gameId),
+    queryFn: async (): Promise<GameSummaryVM> => {
+      const res = await apiClient.get<GameSummaryApiModel>(
+        `/games/${gameId}/summary`,
+      );
+      return mapGameSummary(res.data);
+    },
+    enabled: !!gameId && enabled,
+    retry: 1,
   });
 };
 
