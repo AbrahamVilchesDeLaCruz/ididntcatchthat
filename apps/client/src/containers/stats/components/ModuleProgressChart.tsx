@@ -77,8 +77,8 @@ export const ModuleProgressChart = ({
             fill="var(--color-brand)"
             radius={[4, 4, 0, 0]}
             cursor={onCategoryClick ? 'pointer' : undefined}
-            onClick={(barData) => {
-              const row = barData as ChartRow | undefined;
+            onClick={(_barData, index) => {
+              const row = chartData[index];
               if (row?.module && onCategoryClick) {
                 onCategoryClick(row.module);
               }
