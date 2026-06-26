@@ -60,6 +60,26 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
 
     // 3 accents for expression + 1 for examples = 4 calls
     expect(audioGenerator.generate).toHaveBeenCalledTimes(4);
+    expect(audioGenerator.generate).toHaveBeenCalledWith(
+      expect.stringMatching(/^".*"$/),
+      'us',
+      'expression',
+    );
+    expect(audioGenerator.generate).toHaveBeenCalledWith(
+      expect.stringMatching(/^".*"$/),
+      'uk',
+      'expression',
+    );
+    expect(audioGenerator.generate).toHaveBeenCalledWith(
+      expect.stringMatching(/^".*"$/),
+      'au',
+      'expression',
+    );
+    expect(audioGenerator.generate).toHaveBeenCalledWith(
+      flashcard.examplesEnglishText,
+      'us',
+      'examples',
+    );
     expect(audioStorage.upload).toHaveBeenCalledTimes(4);
     expect(repository.save).toHaveBeenCalledTimes(2); // markGenerating + markReady
 

@@ -8,8 +8,10 @@ interface GameComponentProps {
   isFlipped: boolean;
   currentIndex: number;
   totalCount: number;
+  canPause?: boolean;
   onFlip: () => void;
   onAnswer: (correct: boolean) => void;
+  onPause?: () => void;
 }
 
 type AudioDialect = 'us' | 'uk' | 'au';
@@ -26,8 +28,10 @@ export const GameComponent = ({
   isFlipped,
   currentIndex,
   totalCount,
+  canPause = false,
   onFlip,
   onAnswer,
+  onPause,
 }: GameComponentProps): ReactElement => {
   const { t } = useI18n();
   const gp = t.game.play;
@@ -67,8 +71,19 @@ export const GameComponent = ({
         />
       </div>
 
-      {/* Counter */}
-      <div className="flex items-center justify-end px-5 py-3">
+      {/* Counter + pause */}
+      <div className="flex items-center justify-between px-5 py-3">
+        {canPause && onPause ? (
+          <button
+            type="button"
+            onClick={onPause}
+            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-brand)]"
+          >
+            ⏸ Pausar
+          </button>
+        ) : (
+          <span />
+        )}
         <span className="text-sm text-[var(--color-text-muted)]">
           {currentIndex + 1} {gp.cardOf} {totalCount}
         </span>
