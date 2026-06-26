@@ -1,6 +1,19 @@
+export interface LocalizedLabelApiModel {
+  es: string;
+  en: string;
+}
+
+export interface FlashcardCatalogSubcategoryApiModel {
+  value: string;
+  label: LocalizedLabelApiModel;
+  description: LocalizedLabelApiModel;
+  anchorExamples: string[];
+}
+
 export interface FlashcardCatalogCategoryApiModel {
   value: string;
-  subcategories: string[];
+  label: LocalizedLabelApiModel;
+  subcategories: FlashcardCatalogSubcategoryApiModel[];
 }
 
 export interface FlashcardCatalogApiModel {
@@ -31,8 +44,8 @@ export interface FlashcardApiModel {
   audioStatus: 'pending' | 'generating' | 'ready' | 'failed';
   audioUrls: FlashcardAudioUrlsApiModel | null;
   examples: FlashcardExampleApiModel[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FlashcardsListApiModel {
@@ -93,4 +106,15 @@ export interface FlashcardDraftApiModel {
   ipaNotation: string | null;
   nativeSpeech: string | null;
   examples: FlashcardDraftExampleApiModel[];
+}
+
+export interface GenerateFlashcardsApiPayload {
+  category: string;
+  subcategory: string;
+  count?: number;
+  prompt?: string;
+}
+
+export interface GenerateFlashcardsApiResult {
+  drafts: FlashcardDraftApiModel[];
 }

@@ -9,7 +9,7 @@ import { FlashcardsTable } from './components/FlashcardsTable';
 import { FlashcardFormModal } from './components/FlashcardFormModal';
 import { FlashcardsToolbar } from './components/FlashcardsToolbar';
 import { BulkCreateModal } from './components/BulkCreateModal';
-import { ImportPdfModal } from './components/ImportPdfModal';
+import { AiGenerateModal } from './components/AiGenerateModal';
 import { FlashcardDetailModal } from './components/FlashcardDetailModal';
 
 interface BackofficeFlashcardsComponentProps {
@@ -21,8 +21,8 @@ interface BackofficeFlashcardsComponentProps {
   isLoading: boolean;
   isError: boolean;
   isMutating: boolean;
-  isImportingPdf: boolean;
-  pdfDrafts: FlashcardDraftApiModel[] | null;
+  isGeneratingAi: boolean;
+  aiDrafts: FlashcardDraftApiModel[] | null;
   categoryFilter: string | undefined;
   subcategoryFilter: string | undefined;
   audioStatusFilter: string | undefined;
@@ -34,9 +34,14 @@ interface BackofficeFlashcardsComponentProps {
   onUpdate: (id: string, values: Partial<FlashcardFormValues>) => void;
   onDelete: (id: string) => void;
   onBulkCreate: (flashcards: CreateFlashcardApiPayload[]) => void;
-  onPdfUpload: (file: File) => void;
-  onPdfConfirm: (drafts: FlashcardDraftApiModel[]) => void;
-  onPdfDraftsClose: () => void;
+  onAiGenerate: (params: {
+    category: string;
+    subcategory: string;
+    count: number;
+    prompt?: string;
+  }) => void;
+  onDraftConfirm: (drafts: FlashcardDraftApiModel[]) => void;
+  onAiDraftsClose: () => void;
 }
 
 export const BackofficeFlashcardsComponent = ({
@@ -48,8 +53,8 @@ export const BackofficeFlashcardsComponent = ({
   isLoading,
   isError,
   isMutating,
-  isImportingPdf,
-  pdfDrafts,
+  isGeneratingAi,
+  aiDrafts,
   categoryFilter,
   subcategoryFilter,
   audioStatusFilter,
@@ -61,13 +66,13 @@ export const BackofficeFlashcardsComponent = ({
   onUpdate,
   onDelete,
   onBulkCreate,
-  onPdfUpload,
-  onPdfConfirm,
-  onPdfDraftsClose,
+  onAiGenerate,
+  onDraftConfirm,
+  onAiDraftsClose,
 }: BackofficeFlashcardsComponentProps): ReactElement => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const [isImportPdfModalOpen, setIsImportPdfModalOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [viewingFlashcard, setViewingFlashcard] = useState<FlashcardVM | null>(
     null,
   );
@@ -121,10 +126,10 @@ export const BackofficeFlashcardsComponent = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setIsImportPdfModalOpen(true)}
+            onClick={() => setIsAiModalOpen(true)}
             className="px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition text-sm border border-white/10"
           >
-            📄 Importar PDF
+            ✨ Generar con IA
           </button>
           <button
             type="button"
@@ -267,19 +272,20 @@ export const BackofficeFlashcardsComponent = ({
       )}
 
       {/* Import PDF Modal */}
-      {isImportPdfModalOpen && (
-        <ImportPdfModal
-          isUploading={isImportingPdf}
+      {isAiModalOpen && (
+        <AiGenerateModal
+          catalog={catalog}
+          isGenerating={isGeneratingAi}
           isImporting={isMutating}
-          drafts={pdfDrafts}
-          onUpload={onPdfUpload}
+          drafts={aiDrafts}
+          onGenerate={onAiGenerate}
           onConfirm={(drafts) => {
-            onPdfConfirm(drafts);
-            setIsImportPdfModalOpen(false);
+            onDraftConfirm(drafts);
+            setIsAiModalOpen(false);
           }}
           onClose={() => {
-            onPdfDraftsClose();
-            setIsImportPdfModalOpen(false);
+            onAiDraftsClose();
+            setIsAiModalOpen(false);
           }}
         />
       )}

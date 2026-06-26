@@ -1,6 +1,7 @@
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-enums';
+import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
+import { LearningModule } from '@/shared/domain/learning-module';
 
 describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => {
   let querier: FlashcardCatalogQuerier;
@@ -15,7 +16,7 @@ describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => 
     expect(catalog.categories).toHaveLength(4);
   });
 
-  it('should include all CategoryValues', () => {
+  it('should include all LearningModule values', () => {
     const catalog = querier.execute();
     const values = catalog.categories.map((c) => c.value);
 
@@ -29,10 +30,24 @@ describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => 
 
     for (const category of catalog.categories) {
       const expected = Array.from(
-        SUBCATEGORY_BY_CATEGORY[category.value as CategoryValue],
+        SUBCATEGORY_BY_CATEGORY[category.value as LearningModule],
       );
-      expect(category.subcategories).toEqual(expected);
+      const actual = category.subcategories.map((s) => s.value);
+      expect(actual).toEqual(expected);
     }
+  });
+
+  it('should return labels and anchorExamples for subcategories', () => {
+    const catalog = querier.execute();
+    const nativeSounds = catalog.categories.find(
+      (c) => (c.value as LearningModule) === LearningModule.NativeSounds,
+    );
+    const flap = nativeSounds?.subcategories.find(
+      (s) => s.value === 'v_vacation',
+    );
+
+    expect(flap?.label.es).toBe('V de vacation');
+    expect(flap?.anchorExamples.length).toBeGreaterThan(0);
   });
 
   it('should return non-empty subcategories for every category', () => {

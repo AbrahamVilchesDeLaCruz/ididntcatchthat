@@ -10,7 +10,7 @@ Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
 | --------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | [Create](./create/)                     | Crear flashcard individual (formulario)        | [Secuencia](./create/sequence.md) · [Clases](./create/classes.md) · [Casos de uso](./create/usecases.md)                               |
 | [Bulk Create](./bulk-create/)           | Crear múltiples flashcards en un solo request  | [Secuencia](./bulk-create/sequence.md) · [Clases](./bulk-create/classes.md) · [Casos de uso](./bulk-create/usecases.md)                |
-| [Import PDF](./import-pdf/)             | Extraer flashcards desde PDF con IA            | [Secuencia](./import-pdf/sequence.md) · [Clases](./import-pdf/classes.md) · [Casos de uso](./import-pdf/usecases.md)                   |
+| [Generate Flashcards](./generate-flashcards/) | Generar borradores con IA (backoffice)   | [Secuencia](./generate-flashcards/sequence.md) · [Clases](./generate-flashcards/classes.md) · [Casos de uso](./generate-flashcards/usecases.md) |
 | [Update](./update/)                     | Editar flashcard existente                     | [Secuencia](./update/sequence.md) · [Clases](./update/classes.md) · [Casos de uso](./update/usecases.md)                               |
 | [Search](./search/)                     | Listar y filtrar flashcards                    | [Secuencia](./search/sequence.md) · [Clases](./search/classes.md) · [Casos de uso](./search/usecases.md)                               |
 | [Suggest Examples](./suggest-examples/) | Generar ejemplos de uso con IA                 | [Secuencia](./suggest-examples/sequence.md) · [Clases](./suggest-examples/classes.md) · [Casos de uso](./suggest-examples/usecases.md) |
@@ -24,11 +24,12 @@ Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
 | ------ | ------------------------ | --------------------------------------- | ---------------------- |
 | `POST` | `/flashcards`            | [Create](./create/)                     | Bearer (teacher/admin) |
 | `POST` | `/flashcards/bulk`       | [Bulk Create](./bulk-create/)           | Bearer (teacher/admin) |
-| `POST` | `/flashcards/import/pdf` | [Import PDF](./import-pdf/)             | Bearer (teacher/admin) |
+| `POST` | `/ai/generate-flashcards`| [Generate Flashcards](./generate-flashcards/) | Bearer (teacher/admin) |
 | `PUT`  | `/flashcards/:id`        | [Update](./update/)                     | Bearer (teacher/admin) |
 | `GET`  | `/flashcards/:id`        | [Search](./search/)                     | Bearer (any)           |
 | `GET`  | `/flashcards`            | [Search](./search/)                     | Bearer (any)           |
 | `POST` | `/ai/suggest-examples`   | [Suggest Examples](./suggest-examples/) | Bearer (teacher/admin) |
+| `GET`  | `/catalogs/categories`   | [Catalogs](./catalogs/)                 | Público                |
 
 ---
 
@@ -41,7 +42,7 @@ graph LR
         E[TypeORM Entities]
         R[TypeOrmFlashcardRepository]
         AI_EX[DeepseekAiExampleGenerator]
-        AI_PDF[DeepseekPdfFlashcardExtractor]
+        AI_GEN[DeepseekFlashcardDraftGenerator]
         EL[ElevenLabsAudioGenerator]
         CDN[CloudflareAudioCdnUploader]
     end
@@ -56,7 +57,7 @@ graph LR
         EX[Example Entity]
         RI[FlashcardRepository interface]
         AEG[AiExampleGenerator interface]
-        PFE[PdfFlashcardExtractor interface]
+        FDG[FlashcardDraftGenerator interface]
         AG[AudioGenerator interface]
         ACU[AudioCdnUploader interface]
         EV[Domain Events]
@@ -67,7 +68,7 @@ graph LR
     UC --> F
     UC --> RI
     UC --> AEG
-    UC --> PFE
+    UC --> FDG
     AH --> AG
     AH --> ACU
     AH --> RI
@@ -75,7 +76,7 @@ graph LR
     F --> ERR
     R -.implements.-> RI
     AI_EX -.implements.-> AEG
-    AI_PDF -.implements.-> PFE
+    AI_GEN -.implements.-> FDG
     EL -.implements.-> AG
     CDN -.implements.-> ACU
 ```
@@ -95,6 +96,7 @@ graph LR
 
 ## Referencias
 
+- [Taxonomía de contenido](../../../domain/content-taxonomy.md)
 - [Spec de Content](../../../spec/content.md)
 - [Tasks](../../../tasks/content.md)
 - [Domain Model](../../../domain/domain-model.md)

@@ -69,7 +69,7 @@ graph TB
 | -------------- | ------------------------------------------------------------------------------------- |
 | `Expression`   | non-empty string                                                                      |
 | `Meaning`      | non-empty string                                                                      |
-| `Category`     | enum: `native_sounds \| connecting_words \| beautifying_sentences \| sounding_native` |
+| `Category`     | enum: `native_sounds \| connected_speech \| flow_connectors \| real_talk` |
 | `Subcategory`  | enum cerrado por categoría                                                            |
 | `IpaNotation`  | string, generado por IA                                                               |
 | `NativeSpeech` | string, generado por IA                                                               |

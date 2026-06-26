@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
+import type { FlashcardsPageVM } from '../flashcards.types';
 import type {
   BulkCreateFlashcardApiPayload,
   BulkCreateFlashcardApiResult,
@@ -11,6 +12,8 @@ import type {
   FlashcardsListApiModel,
   SearchFlashcardsParams,
   UpdateFlashcardApiPayload,
+  GenerateFlashcardsApiPayload,
+  GenerateFlashcardsApiResult,
 } from './flashcards.api-model';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
@@ -40,18 +43,21 @@ export const useFlashcardCatalog = () => {
 
 export const useFlashcards = (
   params: SearchFlashcardsParams = {},
+  options?: { enabled?: boolean },
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 ) => {
-  return useQuery({
+  return useQuery<FlashcardsListApiModel, Error, FlashcardsPageVM>({
     queryKey: flashcardKeys.list(params),
-    queryFn: () =>
+    queryFn: (): Promise<FlashcardsListApiModel> =>
       apiClient
         .get<FlashcardsListApiModel>('/flashcards', { params })
         .then((res) => res.data),
     select: mapFlashcardsPage,
+    enabled: options?.enabled ?? true,
     refetchInterval: (query) => {
+      // query.state.data es la respuesta cruda (pre-select), no FlashcardsPageVM
       const raw = query.state.data;
-      const hasPending = raw?.data.some(
+      const hasPending = raw?.data?.some(
         (f) => f.audioStatus === 'pending' || f.audioStatus === 'generating',
       );
       return hasPending ? 3000 : false;
@@ -144,16 +150,13 @@ export const useBulkCreateFlashcards = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useImportPdfFlashcards = () => {
+export const useGenerateFlashcards = () => {
   return useMutation({
-    mutationFn: (file: File): Promise<FlashcardDraftApiModel[]> => {
-      const formData = new FormData();
-      formData.append('file', file);
-      return apiClient
-        .post<FlashcardDraftApiModel[]>('/flashcards/import/pdf', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-        .then((res) => res.data);
-    },
+    mutationFn: (
+      payload: GenerateFlashcardsApiPayload,
+    ): Promise<FlashcardDraftApiModel[]> =>
+      apiClient
+        .post<GenerateFlashcardsApiResult>('/ai/generate-flashcards', payload)
+        .then((res) => res.data.drafts),
   });
 };

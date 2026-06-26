@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { AppSidebar } from '@/common/layout/AppSidebar';
 
 /**
@@ -10,8 +11,21 @@ import { AppSidebar } from '@/common/layout/AppSidebar';
  */
 export const AppShell = (): ReactElement => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const location = useLocation();
+  const { canManageFlashcards, canAccessBackoffice } = useCurrentUser();
 
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
+
+  if (
+    location.pathname.startsWith('/backoffice/flashcards') &&
+    !canManageFlashcards
+  ) {
+    return <Navigate to="/stats" replace />;
+  }
+
+  if (location.pathname.startsWith('/backoffice') && !canAccessBackoffice) {
+    return <Navigate to="/stats" replace />;
+  }
 
   return (
     <div className="flex min-h-svh bg-[var(--color-bg-base)]">

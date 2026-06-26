@@ -9,9 +9,9 @@ export type RankingPeriod = 'weekly' | 'monthly' | 'all_time';
 
 export type RankingModule =
   | 'native_sounds'
-  | 'connecting_words'
-  | 'beautifying_sentences'
-  | 'sounding_native';
+  | 'connected_speech'
+  | 'flow_connectors'
+  | 'real_talk';
 
 export type RankingEntryVM = {
   rank: number;

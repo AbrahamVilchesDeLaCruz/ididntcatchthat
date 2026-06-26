@@ -1,6 +1,8 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
+import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
 import { useLogin, useRegister, useGuestAuth } from './api';
 import type {
   AuthMode,
@@ -64,20 +66,26 @@ export const AuthContainer = (): ReactElement => {
   const { mutate: login, isPending: isLoginPending } = useLogin();
   const { mutate: register, isPending: isRegisterPending } = useRegister();
   const { mutate: guestAuth } = useGuestAuth();
+  const guestAuthStarted = useRef(false);
 
   // Obtener token de guest al montar si no hay uno ya guardado
   useEffect(() => {
-    if (!guestDeviceId) {
-      guestAuth(
-        { guestDeviceId: undefined },
-        {
-          onSuccess: ({ deviceId, accessToken }) => {
-            setGuestDeviceId(deviceId);
-            setAccessToken(accessToken);
-          },
+    if (guestDeviceId || guestAuthStarted.current) return;
+    guestAuthStarted.current = true;
+
+    guestAuth(
+      { guestDeviceId: undefined },
+      {
+        onSuccess: ({ deviceId, accessToken }) => {
+          const { userType } = useAuthStore.getState();
+          // No sobrescribir sesión de usuario registrado si el guest llega tarde
+          if (userType && userType !== 'guest') return;
+
+          setGuestDeviceId(deviceId);
+          setAccessToken(accessToken);
         },
-      );
-    }
+      },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,7 +97,10 @@ export const AuthContainer = (): ReactElement => {
         onSuccess: ({ accessToken }) => {
           setAccessToken(accessToken);
           clearGuestDeviceId();
-          void navigate('/backoffice/flashcards', { replace: true });
+          void navigate(
+            getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
+            { replace: true },
+          );
         },
         onError: (error) => {
           setServerError(mapAuthError(error));
@@ -106,7 +117,10 @@ export const AuthContainer = (): ReactElement => {
         onSuccess: ({ accessToken }) => {
           setAccessToken(accessToken);
           clearGuestDeviceId();
-          void navigate('/backoffice/flashcards', { replace: true });
+          void navigate(
+            getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
+            { replace: true },
+          );
         },
         onError: (error) => {
           setServerError(mapAuthError(error));

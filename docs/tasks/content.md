@@ -162,7 +162,7 @@
 - [ ] **TASK-CONTENT-26** — Controllers
   - `CreateFlashcardPostController` → `POST /flashcards` — 201.
   - `BulkCreateFlashcardsPostController` → `POST /flashcards/bulk` — 201 con `{ created: N }`.
-  - `ImportPdfFlashcardsPostController` → `POST /flashcards/import/pdf` — 200 con drafts.
+  - `GenerateFlashcardsPostController` → `POST /ai/generate-flashcards` — 200 con drafts.
   - `UpdateFlashcardPutController` → `PUT /flashcards/:id` — 200.
   - `FindFlashcardGetController` → `GET /flashcards/:id` — 200.
   - `SearchFlashcardsGetController` → `GET /flashcards` — 200 paginado.
@@ -222,7 +222,7 @@
 
 - [ ] **TASK-CONTENT-34** — Diagramas por feature en `docs/apps/api/content/`
   - README con índice de flujos.
-  - Por cada flujo (`create/`, `bulk-create/`, `import-pdf/`, `update/`, `search/`, `suggest-examples/`, `audio-pipeline/`, `catalogs/`):
+  - Por cada flujo (`create/`, `bulk-create/`, `generate-flashcards/`, `update/`, `search/`, `suggest-examples/`, `audio-pipeline/`, `catalogs/`):
     - `sequence.md` — diagrama de secuencia Mermaid.
     - `classes.md` — diagrama de clases Mermaid.
     - `usecases.md` — diagrama de casos de uso Mermaid.

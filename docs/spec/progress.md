@@ -75,7 +75,7 @@ Read model materializado. Se recalcula cada vez que llega `GameCompleted` con m�
 | Columna          | Tipo        | Notas                                                                           |
 | ---------------- | ----------- | ------------------------------------------------------------------------------- |
 | `user_id`        | `uuid FK`   |                                                                                 |
-| `module`         | `varchar`   | `native_sounds \| connecting_words \| beautifying_sentences \| sounding_native` |
+| `module`         | `varchar`   | `native_sounds \| connected_speech \| flow_connectors \| real_talk` |
 | `total_attempts` | `int`       | Total de attempts del usuario en este módulo                                    |
 | `correct_count`  | `int`       |                                                                                 |
 | `accuracy`       | `decimal`   | 0–1                                                                             |
@@ -122,7 +122,7 @@ Cuando `masteryLevel` sube (comparar valor anterior con nuevo), publicar `Module
 StringValueObject (shared)
   ├── ProgressUserId    — UUID v4
   ├── ProgressFlashcardId — UUID v4
-  └── ModuleName        — enum: native_sounds | connecting_words | beautifying_sentences | sounding_native
+  └── ModuleName        — enum: native_sounds | connected_speech | flow_connectors | real_talk
 ```
 
 > `ProgressUserId` y `ProgressFlashcardId` son wrappers locales para no acoplar al BC Identity/Content.

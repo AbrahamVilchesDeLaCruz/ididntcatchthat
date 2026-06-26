@@ -21,7 +21,7 @@
 - [x] **TASK-GAMING-02** — Value Objects enum: `GameMode`, `GameModule`, `CardCount`, `GameStatus`
   - Cada uno extiende `StringValueObject`. Factory `create(value)` con validación de enum.
   - `GameMode`: `study | game`.
-  - `GameModule`: `native_sounds | connecting_words | beautifying_sentences | sounding_native | random`.
+  - `GameModule`: `native_sounds | connected_speech | flow_connectors | real_talk | random`.
   - `CardCount`: `10 | 20 | 50` (validar como número — internamente string o number, decidir).
   - `GameStatus`: `in_progress | paused | completed | abandoned`.
   - **Test (RED primero)**: valores válidos e inválidos para cada VO.

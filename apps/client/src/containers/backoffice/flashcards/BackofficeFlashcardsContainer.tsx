@@ -1,21 +1,20 @@
 import { type ReactElement, useState } from 'react';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import {
   useBulkCreateFlashcards,
   useCreateFlashcard,
   useDeleteFlashcard,
   useFlashcardCatalog,
   useFlashcards,
-  useImportPdfFlashcards,
   useUpdateFlashcard,
 } from './api';
 import type { FlashcardFormValues } from './flashcards.types';
-import type {
-  CreateFlashcardApiPayload,
-  FlashcardDraftApiModel,
-} from './api/flashcards.api-model';
+import type { CreateFlashcardApiPayload } from './api/flashcards.api-model';
+import { useFlashcardAiGeneration } from './hooks';
 import { BackofficeFlashcardsComponent } from './BackofficeFlashcardsComponent';
 
 export const BackofficeFlashcardsContainer = (): ReactElement => {
+  const { canManageFlashcards } = useCurrentUser();
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string | undefined>(
     undefined,
@@ -26,17 +25,17 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
   const [audioStatusFilter, setAudioStatusFilter] = useState<
     string | undefined
   >(undefined);
-  const [pdfDrafts, setPdfDrafts] = useState<FlashcardDraftApiModel[] | null>(
-    null,
-  );
 
-  const { data, isLoading, isError } = useFlashcards({
-    page,
-    pageSize: 20,
-    category: categoryFilter,
-    subcategory: subcategoryFilter,
-    audioStatus: audioStatusFilter,
-  });
+  const { data, isLoading, isError } = useFlashcards(
+    {
+      page,
+      pageSize: 20,
+      category: categoryFilter,
+      subcategory: subcategoryFilter,
+      audioStatus: audioStatusFilter,
+    },
+    { enabled: canManageFlashcards },
+  );
 
   const { data: catalog } = useFlashcardCatalog();
 
@@ -48,8 +47,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     useDeleteFlashcard();
   const { mutate: bulkCreateFlashcards, isPending: isBulkCreating } =
     useBulkCreateFlashcards();
-  const { mutate: importPdf, isPending: isImportingPdf } =
-    useImportPdfFlashcards();
+
+  const [aiState, aiHandlers] = useFlashcardAiGeneration();
 
   const handleCreate = (values: FlashcardFormValues): void => {
     createFlashcard({
@@ -79,40 +78,6 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     bulkCreateFlashcards({ flashcards });
   };
 
-  const handlePdfUpload = (file: File): void => {
-    importPdf(file, {
-      onSuccess: (drafts) => {
-        setPdfDrafts(drafts);
-      },
-    });
-  };
-
-  const handlePdfConfirm = (drafts: FlashcardDraftApiModel[]): void => {
-    const flashcards: CreateFlashcardApiPayload[] = drafts.map((draft) => ({
-      id: globalThis.crypto.randomUUID(),
-      expression: draft.expression,
-      meaning: draft.meaning,
-      category: draft.category,
-      subcategory: draft.subcategory,
-      ipaNotation: draft.ipaNotation,
-      nativeSpeech: draft.nativeSpeech,
-      examples: draft.examples.map((ex, i) => ({
-        id: globalThis.crypto.randomUUID(),
-        textEn: ex.textEn,
-        textEs: ex.textEs,
-        position: i + 1,
-      })),
-    }));
-    bulkCreateFlashcards(
-      { flashcards },
-      {
-        onSuccess: () => {
-          setPdfDrafts(null);
-        },
-      },
-    );
-  };
-
   return (
     <BackofficeFlashcardsComponent
       flashcards={data?.items ?? []}
@@ -123,8 +88,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       isLoading={isLoading}
       isError={isError}
       isMutating={isCreating || isUpdating || isDeleting || isBulkCreating}
-      isImportingPdf={isImportingPdf}
-      pdfDrafts={pdfDrafts}
+      isGeneratingAi={aiState.isGenerating}
+      aiDrafts={aiState.drafts}
       categoryFilter={categoryFilter}
       subcategoryFilter={subcategoryFilter}
       audioStatusFilter={audioStatusFilter}
@@ -136,9 +101,9 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       onUpdate={handleUpdate}
       onDelete={handleDelete}
       onBulkCreate={handleBulkCreate}
-      onPdfUpload={handlePdfUpload}
-      onPdfConfirm={handlePdfConfirm}
-      onPdfDraftsClose={() => setPdfDrafts(null)}
+      onAiGenerate={aiHandlers.generate}
+      onDraftConfirm={aiHandlers.confirm}
+      onAiDraftsClose={aiHandlers.close}
     />
   );
 };

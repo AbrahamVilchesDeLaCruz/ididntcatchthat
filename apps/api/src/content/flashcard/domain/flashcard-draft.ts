@@ -9,9 +9,3 @@ export type FlashcardDraft = {
   nativeSpeech: string | null;
   examples: ExampleDraft[];
 };
-
-export interface PdfFlashcardExtractor {
-  extract(pdfBuffer: Buffer): Promise<FlashcardDraft[]>;
-}
-
-export const PDF_FLASHCARD_EXTRACTOR = Symbol('PdfFlashcardExtractor');

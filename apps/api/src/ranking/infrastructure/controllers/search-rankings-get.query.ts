@@ -13,9 +13,9 @@ const RANKING_PERIODS = ['weekly', 'monthly', 'all_time'] as const;
 
 const MODULES = [
   'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
 ] as const;
 
 export class SearchRankingsGetQuery {

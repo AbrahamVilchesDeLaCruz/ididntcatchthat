@@ -46,7 +46,7 @@ export const en: Translations = {
       exampleLabel: 'Connected speech — example',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
-      exampleTag: 'Flap T',
+      exampleTag: 'Soft T',
     },
     howItWorks: {
       sectionLabel: 'How it works',
@@ -93,20 +93,20 @@ export const en: Translations = {
             'Master the 23 phonemes of English. Focus on the ones that trip up Spanish speakers most.',
         },
         {
-          title: 'Connecting Words',
-          tag: 'Connected Speech',
+          title: 'Connected Speech',
+          tag: 'Linking & reduction',
           description:
-            'Hear how sounds morph and merge when natives speak at full speed.',
+            'Hear how sounds morph and merge when natives speak at full speed — gonna, linking, elision.',
         },
         {
-          title: 'Beautifying Sentences',
+          title: 'Flow & Connectors',
           tag: 'Fluency',
           description:
             'Connectors and structures that make you sound fluent, not robotic.',
         },
         {
-          title: 'Sounding Native',
-          tag: 'Expressions',
+          title: 'Real Talk',
+          tag: 'Everyday English',
           description:
             'The casual vocabulary natives use every day — never taught in class.',
         },
@@ -135,9 +135,9 @@ export const en: Translations = {
       modules: {
         random: 'Random mix',
         native_sounds: 'Native Sounds',
-        connecting_words: 'Connecting Words',
-        beautifying_sentences: 'Beautifying Sentences',
-        sounding_native: 'Sounding Native',
+        connected_speech: 'Connected Speech',
+        flow_connectors: 'Flow & Connectors',
+        real_talk: 'Real Talk',
       },
     },
     play: {

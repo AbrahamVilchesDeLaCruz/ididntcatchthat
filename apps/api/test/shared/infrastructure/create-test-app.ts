@@ -5,10 +5,12 @@ import { type App } from 'supertest/types';
 import { AppModule } from '../../../src/app.module';
 import { AI_EXAMPLE_GENERATOR } from '../../../src/content/flashcard/domain/ai-example-generator';
 import { AI_PHONETICS_GENERATOR } from '../../../src/content/flashcard/domain/ai-phonetics-generator';
+import { FLASHCARD_DRAFT_GENERATOR } from '../../../src/content/flashcard/domain/flashcard-draft-generator';
 import { AUDIO_GENERATOR } from '../../../src/content/flashcard/domain/audio-generator';
 import { AUDIO_STORAGE } from '../../../src/content/flashcard/domain/audio-storage';
 import { StubAiExampleGenerator } from '../../../src/content/flashcard/infrastructure/adapters/local/stub-ai-example-generator';
 import { StubAiPhoneticsGenerator } from '../../../src/content/flashcard/infrastructure/adapters/local/stub-ai-phonetics-generator';
+import { StubFlashcardDraftGenerator } from '../../../src/content/flashcard/infrastructure/adapters/local/stub-flashcard-draft-generator';
 import { StubAudioGenerator } from '../../../src/content/flashcard/infrastructure/adapters/local/stub-audio-generator';
 import { StubAudioStorage } from '../../../src/content/flashcard/infrastructure/adapters/local/stub-audio-storage';
 import { LOGGER_SERVICE } from '../../../src/shared/domain/logger';
@@ -27,6 +29,8 @@ export async function createTestApp(): Promise<INestApplication<App>> {
     .useClass(StubAiExampleGenerator)
     .overrideProvider(AI_PHONETICS_GENERATOR)
     .useClass(StubAiPhoneticsGenerator)
+    .overrideProvider(FLASHCARD_DRAFT_GENERATOR)
+    .useClass(StubFlashcardDraftGenerator)
     .overrideProvider(AUDIO_GENERATOR)
     .useClass(StubAudioGenerator)
     .overrideProvider(AUDIO_STORAGE)

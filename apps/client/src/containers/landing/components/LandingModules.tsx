@@ -5,25 +5,25 @@ import { useI18n } from '@/core/i18n';
 const modulesMeta = [
   {
     Icon: Volume2,
-    examples: ['/θ/ vs /ð/', 'Flap T', 'Schwa /ə/'],
+    examples: ['/θ/ vs /ð/', 'T suave', 'schwa /ə/'],
     color: 'var(--color-brand)',
     colorDim: 'var(--color-brand-dim)',
   },
   {
     Icon: Link2,
-    examples: ['Linking', 'Reduction', 'Elision'],
+    examples: ['gonna', 'wanna', 'word linking'],
     color: 'var(--color-brand-light)',
     colorDim: 'var(--color-brand-dim)',
   },
   {
     Icon: Sparkles,
-    examples: ['"Having said that"', '"Not only… but also"'],
+    examples: ['however', 'furthermore', 'in short'],
     color: 'var(--color-accent-green)',
     colorDim: 'var(--color-accent-green-dim)',
   },
   {
     Icon: MessageCircle,
-    examples: ['"stuff"', '"you guys"', '"I\'m good"'],
+    examples: ['stuff', 'you guys', "I'm good"],
     color: 'var(--color-accent-green)',
     colorDim: 'var(--color-accent-green-dim)',
   },

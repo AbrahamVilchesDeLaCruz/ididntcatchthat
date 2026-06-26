@@ -16,7 +16,7 @@
 | --------------- | ------------------------------------ | ----------------------------------- |
 | Teacher / Admin | Crear flashcard (formulario)         | `POST /flashcards`                  |
 | Teacher / Admin | Crear flashcards en bulk (JSON)      | `POST /flashcards/bulk`             |
-| Teacher / Admin | Importar flashcards desde PDF (IA)   | `POST /flashcards/import/pdf`       |
+| Teacher / Admin | Generar borradores con IA (backoffice) | `POST /ai/generate-flashcards`      |
 | Teacher / Admin | Editar flashcard                     | `PUT /flashcards/:id`               |
 | Teacher / Admin | Obtener flashcard por id             | `GET /flashcards/:id`               |
 | Teacher / Admin | Listar flashcards con filtros        | `GET /flashcards`                   |
@@ -40,7 +40,7 @@ StringValueObject (shared)
   ├── FlashcardId      — UUID v4, generate()
   ├── Expression       — non-empty, max 200 chars
   ├── Meaning          — non-empty, max 500 chars
-  ├── Category         — enum: mastering_sounds | connecting_words_in_speech | beautifying_sentences | sounding_native
+  ├── Category         — enum: native_sounds | connected_speech | flow_connectors | real_talk
   ├── Subcategory      — enum cerrado por categoría (ver tabla más abajo)
   ├── IpaNotation      — string non-empty (el campo en Aggregate es IpaNotation | null)
   ├── NativeSpeech     — string non-empty (el campo en Aggregate es NativeSpeech | null)
@@ -49,132 +49,15 @@ StringValueObject (shared)
 
 ### Subcategorías por categoría
 
-Las subcategorías son enums cerrados validados en el VO `Subcategory.create(value, category)`.  
+Las subcategorías son slugs cerrados validados en el VO `Subcategory(value, category)`.  
 Si la combinación es inválida, lanza `InvalidSubcategory`.
 
-#### `mastering_sounds` (category: `MasteringSounds`)
+> Catálogo completo con slugs, labels ES/EN, descripciones y `anchorExamples`: [`docs/domain/content-taxonomy.md`](../domain/content-taxonomy.md).
 
-| Valor enum              | Label                               |
-| ----------------------- | ----------------------------------- |
-| `FLAP_T_PARTY_CITY`     | Flap T (party, city...)             |
-| `STOP_T`                | Stop T                              |
-| `THE_T_SOUND`           | The T sound                         |
-| `THE_B_SOUND`           | The B sound                         |
-| `THE_CH_SOUND`          | The Ch sound                        |
-| `THE_H_SOUND`           | The H Sound                         |
-| `THE_K_SOUND`           | The K Sound                         |
-| `THE_N_SOUND`           | The N Sound                         |
-| `THE_P_SOUND`           | The P Sound                         |
-| `THE_R_SOUND`           | The R sound                         |
-| `THE_SH_SOUND`          | The SH Sound                        |
-| `THE_SCHWA_SOUND`       | The Schwa sound                     |
-| `THE_U_SOUND`           | The U sound                         |
-| `THE_V_SOUND`           | The V Sound                         |
-| `THE_W_SOUND`           | The W sound                         |
-| `THE_Z_SOUND`           | The Z Sound                         |
-| `THE_A_SOUND_PART1`     | The a sound - Part 1                |
-| `THE_ZH_SOUND`          | The zh sound (measure, confusion)   |
-| `THE_D_SOUND`           | The D sound                         |
-| `THE_J_SOUND`           | The J sound                         |
-| `THE_L_SOUND`           | The L Sound                         |
-| `THE_S_SOUND`           | The S sound                         |
-| `THE_F_SOUND`           | The F sound                         |
-| `THE_M_SOUND`           | The M sound                         |
-| `THE_E_AS_IN_BED`       | The E as in Bed                     |
-| `SOUND_A_AS_IN_CAKE`    | The sound A as in Cake              |
-| `SOUND_E_AS_IN_HE`      | The sound E as in HE                |
-| `SOUND_G_AS_IN_EGG`     | The sound G as in Egg               |
-| `SOUND_NG_AS_IN_LONG`   | The sound NG as in Long             |
-| `SOUND_O_AS_IN_OPEN`    | The sound O as in Open              |
-| `SOUND_O_AS_IN_GOT`     | The sound O as in got               |
-| `SOUND_OU_AS_IN_OUT`    | The sound OU as in out              |
-| `SOUND_OI_AS_IN_BOY`    | The sound Oi as in Boy              |
-| `SOUND_TH_AS_IN_THAT`   | The sound Th as in That             |
-| `SOUND_TH_AS_IN_THINK`  | The sound Th as in Think            |
-| `SOUND_U_AS_IN_CUT`     | The sound U as in Cut               |
-| `SOUND_U_AS_IN_LOOK`    | The sound U as in Look              |
-| `SOUND_U_AS_IN_FOOD`    | The sound U as in Food              |
-| `SOUND_UR_AS_IN_CURE`   | The sound Ur as in Cure             |
-| `SOUND_X_AS_IN_EXACT`   | The sound X as in Exact             |
-| `SOUND_X_AS_IN_EXPLAIN` | The sound X as in Explain           |
-| `SOUND_Y_AS_IN_YES`     | The sound Y as in Yes               |
-| `SOUND_I_AS_IN_ICE`     | The sound i as in ice               |
-| `SOUND_I_AS_IN_IT`      | The sound i as in it                |
-| `SOUND_AR_AS_IN_CAR`    | The Sound AR as in Car              |
-| `SOUND_AW_AS_IN_LAW`    | The Sound AW as in law              |
-| `SOUND_ER_AS_IN_BIRD`   | The Sound ER as in Bird             |
-| `SOUND_ER_AS_IN_AIR`    | The sound ER as in Air, Bear, Chair |
-| `SOUND_EER_AS_IN_HEAR`  | The sound Eer as in Hear            |
-| `BONUS`                 | Bonus                               |
-| `BONUS_DIDJU`           | Bonus Didju                         |
-| `BONUS_KISS_THE_KEYS`   | Bonus: Kiss the keys                |
-| `BONUS_MASTERING_2_THS` | Bonus: Mastering the 2 THs          |
-| `BONUS_CH_SOUND`        | Bonus: The CH sound                 |
-| `BONUS_R`               | Bonus: The R                        |
-| `BONUS_SH`              | Bonus: The SH                       |
-| `BONUS_V_AND_B`         | Bonus: The V and the B              |
-| `BONUS_A_AND_U`         | Bonus: The a and the u              |
-| `BONUS_L_AND_R`         | Bonus: The L and the R              |
-| `BONUS_S_AND_Z`         | Bonus: The S and the Z              |
+Implementación en código: `subcategory-catalog.ts` (`SUBCATEGORY_META`, `SUBCATEGORY_BY_CATEGORY`).
 
-#### `connecting_words_in_speech` (category: `ConnectingWordsInSpeech`)
-
-| Valor enum          | Label                             |
-| ------------------- | --------------------------------- |
-| `FLAP_T_THAT_APPLE` | Flap T (that apple)               |
-| `WANNA_AND_GONNA`   | Wanna and Gonna                   |
-| `BONUS_WANNA_GONNA` | Bonus wanna and gonna             |
-| `KINDA_SORTA`       | Kinda / Sorta (Kind of / Sort of) |
-| `NEEDA_HAFTA_GIMME` | needa, hafta, gimme               |
-| `COULDA_SHOULDA`    | Coulda, shoulda...                |
-| `DIDJU_COULDJU`     | Didju, Couldju...                 |
-| `DONCHU_DONCHA`     | Donchu/Doncha (Don't you)         |
-| `USING_THE_SCHWA`   | Using the Schwa sound             |
-| `D_AND_T_DISAPPEAR` | When the D and T disappear        |
-| `OUTTA`             | Outta                             |
-| `GOWOUT`            | Gowout (Go out)                   |
-| `TELL_IM_TELL_ER`   | Tell_im – Tell_er                 |
-| `STRONG_GUY`        | Strong_guy                        |
-
-#### `beautifying_sentences` (category: `BeautifyingSentences`)
-
-| Valor enum                           | Label                                   |
-| ------------------------------------ | --------------------------------------- |
-| `CONTRAST`                           | Contrast                                |
-| `ADDITION_1`                         | Addition 1                              |
-| `ADDITION_1_FURTHERMORE`             | Addition 1 (Furthermore)                |
-| `ADDITION_2`                         | Addition 2                              |
-| `EMPHASIS_1`                         | Emphasis 1                              |
-| `EMPHASIS_2`                         | Emphasis 2                              |
-| `EXCEPTIONS_AND_CONDITIONS`          | Exceptions and Conditions               |
-| `EXPLAINING_REPHRASING_GAINING_TIME` | Explaining, rephrasing and gaining time |
-| `GIVING_EXAMPLES`                    | Giving examples                         |
-| `GIVING_AN_EXAMPLE`                  | Giving an example                       |
-| `MEETINGS`                           | Meetings                                |
-| `PRESENTATIONS`                      | Presentations                           |
-| `REASON_PURPOSE_AND_RESULT`          | Reason, purpose and result              |
-| `SUMMARY`                            | Summary                                 |
-| `TIME_AND_SEQUENCE`                  | Time and sequence                       |
-
-#### `sounding_native` (category: `SoundingNative`)
-
-| Valor enum                   | Label                                           |
-| ---------------------------- | ----------------------------------------------- |
-| `DEAL_AND_OTHER_EXPRESSIONS` | Deal & other expressions                        |
-| `FIGURE_OUT_PRETTY`          | Figure out, Pretty...                           |
-| `STUFF_AND_YOU_GUYS`         | Stuff & You guys                                |
-| `AINT_CUZ_POINT`             | Ain't / Cuz / Point                             |
-| `BIG_TIME_HANG_OUT`          | Big time, hang out...                           |
-| `GOTTA_DAMN_MAKE_IT`         | Gotta, Damn, Make it                            |
-| `GRAB_APPRECIATE`            | Grab, appreciate...                             |
-| `I_MEAN_MIGHT_AS_WELL`       | I mean, might as well, long story short...      |
-| `PITCH_IN_HIT_THE_SACK`      | Pitch in, hit the sack...                       |
-| `REGULAR_VERBS_PART1`        | Regular Verbs Pronunciation Part 1 (T / id)     |
-| `REGULAR_VERBS_PART2`        | Regular Verbs Pronunciation Part 2 (D – Voiced) |
-| `UHM_SO_I_MEAN`              | Uhm, So, I mean...                              |
-
-> **Regla de validación**: `Subcategory.create(value, category)` verifica que `value` pertenezca  
-> al enum correspondiente a `category`. Si no, lanza `InvalidSubcategory`.  
+> **Regla de validación**: `new Subcategory(value, category)` verifica que `value` pertenezca  
+> al catálogo correspondiente a `category`. Si no, lanza `InvalidSubcategory`.  
 > Los valores del enum se almacenan en DB como strings (e.g. `"FLAP_T_PARTY_CITY"`).  
 > Los labels son solo para presentación — no se persisten.
 
@@ -420,17 +303,20 @@ export const PDF_FLASHCARD_EXTRACTOR = Symbol("PdfFlashcardExtractor");
 
 ```ts
 CategoryCatalogEntry = {
-  value: string           // e.g. "mastering_sounds"
+  value: string           // e.g. "native_sounds"
+  label: { es: string; en: string }
   subcategories: {
-    value: string         // e.g. "FLAP_T_PARTY_CITY"
-    label: string         // e.g. "Flap T (party, city...)"
+    value: string         // e.g. "informal_going_to"
+    label: { es: string; en: string }
+    description: { es: string; en: string }
+    anchorExamples: string[]
   }[]
 }
 ```
 
 **Algoritmo**:
 
-1. Serializar el map estático `CATEGORIES_CATALOG` (enums TypeScript) en runtime.
+1. Serializar `LearningModule` + `SUBCATEGORY_META` desde `subcategory-catalog.ts`.
 2. Retornar la estructura sin consultar DB ni repositorio.
 
 > No tiene repositorio, no tiene dominio mutable. Es un query puro sobre datos estáticos.
@@ -445,7 +331,6 @@ CategoryCatalogEntry = {
 | `FlashcardAccessDenied` | 403         | El updatedBy no es el creador ni admin                 |
 | `InvalidSubcategory`    | 422         | Subcategoría no pertenece a la categoría elegida       |
 | `InvalidExampleCount`   | 422         | Más de 3 ejemplos o 0 ejemplos                         |
-| `PdfExtractionFailed`   | 422         | El LLM no pudo extraer flashcards del PDF              |
 | `AudioGenerationFailed` | —           | Error interno (no HTTP) — cambia `audioStatus: failed` |
 
 ---
@@ -456,7 +341,7 @@ CategoryCatalogEntry = {
 | ------ | ------------------------ | ---------------------- | ---------------------- |
 | `POST` | `/flashcards`            | `FlashcardCreator`     | Bearer (teacher/admin) |
 | `POST` | `/flashcards/bulk`       | `FlashcardBulkCreator` | Bearer (teacher/admin) |
-| `POST` | `/flashcards/import/pdf` | `PdfFlashcardImporter` | Bearer (teacher/admin) |
+| `POST` | `/ai/generate-flashcards`| `AiFlashcardDraftGenerator` | Bearer (teacher/admin) |
 | `PUT`  | `/flashcards/:id`        | `FlashcardUpdater`     | Bearer (teacher/admin) |
 | `GET`  | `/flashcards/:id`        | `FlashcardFinder`      | Bearer (any)           |
 | `GET`  | `/flashcards`            | `FlashcardSearcher`    | Bearer (any)           |
@@ -482,20 +367,20 @@ apps/api/src/
       meaning.ts                          ← VO
       category.ts                         ← VO enum
       subcategory.ts                      ← VO enum con validación cruzada por categoría
-      categories-catalog.ts               ← CATEGORIES_CATALOG map estático (enums serializables)
+      subcategory-catalog.ts              ← SUBCATEGORY_META + SUBCATEGORY_BY_CATEGORY
       ipa-notation.ts                     ← VO (string non-empty) — el Aggregate lo contiene como IpaNotation | null
       native-speech.ts                    ← VO (string non-empty) — el Aggregate lo contiene como NativeSpeech | null
       audio-status.ts                     ← VO enum
       audio-urls.ts                       ← VO compuesto
       flashcard.repository.ts             ← interface + token FLASHCARD_REPOSITORY
       ai-example-generator.ts             ← interface (port) + token AI_EXAMPLE_GENERATOR
-      pdf-flashcard-extractor.ts          ← interface (port) + token PDF_FLASHCARD_EXTRACTOR
+      flashcard-draft-generator.ts        ← interface (port) + token FLASHCARD_DRAFT_GENERATOR
+      flashcard-draft.ts                  ← type FlashcardDraft
       exceptions/
         flashcard-not-found.ts
         flashcard-access-denied.ts
         invalid-subcategory.ts
         invalid-example-count.ts
-        pdf-extraction-failed.ts
       events/
         flashcard-created.event.ts
         flashcard-expression-updated.event.ts
@@ -509,8 +394,8 @@ apps/api/src/
         flashcard-creator.ts
       bulk-create/
         flashcard-bulk-creator.ts
-      import-pdf/
-        pdf-flashcard-importer.ts
+      generate-drafts/
+        ai-flashcard-draft-generator.ts
       update/
         flashcard-updater.ts
       find/
@@ -528,7 +413,7 @@ apps/api/src/
         create-flashcard-post.payload.ts
         bulk-create-flashcards-post.controller.ts
         bulk-create-flashcards-post.payload.ts
-        import-pdf-flashcards-post.controller.ts
+        generate-flashcards-post.controller.ts
         update-flashcard-put.controller.ts
         update-flashcard-put.payload.ts
         find-flashcard-get.controller.ts
@@ -543,7 +428,7 @@ apps/api/src/
         typeorm-flashcard.repository.ts
       ai/
         deepseek-ai-example-generator.ts    ← implementa AiExampleGenerator
-        deepseek-pdf-flashcard-extractor.ts ← implementa PdfFlashcardExtractor
+        deepseek-flashcard-draft-generator.ts ← implementa FlashcardDraftGeneratorPort
       framework/
         content.module.ts
 
@@ -560,8 +445,8 @@ apps/api/test/
       bulk-create/
         flashcard-bulk-creator.spec.ts
         request-flashcard-bulk-creator-mother.ts
-      import-pdf/
-        pdf-flashcard-importer.spec.ts
+      generate-drafts/
+        ai-flashcard-draft-generator.spec.ts
       update/
         flashcard-updater.spec.ts
         request-flashcard-updater-mother.ts
@@ -622,10 +507,11 @@ En caso de error:
 - [ ] `POST /flashcards/bulk` con array válido crea todas las flashcards y retorna `{ created: N }`.
 - [ ] Si alguna flashcard tiene datos inválidos → 422, ninguna se persiste (transacción).
 
-### Import PDF
+### Generar borradores con IA
 
-- [ ] `POST /flashcards/import/pdf` retorna array de drafts editables — no persiste.
-- [ ] PDF sin contenido extraíble → 422 `PdfExtractionFailed`.
+- [ ] `POST /ai/generate-flashcards` retorna array de drafts editables — no persiste.
+- [ ] Subcategoría inválida para la categoría → 422 `InvalidSubcategory`.
+- [ ] Dedup: el generador recibe expresiones existentes en la subcategoría.
 
 ### Editar flashcard
 
@@ -654,9 +540,9 @@ En caso de error:
 ## Notas de implementación
 
 - **`Subcategory` con validación cruzada**: el VO `Subcategory` recibe también la categoría para validar que la combinación es válida. Lanza `InvalidSubcategory` si no coincide.
-- **`AiExampleGenerator`** y **`PdfFlashcardExtractor`**: implementados con DeepSeek en infra. El token `AI_EXAMPLE_GENERATOR` y `PDF_FLASHCARD_EXTRACTOR` permiten mockearlos fácilmente en tests.
+- **`AiExampleGenerator`** y **`FlashcardDraftGeneratorPort`**: implementados con DeepSeek en infra (stub en local). Los tokens `AI_EXAMPLE_GENERATOR` y `FLASHCARD_DRAFT_GENERATOR` permiten mockearlos en tests.
 - **Audio pipeline**: el handler `AudioGenerationHandler` vive en `content/application/` y escucha los eventos internos. En la fase MVP sin AMQP real, se puede llamar directamente desde el use case en modo fire-and-forget.
 - **Flashcard visible de inmediato**: `audioStatus: pending` no bloquea la visibilidad. El cliente muestra skeleton de audio si status !== ready.
-- **Import PDF es solo extracción**: `PdfFlashcardImporter` NO persiste — devuelve drafts. El teacher confirma con `FlashcardBulkCreator` en un segundo paso.
+- **Generación IA es solo borrador**: `AiFlashcardDraftGenerator` NO persiste — devuelve drafts. El teacher confirma con `FlashcardBulkCreator` en un segundo paso.
 - **Paginación**: `GET /flashcards` usa el patrón Criteria con `page` y `pageSize`. Default: `page=1`, `pageSize=20`.
 - **`createdBy`** referencia a `users.id` via FK — no se carga el objeto User, solo el id.

@@ -6,8 +6,8 @@ import { createAdminToken } from '../../shared/infrastructure/create-admin-token
 
 const BASE_PAYLOAD = {
   meaning: "Short form of 'going to'",
-  category: 'connecting_words_in_speech',
-  subcategory: 'WANNA_AND_GONNA',
+  category: 'connected_speech',
+  subcategory: 'informal_going_to',
   ipaNotation: 'ˈɡɒnə',
   nativeSpeech: null,
   examples: [],
