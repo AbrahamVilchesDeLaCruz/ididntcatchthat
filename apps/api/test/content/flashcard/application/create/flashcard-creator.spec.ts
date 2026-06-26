@@ -12,7 +12,7 @@ import { JestTimers } from '@test/shared/jest-timers';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { RequestFlashcardCreatorMother } from './request-flashcard-creator-mother';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { ConnectingWordsInSpeechSubcategory } from '@/content/flashcard/domain/subcategory-enums';
+import { ConnectedSpeechSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
 
 describe('content/flashcard/application/create FlashcardCreator', () => {
   const repository = mock<FlashcardRepository>();
@@ -69,8 +69,8 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
 
   it('should throw InvalidSubcategory when subcategory does not belong to category', async () => {
     const request = RequestFlashcardCreatorMother.random({
-      category: CategoryValue.MasteringSounds,
-      subcategory: ConnectingWordsInSpeechSubcategory.WANNA_AND_GONNA,
+      category: CategoryValue.NativeSounds,
+      subcategory: ConnectedSpeechSubcategory.InformalGoingTo,
     });
 
     await expect(creator.execute(request)).rejects.toThrow(InvalidSubcategory);

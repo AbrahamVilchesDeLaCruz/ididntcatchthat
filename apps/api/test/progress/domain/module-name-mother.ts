@@ -6,9 +6,9 @@ import { MotherCreator } from '../../shared/domain/mother-creator';
 
 const MODULE_NAME_VALUES: ModuleNameValue[] = [
   'native_sounds',
-  'connecting_words',
-  'beautifying_sentences',
-  'sounding_native',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
 ];
 
 export class ModuleNameMother {

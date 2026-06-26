@@ -13,9 +13,10 @@ async function bootstrap(): Promise<void> {
   app.use(cookieParser());
 
   // ─── CORS ──────────────────────────────────────────────────────────────────
-  // CORS_ORIGIN: comma-separated list of allowed origins.
-  // Defaults to localhost:5173 (Vite dev server) in non-production environments.
-  const rawOrigins = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+  // CORS_ORIGIN: comma-separated list of allowed browser origins.
+  // Defaults include Docker client (:4001) and Vite dev (:5173).
+  const rawOrigins =
+    process.env.CORS_ORIGIN ?? 'http://localhost:4001,http://localhost:5173';
   const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 
   app.enableCors({

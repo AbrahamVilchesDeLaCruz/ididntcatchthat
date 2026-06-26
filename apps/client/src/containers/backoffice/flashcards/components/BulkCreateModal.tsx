@@ -13,8 +13,8 @@ const PLACEHOLDER = JSON.stringify(
       id: 'uuid-here',
       expression: 'gonna',
       meaning: 'going to — forma reducida coloquial',
-      category: 'reduced_forms',
-      subcategory: 'informal_contractions',
+      category: 'connected_speech',
+      subcategory: 'informal_going_to',
       ipaNotation: 'ˈɡɒnə',
       nativeSpeech: 'gonna',
       examples: [

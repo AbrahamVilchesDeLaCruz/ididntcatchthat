@@ -3,9 +3,9 @@ import { GameModuleInvalid } from './exceptions/game-module-invalid';
 
 export enum GameModuleValue {
   NativeSounds = 'native_sounds',
-  ConnectingWords = 'connecting_words',
-  BeautifyingSentences = 'beautifying_sentences',
-  SoundingNative = 'sounding_native',
+  ConnectedSpeech = 'connected_speech',
+  FlowConnectors = 'flow_connectors',
+  RealTalk = 'real_talk',
   Random = 'random',
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import { resolveApiBaseUrl } from '@/core/api/resolveApiBaseUrl';
 import { useAuthStore } from '@/core/store/auth.store';
 
 /**
@@ -43,7 +44,7 @@ export const useAuthBootstrap = (): boolean => {
 
     axios
       .post<{ accessToken: string }>(
-        `${import.meta.env.VITE_API_URL ?? '/api/v1'}/auth/refresh`,
+        `${resolveApiBaseUrl()}/auth/refresh`,
         {},
         { withCredentials: true },
       )

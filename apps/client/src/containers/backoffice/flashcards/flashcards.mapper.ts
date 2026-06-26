@@ -29,8 +29,8 @@ export const mapFlashcard = (raw: FlashcardApiModel): FlashcardVM => ({
     textEs: ex.textEs,
     position: ex.position,
   })),
-  createdAt: new Date(raw.createdAt),
-  updatedAt: new Date(raw.updatedAt),
+  createdAt: raw.createdAt ? new Date(raw.createdAt) : new Date(0),
+  updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : new Date(0),
 });
 
 export const mapFlashcardsPage = (

@@ -88,9 +88,9 @@ export interface GameTranslations {
     modules: {
       random: string;
       native_sounds: string;
-      connecting_words: string;
-      beautifying_sentences: string;
-      sounding_native: string;
+      connected_speech: string;
+      flow_connectors: string;
+      real_talk: string;
     };
   };
   play: {

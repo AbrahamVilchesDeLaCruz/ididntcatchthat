@@ -21,9 +21,9 @@ export interface FlashcardGameApiModel {
 // ─── Start game (POST /v1/games) ─────────────────────────────────────────────
 export type GameModule =
   | 'native_sounds'
-  | 'connecting_words'
-  | 'beautifying_sentences'
-  | 'sounding_native'
+  | 'connected_speech'
+  | 'flow_connectors'
+  | 'real_talk'
   | 'random';
 
 export interface StartGamePayload {

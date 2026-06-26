@@ -3,15 +3,15 @@ import {
   type FlashcardPrimitives,
 } from '@/content/flashcard/domain/flashcard';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { MasteringSoundsSubcategory } from '@/content/flashcard/domain/subcategory-enums';
+import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
 import { AudioStatusValue } from '@/content/flashcard/domain/audio-status';
 import { FlashcardIdMother } from './flashcard-id-mother';
 import { ExampleMother } from './example-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
 
-const DEFAULT_CATEGORY = CategoryValue.MasteringSounds;
-const DEFAULT_SUBCATEGORY = MasteringSoundsSubcategory.FLAP_T_PARTY_CITY;
+const DEFAULT_CATEGORY = CategoryValue.NativeSounds;
+const DEFAULT_SUBCATEGORY = NativeSoundsSubcategory.VVacation;
 
 export class FlashcardMother {
   static randomPrimitives(

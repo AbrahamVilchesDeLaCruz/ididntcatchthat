@@ -55,7 +55,7 @@ Query params:
 | -------- | ----------------------------------------------------------------------- | --------------------------------- |
 | `type`   | `most_active` \| `most_accurate` \| `top_scorer` \| `best_streak` \| `module_master` | Sí                                |
 | `period` | `weekly` \| `monthly` \| `all_time`                                   | Sí                                |
-| `module` | `native_sounds` \| `connecting_words` \| `beautifying_sentences` \| `sounding_native` | Solo para `module_master`         |
+| `module` | `native_sounds` \| `connected_speech` \| `flow_connectors` \| `real_talk` | Solo para `module_master`         |
 | `limit`  | 1–50 (default 10)                                                       | No                                |
 
 Solo aparecen usuarios con `show_in_ranking = true` (filas existentes en la proyección).

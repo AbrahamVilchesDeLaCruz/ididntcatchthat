@@ -47,12 +47,25 @@ describe('auth.store', () => {
       expect(useAuthStore.getState().roles).toEqual([]);
     });
 
-    it('defaults userType to null when JWT has no type field', () => {
+    it('defaults userType to null when JWT has no type nor roles', () => {
       const token = makeJwt({ userId: 'u-3' });
 
       useAuthStore.getState().setAccessToken(token);
 
       expect(useAuthStore.getState().userType).toBeNull();
+    });
+
+    it('prioriza roles[] sobre type al decodificar JWT', () => {
+      const token = makeJwt({
+        type: 'admin',
+        userId: 'u-5',
+        roles: ['user'],
+      });
+
+      useAuthStore.getState().setAccessToken(token);
+
+      expect(useAuthStore.getState().userType).toBe('user');
+      expect(useAuthStore.getState().roles).toEqual(['user']);
     });
   });
 

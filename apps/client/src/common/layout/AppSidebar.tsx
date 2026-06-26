@@ -26,8 +26,13 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
   const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
   const { mutate: logoutApi } = useLogout();
-  const { canAccessBackoffice, canAccessObservability, isUser, isAdmin } =
-    useCurrentUser();
+  const {
+    canAccessBackoffice,
+    canAccessObservability,
+    canManageFlashcards,
+    isUser,
+    isAdmin,
+  } = useCurrentUser();
 
   const handleLogout = (): void => {
     logoutApi(undefined, {
@@ -88,19 +93,21 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               Backoffice
             </p>
             <NavLink
-              to="/backoffice/flashcards"
-              className={navLinkClass}
-              onClick={onNavigate}
-            >
-              🃏 Flashcards
-            </NavLink>
-            <NavLink
               to="/backoffice/games"
               className={navLinkClass}
               onClick={onNavigate}
             >
               📈 Métricas de juegos
             </NavLink>
+            {canManageFlashcards && (
+              <NavLink
+                to="/backoffice/flashcards"
+                className={navLinkClass}
+                onClick={onNavigate}
+              >
+                🃏 Flashcards
+              </NavLink>
+            )}
           </div>
         )}
 

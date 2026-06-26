@@ -70,7 +70,7 @@ export const FlashcardsToolbar = ({
           <option value="">Todas las categorías</option>
           {catalog?.categories.map((c) => (
             <option key={c.value} value={c.value}>
-              {c.value.replace(/_/g, ' ')}
+              {c.label.es}
             </option>
           ))}
         </select>
@@ -94,8 +94,8 @@ export const FlashcardsToolbar = ({
               : 'Elegí categoría primero'}
           </option>
           {subcategories.map((s) => (
-            <option key={s} value={s}>
-              {s}
+            <option key={s.value} value={s.value}>
+              {s.label.es}
             </option>
           ))}
         </select>

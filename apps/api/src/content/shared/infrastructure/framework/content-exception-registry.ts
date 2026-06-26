@@ -20,7 +20,6 @@ import { IpaNotationEmpty } from '@/content/flashcard/domain/exceptions/ipa-nota
 import { MeaningEmpty } from '@/content/flashcard/domain/exceptions/meaning-empty';
 import { MeaningTooLong } from '@/content/flashcard/domain/exceptions/meaning-too-long';
 import { NativeSpeechEmpty } from '@/content/flashcard/domain/exceptions/native-speech-empty';
-import { PdfExtractionFailed } from '@/content/flashcard/domain/exceptions/pdf-extraction-failed';
 
 @Injectable()
 export class ContentExceptionRegistry implements OnModuleInit {
@@ -49,7 +48,6 @@ export class ContentExceptionRegistry implements OnModuleInit {
         [MeaningEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [MeaningTooLong.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [NativeSpeechEmpty.name, HttpStatus.UNPROCESSABLE_ENTITY],
-        [PdfExtractionFailed.name, HttpStatus.UNPROCESSABLE_ENTITY],
       ]),
     );
   }

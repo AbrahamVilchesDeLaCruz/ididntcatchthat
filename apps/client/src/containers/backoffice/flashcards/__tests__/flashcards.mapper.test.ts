@@ -13,8 +13,8 @@ class FlashcardApiModelMother {
       id: 'fc-001',
       expression: 'gonna',
       meaning: 'going to — forma reducida',
-      category: 'reduced_forms',
-      subcategory: 'informal',
+      category: 'connected_speech',
+      subcategory: 'informal_going_to',
       ipaNotation: 'ˈɡɒnə',
       nativeSpeech: 'gonna',
       audioStatus: 'ready',
@@ -54,8 +54,8 @@ describe('flashcards.mapper', () => {
       expect(vm.id).toBe('fc-001');
       expect(vm.expression).toBe('gonna');
       expect(vm.meaning).toBe('going to — forma reducida');
-      expect(vm.category).toBe('reduced_forms');
-      expect(vm.subcategory).toBe('informal');
+      expect(vm.category).toBe('connected_speech');
+      expect(vm.subcategory).toBe('informal_going_to');
       expect(vm.ipaNotation).toBe('ˈɡɒnə');
       expect(vm.nativeSpeech).toBe('gonna');
       expect(vm.audioStatus).toBe('ready');

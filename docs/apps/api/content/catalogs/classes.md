@@ -2,67 +2,49 @@
 
 ```mermaid
 classDiagram
-    class CatalogQuerier {
-        +run() CatalogResult
+    class FlashcardCatalogQuerier {
+        +execute(): CatalogResult
     }
 
-    class CATEGORIES_CATALOG {
+    class LearningModule {
+        <<enum>>
+        native_sounds
+        connected_speech
+        flow_connectors
+        real_talk
+    }
+
+    class SUBCATEGORY_META {
         <<constant>>
-        +mastering_sounds: MasteringSounds
-        +connecting_words_in_speech: ConnectingWordsInSpeech
-        +beautifying_sentences: BeautifyingSentences
-        +sounding_native: SoundingNative
+        slug → label, description, anchorExamples
     }
 
-    class MasteringSounds {
-        <<enum>>
-        FLAP_T_PARTY_CITY
-        STOP_T
-        THE_T_SOUND
-        ...
-    }
-
-    class ConnectingWordsInSpeech {
-        <<enum>>
-        FLAP_T_THAT_APPLE
-        WANNA_AND_GONNA
-        ...
-    }
-
-    class BeautifyingSentences {
-        <<enum>>
-        CONTRAST
-        ADDITION_1
-        ...
-    }
-
-    class SoundingNative {
-        <<enum>>
-        DEAL_AND_OTHER_EXPRESSIONS
-        FIGURE_OUT_PRETTY
-        ...
+    class SUBCATEGORY_BY_CATEGORY {
+        <<constant>>
+        LearningModule → Set~slug~
     }
 
     class GetCategoriesGetController {
-        +run() Promise~ApiResponse~
+        +run(): Promise~ApiResponse~
     }
 
     class CategoryCatalogEntry {
         +value: string
+        +label: LocalizedLabel
         +subcategories: SubcategoryEntry[]
     }
 
     class SubcategoryEntry {
         +value: string
-        +label: string
+        +label: LocalizedLabel
+        +description: LocalizedLabel
+        +anchorExamples: string[]
     }
 
-    GetCategoriesGetController --> CatalogQuerier : invoca
-    CatalogQuerier --> CATEGORIES_CATALOG : lee
-    CATEGORIES_CATALOG --> MasteringSounds
-    CATEGORIES_CATALOG --> ConnectingWordsInSpeech
-    CATEGORIES_CATALOG --> BeautifyingSentences
-    CATEGORIES_CATALOG --> SoundingNative
-    CatalogQuerier ..> CategoryCatalogEntry : retorna
+    GetCategoriesGetController --> FlashcardCatalogQuerier : invoca
+    FlashcardCatalogQuerier --> LearningModule : categorías
+    FlashcardCatalogQuerier --> SUBCATEGORY_META : labels + metadata
+    FlashcardCatalogQuerier --> SUBCATEGORY_BY_CATEGORY : validación
+    FlashcardCatalogQuerier ..> CategoryCatalogEntry : retorna
     CategoryCatalogEntry --> SubcategoryEntry
 ```

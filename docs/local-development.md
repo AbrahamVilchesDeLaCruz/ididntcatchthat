@@ -101,7 +101,7 @@ Flag principal:
 USE_STUB_ADAPTERS=true
 ```
 
-Cuando está activo, la API usa stubs para DeepSeek, ElevenLabs y extracción PDF. El almacenamiento de audio sigue usando `R2AudioStorage` apuntando a MinIO.
+Cuando está activo, la API usa stubs para DeepSeek (generación de borradores y sugerencia de ejemplos), ElevenLabs y almacenamiento local. El almacenamiento de audio sigue usando `R2AudioStorage` apuntando a MinIO.
 
 ---
 

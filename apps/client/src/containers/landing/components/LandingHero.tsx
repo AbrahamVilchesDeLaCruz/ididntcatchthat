@@ -2,8 +2,8 @@ import { type ReactElement } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
-import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useAuthStore } from '@/core/store/auth.store';
+import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
 
 interface LandingHeroProps {
   onPlay: () => void;
@@ -13,12 +13,16 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   const { t, locale, toggleLocale } = useI18n();
   const h = t.landing.hero;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { canAccessBackoffice } = useCurrentUser();
+  const roles = useAuthStore((s) => s.roles);
 
   const authNavLink = isAuthenticated
-    ? canAccessBackoffice
-      ? { to: '/backoffice/flashcards', label: h.navDashboard }
-      : { to: '/stats', label: h.navStats }
+    ? {
+        to: getAuthenticatedHomePathFromRoles(roles),
+        label:
+          roles.includes('admin') || roles.includes('teacher')
+            ? h.navDashboard
+            : h.navStats,
+      }
     : null;
 
   return (

@@ -43,12 +43,14 @@ Los campos `ipa_notation`, `native_speech` y `examples` se generan automáticame
 
 Las subcategorías son un **catálogo cerrado predefinido** — no las puede crear el teacher libremente.
 
-| Categoría                  | Ejemplos de subcategoría                             |
-| -------------------------- | ---------------------------------------------------- |
-| Native Sounds              | Flap T, schwa, /θ/ vs /ð/, vocal reduction...        |
-| Connecting Words in Speech | Linking, elision, assimilation, contraction...       |
-| Beautifying Sentences      | Conectores de contraste, introducción, conclusión... |
-| Sounding Native            | Expresiones coloquiales, fillers, phrasal verbs...   |
+| Categoría          | Slug               | Ejemplos de subcategoría                          |
+| ------------------ | ------------------ | ------------------------------------------------- |
+| Sonidos nativos    | `native_sounds`    | `v_vacation`, `t_soft_between_vowels`, vocales... |
+| Habla conectada    | `connected_speech` | `informal_going_to`, `word_linking`...            |
+| Fluidez y conectores | `flow_connectors`| `contrast`, `meetings`...                         |
+| Inglés de calle    | `real_talk`        | `phrasal_verbs`, `fillers`...                     |
+
+> Catálogo completo: [`content-taxonomy.md`](./content-taxonomy.md)
 
 ---
 
@@ -67,8 +69,8 @@ Endpoint que acepta un array de flashcards en el mismo formato del formulario. �
   {
     "expression": "gonna",
     "meaning": "voy a / va a",
-    "category": "sounding_native",
-    "subcategory": "contractions",
+    "category": "connected_speech",
+    "subcategory": "informal_going_to",
     "examples": [
       { "en": "I'm gonna call you later.", "es": "Te voy a llamar más tarde." },
       { "en": "She's gonna love it.", "es": "Le va a encantar." }
@@ -77,27 +79,29 @@ Endpoint que acepta un array de flashcards en el mismo formato del formulario. �
 ]
 ```
 
-### 3. PDF con análisis IA
+### 3. Generación asistida con IA
 
-El teacher sube un PDF (material de clase, libro, apuntes). Un LLM (DeepSeek, Grok u otro) analiza el contenido mediante un **system prompt estructurado** que extrae:
+El teacher selecciona categoría, subcategoría, cantidad (5–20) y opcionalmente un prompt extra. Un LLM (DeepSeek en prod, stub en local) genera borradores evitando duplicar expresiones ya existentes en la subcategoría:
 
-- Expresiones candidatas
+- Expresión en inglés
 - Significado en castellano
-- Categoría y subcategoría sugeridas
-- Ejemplos de uso (en inglés + traducción)
+- Categoría y subcategoría (fijadas por el request)
+- Ejemplos de uso (1–3, en inglés + traducción)
 
-El resultado se muestra como un conjunto de flashcards **editables** antes de confirmar. El teacher revisa, ajusta y publica.
+El resultado se muestra como flashcards **editables** antes de confirmar. El teacher revisa, ajusta y publica vía bulk create.
 
 ```
-PDF upload
+Selección category + subcategory + count
     ↓
-LLM analysis (system prompt estructurado)
+Consulta expresiones existentes (dedup)
+    ↓
+LLM genera drafts (system prompt estructurado)
     ↓
 Draft de flashcards (editable en UI)
     ↓
 Teacher confirma / edita
     ↓
-Publicación directa + trigger audio pipeline
+POST /flashcards/bulk + trigger audio pipeline
 ```
 
 ---
@@ -172,7 +176,7 @@ sequenceDiagram
     API->>API: UPDATE flashcard (audio_status: ready)
 ```
 
-### Creación masiva vía PDF
+### Generación masiva vía IA
 
 ```mermaid
 sequenceDiagram
@@ -181,9 +185,10 @@ sequenceDiagram
     participant API as API
     participant LLM as LLM (IA)
 
-    T->>FE: Sube PDF
-    FE->>API: POST /flashcards/import/pdf (multipart)
-    API->>LLM: system prompt + contenido del PDF
+    T->>FE: Selecciona category, subcategory, count, prompt opcional
+    FE->>API: POST /ai/generate-flashcards
+    API->>API: Consulta expresiones existentes (dedup)
+    API->>LLM: system prompt + catálogo + anchorExamples
     LLM-->>API: flashcards candidatas[]
     API-->>FE: draft de flashcards (editables)
     T->>FE: Revisa, edita, elimina las que no sirven

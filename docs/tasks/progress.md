@@ -38,7 +38,7 @@
 - [x] **TASK-PROGRESS-01** — Value Objects
   - `ProgressUserId` — UUID v4. Extiende `StringValueObject`. Método `generate()`.
   - `ProgressFlashcardId` — UUID v4. Extiende `StringValueObject`. Método `generate()`.
-  - `ModuleName` — enum: `native_sounds | connecting_words | beautifying_sentences | sounding_native`. Extiende `StringValueObject`.
+  - `ModuleName` — enum: `native_sounds | connected_speech | flow_connectors | real_talk`. Extiende `StringValueObject`.
   - Archivo: `progress/domain/value-objects/<name>.ts`.
   - **Test (RED primero)**: válido, inválido lanza error shared.
   - Mother: `ProgressUserIdMother.random()`, `ModuleNameMother.random()`.
