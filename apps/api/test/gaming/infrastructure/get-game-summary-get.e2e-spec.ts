@@ -35,7 +35,7 @@ async function startGame(
   return res.body as { gameId: string; flashcardIds: string[] };
 }
 
-describe('gaming/game CompleteGamePostController (e2e)', () => {
+describe('gaming/game GetGameSummaryGetController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -47,8 +47,8 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /v1/games/:id/complete', () => {
-    it('should return 200 with summary when all attempts have been recorded', async () => {
+  describe('GET /v1/games/:id/summary', () => {
+    it('should return summary when all attempts recorded but game not completed', async () => {
       const userToken = await registerAndLogin(app);
       const { gameId, flashcardIds } = await startGame(app, userToken, 10);
 
@@ -61,29 +61,53 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
       }
 
       const res = await request(app.getHttpServer())
-        .post(`/v1/games/${gameId}/complete`)
+        .get(`/v1/games/${gameId}/summary`)
         .set('Authorization', `Bearer ${userToken}`)
-        .send({})
         .expect(200);
 
       const body = res.body as {
         correctCount: number;
         totalCount: number;
         accuracy: number;
-        duration: number;
       };
 
       expect(body.totalCount).toBe(10);
       expect(body.correctCount).toBe(7);
       expect(body.accuracy).toBe(70);
-      expect(typeof body.duration).toBe('number');
     });
 
-    it('should return 422 when there are pending attempts remaining', async () => {
+    it('should return summary after game is completed', async () => {
+      const userToken = await registerAndLogin(app);
+      const { gameId, flashcardIds } = await startGame(app, userToken, 5);
+
+      for (const flashcardId of flashcardIds) {
+        await request(app.getHttpServer())
+          .post(`/v1/games/${gameId}/attempts`)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({ flashcardId, correct: true })
+          .expect(204);
+      }
+
+      await request(app.getHttpServer())
+        .post(`/v1/games/${gameId}/complete`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({})
+        .expect(200);
+
+      const res = await request(app.getHttpServer())
+        .get(`/v1/games/${gameId}/summary`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      const body = res.body as { correctCount: number; totalCount: number };
+      expect(body.totalCount).toBe(5);
+      expect(body.correctCount).toBe(5);
+    });
+
+    it('should return 422 when pending attempts remain', async () => {
       const userToken = await registerAndLogin(app);
       const { gameId, flashcardIds } = await startGame(app, userToken, 10);
 
-      // Record only some attempts (not all)
       await request(app.getHttpServer())
         .post(`/v1/games/${gameId}/attempts`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -91,9 +115,8 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
         .expect(204);
 
       await request(app.getHttpServer())
-        .post(`/v1/games/${gameId}/complete`)
+        .get(`/v1/games/${gameId}/summary`)
         .set('Authorization', `Bearer ${userToken}`)
-        .send({})
         .expect(422);
     });
   });

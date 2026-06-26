@@ -23,12 +23,12 @@ export const GameContainer = (): ReactElement => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
 
   const { data: flashcards = [], isLoading } = useGameFlashcards(gameId ?? '');
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
 
-  // If no flashcardIds in state, redirect back to config
   useEffect(() => {
     if (!hasFlashcardIds) {
       void navigate('/game', { replace: true });
@@ -38,8 +38,29 @@ export const GameContainer = (): ReactElement => {
 
   const currentFlashcard = flashcards[currentIndex] ?? null;
 
+  const navigateToSummary = (summary: GameSummaryVM): void => {
+    if (gameId) saveGameSummary(gameId, summary);
+    void navigate(`/game/${gameId ?? ''}/summary`, {
+      state: { summary },
+      replace: true,
+    });
+  };
+
   const handleFlip = (): void => {
     setIsFlipped((prev) => !prev);
+  };
+
+  const runCompleteGame = (): void => {
+    if (!gameId) return;
+    setCompleteError(null);
+    completeGame(gameId, {
+      onSuccess: navigateToSummary,
+      onError: () => {
+        setCompleteError(
+          'No se pudo finalizar la partida. Reintenta o continúa jugando.',
+        );
+      },
+    });
   };
 
   const handleAnswer = (correct: boolean): void => {
@@ -49,21 +70,8 @@ export const GameContainer = (): ReactElement => {
 
     const afterAttemptRecorded = (): void => {
       if (isLast) {
-        completeGame(gameId ?? '', {
-          onSuccess: (summary: GameSummaryVM) => {
-            if (gameId) saveGameSummary(gameId, summary);
-            void navigate(`/game/${gameId ?? ''}/summary`, {
-              state: { summary },
-              replace: true,
-            });
-          },
-          onError: () => {
-            void navigate(`/game/${gameId ?? ''}/summary`, { replace: true });
-          },
-        });
+        runCompleteGame();
       } else {
-        // Reset flip first, advance index on next frame so the card
-        // transition starts from the front face
         setIsFlipped(false);
         requestAnimationFrame(() => {
           setCurrentIndex((prev) => prev + 1);
@@ -74,11 +82,32 @@ export const GameContainer = (): ReactElement => {
     void recordAttempt({ flashcardId: currentFlashcard.id, correct })
       .then(() => afterAttemptRecorded())
       .catch(() => {
-        if (isLast) {
-          void navigate(`/game/${gameId ?? ''}/summary`, { replace: true });
-        }
+        setCompleteError('No se pudo registrar la respuesta. Reintenta.');
       });
   };
+
+  if (completeError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5 py-16">
+        <p className="text-center text-[var(--color-accent-red)]">
+          {completeError}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (currentIndex === flashcards.length - 1) {
+              runCompleteGame();
+            } else {
+              setCompleteError(null);
+            }
+          }}
+          className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   return (
     <GameComponent
