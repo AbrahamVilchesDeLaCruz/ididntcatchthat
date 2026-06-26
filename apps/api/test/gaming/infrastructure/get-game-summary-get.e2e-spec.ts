@@ -78,7 +78,7 @@ describe('gaming/game GetGameSummaryGetController (e2e)', () => {
 
     it('should return summary after game is completed', async () => {
       const userToken = await registerAndLogin(app);
-      const { gameId, flashcardIds } = await startGame(app, userToken, 5);
+      const { gameId, flashcardIds } = await startGame(app, userToken, 10);
 
       for (const flashcardId of flashcardIds) {
         await request(app.getHttpServer())
@@ -100,8 +100,8 @@ describe('gaming/game GetGameSummaryGetController (e2e)', () => {
         .expect(200);
 
       const body = res.body as { correctCount: number; totalCount: number };
-      expect(body.totalCount).toBe(5);
-      expect(body.correctCount).toBe(5);
+      expect(body.totalCount).toBe(10);
+      expect(body.correctCount).toBe(10);
     });
 
     it('should return 422 when pending attempts remain', async () => {
