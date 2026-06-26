@@ -11,13 +11,23 @@ export class TypeOrmFlashcardSelector implements FlashcardSelector {
     private readonly dataSource: DataSource,
   ) {}
 
-  async select(module: GameModule | null, count: number): Promise<string[]> {
+  async select(
+    module: GameModule | null,
+    subcategory: string | null,
+    count: number,
+  ): Promise<string[]> {
     const params: (string | number)[] = ['ready', count];
     let categoryClause = '';
+    let subcategoryClause = '';
 
     if (module !== null) {
       params.push(module.value);
       categoryClause = `AND category = $${params.length}`;
+    }
+
+    if (subcategory !== null) {
+      params.push(subcategory);
+      subcategoryClause = `AND subcategory = $${params.length}`;
     }
 
     const rows = await this.dataSource.query<{ id: string }[]>(
@@ -25,6 +35,7 @@ export class TypeOrmFlashcardSelector implements FlashcardSelector {
        FROM flashcards
        WHERE audio_status = $1
        ${categoryClause}
+       ${subcategoryClause}
        ORDER BY RANDOM()
        LIMIT $2`,
       params,

@@ -130,6 +130,8 @@ export const en: Translations = {
       title: 'Set up your game',
       subtitle: 'Choose a module and how many cards you want to practice.',
       moduleLabel: 'Module',
+      subcategoryLabel: 'Scope',
+      wholeCategory: 'Whole category',
       countLabel: 'Cards',
       ctaStart: 'Start game',
       modules: {

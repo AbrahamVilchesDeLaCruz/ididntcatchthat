@@ -5,6 +5,8 @@ import { type FlashcardSelector } from '@/gaming/domain/flashcard-selector';
 import { GameStarter } from '@/gaming/application/start/game-starter';
 import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
 import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
+import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
+import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
 import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestGameStarterMother } from './request-game-starter-mother';
 
@@ -91,5 +93,57 @@ describe('gaming/application/start GameStarter', () => {
 
     expect(result.gameId).toBeDefined();
     expect(result.flashcardIds).toEqual(flashcardIds);
+    expect(flashcardSelector.select).toHaveBeenCalledWith(
+      null,
+      null,
+      request.cardCount,
+    );
+  });
+
+  it('should start a game with module and subcategory', async () => {
+    const subcategory = NativeSoundsSubcategory.TSoftBetweenVowels;
+    const request = RequestGameStarterMother.random({
+      module: 'native_sounds',
+      subcategory,
+    });
+    const flashcardIds = ['fc-1', 'fc-2'];
+    gameRepository.match.mockResolvedValue([]);
+    flashcardSelector.select.mockResolvedValue(flashcardIds);
+    gameRepository.save.mockResolvedValue(undefined);
+
+    const result = await starter.execute(request);
+
+    expect(result.gameId).toBeDefined();
+    expect(flashcardSelector.select).toHaveBeenCalledWith(
+      expect.objectContaining({ value: 'native_sounds' }),
+      subcategory,
+      request.cardCount,
+    );
+  });
+
+  it('should throw GameSubcategoryInvalid when subcategory without module', async () => {
+    const request = RequestGameStarterMother.random({
+      module: null,
+      subcategory: NativeSoundsSubcategory.TSoftBetweenVowels,
+    });
+    gameRepository.match.mockResolvedValue([]);
+
+    await expect(starter.execute(request)).rejects.toThrow(
+      GameSubcategoryInvalid,
+    );
+    expect(gameRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should throw GameSubcategoryInvalid when subcategory does not belong to module', async () => {
+    const request = RequestGameStarterMother.random({
+      module: 'connected_speech',
+      subcategory: NativeSoundsSubcategory.TSoftBetweenVowels,
+    });
+    gameRepository.match.mockResolvedValue([]);
+
+    await expect(starter.execute(request)).rejects.toThrow(
+      GameSubcategoryInvalid,
+    );
+    expect(gameRepository.save).not.toHaveBeenCalled();
   });
 });

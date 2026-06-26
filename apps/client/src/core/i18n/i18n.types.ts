@@ -83,6 +83,8 @@ export interface GameTranslations {
     title: string;
     subtitle: string;
     moduleLabel: string;
+    subcategoryLabel: string;
+    wholeCategory: string;
     countLabel: string;
     ctaStart: string;
     modules: {

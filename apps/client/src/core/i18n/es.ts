@@ -131,6 +131,8 @@ export const es: Translations = {
       title: 'Configurá tu partida',
       subtitle: 'Elegí un módulo y cuántas cartas querés practicar.',
       moduleLabel: 'Módulo',
+      subcategoryLabel: 'Alcance',
+      wholeCategory: 'Toda la categoría',
       countLabel: 'Cartas',
       ctaStart: 'Empezar partida',
       modules: {

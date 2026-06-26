@@ -29,6 +29,7 @@ export class StartGamePostController {
       userId: user.userId ?? null,
       mode: body.mode,
       module: body.module ?? null,
+      subcategory: body.subcategory ?? null,
       cardCount: body.cardCount,
     });
   }

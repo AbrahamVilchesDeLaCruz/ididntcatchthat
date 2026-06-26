@@ -20,6 +20,7 @@ export interface GamePrimitives {
   userId: string | null;
   mode: string;
   module: string | null;
+  subcategory: string | null;
   cardCount: string;
   status: string;
   flashcardIds: string[];
@@ -35,6 +36,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     readonly userId: string | null,
     readonly mode: GameMode,
     readonly module: GameModule | null,
+    readonly subcategory: string | null,
     readonly cardCount: CardCount,
     private _status: GameStatus,
     readonly flashcardIds: string[],
@@ -66,6 +68,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     userId: string | null,
     mode: string,
     module: string | null,
+    subcategory: string | null,
     cardCount: string,
     flashcardIds: string[],
   ): Game {
@@ -74,6 +77,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       userId,
       GameMode.create(mode),
       module ? GameModule.create(module) : null,
+      subcategory,
       CardCount.create(cardCount),
       GameStatus.create(GameStatusValue.InProgress),
       flashcardIds,
@@ -142,6 +146,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
         userId: this.userId,
         mode: this.mode.value,
         module: this.module?.value ?? null,
+        subcategory: this.subcategory,
         cardCount: this.cardCount.value,
         startedAt: this.startedAt.toISOString(),
         finishedAt: finishedAt.toISOString(),
@@ -192,6 +197,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       p.userId,
       GameMode.create(p.mode),
       p.module ? GameModule.create(p.module) : null,
+      p.subcategory ?? null,
       CardCount.create(p.cardCount),
       GameStatus.create(p.status),
       p.flashcardIds,
@@ -208,6 +214,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       userId: this.userId,
       mode: this.mode.value,
       module: this.module?.value ?? null,
+      subcategory: this.subcategory,
       cardCount: this.cardCount.value,
       status: this._status.value,
       flashcardIds: this.flashcardIds,

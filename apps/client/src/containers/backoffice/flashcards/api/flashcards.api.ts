@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import { useFlashcardCatalog as useFlashcardCatalogCore } from '@/core/api/flashcard-catalog.api';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
 import type { FlashcardsPageVM } from '../flashcards.types';
 import type {
@@ -7,7 +8,6 @@ import type {
   BulkCreateFlashcardApiResult,
   CreateFlashcardApiPayload,
   FlashcardApiModel,
-  FlashcardCatalogApiModel,
   FlashcardDraftApiModel,
   FlashcardsListApiModel,
   SearchFlashcardsParams,
@@ -26,21 +26,9 @@ export const flashcardKeys = {
   catalog: () => [...flashcardKeys.all, 'catalog'] as const,
 };
 
-// ─── Queries ──────────────────────────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useFlashcardCatalog = () => {
-  return useQuery({
-    queryKey: flashcardKeys.catalog(),
-    queryFn: async (): Promise<FlashcardCatalogApiModel> => {
-      const res = await apiClient.get<FlashcardCatalogApiModel>(
-        '/flashcards/catalog',
-      );
-      return res.data;
-    },
-    staleTime: Infinity,
-  });
-};
+export { useFlashcardCatalogCore as useFlashcardCatalog };
 
+// ─── Queries ──────────────────────────────────────────────────────────────────
 export const useFlashcards = (
   params: SearchFlashcardsParams = {},
   options?: { enabled?: boolean },
