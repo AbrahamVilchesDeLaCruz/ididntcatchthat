@@ -155,3 +155,10 @@ Ubicadas en `apps/client/src/pods/gaming/api/`:
    - Este flujo no genera nuevas partidas en la API. Es un _loop_ puramente de UI. Los `flashcardIds` fallados se meten en una cola temporal y se muestran nuevamente. Solo al vaciar la cola o cancelar, se hace el `POST /v1/games/:id/complete` finalizando oficialmente la partida con las métricas finales (calculadas sobre el intento original, no las repeticiones).
 6. **Landing estática**:
    - Las tarjetas de demostración en la landing usarán datos mockeados en el cliente. No consumirán la API para asegurar que el LCP (Largest Contentful Paint) y TTI (Time to Interactive) de la landing sean instantáneos.
+7. **Layout responsive desktop**:
+   - Mobile-first en todas las pantallas de `/game`; en `lg+` (≥1024px) el layout escala sin sidebar global (se mantiene `GameShell`).
+   - Config: panel de pausadas sticky a la izquierda + formulario ancho (`max-w-5xl` grid).
+   - Partida: carta más grande + `GamePlaySidebar` con progreso y atajos de teclado.
+   - Resumen: stats en 4 columnas, CTAs en grid.
+   - Spec detallada: [game-stats-ux.md](./game-stats-ux.md) bloque I.
+   - Estilo visual: tokens de diseño existentes; evitar capas arcade (glow/shimmer) que compiten con la UI de estudio.

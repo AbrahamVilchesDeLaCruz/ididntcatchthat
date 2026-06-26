@@ -1,4 +1,10 @@
-import { type ReactElement, useEffect, useMemo, useState } from 'react';
+import {
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import {
@@ -11,6 +17,7 @@ import {
 import { GameComponent } from './GameComponent';
 import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
 import { useGameSession } from './hooks/useGameSession';
+import { useGameKeyboardShortcuts } from './hooks/useGameKeyboardShortcuts';
 import { saveGameSummary } from './game-summary.storage';
 import type { FlashcardGameVM, GameSummaryVM } from './game.types';
 
@@ -84,18 +91,27 @@ export const GameContainer = (): ReactElement => {
     onOriginalQueueComplete: runCompleteGame,
   });
 
-  const handleAnswer = (correct: boolean): void => {
-    const flashcard = session.currentFlashcard;
-    if (!flashcard) return;
+  const isLoading =
+    isLoadingFlashcards ||
+    (isResumeMode && isLoadingResume) ||
+    isCompleting ||
+    isPausing;
 
-    void recordAttempt({ flashcardId: flashcard.id, correct })
-      .then(() => session.recordAnswer(correct))
-      .catch(() => {
-        setCompleteError('No se pudo registrar la respuesta. Reintenta.');
-      });
-  };
+  const handleAnswer = useCallback(
+    (correct: boolean): void => {
+      const flashcard = session.currentFlashcard;
+      if (!flashcard) return;
 
-  const handlePause = (): void => {
+      void recordAttempt({ flashcardId: flashcard.id, correct })
+        .then(() => session.recordAnswer(correct))
+        .catch(() => {
+          setCompleteError('No se pudo registrar la respuesta. Reintenta.');
+        });
+    },
+    [recordAttempt, session],
+  );
+
+  const handlePause = useCallback((): void => {
     if (!gameId || !session.currentFlashcard || !canPause) return;
     setPauseError(null);
     patchGame(
@@ -115,13 +131,35 @@ export const GameContainer = (): ReactElement => {
         },
       },
     );
-  };
+  }, [canPause, gameId, navigate, patchGame, session.currentFlashcard]);
 
-  const isLoading =
-    isLoadingFlashcards ||
-    (isResumeMode && isLoadingResume) ||
-    isCompleting ||
-    isPausing;
+  const shortcutsEnabled =
+    !isLoading && !!session.currentFlashcard && session.phase === 'playing';
+
+  const onFlipShortcut = useCallback(() => {
+    session.toggleFlip();
+  }, [session]);
+
+  const onCorrectShortcut = useCallback(() => {
+    handleAnswer(true);
+  }, [handleAnswer]);
+
+  const onIncorrectShortcut = useCallback(() => {
+    handleAnswer(false);
+  }, [handleAnswer]);
+
+  const onPauseShortcut = useCallback(() => {
+    handlePause();
+  }, [handlePause]);
+
+  useGameKeyboardShortcuts({
+    enabled: shortcutsEnabled,
+    isFlipped: session.isFlipped,
+    onFlip: onFlipShortcut,
+    onCorrect: onCorrectShortcut,
+    onIncorrect: onIncorrectShortcut,
+    onPause: canPause ? onPauseShortcut : undefined,
+  });
 
   if (completeError) {
     return (
@@ -163,6 +201,8 @@ export const GameContainer = (): ReactElement => {
         isFlipped={session.isFlipped}
         currentIndex={session.currentIndex}
         totalCount={session.totalCount}
+        correctCount={session.correctCount}
+        incorrectCount={session.incorrectCount}
         canPause={canPause}
         onFlip={session.toggleFlip}
         onAnswer={handleAnswer}

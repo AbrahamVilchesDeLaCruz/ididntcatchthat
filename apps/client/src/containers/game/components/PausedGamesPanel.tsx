@@ -56,10 +56,8 @@ export const PausedGamesPanel = ({
   };
 
   return (
-    <div className="mb-8 w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-4">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-        {gp.title}
-      </h2>
+    <div className="game-panel w-full rounded-[var(--radius-lg)] p-4 lg:mb-0">
+      <h2 className="game-label mb-3">{gp.title}</h2>
       <ul className="space-y-2">
         {games.map((game) => {
           const subLabel = subcategoryLabel(game.module, game.subcategory);

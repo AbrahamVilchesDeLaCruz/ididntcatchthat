@@ -137,6 +137,7 @@ export const en: Translations = {
       guestError: 'We could not start the guest game.',
       guestRetry: 'Retry',
       pausedSaved: 'Game saved. You can resume it anytime.',
+      hudSetupLabel: 'Loadout',
       modules: {
         random: 'Random mix',
         native_sounds: 'Native Sounds',
@@ -170,6 +171,22 @@ export const en: Translations = {
       listenNative: 'Listen native',
       micSoon: 'Coming soon',
       pausedToast: 'Game saved',
+      sidebarTitle: 'Game progress',
+      progressLabel: 'Progress',
+      shortcutsTitle: 'Keyboard shortcuts',
+      shortcutFlip: 'Flip card',
+      shortcutCorrect: 'Mark correct',
+      shortcutIncorrect: 'Mark incorrect',
+      shortcutPause: 'Pause game',
+      hudCardLabel: 'Card',
+      clickToReveal: 'Click or press Space to reveal',
+      audioDialectUs: 'American English',
+      audioDialectUk: 'British English',
+      audioDialectAu: 'Australian English',
+      playExample: 'Play example',
+      sessionTimerLabel: 'Session time',
+      touchSwipeIncorrect: "Didn't know — swipe left",
+      touchSwipeCorrect: 'Knew it — swipe right',
     },
     summary: {
       title: 'Game over!',
@@ -187,6 +204,7 @@ export const en: Translations = {
       registerHint:
         "You played as a guest — your streak won't be saved. Sign up, it's free!",
       pausedGamesLink: 'You have {count} paused games — continue',
+      hudVictoryLabel: 'Run complete',
     },
   },
   stats: {

@@ -95,4 +95,28 @@ describe('GameConfigComponent', () => {
 
     expect(onSubcategoryChange).toHaveBeenCalledWith('t_soft_between_vowels');
   });
+
+  it('uses single-column layout when paused panel is omitted', () => {
+    render(<GameConfigComponent {...defaultProps} />);
+
+    expect(screen.getByTestId('game-config-layout')).toHaveAttribute(
+      'data-layout',
+      'config-only',
+    );
+  });
+
+  it('uses two-column layout marker when paused panel is provided', () => {
+    render(
+      <GameConfigComponent
+        {...defaultProps}
+        pausedGamesPanel={<div data-testid="paused-panel">Paused</div>}
+      />,
+    );
+
+    expect(screen.getByTestId('game-config-layout')).toHaveAttribute(
+      'data-layout',
+      'with-paused',
+    );
+    expect(screen.getByTestId('paused-panel')).toBeInTheDocument();
+  });
 });

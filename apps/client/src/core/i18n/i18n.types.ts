@@ -90,6 +90,7 @@ export interface GameTranslations {
     guestError: string;
     guestRetry: string;
     pausedSaved: string;
+    hudSetupLabel: string;
     modules: {
       random: string;
       native_sounds: string;
@@ -123,6 +124,22 @@ export interface GameTranslations {
     listenNative: string;
     micSoon: string;
     pausedToast: string;
+    sidebarTitle: string;
+    progressLabel: string;
+    shortcutsTitle: string;
+    shortcutFlip: string;
+    shortcutCorrect: string;
+    shortcutIncorrect: string;
+    shortcutPause: string;
+    hudCardLabel: string;
+    clickToReveal: string;
+    audioDialectUs: string;
+    audioDialectUk: string;
+    audioDialectAu: string;
+    playExample: string;
+    sessionTimerLabel: string;
+    touchSwipeIncorrect: string;
+    touchSwipeCorrect: string;
   };
   summary: {
     title: string;
@@ -139,6 +156,7 @@ export interface GameTranslations {
     registerTitle: string;
     registerHint: string;
     pausedGamesLink: string;
+    hudVictoryLabel: string;
   };
 }
 

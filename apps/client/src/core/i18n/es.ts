@@ -138,6 +138,7 @@ export const es: Translations = {
       guestError: 'No pudimos iniciar la partida de invitado.',
       guestRetry: 'Reintentar',
       pausedSaved: 'Partida guardada. Podés retomarla cuando quieras.',
+      hudSetupLabel: 'Loadout',
       modules: {
         random: 'Mezcla aleatoria',
         native_sounds: 'Sonidos nativos',
@@ -172,6 +173,22 @@ export const es: Translations = {
       listenNative: 'Escuchar nativo',
       micSoon: 'Próximamente',
       pausedToast: 'Partida guardada',
+      sidebarTitle: 'Progreso de la partida',
+      progressLabel: 'Progreso',
+      shortcutsTitle: 'Atajos de teclado',
+      shortcutFlip: 'Voltear carta',
+      shortcutCorrect: 'Marcar correcta',
+      shortcutIncorrect: 'Marcar incorrecta',
+      shortcutPause: 'Pausar partida',
+      hudCardLabel: 'Carta',
+      clickToReveal: 'Clic o Space para revelar',
+      audioDialectUs: 'Inglés americano',
+      audioDialectUk: 'Inglés británico',
+      audioDialectAu: 'Inglés australiano',
+      playExample: 'Escuchar ejemplo',
+      sessionTimerLabel: 'Tiempo de sesión',
+      touchSwipeIncorrect: 'No lo sabía — desliza ←',
+      touchSwipeCorrect: 'Lo sabía — desliza →',
     },
     summary: {
       title: '¡Partida terminada!',
@@ -189,6 +206,7 @@ export const es: Translations = {
       registerHint:
         'Jugaste como invitado — tu racha no se guarda. ¡Registrate, es gratis!',
       pausedGamesLink: 'Tenés {count} partidas pausadas — continuar',
+      hudVictoryLabel: 'Run completado',
     },
   },
   stats: {

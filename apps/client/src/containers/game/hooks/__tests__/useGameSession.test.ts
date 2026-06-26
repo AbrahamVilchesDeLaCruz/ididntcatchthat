@@ -38,6 +38,7 @@ describe('useGameSession', () => {
 
     expect(result.current.phase).toBe('repeat-prompt');
     expect(result.current.wrongCount).toBe(2);
+    expect(result.current.incorrectCount).toBe(2);
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -50,6 +51,7 @@ describe('useGameSession', () => {
     act(() => result.current.recordAnswer(true));
     act(() => result.current.recordAnswer(true));
 
+    expect(result.current.correctCount).toBe(2);
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 

@@ -102,3 +102,80 @@ flowchart TB
 - Repeat-wrong no aplica al retomar pausada
 - `module === null` → label “Aleatorio” en panel pausadas
 - 409 modal usa `GET /games` (lista real), no parsear error body
+
+## Bloque I — Layout responsive desktop (`/game`)
+
+> Objetivo: la experiencia mobile-first se mantiene en móvil; en `lg+` (≥1024px) el flujo aprovecha el ancho sin romper el foco de una carta a la vez.
+
+### Principios
+
+| Pantalla | Mobile / tablet | Desktop (`lg+`) |
+|----------|-----------------|-----------------|
+| Shell | `GameShell` sin sidebar (foco) | Igual — no sidebar en partida activa |
+| Config | Columna única centrada | 2 columnas: pausadas sticky \| formulario ancho |
+| Partida | Carta ~420px, controles apilados | Carta hasta ~672px + panel lateral de progreso/atajos |
+| Resumen | Grid 2×2 stats | Grid 4 columnas stats + CTAs en grid |
+
+### Breakpoints (Tailwind)
+
+- **`sm` (640px):** módulos 2 cols; subcategorías 2 cols
+- **`md` (768px):** caps de ancho suben (`max-w-xl`); subcategorías sin scroll forzado
+- **`lg` (1024px):** layout de 2 columnas en config; sidebar en partida; stats 4 cols
+
+### `/game` — Configuración
+
+```
+Mobile                    Desktop (lg+)
+┌──────────────┐         ┌──────────┬─────────────────────┐
+│ Pausadas     │         │ Pausadas │ Título + formulario │
+│ (stack)      │         │ sticky   │ módulos 3 cols      │
+│ Módulos      │         │ 320px    │ subcats 3 cols      │
+│ Subcats      │         │          │ CTA full width col  │
+│ CTA          │         └──────────┴─────────────────────┘
+└──────────────┘
+```
+
+- `PausedGamesPanel` en `<aside>` sticky (`top-20`) cuando hay partidas pausadas
+- Formulario: `max-w-md` → `max-w-2xl` cuando no hay panel; `max-w-5xl` grid cuando sí hay
+- Subcategorías: `max-h-48` solo en mobile; grid 2–3 cols en `md+`
+
+### `/game/:id` — Partida
+
+```
+Mobile                    Desktop (lg+)
+┌──────────────┐         ┌────────────────────┬──────────┐
+│ progress     │         │ progress           │ Progreso │
+│ carta 420px  │         │ carta hasta 672px  │ Atajos   │
+│ ✓/✗          │         │ ✓/✗                │ teclado  │
+│ mic (hidden  │         │                    │          │
+│  lg:hidden)  │         └────────────────────┴──────────┘
+└──────────────┘
+```
+
+- Carta: `max-w-[420px] md:max-w-xl lg:max-w-2xl`, altura `300→360→420px`
+- `GamePlaySidebar`: progreso numérico + barra + atajos (`Space`, `←`, `→`, `P`)
+- Hint flip: `tapToReveal` en touch; `hoverToReveal` con `(hover: hover) and (pointer: fine)`
+- Atajos globales vía `useGameKeyboardShortcuts` en `GameContainer`
+
+### `/game/:id/summary` — Resumen
+
+- Contenedor: `max-w-sm` → `md:max-w-xl lg:max-w-3xl`
+- Stats: `grid-cols-2 md:grid-cols-4`
+- CTAs logged: grid 2 cols en `lg`; link pausadas span 2 cols
+
+### Criterios de aceptación (responsive)
+
+- [ ] En viewport ≥1024px, config con pausadas muestra panel lateral sticky
+- [ ] Sin partidas pausadas, config centrada en una sola columna (no grid vacío)
+- [ ] Carta de partida ocupa más ancho/alto que en mobile
+- [ ] Sidebar de atajos visible solo en `lg+`
+- [ ] Space voltea; flechas responden solo con carta volteada
+- [ ] Resumen muestra 4 métricas en fila en desktop
+- [ ] Mobile sin regresiones (single column, tap hints)
+
+### Fuera de alcance (follow-up)
+
+- `/game` config dentro de `AppShell` (sidebar global de app)
+- Flip automático on hover (solo hint de texto)
+- `FlashcardBoard` refactor completo
+- Capa visual arcade (glows, shimmer, pseudo-HUD) — descartada por sensación artificial; priorizar polish sutil sobre tokens existentes

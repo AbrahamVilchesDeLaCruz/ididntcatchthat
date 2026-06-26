@@ -210,7 +210,7 @@ export const GameConfigContainer = (): ReactElement => {
         guestError={false}
         pausedSavedBanner={showPausedSavedBanner && !isGuest}
         pausedGamesPanel={
-          canPause ? (
+          canPause && pausedGames.length > 0 ? (
             <PausedGamesPanel
               games={pausedGames}
               catalog={catalog}

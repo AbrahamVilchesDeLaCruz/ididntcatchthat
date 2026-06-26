@@ -97,6 +97,11 @@
   - **Criterios**: logged puede pausar/retomar/listar; guest no ve pausa ni panel pausadas; modal 409 con límite 5.
   - **Spec**: [game-stats-ux.md](../spec/game-stats-ux.md)
 
+- [x] **TASK-GAMING-CLIENT-15b — Layout responsive desktop `/game`**
+  - **Archivos**: `GameConfigComponent`, `GameComponent`, `GamePlaySidebar`, `GameSummaryComponent`, hooks `usePrefersFinePointer`/`useGameKeyboardShortcuts`.
+  - **Criterios**: config 2 cols en `lg+`; carta más grande; sidebar atajos; resumen 4 cols stats; mobile sin regresión. Sin capa arcade (glow/shimmer).
+  - **Spec**: [game-stats-ux.md](../spec/game-stats-ux.md) bloque I
+
 - [ ] **TASK-GAMING-CLIENT-16 — Cobertura final de integración/E2E**
   - **Archivos**: `containers/game/__tests__/*.test.tsx`, `apps/client/e2e/gaming.spec.ts`.
   - **Criterios**: cubre landing→auth gate→guest quick game y logged config→game→summary con repeat wrong/fire & forget.
