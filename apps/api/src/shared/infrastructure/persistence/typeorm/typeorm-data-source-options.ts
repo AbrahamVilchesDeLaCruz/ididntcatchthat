@@ -18,7 +18,7 @@ import { Migration202605281913201779988375165 } from '../migrations/Migration202
 import { Migration202606200410001779990000001 } from '../migrations/Migration202606200410001779990000001';
 import { Migration202606200519001779990000002 } from '../migrations/Migration202606200519001779990000002';
 import { Migration202606200600001779990000003 } from '../migrations/Migration202606200600001779990000003';
-import { Migration202606260000000000005 } from '../migrations/Migration202606260000000000005';
+import { Migration202606261200001779990000005 } from '../migrations/Migration202606261200001779990000005';
 import { parseDatabaseUrl, resolveDbSsl } from './resolve-db-ssl';
 
 export const typeOrmEntities = [
@@ -44,7 +44,7 @@ export const typeOrmMigrations = [
   Migration202606200410001779990000001,
   Migration202606200519001779990000002,
   Migration202606200600001779990000003,
-  Migration202606260000000000005,
+  Migration202606261200001779990000005,
 ];
 
 export function buildTypeOrmDataSourceOptions(options?: {
