@@ -11,6 +11,8 @@ describe('WeakFlashcardsTable', () => {
             flashcardId: 'fc-1',
             expression: 'gonna',
             module: 'connected_speech',
+            category: 'connected_speech',
+            subcategory: 'informal_going_to',
             errorCount: 3,
             lastAttemptAt: new Date('2026-01-01T00:00:00.000Z'),
           },

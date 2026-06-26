@@ -15,7 +15,7 @@ graph TB
     User --> UC2
     User --> UC3
 
-    note1["limit: 1–50\ndefault: 10\nOrdenado por accuracyRate ASC"]
+    note1["limit: 1–50\ndefault: 10\nSolo times_played > 0\nOrdenado por error_count DESC, accuracy_rate ASC"]
     UC1 -.- note1
     UC2 -.- note1
 ```
@@ -26,6 +26,7 @@ graph TB
 |---|---|---|
 | Solo usuarios autenticados con JWT | User | `JwtAuthGuard` — 401 si no hay token |
 | `limit` entre 1 y 50, default 10 | Sistema | `ValidationPipe` — 400 si fuera de rango |
-| Ordenado por `accuracyRate` ASC | Sistema | Las flashcards con menos aciertos primero |
+| Ordenado por error_count DESC, accuracy_rate ASC | Sistema | Solo cartas con `times_played > 0`; las más falladas primero |
+| DTO incluye `category` y `subcategory` | Sistema | Labels resueltos en client vía catálogo |
 | `accuracyRate` solo refleja intentos en modo `game` | Sistema | `recordPlay()` — el modo `study` actualiza `timesStudied` pero no `accuracyRate` |
 | Lista vacía si el usuario no ha jugado ninguna partida | User | `[]` — no es un error |

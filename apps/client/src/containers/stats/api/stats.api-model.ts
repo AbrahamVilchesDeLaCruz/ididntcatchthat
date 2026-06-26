@@ -13,6 +13,8 @@ export interface WeakFlashcardApiModel {
   flashcardId: string;
   expression: string;
   module: string;
+  category: string;
+  subcategory: string;
   errorCount: number;
   lastSeenAt: string;
 }
