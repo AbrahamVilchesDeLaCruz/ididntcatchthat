@@ -9,6 +9,7 @@ import { GameNotFinished } from '@/gaming/domain/exceptions/game-not-finished';
 import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-game';
 import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
 import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
+import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 
 @Injectable()
 export class GamingExceptionRegistry implements OnModuleInit {
@@ -26,6 +27,7 @@ export class GamingExceptionRegistry implements OnModuleInit {
         [FlashcardNotInGame.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [MaxPausedGamesReached.name, HttpStatus.CONFLICT],
         [GuestLimitExceeded.name, HttpStatus.TOO_MANY_REQUESTS],
+        [GameSubcategoryInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
       ]),
     );
   }

@@ -23,6 +23,7 @@ describe('progress/application/update ModuleProgressUpdaterOnGameCompleted', () 
       mode: 'game',
       module:
         overrides?.module !== undefined ? overrides.module : 'native_sounds',
+      subcategory: null,
       cardCount: '10',
       startedAt: new Date().toISOString(),
       finishedAt: new Date().toISOString(),

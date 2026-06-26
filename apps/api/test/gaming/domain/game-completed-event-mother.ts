@@ -18,6 +18,7 @@ export class GameCompletedEventMother {
       userId: UserIdMother.random().value,
       mode: GameModeMother.game().value,
       module: null,
+      subcategory: null,
       cardCount: CardCountMother.ten().value,
       startedAt: DateMother.recent().toISOString(),
       finishedAt: DateMother.recent().toISOString(),

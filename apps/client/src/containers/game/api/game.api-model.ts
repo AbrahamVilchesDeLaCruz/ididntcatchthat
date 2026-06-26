@@ -29,6 +29,7 @@ export type GameModule =
 export interface StartGamePayload {
   mode: 'game';
   module: GameModule | null;
+  subcategory?: string | null;
   cardCount: 10 | 20 | 50;
 }
 

@@ -1,6 +1,7 @@
 import { type ReactElement, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useFlashcardCatalog } from '@/core/api/flashcard-catalog.api';
 import { useStartGame } from './api/game.api';
 import { useGuestAuth } from '@/containers/auth/api/auth.api';
 import { GameConfigComponent } from './GameConfigComponent';
@@ -15,15 +16,18 @@ export const GameConfigContainer = (): ReactElement => {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setGuestDeviceId = useAuthStore((s) => s.setGuestDeviceId);
 
+  const { data: catalog } = useFlashcardCatalog();
   const { mutate: startGame, isPending: isStarting } = useStartGame();
   const { mutate: guestAuth, isPending: isAuthenticating } = useGuestAuth();
 
   const [selectedModule, setSelectedModule] = useState<GameModule>('random');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
+    null,
+  );
   const [selectedCount, setSelectedCount] = useState<CardCount>(10);
 
   const isPending = isStarting || isAuthenticating;
 
-  // Guest users: get a guest token then auto-start
   useEffect(() => {
     if (!isAuthenticated) {
       guestAuth(
@@ -33,7 +37,7 @@ export const GameConfigContainer = (): ReactElement => {
             setAccessToken(accessToken);
             setGuestDeviceId(deviceId);
             startGame(
-              { mode: 'game', module: null, cardCount: 10 },
+              { mode: 'game', module: null, subcategory: null, cardCount: 10 },
               {
                 onSuccess: ({ gameId, flashcardIds }) => {
                   void navigate(`/game/${gameId}`, {
@@ -50,11 +54,18 @@ export const GameConfigContainer = (): ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleModuleChange = (module: GameModule): void => {
+    setSelectedModule(module);
+    setSelectedSubcategory(null);
+  };
+
   const handleStart = (): void => {
+    const module = selectedModule === 'random' ? null : selectedModule;
     startGame(
       {
         mode: 'game',
-        module: selectedModule === 'random' ? null : selectedModule,
+        module,
+        subcategory: module === null ? null : selectedSubcategory,
         cardCount: selectedCount,
       },
       {
@@ -65,7 +76,6 @@ export const GameConfigContainer = (): ReactElement => {
     );
   };
 
-  // While guest authenticates + auto-starts, show spinner
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-[var(--color-bg-base)]">
@@ -77,9 +87,12 @@ export const GameConfigContainer = (): ReactElement => {
   return (
     <GameConfigComponent
       selectedModule={selectedModule}
+      selectedSubcategory={selectedSubcategory}
       selectedCount={selectedCount}
+      catalog={catalog}
       isPending={isPending}
-      onModuleChange={setSelectedModule}
+      onModuleChange={handleModuleChange}
+      onSubcategoryChange={setSelectedSubcategory}
       onCountChange={setSelectedCount}
       onStart={handleStart}
     />

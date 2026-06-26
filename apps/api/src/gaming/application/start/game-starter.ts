@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Game } from '@/gaming/domain/game';
 import { GameModule } from '@/gaming/domain/game-module';
+import { LearningModule } from '@/shared/domain/learning-module';
+import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
 import {
   type GameRepository,
   GAME_REPOSITORY,
@@ -11,6 +13,7 @@ import {
 } from '@/gaming/domain/flashcard-selector';
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
+import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestGameStarter } from './request-game-starter';
@@ -30,7 +33,9 @@ export class GameStarter {
   ) {}
 
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
-    const { userId, mode, module, cardCount } = request;
+    const { userId, mode, module, subcategory, cardCount } = request;
+
+    this.assertValidScope(module, subcategory);
 
     if (userId === null) {
       const today = new Date();
@@ -58,6 +63,7 @@ export class GameStarter {
     const gameModule = module ? GameModule.create(module) : null;
     const flashcardIds = await this.flashcardSelector.select(
       gameModule,
+      subcategory,
       cardCount,
     );
 
@@ -65,6 +71,7 @@ export class GameStarter {
       userId,
       mode,
       module,
+      subcategory,
       String(cardCount),
       flashcardIds,
     );
@@ -76,6 +83,7 @@ export class GameStarter {
       userId: userId ?? 'guest',
       mode,
       module: module ?? null,
+      subcategory,
       cardCount,
     });
 
@@ -83,5 +91,27 @@ export class GameStarter {
       gameId: game.id.value,
       flashcardIds,
     };
+  }
+
+  private assertValidScope(
+    module: string | null,
+    subcategory: string | null,
+  ): void {
+    if (subcategory !== null && module === null) {
+      throw new GameSubcategoryInvalid();
+    }
+
+    if (module === null) {
+      return;
+    }
+
+    if (subcategory === null) {
+      return;
+    }
+
+    const valid = SUBCATEGORY_BY_CATEGORY[module as LearningModule];
+    if (!valid?.has(subcategory)) {
+      throw new GameSubcategoryInvalid();
+    }
   }
 }
