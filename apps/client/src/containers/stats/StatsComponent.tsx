@@ -1,20 +1,32 @@
 import { type ReactElement } from 'react';
 import { ModuleProgressChart } from './components/ModuleProgressChart';
+import { SubcategoryProgressPanel } from './components/SubcategoryProgressPanel';
 import { WeakFlashcardsTable } from './components/WeakFlashcardsTable';
-import type { ModuleProgressVM, WeakFlashcardVM } from './stats.types';
+import type {
+  ModuleProgressVM,
+  SubcategoryProgressVM,
+  WeakFlashcardVM,
+} from './stats.types';
 
 interface StatsComponentProps {
   modules: ModuleProgressVM[];
+  subcategories: SubcategoryProgressVM[];
   weakFlashcards: WeakFlashcardVM[];
+  selectedCategory: string | null;
+  onCategorySelect: (category: string) => void;
+  onCategoryClear: () => void;
 }
 
 export const StatsComponent = ({
   modules,
+  subcategories,
   weakFlashcards,
+  selectedCategory,
+  onCategorySelect,
+  onCategoryClear,
 }: StatsComponentProps): ReactElement => {
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
           Mi progreso
@@ -24,23 +36,33 @@ export const StatsComponent = ({
         </p>
       </div>
 
-      {/* Grid: Chart + Table */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Precisión por módulo */}
         <div className="bg-[var(--color-bg-card)] rounded-xl p-6 border border-[var(--color-border)]">
-          <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
-            Precisión por módulo
-          </h2>
-          {modules.length === 0 ? (
-            <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
-              Sin datos de módulos aún
-            </p>
+          {selectedCategory === null ? (
+            <>
+              <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
+                Precisión por módulo
+              </h2>
+              {modules.length === 0 ? (
+                <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
+                  Sin datos de módulos aún
+                </p>
+              ) : (
+                <ModuleProgressChart
+                  data={modules}
+                  onCategoryClick={onCategorySelect}
+                />
+              )}
+            </>
           ) : (
-            <ModuleProgressChart data={modules} />
+            <SubcategoryProgressPanel
+              category={selectedCategory}
+              data={subcategories}
+              onBack={onCategoryClear}
+            />
           )}
         </div>
 
-        {/* Flashcards más débiles */}
         <div className="bg-[var(--color-bg-card)] rounded-xl p-6 border border-[var(--color-border)]">
           <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
             Flashcards más difíciles

@@ -1,8 +1,13 @@
 import type {
   ModuleProgressApiModel,
+  SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
 } from './api/stats.api-model';
-import type { ModuleProgressVM, WeakFlashcardVM } from './stats.types';
+import type {
+  ModuleProgressVM,
+  SubcategoryProgressVM,
+  WeakFlashcardVM,
+} from './stats.types';
 
 export function mapModuleProgress(
   raw: ModuleProgressApiModel,
@@ -26,5 +31,17 @@ export function mapWeakFlashcard(raw: WeakFlashcardApiModel): WeakFlashcardVM {
     subcategory: raw.subcategory,
     errorCount: raw.errorCount,
     lastAttemptAt: new Date(raw.lastSeenAt),
+  };
+}
+
+export function mapSubcategoryProgress(
+  raw: SubcategoryProgressApiModel,
+): SubcategoryProgressVM {
+  return {
+    category: raw.category,
+    subcategory: raw.subcategory,
+    totalAttempts: raw.totalAttempts,
+    correctCount: raw.correctCount,
+    accuracy: raw.accuracy * 100,
   };
 }

@@ -7,6 +7,7 @@ import { MODULE_PROGRESS_REPOSITORY } from '@/progress/domain/module-progress.re
 import { PROCESSED_EVENTS_REPOSITORY } from '@/shared/domain/processed-events.repository';
 import { GUEST_ATTEMPT_REPOSITORY } from '@/progress/domain/guest-attempt.repository';
 import { WEAKEST_FLASHCARD_QUERY } from '@/progress/domain/weakest-flashcard.query';
+import { SUBCATEGORY_PROGRESS_QUERY } from '@/progress/domain/subcategory-progress.query';
 
 // Infrastructure — entities
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
@@ -19,9 +20,11 @@ import { TypeOrmModuleProgressRepository } from '@/progress/infrastructure/persi
 import { TypeOrmProcessedEventsRepository } from '@/shared/infrastructure/persistence/inbox/typeorm-processed-events.repository';
 import { TypeOrmGuestAttemptRepository } from '@/progress/infrastructure/persistence/typeorm/typeorm-guest-attempt.repository';
 import { TypeOrmWeakestFlashcardQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-weakest-flashcard.query';
+import { TypeOrmSubcategoryProgressQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-subcategory-progress.query';
 // Infrastructure — controllers
 import { SearchModulesProgressGetController } from '@/progress/infrastructure/controllers/search-modules-progress-get.controller';
 import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
+import { GetSubcategoriesProgressGetController } from '@/progress/infrastructure/controllers/get-subcategories-progress-get.controller';
 
 // Infrastructure — event bus
 import {
@@ -32,6 +35,7 @@ import { type Subscriber } from '@/shared/application/subscriber';
 
 // Application — use cases
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
+import { SubcategoryProgressFinder } from '@/progress/application/find/subcategory-progress-finder';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
 import { FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
 import { ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
@@ -59,6 +63,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   controllers: [
     SearchModulesProgressGetController,
     GetWeakestFlashcardsGetController,
+    GetSubcategoriesProgressGetController,
   ],
   providers: [
     // Repositories
@@ -82,9 +87,14 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
       provide: WEAKEST_FLASHCARD_QUERY,
       useClass: TypeOrmWeakestFlashcardQuery,
     },
+    {
+      provide: SUBCATEGORY_PROGRESS_QUERY,
+      useClass: TypeOrmSubcategoryProgressQuery,
+    },
 
     // Use cases
     ModuleProgressFinder,
+    SubcategoryProgressFinder,
     WeakestFlashcardSearcher,
     FlashcardStatsUpdater,
     ModuleProgressUpdater,

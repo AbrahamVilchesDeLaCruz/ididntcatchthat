@@ -17,3 +17,11 @@ export interface WeakFlashcardVM {
   errorCount: number;
   lastAttemptAt: Date;
 }
+
+export interface SubcategoryProgressVM {
+  category: string;
+  subcategory: string;
+  totalAttempts: number;
+  correctCount: number;
+  accuracy: number;
+}

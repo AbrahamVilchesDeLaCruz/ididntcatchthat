@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { mapModuleProgress, mapWeakFlashcard } from '../stats.mapper';
+import {
+  mapModuleProgress,
+  mapSubcategoryProgress,
+  mapWeakFlashcard,
+} from '../stats.mapper';
 import type { WeakFlashcardApiModel } from '../api/stats.api-model';
 import type { ModuleProgressApiModel } from '../api/stats.api-model';
 
@@ -18,6 +22,22 @@ describe('stats/mapModuleProgress', () => {
 
     expect(vm.accuracy).toBe(75);
     expect(vm.masteryLevel).toBe(2);
+  });
+});
+
+describe('mapSubcategoryProgress', () => {
+  it('converts accuracy from 0-1 to percentage', () => {
+    const result = mapSubcategoryProgress({
+      category: 'native_sounds',
+      subcategory: 'b_ball',
+      totalAttempts: 20,
+      correctCount: 15,
+      accuracy: 0.75,
+    });
+
+    expect(result.accuracy).toBe(75);
+    expect(result.category).toBe('native_sounds');
+    expect(result.subcategory).toBe('b_ball');
   });
 });
 
