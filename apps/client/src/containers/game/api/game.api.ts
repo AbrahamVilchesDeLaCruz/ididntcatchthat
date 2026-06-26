@@ -1,18 +1,22 @@
 import {
   useMutation,
   useQuery,
+  useQueryClient,
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import { statsKeys } from '@/containers/stats/api/stats.api';
 import {
   mapFlashcardForGame,
   mapGameSummary,
+  mapPausedGame,
   mapResumeGame,
 } from '../game.mapper';
 import type {
   FlashcardGameApiModel,
   GameSummaryApiModel,
+  PausedGameApiModel,
   PatchGamePayload,
   RecordAttemptPayload,
   ResumeGameApiResponse,
@@ -22,16 +26,25 @@ import type {
 import type {
   FlashcardGameVM,
   GameSummaryVM,
+  PausedGameVM,
   ResumeGameVM,
 } from '../game.types';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 export const gameKeys = {
   all: ['game'] as const,
+  paused: ['game', 'paused'] as const,
   flashcards: (gameId: string) =>
     [...gameKeys.all, 'flashcards', gameId] as const,
   resume: (gameId: string) => [...gameKeys.all, 'resume', gameId] as const,
   summary: (gameId: string) => [...gameKeys.all, 'summary', gameId] as const,
+};
+
+const invalidateGameAndStats = (
+  queryClient: ReturnType<typeof useQueryClient>,
+): void => {
+  void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
+  void queryClient.invalidateQueries({ queryKey: statsKeys.all });
 };
 
 // ─── Start game ───────────────────────────────────────────────────────────────
@@ -40,12 +53,17 @@ export const useStartGame = (): UseMutationResult<
   Error,
   StartGamePayload
 > => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (
       payload: StartGamePayload,
     ): Promise<StartGameApiResponse> => {
       const res = await apiClient.post<StartGameApiResponse>('/games', payload);
       return res.data;
+    },
+    onSuccess: () => {
+      invalidateGameAndStats(queryClient);
     },
   });
 };
@@ -67,12 +85,17 @@ export const useCompleteGame = (): UseMutationResult<
   Error,
   string
 > => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (gameId: string): Promise<GameSummaryVM> => {
       const res = await apiClient.post<GameSummaryApiModel>(
         `/games/${gameId}/complete`,
       );
       return mapGameSummary(res.data);
+    },
+    onSuccess: () => {
+      invalidateGameAndStats(queryClient);
     },
   });
 };
@@ -101,6 +124,8 @@ export const usePatchGame = (): UseMutationResult<
   Error,
   { gameId: string; payload: PatchGamePayload }
 > => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       gameId,
@@ -111,6 +136,37 @@ export const usePatchGame = (): UseMutationResult<
     }): Promise<void> => {
       await apiClient.patch(`/games/${gameId}`, payload);
     },
+    onSuccess: () => {
+      invalidateGameAndStats(queryClient);
+    },
+  });
+};
+
+// ─── Abandon paused game ──────────────────────────────────────────────────────
+export const useAbandonGame = (): UseMutationResult<void, Error, string> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (gameId: string): Promise<void> => {
+      await apiClient.patch(`/games/${gameId}`, { status: 'abandoned' });
+    },
+    onSuccess: () => {
+      invalidateGameAndStats(queryClient);
+    },
+  });
+};
+
+// ─── List paused games ────────────────────────────────────────────────────────
+export const usePausedGames = (
+  enabled = true,
+): UseQueryResult<PausedGameVM[]> => {
+  return useQuery({
+    queryKey: gameKeys.paused,
+    queryFn: async (): Promise<PausedGameVM[]> => {
+      const res = await apiClient.get<PausedGameApiModel[]>('/games');
+      return res.data.map(mapPausedGame);
+    },
+    enabled,
   });
 };
 
@@ -127,12 +183,15 @@ export const useGameFlashcards = (
       return res.data.map(mapFlashcardForGame);
     },
     enabled: !!gameId,
-    staleTime: Infinity, // flashcard content never changes mid-game
+    staleTime: Infinity,
   });
 };
 
 // ─── Resume game ──────────────────────────────────────────────────────────────
-export const useResumeGame = (gameId: string): UseQueryResult<ResumeGameVM> => {
+export const useResumeGame = (
+  gameId: string,
+  enabled = true,
+): UseQueryResult<ResumeGameVM> => {
   return useQuery({
     queryKey: gameKeys.resume(gameId),
     queryFn: async (): Promise<ResumeGameApiResponse> => {
@@ -142,6 +201,7 @@ export const useResumeGame = (gameId: string): UseQueryResult<ResumeGameVM> => {
       return res.data;
     },
     select: mapResumeGame,
-    enabled: !!gameId,
+    enabled: !!gameId && enabled,
+    retry: false,
   });
 };

@@ -5,7 +5,9 @@ import type { GameSummaryVM } from './game.types';
 interface GameSummaryComponentProps {
   summary: GameSummaryVM;
   isGuest: boolean;
+  pausedGamesCount?: number;
   onPlayAgain: () => void;
+  onViewPaused?: () => void;
   onRegister: () => void;
   onViewStats: () => void;
 }
@@ -26,7 +28,9 @@ const getAccuracyEmoji = (pct: number): string => {
 export const GameSummaryComponent = ({
   summary,
   isGuest,
+  pausedGamesCount = 0,
   onPlayAgain,
+  onViewPaused,
   onRegister,
   onViewStats,
 }: GameSummaryComponentProps): ReactElement => {
@@ -90,14 +94,27 @@ export const GameSummaryComponent = ({
         </div>
       ) : (
         <div className="flex w-full max-w-sm flex-col gap-3">
-          {/* Authenticated: play again = acción primaria */}
+          {pausedGamesCount > 0 && onViewPaused ? (
+            <button
+              type="button"
+              onClick={onViewPaused}
+              className="w-full rounded-full border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] py-3 text-sm font-medium text-[var(--color-brand-light)]"
+            >
+              {gs.pausedGamesLink.replace('{count}', String(pausedGamesCount))}
+            </button>
+          ) : null}
           <button
             onClick={onPlayAgain}
             className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
           >
             {gs.ctaPlayAgain}
           </button>
-          {/* Ver estadísticas — secundario */}
+          <button
+            onClick={onPlayAgain}
+            className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          >
+            {gs.ctaChooseModule}
+          </button>
           <button
             onClick={onViewStats}
             className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"

@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import {
@@ -6,15 +6,17 @@ import {
   useRecordAttempt,
   useCompleteGame,
   usePatchGame,
+  useResumeGame,
 } from './api/game.api';
 import { GameComponent } from './GameComponent';
 import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
 import { useGameSession } from './hooks/useGameSession';
 import { saveGameSummary } from './game-summary.storage';
-import type { GameSummaryVM } from './game.types';
+import type { FlashcardGameVM, GameSummaryVM } from './game.types';
 
 interface LocationState {
   flashcardIds?: string[];
+  mode?: 'resume';
 }
 
 export const GameContainer = (): ReactElement => {
@@ -25,21 +27,36 @@ export const GameContainer = (): ReactElement => {
   const userType = useAuthStore((s) => s.userType);
 
   const hasFlashcardIds = (state.flashcardIds ?? []).length > 0;
+  const isResumeMode = state.mode === 'resume' || !hasFlashcardIds;
   const canPause = userType !== null && userType !== 'guest';
 
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const [pauseError, setPauseError] = useState<string | null>(null);
 
-  const { data: flashcards = [], isLoading } = useGameFlashcards(gameId ?? '');
+  const { data: flashcards = [], isLoading: isLoadingFlashcards } =
+    useGameFlashcards(gameId ?? '');
+  const {
+    data: resumeData,
+    isLoading: isLoadingResume,
+    isError: isResumeError,
+  } = useResumeGame(gameId ?? '', isResumeMode && !!gameId);
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
 
   useEffect(() => {
-    if (!hasFlashcardIds) {
+    if (isResumeMode && isResumeError) {
       void navigate('/game', { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isResumeMode, isResumeError, navigate]);
+
+  const sessionFlashcards = useMemo((): FlashcardGameVM[] => {
+    if (!isResumeMode || !resumeData) {
+      return flashcards;
+    }
+    const pendingSet = new Set(resumeData.pendingFlashcardIds);
+    return flashcards.filter((f) => pendingSet.has(f.id));
+  }, [flashcards, isResumeMode, resumeData]);
 
   const navigateToSummary = (summary: GameSummaryVM): void => {
     if (gameId) saveGameSummary(gameId, summary);
@@ -63,7 +80,7 @@ export const GameContainer = (): ReactElement => {
   };
 
   const session = useGameSession({
-    flashcards,
+    flashcards: sessionFlashcards,
     onOriginalQueueComplete: runCompleteGame,
   });
 
@@ -80,6 +97,7 @@ export const GameContainer = (): ReactElement => {
 
   const handlePause = (): void => {
     if (!gameId || !session.currentFlashcard || !canPause) return;
+    setPauseError(null);
     patchGame(
       {
         gameId,
@@ -90,11 +108,20 @@ export const GameContainer = (): ReactElement => {
       },
       {
         onSuccess: () => {
-          void navigate('/game');
+          void navigate('/game', { state: { pausedSaved: true } });
+        },
+        onError: () => {
+          setPauseError('No se pudo pausar la partida. Reintenta.');
         },
       },
     );
   };
+
+  const isLoading =
+    isLoadingFlashcards ||
+    (isResumeMode && isLoadingResume) ||
+    isCompleting ||
+    isPausing;
 
   if (completeError) {
     return (
@@ -125,9 +152,14 @@ export const GameContainer = (): ReactElement => {
           onDecline={session.declineRepeatWrong}
         />
       )}
+      {pauseError ? (
+        <div className="bg-[var(--color-accent-red)]/10 px-5 py-2 text-center text-sm text-[var(--color-accent-red)]">
+          {pauseError}
+        </div>
+      ) : null}
       <GameComponent
         flashcard={session.currentFlashcard}
-        isLoading={isLoading || isCompleting || isPausing}
+        isLoading={isLoading}
         isFlipped={session.isFlipped}
         currentIndex={session.currentIndex}
         totalCount={session.totalCount}

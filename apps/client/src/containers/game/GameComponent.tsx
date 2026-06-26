@@ -60,10 +60,10 @@ export const GameComponent = ({
 
   const progressPct = ((currentIndex + 1) / totalCount) * 100;
   const audioUrls = flashcard.audioUrls;
+  const nativeAudioUrl = audioUrls?.expression.us ?? null;
 
   return (
     <div className="flex flex-1 flex-col bg-[var(--color-bg-base)]">
-      {/* Progress bar */}
       <div className="h-1 w-full bg-[var(--color-bg-elevated)]">
         <div
           className="h-full bg-[var(--color-brand)] transition-all duration-300"
@@ -71,7 +71,6 @@ export const GameComponent = ({
         />
       </div>
 
-      {/* Counter + pause */}
       <div className="flex items-center justify-between px-5 py-3">
         {canPause && onPause ? (
           <button
@@ -79,7 +78,7 @@ export const GameComponent = ({
             onClick={onPause}
             className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-brand)]"
           >
-            ⏸ Pausar
+            ⏸ {gp.pause}
           </button>
         ) : (
           <span />
@@ -89,9 +88,7 @@ export const GameComponent = ({
         </span>
       </div>
 
-      {/* Card area */}
       <div className="flex flex-1 flex-col items-center justify-center px-5 py-8">
-        {/* Flashcard — CSS 3D flip (toggle) */}
         <div
           className="game-card-wrapper cursor-pointer"
           style={{
@@ -113,7 +110,6 @@ export const GameComponent = ({
               transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
             }}
           >
-            {/* Front */}
             <div
               style={{
                 backfaceVisibility: 'hidden',
@@ -124,13 +120,7 @@ export const GameComponent = ({
               <span className="text-4xl font-bold text-[var(--color-text-primary)]">
                 {flashcard.expression}
               </span>
-              {flashcard.ipaNotation && (
-                <span className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 font-mono text-base text-[var(--color-brand-light)]">
-                  {flashcard.ipaNotation}
-                </span>
-              )}
 
-              {/* Audio — 3 dialects */}
               {audioUrls && (
                 <div
                   className="flex gap-2"
@@ -157,7 +147,6 @@ export const GameComponent = ({
               </span>
             </div>
 
-            {/* Back */}
             <div
               style={{
                 backfaceVisibility: 'hidden',
@@ -170,11 +159,17 @@ export const GameComponent = ({
                 {flashcard.meaning}
               </span>
 
+              {flashcard.ipaNotation && (
+                <span className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 font-mono text-base text-[var(--color-brand-light)]">
+                  {flashcard.ipaNotation}
+                </span>
+              )}
+
               {flashcard.examples.length > 0 && (
                 <div className="flex w-full flex-col gap-3">
-                  {flashcard.examples.map((ex, i) => (
+                  {flashcard.examples.map((ex) => (
                     <div
-                      key={i}
+                      key={ex.id}
                       className="flex flex-col items-center gap-0.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2"
                     >
                       <p className="text-center text-sm italic text-[var(--color-text-secondary)]">
@@ -188,20 +183,31 @@ export const GameComponent = ({
                 </div>
               )}
 
-              {/* Audio — example */}
-              {audioUrls?.examples.us && (
-                <button
-                  onClick={(e) => playAudio(audioUrls.examples.us, e)}
-                  className="shrink-0 flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] active:scale-95"
-                >
-                  🇺🇸 ▶ <span>Listen to example</span>
-                </button>
-              )}
+              <div
+                className="flex shrink-0 flex-wrap items-center justify-center gap-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {audioUrls?.examples.us ? (
+                  <button
+                    onClick={(e) => playAudio(audioUrls.examples.us, e)}
+                    className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] active:scale-95"
+                  >
+                    🇺🇸 ▶ <span>{gp.listenExample}</span>
+                  </button>
+                ) : null}
+                {flashcard.nativeSpeech && nativeAudioUrl ? (
+                  <button
+                    onClick={(e) => playAudio(nativeAudioUrl, e)}
+                    className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] active:scale-95"
+                  >
+                    🗣 ▶ <span>{gp.listenNative}</span>
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Answer buttons — only visible when flipped */}
         <div
           className={[
             'mt-8 flex w-full max-w-[420px] gap-4 transition-all duration-300',
@@ -223,6 +229,15 @@ export const GameComponent = ({
             ✓ {gp.correct}
           </button>
         </div>
+
+        <button
+          type="button"
+          disabled
+          title={gp.micSoon}
+          className="mt-4 flex items-center gap-2 rounded-full border border-[var(--color-border)] px-4 py-2 text-xs text-[var(--color-text-muted)] opacity-50 cursor-not-allowed"
+        >
+          🎤 {gp.micSoon}
+        </button>
       </div>
     </div>
   );

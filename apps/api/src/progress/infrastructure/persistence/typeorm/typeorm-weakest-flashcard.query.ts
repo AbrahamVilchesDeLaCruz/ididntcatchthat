@@ -39,6 +39,7 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
        JOIN flashcards f ON f.id = ufs.flashcard_id
        WHERE ufs.user_id = $1
          AND ufs.times_played > 0
+         AND (ufs.times_played - ufs.correct_count) > 0
        ORDER BY error_count DESC, ufs.accuracy_rate ASC
        LIMIT $2`,
       [userId.value, limit],

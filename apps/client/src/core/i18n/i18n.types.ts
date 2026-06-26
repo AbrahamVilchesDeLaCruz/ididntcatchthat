@@ -87,6 +87,9 @@ export interface GameTranslations {
     wholeCategory: string;
     countLabel: string;
     ctaStart: string;
+    guestError: string;
+    guestRetry: string;
+    pausedSaved: string;
     modules: {
       random: string;
       native_sounds: string;
@@ -95,6 +98,19 @@ export interface GameTranslations {
       real_talk: string;
     };
   };
+  paused: {
+    title: string;
+    cards: string;
+    continue: string;
+    abandon: string;
+    abandonConfirm: string;
+    cancel: string;
+    randomModule: string;
+    maxModalTitle: string;
+    maxModalBody: string;
+    abandonOldest: string;
+    chooseToAbandon: string;
+  };
   play: {
     cardOf: string;
     correct: string;
@@ -102,6 +118,11 @@ export interface GameTranslations {
     hoverToReveal: string;
     tapToReveal: string;
     tapToFlipBack: string;
+    pause: string;
+    listenExample: string;
+    listenNative: string;
+    micSoon: string;
+    pausedToast: string;
   };
   summary: {
     title: string;
@@ -112,10 +133,44 @@ export interface GameTranslations {
     total: string;
     duration: string;
     ctaPlayAgain: string;
+    ctaChooseModule: string;
     ctaViewStats: string;
     ctaRegister: string;
     registerTitle: string;
     registerHint: string;
+    pausedGamesLink: string;
+  };
+}
+
+export interface StatsTranslations {
+  title: string;
+  subtitle: string;
+  moduleChartTitle: string;
+  moduleChartHint: string;
+  weakTableTitle: string;
+  noModuleData: string;
+  noWeakData: string;
+  noWeakInModule: string;
+  noSubcategoryData: string;
+  emptyGlobalTitle: string;
+  emptyGlobalBody: string;
+  emptyGlobalCta: string;
+  retry: string;
+  loadError: string;
+  backToModules: string;
+  subcategoryTitleSuffix: string;
+  practice: string;
+  table: {
+    expression: string;
+    module: string;
+    errors: string;
+    lastAttempt: string;
+  };
+  mastery: {
+    novice: string;
+    progressing: string;
+    solid: string;
+    mastered: string;
   };
 }
 
@@ -171,5 +226,6 @@ export interface RankingTranslations {
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
+  stats: StatsTranslations;
   ranking: RankingTranslations;
 }

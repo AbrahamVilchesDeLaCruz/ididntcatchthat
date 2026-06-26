@@ -50,6 +50,10 @@ describe('progress/infrastructure/persistence TypeOrmWeakestFlashcardQuery', () 
       [userId.value, 5],
     );
     expect(dataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('(ufs.times_played - ufs.correct_count) > 0'),
+      [userId.value, 5],
+    );
+    expect(dataSource.query).toHaveBeenCalledWith(
       expect.stringContaining('ORDER BY error_count DESC'),
       [userId.value, 5],
     );

@@ -67,4 +67,22 @@ describe('useGameSession', () => {
     expect(result.current.totalCount).toBe(1);
     expect(result.current.currentFlashcard?.id).toBe('fc-1');
   });
+
+  it('works with a filtered pending subset (resume path)', () => {
+    const onComplete = vi.fn();
+    const pendingOnly = [flashcards[1]];
+    const { result } = renderHook(() =>
+      useGameSession({
+        flashcards: pendingOnly,
+        onOriginalQueueComplete: onComplete,
+      }),
+    );
+
+    expect(result.current.totalCount).toBe(1);
+    expect(result.current.currentFlashcard?.id).toBe('fc-2');
+
+    act(() => result.current.recordAnswer(true));
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
 });

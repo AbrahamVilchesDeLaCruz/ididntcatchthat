@@ -1,10 +1,21 @@
 import { describe, it, expect } from 'vitest';
+import { type ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WeakFlashcardsTable } from '../WeakFlashcardsTable';
 
+const renderTable = (ui: ReactElement): ReturnType<typeof render> => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+};
+
 describe('WeakFlashcardsTable', () => {
-  it('shows Expresión header and renders expression value', () => {
-    render(
+  it('shows expression header and renders expression value', () => {
+    renderTable(
       <WeakFlashcardsTable
         data={[
           {
@@ -21,16 +32,36 @@ describe('WeakFlashcardsTable', () => {
     );
 
     expect(
-      screen.getByRole('columnheader', { name: 'Expresión' }),
+      screen.getByRole('columnheader', { name: 'Expression' }),
     ).toBeInTheDocument();
     expect(screen.getByText('gonna')).toBeInTheDocument();
   });
 
   it('does not show Flashcard ID header anymore', () => {
-    render(<WeakFlashcardsTable data={[]} />);
+    renderTable(<WeakFlashcardsTable data={[]} />);
 
     expect(
       screen.queryByRole('columnheader', { name: 'Flashcard ID' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('hides rows with zero errors', () => {
+    renderTable(
+      <WeakFlashcardsTable
+        data={[
+          {
+            flashcardId: 'fc-zero',
+            expression: 'hidden',
+            module: 'native_sounds',
+            category: 'native_sounds',
+            subcategory: 'test',
+            errorCount: 0,
+            lastAttemptAt: new Date(),
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByText('hidden')).not.toBeInTheDocument();
   });
 });

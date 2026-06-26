@@ -20,6 +20,10 @@ interface GameConfigComponentProps {
   selectedCount: CardCount;
   catalog: FlashcardCatalogApiModel | undefined;
   isPending: boolean;
+  guestError?: boolean;
+  pausedSavedBanner?: boolean;
+  pausedGamesPanel?: ReactElement;
+  onGuestRetry?: () => void;
   onModuleChange: (m: GameModule) => void;
   onSubcategoryChange: (subcategory: string | null) => void;
   onCountChange: (c: CardCount) => void;
@@ -32,6 +36,10 @@ export const GameConfigComponent = ({
   selectedCount,
   catalog,
   isPending,
+  guestError = false,
+  pausedSavedBanner = false,
+  pausedGamesPanel,
+  onGuestRetry,
   onModuleChange,
   onSubcategoryChange,
   onCountChange,
@@ -52,8 +60,33 @@ export const GameConfigComponent = ({
 
   const showSubcategoryStep = selectedModule !== 'random';
 
+  if (guestError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5 py-16">
+        <p className="text-center text-[var(--color-accent-red)]">
+          {gc.guestError}
+        </p>
+        <button
+          type="button"
+          onClick={onGuestRetry}
+          className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
+        >
+          {gc.guestRetry}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
+      {pausedSavedBanner ? (
+        <div className="mb-6 w-full max-w-md rounded-[var(--radius-md)] border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] px-4 py-3 text-center text-sm text-[var(--color-brand-light)]">
+          {gc.pausedSaved}
+        </div>
+      ) : null}
+
+      {pausedGamesPanel}
+
       <div className="mb-10 text-center">
         <h1 className="mb-2 text-3xl font-bold text-[var(--color-text-primary)]">
           {gc.title}

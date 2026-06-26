@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { useGameSummary } from './api/game.api';
+import { useGameSummary, usePausedGames } from './api/game.api';
 import { GameSummaryComponent } from './GameSummaryComponent';
 import {
   clearGameSummary,
@@ -20,8 +20,10 @@ export const GameSummaryContainer = (): ReactElement => {
   const navigate = useNavigate();
   const location = useLocation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const userType = useAuthStore((s) => s.userType);
   const guestDeviceId = useAuthStore((s) => s.guestDeviceId);
   const isGuest = isAuthenticated && guestDeviceId !== null;
+  const canSeePaused = userType !== null && userType !== 'guest';
   const state = (location.state as LocationState | null) ?? {};
 
   const hasNavigationSummary = state.summary !== undefined;
@@ -37,6 +39,8 @@ export const GameSummaryContainer = (): ReactElement => {
     isError,
   } = useGameSummary(gameId ?? '', shouldFetch);
 
+  const { data: pausedGames = [] } = usePausedGames(canSeePaused);
+
   useEffect(() => {
     if (gameId && state.summary) {
       saveGameSummary(gameId, state.summary);
@@ -51,6 +55,10 @@ export const GameSummaryContainer = (): ReactElement => {
 
   const handlePlayAgain = (): void => {
     if (gameId) clearGameSummary(gameId);
+    void navigate('/game');
+  };
+
+  const handleViewPaused = (): void => {
     void navigate('/game');
   };
 
@@ -91,7 +99,9 @@ export const GameSummaryContainer = (): ReactElement => {
     <GameSummaryComponent
       summary={summary ?? resolveGameSummary(gameId, undefined)}
       isGuest={isGuest}
+      pausedGamesCount={canSeePaused ? pausedGames.length : 0}
       onPlayAgain={handlePlayAgain}
+      onViewPaused={handleViewPaused}
       onViewStats={handleViewStats}
       onRegister={handleRegister}
     />
