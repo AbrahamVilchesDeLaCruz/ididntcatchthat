@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { GameComponent } from '../GameComponent';
 import type { FlashcardGameVM } from '../game.types';
 
+const playMock = vi.fn().mockResolvedValue(undefined);
+
 const flashcard: FlashcardGameVM = {
   id: 'fc-1',
   position: 1,
@@ -39,6 +41,7 @@ const defaultProps = {
 describe('GameComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(playMock);
     vi.stubGlobal(
       'matchMedia',
       vi.fn().mockImplementation(() => ({
@@ -47,6 +50,109 @@ describe('GameComponent', () => {
         removeEventListener: vi.fn(),
       })),
     );
+  });
+
+  it('shows a loading spinner while loading', () => {
+    const { container } = render(
+      <GameComponent {...defaultProps} isLoading flashcard={null} />,
+    );
+
+    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('flips the card when the front is clicked', () => {
+    const onFlip = vi.fn();
+
+    render(<GameComponent {...defaultProps} onFlip={onFlip} />);
+
+    fireEvent.click(document.querySelector('.game-card-wrapper')!);
+
+    expect(onFlip).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays expression and example audio from the back', () => {
+    render(<GameComponent {...defaultProps} isFlipped />);
+
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'American English' })[0],
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Play example' }));
+
+    expect(playMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows native speech audio when available', () => {
+    render(<GameComponent {...defaultProps} isFlipped />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Listen native/i }));
+
+    expect(playMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders multiple dialect buttons when urls exist', () => {
+    render(
+      <GameComponent
+        {...defaultProps}
+        flashcard={{
+          ...flashcard,
+          audioUrls: {
+            expression: {
+              us: 'https://audio.test/us.mp3',
+              uk: 'https://audio.test/uk.mp3',
+              au: 'https://audio.test/au.mp3',
+            },
+            examples: { us: 'https://audio.test/ex.mp3' },
+          },
+        }}
+        isFlipped
+      />,
+    );
+
+    expect(
+      screen.getAllByRole('button', { name: 'British English' }).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('button', { name: 'Australian English' }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('calls onAnswer with false for an incorrect mark', () => {
+    vi.useFakeTimers();
+    const onAnswer = vi.fn();
+
+    render(<GameComponent {...defaultProps} isFlipped onAnswer={onAnswer} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /I didn't know/i }));
+    vi.advanceTimersByTime(320);
+
+    expect(onAnswer).toHaveBeenCalledWith(false);
+    vi.useRealTimers();
+  });
+
+  it('advances to the next card front without an intermediate flip', () => {
+    vi.useFakeTimers();
+    const onAnswer = vi.fn();
+
+    const { rerender } = render(
+      <GameComponent {...defaultProps} isFlipped onAnswer={onAnswer} />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /I knew it/i }));
+    vi.advanceTimersByTime(320);
+
+    rerender(
+      <GameComponent
+        {...defaultProps}
+        isFlipped={false}
+        onAnswer={onAnswer}
+        flashcard={{ ...flashcard, id: 'fc-2', expression: 'world' }}
+      />,
+    );
+
+    expect(onAnswer).toHaveBeenCalledWith(true);
+    expect(screen.getAllByText('World').length).toBeGreaterThan(0);
+
+    vi.useRealTimers();
   });
 
   it('shows click-to-reveal hint and IPA on the front', () => {

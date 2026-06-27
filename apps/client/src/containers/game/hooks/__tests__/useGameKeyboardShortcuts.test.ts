@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { useGameKeyboardShortcuts } from '../useGameKeyboardShortcuts';
 
 describe('useGameKeyboardShortcuts', () => {
@@ -105,6 +106,61 @@ describe('useGameKeyboardShortcuts', () => {
     dispatchKey('p');
 
     expect(onPause).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onCorrect when Y is pressed while flipped', () => {
+    renderHook(() =>
+      useGameKeyboardShortcuts({
+        enabled: true,
+        isFlipped: true,
+        onFlip,
+        onCorrect,
+        onIncorrect,
+      }),
+    );
+
+    dispatchKey('y');
+
+    expect(onCorrect).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onIncorrect when N is pressed while flipped', () => {
+    renderHook(() =>
+      useGameKeyboardShortcuts({
+        enabled: true,
+        isFlipped: true,
+        onFlip,
+        onCorrect,
+        onIncorrect,
+      }),
+    );
+
+    dispatchKey('n');
+
+    expect(onIncorrect).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores shortcuts when typing in an input', () => {
+    renderHook(() =>
+      useGameKeyboardShortcuts({
+        enabled: true,
+        isFlipped: true,
+        onFlip,
+        onCorrect,
+        onIncorrect,
+      }),
+    );
+
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+
+    fireEvent.keyDown(input, { key: ' ' });
+    fireEvent.keyDown(input, { key: 'ArrowRight' });
+
+    expect(onFlip).not.toHaveBeenCalled();
+    expect(onCorrect).not.toHaveBeenCalled();
+
+    document.body.removeChild(input);
   });
 
   it('ignores shortcuts when disabled', () => {
