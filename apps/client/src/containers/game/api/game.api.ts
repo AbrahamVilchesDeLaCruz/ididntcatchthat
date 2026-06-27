@@ -45,6 +45,8 @@ const invalidateGameAndStats = (
 ): void => {
   void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
   void queryClient.invalidateQueries({ queryKey: statsKeys.all });
+  void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
+  void queryClient.invalidateQueries({ queryKey: statsKeys.achievements });
 };
 
 // ─── Start game ───────────────────────────────────────────────────────────────

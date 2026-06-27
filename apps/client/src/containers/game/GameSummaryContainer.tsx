@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { useGameSummary, usePausedGames } from './api/game.api';
+import { useGameSummary, usePausedGames, useStartGame } from './api/game.api';
 import { GameSummaryComponent } from './GameSummaryComponent';
 import {
   clearGameSummary,
@@ -40,6 +40,7 @@ export const GameSummaryContainer = (): ReactElement => {
   } = useGameSummary(gameId ?? '', shouldFetch);
 
   const { data: pausedGames = [] } = usePausedGames(canSeePaused);
+  const { mutate: startGame } = useStartGame();
 
   useEffect(() => {
     if (gameId && state.summary) {
@@ -68,6 +69,17 @@ export const GameSummaryContainer = (): ReactElement => {
 
   const handleRegister = (): void => {
     void navigate('/auth/register');
+  };
+
+  const handlePracticeWeakest = (): void => {
+    startGame(
+      { mode: 'game', module: null, cardCount: 10, source: 'weakest' },
+      {
+        onSuccess: ({ gameId, flashcardIds }) => {
+          void navigate(`/game/${gameId}`, { state: { flashcardIds } });
+        },
+      },
+    );
   };
 
   if (shouldFetch && isLoading) {
@@ -104,6 +116,7 @@ export const GameSummaryContainer = (): ReactElement => {
       onViewPaused={handleViewPaused}
       onViewStats={handleViewStats}
       onRegister={handleRegister}
+      onPracticeWeakest={isGuest ? undefined : handlePracticeWeakest}
     />
   );
 };
