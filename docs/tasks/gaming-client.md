@@ -87,15 +87,20 @@
 
 ## Bloque 7 — Flujos de edge cases (guest CTA, prefetch, fire & forget)
 
-- [ ] **TASK-GAMING-CLIENT-14 — Modal “Repetir fallidas” solo frontend**
+- [x] **TASK-GAMING-CLIENT-14 — Modal “Repetir fallidas” solo frontend**
   - **Archivos**: `containers/game/components/RepeatWrongAnswersModal.tsx`, `GameContainer.tsx`, `hooks/useGameSession.ts`.
   - **Criterios**: intercepta el resumen, reinyecta solo `wrongIds` y no crea nuevo game ni fetch masivo.
   - **Skill/Patrón**: `client-hooks`, `client-container-presentational`.
 
-- [ ] **TASK-GAMING-CLIENT-15 — Pausa/abandono y restricciones guest**
-  - **Archivos**: `containers/game/GameContainer.tsx`, `components/FlashcardBoard.tsx`, `__tests__/GameContainer.test.tsx`.
-  - **Criterios**: logged puede pausar vía `PATCH`; guest no ve pausa y abandonar no usa recovery ni sessionStorage.
-  - **Skill/Patrón**: `client-query`, `client-testing`.
+- [x] **TASK-GAMING-CLIENT-15 — Pausa/abandono y restricciones guest**
+  - **Archivos**: `PausedGamesPanel`, `MaxPausedGamesModal`, `GameConfigContainer`, `GameContainer`, hooks `usePausedGames`/`useAbandonGame`.
+  - **Criterios**: logged puede pausar/retomar/listar; guest no ve pausa ni panel pausadas; modal 409 con límite 5.
+  - **Spec**: [game-stats-ux.md](../spec/game-stats-ux.md)
+
+- [x] **TASK-GAMING-CLIENT-15b — Layout responsive desktop `/game`**
+  - **Archivos**: `GameConfigComponent`, `GameComponent`, `GamePlaySidebar`, `GameSummaryComponent`, hooks `usePrefersFinePointer`/`useGameKeyboardShortcuts`.
+  - **Criterios**: config 2 cols en `lg+`; carta más grande; sidebar atajos; resumen 4 cols stats; mobile sin regresión. Sin capa arcade (glow/shimmer).
+  - **Spec**: [game-stats-ux.md](../spec/game-stats-ux.md) bloque I
 
 - [ ] **TASK-GAMING-CLIENT-16 — Cobertura final de integración/E2E**
   - **Archivos**: `containers/game/__tests__/*.test.tsx`, `apps/client/e2e/gaming.spec.ts`.

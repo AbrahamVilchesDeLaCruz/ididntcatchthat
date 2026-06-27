@@ -5,7 +5,9 @@ import type { GameSummaryVM } from './game.types';
 interface GameSummaryComponentProps {
   summary: GameSummaryVM;
   isGuest: boolean;
+  pausedGamesCount?: number;
   onPlayAgain: () => void;
+  onViewPaused?: () => void;
   onRegister: () => void;
   onViewStats: () => void;
 }
@@ -26,7 +28,9 @@ const getAccuracyEmoji = (pct: number): string => {
 export const GameSummaryComponent = ({
   summary,
   isGuest,
+  pausedGamesCount = 0,
   onPlayAgain,
+  onViewPaused,
   onRegister,
   onViewStats,
 }: GameSummaryComponentProps): ReactElement => {
@@ -37,80 +41,92 @@ export const GameSummaryComponent = ({
   const emoji = getAccuracyEmoji(accuracyPct);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
-      {/* Title */}
-      <div className="mb-2 text-5xl">{emoji}</div>
-      <h1 className="mb-2 text-3xl font-bold text-[var(--color-text-primary)]">
-        {gs.title}
-      </h1>
-      <p className="mb-10 text-sm text-[var(--color-text-muted)]">
-        {accuracyPct >= 70 ? gs.subtitleGood : gs.subtitleKeepGoing}
-      </p>
+    <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-12 md:py-16 lg:px-8">
+      <div className="w-full max-w-sm md:max-w-xl lg:max-w-3xl">
+        <div className="mb-2 text-center text-5xl md:text-6xl">{emoji}</div>
+        <h1 className="mb-2 text-center text-3xl font-bold text-[var(--color-text-primary)] md:text-4xl">
+          {gs.title}
+        </h1>
+        <p className="mb-10 text-center text-sm text-[var(--color-text-muted)]">
+          {accuracyPct >= 70 ? gs.subtitleGood : gs.subtitleKeepGoing}
+        </p>
 
-      {/* Stats grid */}
-      <div className="mb-10 grid w-full max-w-sm grid-cols-2 gap-4">
-        <StatCard label={gs.accuracy} value={`${accuracyPct}%`} highlight />
-        <StatCard
-          label={gs.correct}
-          value={`${summary.correctCount}/${summary.totalCount}`}
-        />
-        <StatCard label={gs.total} value={String(summary.totalCount)} />
-        <StatCard
-          label={gs.duration}
-          value={formatDuration(summary.duration)}
-        />
-      </div>
+        <div className="mb-10 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <StatCard label={gs.accuracy} value={`${accuracyPct}%`} highlight />
+          <StatCard
+            label={gs.correct}
+            value={`${summary.correctCount}/${summary.totalCount}`}
+          />
+          <StatCard label={gs.total} value={String(summary.totalCount)} />
+          <StatCard
+            label={gs.duration}
+            value={formatDuration(summary.duration)}
+          />
+        </div>
 
-      {/* CTAs */}
-      {isGuest ? (
-        <div className="flex w-full max-w-sm flex-col gap-3">
-          {/* Guest: registro = acción primaria */}
-          <div className="rounded-[var(--radius-lg)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-5 text-center">
-            <p className="mb-1 text-sm font-semibold text-[var(--color-text-primary)]">
-              {gs.registerTitle}
-            </p>
-            <p className="mb-4 text-xs text-[var(--color-text-muted)]">
-              {gs.registerHint}
-            </p>
+        {isGuest ? (
+          <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-center">
+            <div className="rounded-[var(--radius-lg)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-5 text-center lg:min-w-[20rem] lg:flex-1">
+              <p className="mb-1 text-sm font-semibold text-[var(--color-text-primary)]">
+                {gs.registerTitle}
+              </p>
+              <p className="mb-4 text-xs text-[var(--color-text-muted)]">
+                {gs.registerHint}
+              </p>
+              <button
+                onClick={onRegister}
+                className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+              >
+                {gs.ctaRegister}
+              </button>
+            </div>
+
             <button
-              onClick={onRegister}
-              className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+              onClick={onPlayAgain}
+              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:max-w-xs lg:self-center"
             >
-              {gs.ctaRegister}
+              {gs.ctaPlayAgain}
             </button>
           </div>
-
-          {/* Play again — secundario */}
-          <button
-            onClick={onPlayAgain}
-            className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-          >
-            {gs.ctaPlayAgain}
-          </button>
-        </div>
-      ) : (
-        <div className="flex w-full max-w-sm flex-col gap-3">
-          {/* Authenticated: play again = acción primaria */}
-          <button
-            onClick={onPlayAgain}
-            className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
-          >
-            {gs.ctaPlayAgain}
-          </button>
-          {/* Ver estadísticas — secundario */}
-          <button
-            onClick={onViewStats}
-            className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-          >
-            {gs.ctaViewStats}
-          </button>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
+            {pausedGamesCount > 0 && onViewPaused ? (
+              <button
+                type="button"
+                onClick={onViewPaused}
+                className="w-full rounded-full border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] py-3 text-sm font-medium text-[var(--color-brand-light)] lg:col-span-2"
+              >
+                {gs.pausedGamesLink.replace(
+                  '{count}',
+                  String(pausedGamesCount),
+                )}
+              </button>
+            ) : null}
+            <button
+              onClick={onPlayAgain}
+              className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+            >
+              {gs.ctaPlayAgain}
+            </button>
+            <button
+              onClick={onPlayAgain}
+              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+            >
+              {gs.ctaChooseModule}
+            </button>
+            <button
+              onClick={onViewStats}
+              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
+            >
+              {gs.ctaViewStats}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// ─── Stat card ────────────────────────────────────────────────────────────────
 interface StatCardProps {
   label: string;
   value: string;
@@ -122,10 +138,10 @@ const StatCard = ({
   value,
   highlight = false,
 }: StatCardProps): ReactElement => (
-  <div className="flex flex-col items-center justify-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5">
+  <div className="flex flex-col items-center justify-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5 md:p-6">
     <span
       className={[
-        'text-2xl font-bold',
+        'text-2xl font-bold md:text-3xl',
         highlight
           ? 'text-[var(--color-brand-light)]'
           : 'text-[var(--color-text-primary)]',

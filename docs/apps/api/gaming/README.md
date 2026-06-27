@@ -24,6 +24,7 @@ Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
 | `POST` | `/games` | [Start](./start/) | Bearer (any) |
 | `POST` | `/games/:id/attempts` | [Attempt](./attempt/) | Bearer (any) |
 | `POST` | `/games/:id/complete` | [Complete](./complete/) | Bearer (any) |
+| `GET` | `/games/:id/summary` | [Complete](./complete/) | Bearer (any) |
 | `PATCH` | `/games/:id` (`status: paused`) | [Pause](./pause/) | Bearer (user) |
 | `GET` | `/games?status=paused` | [Pause](./pause/) | Bearer (user) |
 | `GET` | `/games/:id/resume` | [Resume](./resume/) | Bearer (user) |

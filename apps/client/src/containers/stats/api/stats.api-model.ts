@@ -13,6 +13,16 @@ export interface WeakFlashcardApiModel {
   flashcardId: string;
   expression: string;
   module: string;
+  category: string;
+  subcategory: string;
   errorCount: number;
   lastSeenAt: string;
+}
+
+export interface SubcategoryProgressApiModel {
+  category: string;
+  subcategory: string;
+  totalAttempts: number;
+  correctCount: number;
+  accuracy: number;
 }

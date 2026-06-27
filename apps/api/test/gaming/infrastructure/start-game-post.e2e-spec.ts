@@ -94,5 +94,85 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         .send({ mode: 'invalid_mode', cardCount: 10 })
         .expect(422);
     });
+
+    it('should return 422 when subcategory is sent without module', async () => {
+      const suffix = Date.now();
+      const email = `e2e-user-${suffix}@test.com`;
+      const nickname = `user${suffix}`.slice(0, 20);
+
+      await request(app.getHttpServer())
+        .post('/v1/auth/register')
+        .send({ email, password: 'Str0ng!Pass#2026', nickname })
+        .expect(201);
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/v1/auth/login')
+        .send({ email, password: 'Str0ng!Pass#2026' })
+        .expect(200);
+      const userToken = (loginRes.body as { accessToken: string }).accessToken;
+
+      await request(app.getHttpServer())
+        .post('/v1/games')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          mode: 'study',
+          subcategory: 't_soft_between_vowels',
+          cardCount: 10,
+        })
+        .expect(422);
+    });
+
+    it('should return flashcards only from the requested subcategory', async () => {
+      const ds = app.get(DataSource);
+      await ds.query(`DELETE FROM flashcards`);
+
+      await seedFlashcards(app, 5, {
+        category: 'native_sounds',
+        subcategory: 't_soft_between_vowels',
+      });
+      await seedFlashcards(app, 5, {
+        category: 'native_sounds',
+        subcategory: 'b_ball',
+      });
+
+      const suffix = Date.now();
+      const email = `e2e-user-${suffix}@test.com`;
+      const nickname = `user${suffix}`.slice(0, 20);
+
+      await request(app.getHttpServer())
+        .post('/v1/auth/register')
+        .send({ email, password: 'Str0ng!Pass#2026', nickname })
+        .expect(201);
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/v1/auth/login')
+        .send({ email, password: 'Str0ng!Pass#2026' })
+        .expect(200);
+      const userToken = (loginRes.body as { accessToken: string }).accessToken;
+
+      const startRes = await request(app.getHttpServer())
+        .post('/v1/games')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          mode: 'study',
+          module: 'native_sounds',
+          subcategory: 't_soft_between_vowels',
+          cardCount: 10,
+        })
+        .expect(201);
+
+      const { gameId } = startRes.body as { gameId: string };
+
+      const flashcardsRes = await request(app.getHttpServer())
+        .get(`/v1/games/${gameId}/flashcards`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      const flashcards = flashcardsRes.body as { subcategory: string }[];
+      expect(flashcards.length).toBeGreaterThan(0);
+      expect(
+        flashcards.every((f) => f.subcategory === 't_soft_between_vowels'),
+      ).toBe(true);
+    });
   });
 });

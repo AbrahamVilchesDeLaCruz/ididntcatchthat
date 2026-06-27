@@ -14,6 +14,9 @@ export class GameEntity {
   @Column({ length: 50, nullable: true, type: 'varchar' })
   module: string | null;
 
+  @Column({ length: 100, nullable: true, type: 'varchar' })
+  subcategory: string | null;
+
   @Column({ name: 'card_count', length: 5 })
   cardCount: string;
 

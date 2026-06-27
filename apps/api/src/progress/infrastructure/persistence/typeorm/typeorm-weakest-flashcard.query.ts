@@ -10,7 +10,8 @@ import { type UserId } from '@/shared/domain/user-id';
 interface WeakestFlashcardRow {
   flashcard_id: string;
   expression: string;
-  module: string;
+  category: string;
+  subcategory: string;
   error_count: number;
   last_seen_at: Date;
 }
@@ -30,13 +31,16 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
       `SELECT
          ufs.flashcard_id,
          f.expression,
-         f.category AS module,
+         f.category,
+         f.subcategory,
          (ufs.times_played - ufs.correct_count) AS error_count,
          ufs.last_seen_at
        FROM user_flashcard_stats ufs
        JOIN flashcards f ON f.id = ufs.flashcard_id
        WHERE ufs.user_id = $1
-       ORDER BY ufs.accuracy_rate ASC
+         AND ufs.times_played > 0
+         AND (ufs.times_played - ufs.correct_count) > 0
+       ORDER BY error_count DESC, ufs.accuracy_rate ASC
        LIMIT $2`,
       [userId.value, limit],
     );
@@ -44,7 +48,9 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
     return rows.map((row) => ({
       flashcardId: row.flashcard_id,
       expression: row.expression,
-      module: row.module,
+      module: row.category,
+      category: row.category,
+      subcategory: row.subcategory,
       errorCount: Number(row.error_count),
       lastSeenAt: row.last_seen_at.toISOString(),
     }));

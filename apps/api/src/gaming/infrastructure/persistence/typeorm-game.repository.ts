@@ -38,6 +38,7 @@ export class TypeOrmGameRepository implements GameRepository {
       userId: entity.userId,
       mode: entity.mode,
       module: entity.module,
+      subcategory: entity.subcategory,
       cardCount: entity.cardCount,
       status: entity.status,
       flashcardIds: gameFlashcards.map((gf) => gf.flashcardId),
@@ -100,6 +101,7 @@ export class TypeOrmGameRepository implements GameRepository {
         userId: e.userId,
         mode: e.mode,
         module: e.module,
+        subcategory: e.subcategory,
         cardCount: e.cardCount,
         status: e.status,
         flashcardIds: [],
@@ -117,6 +119,7 @@ export class TypeOrmGameRepository implements GameRepository {
     e.userId = p.userId;
     e.mode = p.mode;
     e.module = p.module;
+    e.subcategory = p.subcategory;
     e.cardCount = p.cardCount;
     e.status = p.status;
     e.lastFlashcardId = p.lastFlashcardId;

@@ -19,9 +19,24 @@ import {
 } from '@/content/flashcard/domain/audio-storage';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
+import { type Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
 
 export type { RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
+
+export function resolveExpressionAudioText(flashcard: Flashcard): string {
+  const expression = flashcard.expression.value;
+  const nativeSpeech = flashcard.nativeSpeech?.value ?? null;
+
+  const preferNativeSpeech =
+    nativeSpeech !== null &&
+    !nativeSpeech.includes('.') &&
+    nativeSpeech.length <= expression.length + 20 &&
+    nativeSpeech.length < expression.length;
+
+  const base = preferNativeSpeech ? nativeSpeech : expression;
+  return `"${base}"`;
+}
 
 @Injectable()
 export class FlashcardAudioGenerator {
@@ -51,13 +66,15 @@ export class FlashcardAudioGenerator {
     await this.publisher.publish(flashcard.pullDomainEvents());
 
     try {
+      const expressionText = resolveExpressionAudioText(flashcard);
       const accents: AudioAccent[] = ['us', 'uk', 'au'];
       const expressionBuffers: Buffer[] = [];
       for (const accent of accents) {
         expressionBuffers.push(
           await this.audioGenerator.generate(
-            flashcard.expression.value,
+            expressionText,
             accent,
+            'expression',
           ),
         );
       }
@@ -65,27 +82,28 @@ export class FlashcardAudioGenerator {
       const examplesBuffer = await this.audioGenerator.generate(
         flashcard.examplesEnglishText,
         'us',
+        'examples',
       );
 
-      const flashcardId = flashcard.id.value;
+      const id = flashcard.id.value;
       const [usUrl, ukUrl, auUrl, examplesUsUrl] = await Promise.all([
         this.audioStorage.upload(
-          `audio/${flashcardId}/expression-us.mp3`,
+          `audio/${id}/expression-us.mp3`,
           expressionBuffers[0],
           'audio/mpeg',
         ),
         this.audioStorage.upload(
-          `audio/${flashcardId}/expression-uk.mp3`,
+          `audio/${id}/expression-uk.mp3`,
           expressionBuffers[1],
           'audio/mpeg',
         ),
         this.audioStorage.upload(
-          `audio/${flashcardId}/expression-au.mp3`,
+          `audio/${id}/expression-au.mp3`,
           expressionBuffers[2],
           'audio/mpeg',
         ),
         this.audioStorage.upload(
-          `audio/${flashcardId}/examples-us.mp3`,
+          `audio/${id}/examples-us.mp3`,
           examplesBuffer,
           'audio/mpeg',
         ),

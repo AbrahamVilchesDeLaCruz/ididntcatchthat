@@ -52,11 +52,11 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
       const userToken = await registerAndLogin(app);
       const { gameId, flashcardIds } = await startGame(app, userToken, 10);
 
-      for (const flashcardId of flashcardIds) {
+      for (let i = 0; i < flashcardIds.length; i++) {
         await request(app.getHttpServer())
           .post(`/v1/games/${gameId}/attempts`)
           .set('Authorization', `Bearer ${userToken}`)
-          .send({ flashcardId, correct: true })
+          .send({ flashcardId: flashcardIds[i], correct: i < 7 })
           .expect(204);
       }
 
@@ -73,10 +73,9 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
         duration: number;
       };
 
-      expect(typeof body.correctCount).toBe('number');
-      expect(typeof body.totalCount).toBe('number');
       expect(body.totalCount).toBe(10);
-      expect(typeof body.accuracy).toBe('number');
+      expect(body.correctCount).toBe(7);
+      expect(body.accuracy).toBe(70);
       expect(typeof body.duration).toBe('number');
     });
 

@@ -12,12 +12,13 @@ describe('progress/infrastructure/persistence TypeOrmWeakestFlashcardQuery', () 
     query = new TypeOrmWeakestFlashcardQuery(dataSource);
   });
 
-  it('should return weakest flashcards with expression and module', async () => {
+  it('should return weakest flashcards with expression, category and subcategory', async () => {
     dataSource.query.mockResolvedValueOnce([
       {
         flashcard_id: 'fc-1',
         expression: 'gonna',
-        module: 'connected_speech',
+        category: 'connected_speech',
+        subcategory: 'informal_going_to',
         error_count: 7,
         last_seen_at: new Date('2026-01-01T00:00:00.000Z'),
       },
@@ -30,20 +31,30 @@ describe('progress/infrastructure/persistence TypeOrmWeakestFlashcardQuery', () 
         flashcardId: 'fc-1',
         expression: 'gonna',
         module: 'connected_speech',
+        category: 'connected_speech',
+        subcategory: 'informal_going_to',
         errorCount: 7,
         lastSeenAt: '2026-01-01T00:00:00.000Z',
       },
     ]);
   });
 
-  it('should query by user and limit ordered by lowest accuracy', async () => {
+  it('should filter played cards and order by error count', async () => {
     const userId = ProgressUserIdMother.random();
     dataSource.query.mockResolvedValueOnce([]);
 
     await query.findWeakest(userId, 5);
 
     expect(dataSource.query).toHaveBeenCalledWith(
-      expect.stringContaining('ORDER BY ufs.accuracy_rate ASC'),
+      expect.stringContaining('ufs.times_played > 0'),
+      [userId.value, 5],
+    );
+    expect(dataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('(ufs.times_played - ufs.correct_count) > 0'),
+      [userId.value, 5],
+    );
+    expect(dataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('ORDER BY error_count DESC'),
       [userId.value, 5],
     );
   });

@@ -1,5 +1,5 @@
 .PHONY: up up-prod down down-prod restart restart-prod build rebuild \
-        dev dev-api dev-client \
+        dev dev-infra dev-api dev-client \
         local-up local-down local-wait local-setup local-seed local-dev local-dev-api local-dev-client \
         logs logs-api logs-client ps \
         obs-up obs-down obs-logs \
@@ -82,15 +82,21 @@ down-prod: ## Stop all services (prod)
 restart-prod: down-prod up-prod ## Restart all services (prod)
 
 # ─── Local dev servers (no Docker) ───────────────────────────────────────────
+# Doppler dev AMQP_URI uses hostname "rabbitmq" (Docker network). Host-side dev
+# rewrites it to localhost and expects `make dev-infra` (RabbitMQ container).
 
-dev: ## Start api + client dev servers with Doppler (no Docker)
-	doppler run --command "pnpm --filter @ididntcatchthat/api start:dev & pnpm --filter @ididntcatchthat/client dev"
+dev-infra: ## RabbitMQ only (:5672) — required before make dev / make dev-api
+	$(ensure-docker)
+	$(COMPOSE_DEV) up -d rabbitmq --wait
 
-dev-api: ## Start api dev server with Doppler (no Docker)
-	doppler run -- pnpm --filter @ididntcatchthat/api start:dev
+dev: dev-infra ## Hot-reload api + client (Doppler); starts RabbitMQ if needed
+	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/api start:dev & pnpm --filter @ididntcatchthat/client dev'
 
-dev-client: ## Start client dev server with Doppler (no Docker)
-	doppler run -- pnpm --filter @ididntcatchthat/client dev
+dev-api: dev-infra ## API hot-reload with Doppler (AMQP → localhost)
+	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; pnpm --filter @ididntcatchthat/api start:dev'
+
+dev-client: ## Client Vite HMR with Doppler
+	doppler run --command 'export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/client dev'
 
 # ─── Local profile (no Doppler, no paid services) ─────────────────────────────
 

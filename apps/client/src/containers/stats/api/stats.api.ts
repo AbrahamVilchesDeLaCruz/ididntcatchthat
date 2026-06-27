@@ -1,16 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
-import { mapModuleProgress, mapWeakFlashcard } from '../stats.mapper';
+import {
+  mapModuleProgress,
+  mapSubcategoryProgress,
+  mapWeakFlashcard,
+} from '../stats.mapper';
 import type {
   ModuleProgressApiModel,
+  SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
 } from './stats.api-model';
-import type { ModuleProgressVM, WeakFlashcardVM } from '../stats.types';
+import type {
+  ModuleProgressVM,
+  SubcategoryProgressVM,
+  WeakFlashcardVM,
+} from '../stats.types';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 export const statsKeys = {
+  all: ['stats'] as const,
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
+  subcategories: ['stats', 'subcategories'] as const,
 };
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -36,6 +47,19 @@ export const useWeakestFlashcards = () => {
         '/progress/flashcards/weakest',
       );
       return res.data.data.map(mapWeakFlashcard);
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useSubcategoryProgress = () => {
+  return useQuery({
+    queryKey: statsKeys.subcategories,
+    queryFn: async (): Promise<SubcategoryProgressVM[]> => {
+      const res = await apiClient.get<{ data: SubcategoryProgressApiModel[] }>(
+        '/progress/subcategories',
+      );
+      return res.data.data.map(mapSubcategoryProgress);
     },
   });
 };

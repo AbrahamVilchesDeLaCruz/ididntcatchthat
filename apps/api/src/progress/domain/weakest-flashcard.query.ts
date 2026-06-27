@@ -3,7 +3,10 @@ import { type UserId } from '@/shared/domain/user-id';
 export interface WeakestFlashcardDto {
   flashcardId: string;
   expression: string;
+  /** @deprecated use category — kept for backward compatibility */
   module: string;
+  category: string;
+  subcategory: string;
   errorCount: number;
   lastSeenAt: string;
 }

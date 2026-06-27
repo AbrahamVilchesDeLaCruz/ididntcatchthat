@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   type AudioGenerator,
   type AudioAccent,
+  type AudioGenerationMode,
 } from '@/content/flashcard/domain/audio-generator';
 import { AudioGenerationFailed } from '@/content/flashcard/domain/exceptions/audio-generation-failed';
 
@@ -20,9 +21,15 @@ export class ElevenLabsAudioGenerator implements AudioGenerator {
     this.apiKey = this.config.getOrThrow<string>('ELEVEN_LABS_API_KEY');
   }
 
-  async generate(text: string, accent: AudioAccent): Promise<Buffer> {
+  async generate(
+    text: string,
+    accent: AudioAccent,
+    mode: AudioGenerationMode,
+  ): Promise<Buffer> {
     const voiceId = this.config.getOrThrow<string>(VOICE_ID_ENV[accent]);
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+
+    const isExpression = mode === 'expression';
 
     const response = await fetch(url, {
       method: 'POST',
@@ -34,7 +41,10 @@ export class ElevenLabsAudioGenerator implements AudioGenerator {
       body: JSON.stringify({
         text,
         model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+        ...(isExpression ? { apply_text_normalization: 'off' } : {}),
+        voice_settings: isExpression
+          ? { stability: 0.85, similarity_boost: 0.9 }
+          : { stability: 0.5, similarity_boost: 0.75 },
       }),
     });
 

@@ -26,17 +26,19 @@ sequenceDiagram
     AH->>FR: save(flashcard)
     FR->>DB: UPDATE audio_status = 'generating'
 
-    par Generación paralela
-        AH->>EL: generate(expression, voice: 'us')
+    par Generación paralela — modo expression
+        AH->>EL: generate("expression", voice: 'us', mode: 'expression')
+        note right of EL: apply_text_normalization: off\nstability: 0.85
         EL-->>AH: audioBuffer US
     and
-        AH->>EL: generate(expression, voice: 'uk')
+        AH->>EL: generate("expression", voice: 'uk', mode: 'expression')
         EL-->>AH: audioBuffer UK
     and
-        AH->>EL: generate(expression, voice: 'au')
+        AH->>EL: generate("expression", voice: 'au', mode: 'expression')
         EL-->>AH: audioBuffer AU
     and
-        AH->>EL: generate(examples concatenados, voice: 'us')
+        AH->>EL: generate(examples concatenados, voice: 'us', mode: 'examples')
+        note right of EL: normalización auto (comportamiento anterior)
         EL-->>AH: audioBuffer examples US
     end
 

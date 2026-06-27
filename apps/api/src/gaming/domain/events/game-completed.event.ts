@@ -8,6 +8,7 @@ export interface GameCompletedAttributes extends DomainEventAttributes {
   userId: string | null;
   mode: string;
   module: string | null;
+  subcategory: string | null;
   cardCount: string;
   startedAt: string;
   finishedAt: string;

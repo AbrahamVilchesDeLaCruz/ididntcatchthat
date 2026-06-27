@@ -1,11 +1,13 @@
 import type {
   FlashcardGameApiModel,
   GameSummaryApiModel,
+  PausedGameApiModel,
   ResumeGameApiResponse,
 } from './api/game.api-model';
 import type {
   FlashcardGameVM,
   GameSummaryVM,
+  PausedGameVM,
   ResumeGameVM,
 } from './game.types';
 
@@ -48,4 +50,13 @@ export const mapResumeGame = (raw: ResumeGameApiResponse): ResumeGameVM => ({
   gameId: raw.game.id,
   pendingFlashcardIds: raw.pendingFlashcardIds,
   lastFlashcardId: raw.game.lastFlashcardId,
+});
+
+export const mapPausedGame = (raw: PausedGameApiModel): PausedGameVM => ({
+  gameId: raw.id,
+  module: raw.module,
+  subcategory: raw.subcategory,
+  cardCount: Number(raw.cardCount),
+  startedAt: new Date(raw.startedAt),
+  lastFlashcardId: raw.lastFlashcardId,
 });

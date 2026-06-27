@@ -8,7 +8,7 @@ import {
   startGame,
   recordAttempts,
   waitUntil,
-  waitForWeakestFlashcard,
+  waitForUserFlashcardStatsCount,
 } from '../../progress/shared/progress-e2e.helpers';
 
 describe('ranking/search-rankings (e2e)', () => {
@@ -38,7 +38,7 @@ describe('ranking/search-rankings (e2e)', () => {
     });
 
     await recordAttempts(app, token, gameId, flashcardIds, true);
-    await waitForWeakestFlashcard(app, token, flashcardIds[0]);
+    await waitForUserFlashcardStatsCount(app, token, flashcardIds.length);
 
     await request(app.getHttpServer())
       .post(`/v1/games/${gameId}/complete`)

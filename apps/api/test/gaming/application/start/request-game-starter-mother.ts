@@ -12,6 +12,7 @@ export class RequestGameStarterMother {
       userId: UserIdMother.random().value,
       mode: GameModeMother.study().value,
       module: GameModuleMother.nativeSounds().value,
+      subcategory: null,
       cardCount: CardCountMother.ten().toNumber(),
       ...overrides,
     };
@@ -22,6 +23,7 @@ export class RequestGameStarterMother {
       userId: null,
       mode: GameModeMother.study().value,
       module: GameModuleMother.nativeSounds().value,
+      subcategory: null,
       cardCount: CardCountMother.ten().toNumber(),
       ...overrides,
     };

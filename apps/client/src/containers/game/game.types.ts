@@ -38,3 +38,13 @@ export interface ResumeGameVM {
   pendingFlashcardIds: string[];
   lastFlashcardId: string | null;
 }
+
+// ─── Paused games ─────────────────────────────────────────────────────────────
+export interface PausedGameVM {
+  gameId: string;
+  module: string | null;
+  subcategory: string | null;
+  cardCount: number;
+  startedAt: Date;
+  lastFlashcardId: string | null;
+}

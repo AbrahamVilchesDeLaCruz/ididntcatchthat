@@ -67,13 +67,31 @@ Las nuevas rutas se ubicarán bajo el namespace `/game`.
 
 ### Flujo 6 — Resumen
 
-1. En `/play/:gameId/summary`, se muestran las métricas:
+1. En `/game/:gameId/summary`, se muestran las métricas:
    - Correctas / Total.
    - Precisión (Accuracy).
    - Duración.
 2. **Acciones**:
-   - "Jugar de nuevo" (Redirige a `/play`).
-   - (Solo logged) "Elegir otro módulo" (Redirige a `/play`).
+   - "Jugar de nuevo" (Redirige a `/game`).
+   - (Solo logged) "Elegir otro módulo" (Redirige a `/game`).
+   - (Solo logged, si hay pausadas) Link a partidas pausadas.
+
+### Flujo 7 — Pausar y retomar (solo logged)
+
+> Spec detallada: [game-stats-ux.md](./game-stats-ux.md)
+
+1. En `/game/:gameId`, el usuario puede pausar (⏸). `PATCH /v1/games/:id` con `status: 'paused'`.
+2. Tras pausar → `/game` muestra `PausedGamesPanel` con partidas en curso (`GET /v1/games`).
+3. **Continuar** → navega a `/game/:id` con `state.mode: 'resume'`; el cliente llama `GET /v1/games/:id/resume` y filtra flashcards a `pendingFlashcardIds`.
+4. **Abandonar** → `PATCH` con `status: 'abandoned'`; invalida lista de pausadas.
+5. Con 5 pausadas, `POST /v1/games` devuelve `409 MaxPausedGamesReached` → `MaxPausedGamesModal` permite abandonar (FIFO o elegir) y reintentar.
+6. Refresh en `/game/:id` de partida pausada intenta resume automáticamente (sin `flashcardIds` en router state).
+
+### Flujo 8 — Stats → Practicar
+
+1. En `/stats`, drill-down por módulo (`?category=`) filtra tabla de débiles.
+2. CTA **Practicar** navega a `/game` con `{ prefillModule, prefillSubcategory }`.
+3. Tras completar partida, stats se invalidan vía TanStack Query (`statsKeys.all`).
 
 ## Componentes nuevos
 
@@ -137,3 +155,10 @@ Ubicadas en `apps/client/src/pods/gaming/api/`:
    - Este flujo no genera nuevas partidas en la API. Es un _loop_ puramente de UI. Los `flashcardIds` fallados se meten en una cola temporal y se muestran nuevamente. Solo al vaciar la cola o cancelar, se hace el `POST /v1/games/:id/complete` finalizando oficialmente la partida con las métricas finales (calculadas sobre el intento original, no las repeticiones).
 6. **Landing estática**:
    - Las tarjetas de demostración en la landing usarán datos mockeados en el cliente. No consumirán la API para asegurar que el LCP (Largest Contentful Paint) y TTI (Time to Interactive) de la landing sean instantáneos.
+7. **Layout responsive desktop**:
+   - Mobile-first en todas las pantallas de `/game`; en `lg+` (≥1024px) el layout escala sin sidebar global (se mantiene `GameShell`).
+   - Config: panel de pausadas sticky a la izquierda + formulario ancho (`max-w-5xl` grid).
+   - Partida: carta más grande + `GamePlaySidebar` con progreso y atajos de teclado.
+   - Resumen: stats en 4 columnas, CTAs en grid.
+   - Spec detallada: [game-stats-ux.md](./game-stats-ux.md) bloque I.
+   - Estilo visual: tokens de diseño existentes; evitar capas arcade (glow/shimmer) que compiten con la UI de estudio.

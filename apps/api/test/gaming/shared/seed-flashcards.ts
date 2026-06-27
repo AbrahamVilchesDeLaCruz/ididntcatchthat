@@ -13,6 +13,11 @@ const BASE_PAYLOAD = {
   examples: [],
 };
 
+export type SeedFlashcardScope = {
+  category?: string;
+  subcategory?: string;
+};
+
 /**
  * Seeds N flashcards into the test DB via the admin API,
  * then marks them as audio_status = 'ready' so the FlashcardSelector picks them up.
@@ -22,9 +27,12 @@ const BASE_PAYLOAD = {
 export async function seedFlashcards(
   app: INestApplication<App>,
   count = 15,
+  scope: SeedFlashcardScope = {},
 ): Promise<string[]> {
   const adminToken = await createAdminToken(app);
   const ids: string[] = [];
+  const category = scope.category ?? BASE_PAYLOAD.category;
+  const subcategory = scope.subcategory ?? BASE_PAYLOAD.subcategory;
 
   for (let i = 0; i < count; i++) {
     const id = crypto.randomUUID();
@@ -33,6 +41,8 @@ export async function seedFlashcards(
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         ...BASE_PAYLOAD,
+        category,
+        subcategory,
         id,
         expression: `expression-${i}-${id.slice(0, 8)}`,
       })

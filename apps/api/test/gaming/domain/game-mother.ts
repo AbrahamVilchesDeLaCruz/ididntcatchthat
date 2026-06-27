@@ -15,6 +15,7 @@ export class GameMother {
       userId: string | null;
       mode: string;
       module: string | null;
+      subcategory: string | null;
       cardCount: string;
       flashcardIds: string[];
     }>,
@@ -23,6 +24,7 @@ export class GameMother {
       overrides?.userId ?? UserIdMother.random().value,
       overrides?.mode ?? GameModeMother.study().value,
       overrides?.module ?? GameModuleMother.nativeSounds().value,
+      overrides?.subcategory ?? null,
       overrides?.cardCount ?? CardCountMother.ten().value,
       overrides?.flashcardIds ?? GameMother.randomFlashcardIds(),
     );
@@ -33,6 +35,7 @@ export class GameMother {
       userId: string | null;
       mode: string;
       module: string | null;
+      subcategory: string | null;
       cardCount: string;
       flashcardIds: string[];
     }>,
@@ -45,6 +48,7 @@ export class GameMother {
       userId: string | null;
       mode: string;
       module: string | null;
+      subcategory: string | null;
       cardCount: string;
       flashcardIds: string[];
     }>,
@@ -62,6 +66,7 @@ export class GameMother {
       userId: string | null;
       mode: string;
       module: string | null;
+      subcategory: string | null;
       cardCount: string;
     }>,
   ): Game {
@@ -80,6 +85,7 @@ export class GameMother {
       userId: UserIdMother.random().value,
       mode: GameModeMother.study().value,
       module: GameModuleMother.nativeSounds().value,
+      subcategory: null,
       cardCount: CardCountMother.ten().value,
       status: 'in_progress',
       flashcardIds,

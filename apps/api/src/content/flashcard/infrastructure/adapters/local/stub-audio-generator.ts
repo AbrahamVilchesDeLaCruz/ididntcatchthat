@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import {
   type AudioGenerator,
   type AudioAccent,
+  type AudioGenerationMode,
 } from '@/content/flashcard/domain/audio-generator';
 
 let cachedSampleAudio: Buffer | null = null;
@@ -20,7 +21,11 @@ function loadSampleAudio(): Buffer {
 
 @Injectable()
 export class StubAudioGenerator implements AudioGenerator {
-  generate(_text: string, _accent: AudioAccent): Promise<Buffer> {
+  generate(
+    _text: string,
+    _accent: AudioAccent,
+    _mode: AudioGenerationMode,
+  ): Promise<Buffer> {
     return Promise.resolve(loadSampleAudio());
   }
 }

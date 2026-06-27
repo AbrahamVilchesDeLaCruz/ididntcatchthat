@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { mapModuleProgress, mapWeakFlashcard } from '../stats.mapper';
+import {
+  mapModuleProgress,
+  mapSubcategoryProgress,
+  mapWeakFlashcard,
+} from '../stats.mapper';
 import type { WeakFlashcardApiModel } from '../api/stats.api-model';
 import type { ModuleProgressApiModel } from '../api/stats.api-model';
 
@@ -21,12 +25,30 @@ describe('stats/mapModuleProgress', () => {
   });
 });
 
+describe('mapSubcategoryProgress', () => {
+  it('converts accuracy from 0-1 to percentage', () => {
+    const result = mapSubcategoryProgress({
+      category: 'native_sounds',
+      subcategory: 'b_ball',
+      totalAttempts: 20,
+      correctCount: 15,
+      accuracy: 0.75,
+    });
+
+    expect(result.accuracy).toBe(75);
+    expect(result.category).toBe('native_sounds');
+    expect(result.subcategory).toBe('b_ball');
+  });
+});
+
 describe('stats/mapWeakFlashcard', () => {
   it('maps weakest flashcard api model including expression', () => {
     const raw: WeakFlashcardApiModel = {
       flashcardId: 'fc-1',
       expression: 'gonna',
       module: 'connected_speech',
+      category: 'connected_speech',
+      subcategory: 'informal_going_to',
       errorCount: 6,
       lastSeenAt: '2026-02-01T10:00:00.000Z',
     };
@@ -46,6 +68,8 @@ describe('stats/mapWeakFlashcard', () => {
       flashcardId: 'fc-2',
       expression: 'wanna',
       module: 'connected_speech',
+      category: 'connected_speech',
+      subcategory: 'informal_want_to',
       errorCount: 2,
       lastSeenAt: '2026-03-01T10:00:00.000Z',
     };
@@ -53,5 +77,21 @@ describe('stats/mapWeakFlashcard', () => {
     const vm = mapWeakFlashcard(raw);
 
     expect(vm.expression).toBe('wanna');
+  });
+
+  it('falls back to module when category is missing', () => {
+    const raw = {
+      flashcardId: 'fc-3',
+      expression: 'kinda',
+      module: 'real_talk',
+      subcategory: 'informal_kind_of',
+      errorCount: 4,
+      lastSeenAt: '2026-04-01T10:00:00.000Z',
+    } as WeakFlashcardApiModel;
+
+    const vm = mapWeakFlashcard(raw);
+
+    expect(vm.module).toBe('real_talk');
+    expect(vm.category).toBe('real_talk');
   });
 });

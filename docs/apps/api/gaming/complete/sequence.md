@@ -40,3 +40,27 @@ sequenceDiagram
     UC-->>C: { correctCount, totalCount, accuracy, duration }
     C-->>U: 200 { summary }
 ```
+
+## GET Summary — recuperación de resumen
+
+```mermaid
+sequenceDiagram
+    actor U as Usuario / Guest
+    participant C as GetGameSummaryGetController
+    participant UC as GameSummaryFinder
+    participant GR as GameRepository
+
+    U->>C: GET /games/:id/summary
+    C->>UC: execute({ gameId, userId })
+    UC->>GR: search(gameId)
+    GR-->>UC: game
+
+    alt pendingFlashcardIds.length > 0
+        UC-->>C: throw GameNotFinished
+        C-->>U: 422
+    else all attempts recorded or completed
+        UC-->>UC: game.completionStats()
+        UC-->>C: { correctCount, totalCount, accuracy, duration }
+        C-->>U: 200
+    end
+```

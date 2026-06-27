@@ -29,6 +29,7 @@ export type GameModule =
 export interface StartGamePayload {
   mode: 'game';
   module: GameModule | null;
+  subcategory?: string | null;
   cardCount: 10 | 20 | 50;
 }
 
@@ -64,6 +65,7 @@ export interface ResumeGameApiResponse {
     userId: string | null;
     mode: string;
     module: string | null;
+    subcategory: string | null;
     cardCount: string;
     status: string;
     flashcardIds: string[];
@@ -74,3 +76,6 @@ export interface ResumeGameApiResponse {
   };
   pendingFlashcardIds: string[];
 }
+
+// ─── Paused games (GET /v1/games) ─────────────────────────────────────────────
+export type PausedGameApiModel = ResumeGameApiResponse['game'];

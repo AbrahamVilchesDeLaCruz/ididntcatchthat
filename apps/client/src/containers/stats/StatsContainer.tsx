@@ -1,31 +1,105 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuthStore } from '@/core/store/auth.store';
 import { useStatsState } from './hooks';
 import { StatsComponent } from './StatsComponent';
+import { StatsSectionSkeleton } from './components/StatsSectionSkeleton';
+import { useI18n } from '@/core/i18n';
 
 export const StatsContainer = (): ReactElement => {
-  const { moduleProgress, weakestFlashcards, isLoading, isError } =
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useI18n();
+  const userType = useAuthStore((s) => s.userType);
+  const isGuest = userType === 'guest';
+
+  const selectedCategory = searchParams.get('category');
+
+  const { moduleProgress, subcategoryProgress, weakestFlashcards } =
     useStatsState();
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-brand)] border-t-transparent" />
-      </div>
-    );
-  }
+  const setSelectedCategory = useCallback(
+    (category: string | null): void => {
+      if (category) {
+        setSearchParams({ category });
+      } else {
+        setSearchParams({});
+      }
+    },
+    [setSearchParams],
+  );
 
-  if (isError) {
+  useEffect(() => {
+    const param = searchParams.get('category');
+    if (param && moduleProgress.data && moduleProgress.data.length > 0) {
+      const exists = moduleProgress.data.some((m) => m.module === param);
+      if (!exists) {
+        setSearchParams({});
+      }
+    }
+  }, [moduleProgress.data, searchParams, setSearchParams]);
+
+  const handlePractice = useCallback(
+    (module: string, subcategory: string | null): void => {
+      if (isGuest) {
+        void navigate('/auth/login');
+        return;
+      }
+      void navigate('/game', {
+        state: {
+          prefillModule: module,
+          prefillSubcategory: subcategory,
+        },
+      });
+    },
+    [isGuest, navigate],
+  );
+
+  const modules = moduleProgress.data ?? [];
+  const subcategories = subcategoryProgress.data ?? [];
+  const weakFlashcards = useMemo(
+    () => (weakestFlashcards.data ?? []).filter((w) => w.errorCount > 0),
+    [weakestFlashcards.data],
+  );
+
+  const isInitialLoading =
+    moduleProgress.isLoading &&
+    subcategoryProgress.isLoading &&
+    weakestFlashcards.isLoading;
+
+  if (isInitialLoading) {
     return (
-      <div className="text-[var(--color-accent-red)] text-center py-16">
-        Error al cargar el progreso. Intentalo de nuevo.
+      <div className="space-y-8">
+        <StatsSectionSkeleton height="h-8" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <StatsSectionSkeleton />
+          <StatsSectionSkeleton />
+        </div>
       </div>
     );
   }
 
   return (
     <StatsComponent
-      modules={moduleProgress.data ?? []}
-      weakFlashcards={weakestFlashcards.data ?? []}
+      modules={modules}
+      subcategories={subcategories}
+      weakFlashcards={weakFlashcards}
+      selectedCategory={selectedCategory}
+      moduleLoading={moduleProgress.isLoading}
+      moduleError={moduleProgress.isError}
+      subcategoryLoading={subcategoryProgress.isLoading}
+      subcategoryError={subcategoryProgress.isError}
+      weakLoading={weakestFlashcards.isLoading}
+      weakError={weakestFlashcards.isError}
+      onCategorySelect={setSelectedCategory}
+      onCategoryClear={() => setSelectedCategory(null)}
+      onRetryModules={() => void moduleProgress.refetch()}
+      onRetrySubcategories={() => void subcategoryProgress.refetch()}
+      onRetryWeak={() => void weakestFlashcards.refetch()}
+      onPractice={handlePractice}
+      emptyGlobalCta={() => void navigate('/game')}
+      loadErrorLabel={t.stats.loadError}
+      retryLabel={t.stats.retry}
     />
   );
 };
