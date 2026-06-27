@@ -1,16 +1,8 @@
 import { type ReactElement, useMemo } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import { useI18n } from '@/core/i18n';
 import { useFlashcardCatalog } from '@/core/api/flashcard-catalog.api';
 import { MasteryBadge } from './MasteryBadge';
+import { AccuracyProgressBar } from './AccuracyProgressBar';
 import { StatsSectionSkeleton } from './StatsSectionSkeleton';
 import type { ModuleProgressVM, SubcategoryProgressVM } from '../stats.types';
 
@@ -27,7 +19,7 @@ interface SubcategoryProgressPanelProps {
   retryLabel?: string;
 }
 
-type ChartRow = SubcategoryProgressVM & { subcategoryLabel: string };
+type SubcategoryRow = SubcategoryProgressVM & { subcategoryLabel: string };
 
 export const SubcategoryProgressPanel = ({
   category,
@@ -50,17 +42,19 @@ export const SubcategoryProgressPanel = ({
     [category, data],
   );
 
-  const chartData = useMemo<ChartRow[]>(() => {
+  const rows = useMemo<SubcategoryRow[]>(() => {
     const categoryMeta = catalog?.categories.find((c) => c.value === category);
-    return filtered.map((row) => {
-      const subMeta = categoryMeta?.subcategories.find(
-        (s) => s.value === row.subcategory,
-      );
-      return {
-        ...row,
-        subcategoryLabel: subMeta?.label[locale] ?? row.subcategory,
-      };
-    });
+    return [...filtered]
+      .map((row) => {
+        const subMeta = categoryMeta?.subcategories.find(
+          (s) => s.value === row.subcategory,
+        );
+        return {
+          ...row,
+          subcategoryLabel: subMeta?.label[locale] ?? row.subcategory,
+        };
+      })
+      .sort((a, b) => b.accuracy - a.accuracy);
   }, [catalog, category, filtered, locale]);
 
   const categoryLabel =
@@ -92,87 +86,80 @@ export const SubcategoryProgressPanel = ({
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div>
+          <button
+            type="button"
+            onClick={onBack}
+            className="mb-2 text-xs font-medium text-[var(--color-brand)] hover:underline"
+          >
+            {st.backToModules}
+          </button>
           <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
-            {categoryLabel} {st.subcategoryTitleSuffix}
+            {categoryLabel}
           </h2>
+          <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
+            {st.subcategoryHint}
+          </p>
           {moduleProgress ? (
-            <div className="mt-1 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <MasteryBadge level={moduleProgress.masteryLevel} />
               <span className="text-xs text-[var(--color-text-muted)]">
-                {moduleProgress.totalAttempts} intentos
+                {st.attemptsLabel.replace(
+                  '{count}',
+                  String(moduleProgress.totalAttempts),
+                )}
+              </span>
+              <span className="text-xs font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                {Math.round(moduleProgress.accuracy)}%
               </span>
             </div>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-[var(--color-brand)] hover:underline shrink-0"
-        >
-          {st.backToModules}
-        </button>
       </div>
 
-      {chartData.length === 0 ? (
-        <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
+      {rows.length === 0 ? (
+        <p className="py-16 text-center text-sm text-[var(--color-text-secondary)]">
           {st.noSubcategoryData}
         </p>
       ) : (
         <>
-          <div className="mb-4 w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 8, right: 16, left: 0, bottom: 8 }}
+          <ul className="mb-4 space-y-3">
+            {rows.map((row) => (
+              <li
+                key={row.subcategory}
+                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-4"
               >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.08)"
-                />
-                <XAxis
-                  dataKey="subcategoryLabel"
-                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={0}
-                  angle={-25}
-                  textAnchor="end"
-                  height={60}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tickFormatter={(v: number) => `${v}%`}
-                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--color-bg-surface)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '8px',
-                    color: 'var(--color-text-primary)',
-                  }}
-                  formatter={(value, _name, item) => {
-                    const num =
-                      typeof value === 'number' ? value : Number(value ?? 0);
-                    const row = item.payload as ChartRow;
-                    return [
-                      `${num.toFixed(1)}% · ${row.totalAttempts} intentos`,
-                      row.subcategoryLabel,
-                    ];
-                  }}
-                />
-                <Bar
-                  dataKey="accuracy"
-                  fill="var(--color-brand)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-[var(--color-text-primary)]">
+                      {row.subcategoryLabel}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                      {st.attemptsLabel.replace(
+                        '{count}',
+                        String(row.totalAttempts),
+                      )}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xl font-bold tabular-nums text-[var(--color-text-primary)]">
+                    {Math.round(row.accuracy)}%
+                  </span>
+                </div>
+                <AccuracyProgressBar value={row.accuracy} className="mt-3" />
+                <button
+                  type="button"
+                  onClick={() => onPractice(row.subcategory)}
+                  className="mt-3 w-full rounded-full border border-[var(--color-border-strong)] py-2 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand-light)]"
+                >
+                  {st.practiceSubcategory.replace(
+                    '{name}',
+                    row.subcategoryLabel,
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
           <button
             type="button"
             onClick={() => onPractice(null)}

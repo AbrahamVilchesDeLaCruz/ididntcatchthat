@@ -1,10 +1,11 @@
 # Spec: Progress — Bounded Context Progress
 
-**Estado**: Borrador  
-**Fecha**: 2026-05-27  
+**Estado**: Implementado  
+**Fecha**: 2026-05-27 (actualizado 2026-06-27 — Progress UX v2)  
 **BC**: Progress  
 **Scope**: API (`apps/api/src/progress/`)  
-**Tasks**: [docs/tasks/progress.md](../tasks/progress.md)
+**Tasks**: [docs/tasks/progress.md](../tasks/progress.md), [docs/tasks/progress-ux-v2.md](../tasks/progress-ux-v2.md)  
+**Spec v2**: [docs/spec/progress-ux-v2.md](../spec/progress-ux-v2.md)
 
 ---
 
@@ -21,6 +22,8 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 | Actor | Caso de uso                | Endpoint                           |
 | ----- | -------------------------- | ---------------------------------- |
 | User  | Ver progreso por módulo    | `GET /progress/modules`            |
+| User  | Ver progreso por subcategoría | `GET /progress/subcategories`   |
+| User  | Ver resumen hero KPI       | `GET /progress/summary`            |
 | User  | Ver flashcards más débiles | `GET /progress/flashcards/weakest` |
 
 > Ambos endpoints requieren usuario autenticado. No existen equivalentes para guests — el progreso guest no se persiste en este BC.

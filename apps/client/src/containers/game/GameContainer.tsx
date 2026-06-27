@@ -3,10 +3,12 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import {
   useGameFlashcards,
   useRecordAttempt,
@@ -39,6 +41,8 @@ export const GameContainer = (): ReactElement => {
 
   const [completeError, setCompleteError] = useState<string | null>(null);
   const [pauseError, setPauseError] = useState<string | null>(null);
+  const failedCardsRef = useRef<{ id: string; expression: string }[]>([]);
+  const completeRef = useRef<() => void>(() => undefined);
 
   const { data: flashcards = [], isLoading: isLoadingFlashcards } =
     useGameFlashcards(gameId ?? '');
@@ -65,16 +69,43 @@ export const GameContainer = (): ReactElement => {
     return flashcards.filter((f) => pendingSet.has(f.id));
   }, [flashcards, isResumeMode, resumeData]);
 
-  const navigateToSummary = (summary: GameSummaryVM): void => {
-    if (gameId) saveGameSummary(gameId, summary);
-    void navigate(`/game/${gameId ?? ''}/summary`, {
-      state: { summary },
-      replace: true,
-    });
-  };
+  const navigateToSummary = useCallback(
+    (summary: GameSummaryVM): void => {
+      const enriched: GameSummaryVM = {
+        ...summary,
+        failedCards: failedCardsRef.current,
+      };
 
-  const runCompleteGame = (): void => {
+      if (userType === 'guest' && gameId) {
+        useGuestStatsStore.getState().recordGameComplete({
+          gameId,
+          correctCount: enriched.correctCount,
+          totalCount: enriched.totalCount,
+          durationMs: enriched.duration * 1000,
+          failedFlashcardIds: failedCardsRef.current.map((c) => c.id),
+        });
+      }
+
+      if (gameId) saveGameSummary(gameId, enriched);
+      void navigate(`/game/${gameId ?? ''}/summary`, {
+        state: { summary: enriched },
+        replace: true,
+      });
+    },
+    [gameId, navigate, userType],
+  );
+
+  const session = useGameSession({
+    flashcards: sessionFlashcards,
+    onOriginalQueueComplete: () => completeRef.current(),
+  });
+
+  const runCompleteGame = useCallback((): void => {
     if (!gameId) return;
+    failedCardsRef.current = session.wrongFlashcardIds
+      .map((id) => sessionFlashcards.find((f) => f.id === id))
+      .filter((f): f is FlashcardGameVM => f !== undefined)
+      .map((f) => ({ id: f.id, expression: f.expression }));
     setCompleteError(null);
     completeGame(gameId, {
       onSuccess: navigateToSummary,
@@ -84,12 +115,17 @@ export const GameContainer = (): ReactElement => {
         );
       },
     });
-  };
+  }, [
+    completeGame,
+    gameId,
+    navigateToSummary,
+    session.wrongFlashcardIds,
+    sessionFlashcards,
+  ]);
 
-  const session = useGameSession({
-    flashcards: sessionFlashcards,
-    onOriginalQueueComplete: runCompleteGame,
-  });
+  useEffect(() => {
+    completeRef.current = runCompleteGame;
+  }, [runCompleteGame]);
 
   const isLoading =
     isLoadingFlashcards ||

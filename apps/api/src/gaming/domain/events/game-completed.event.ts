@@ -9,7 +9,10 @@ export interface GameCompletedAttributes extends DomainEventAttributes {
   mode: string;
   module: string | null;
   subcategory: string | null;
+  source: string;
   cardCount: string;
+  correctCount: number;
+  totalCount: number;
   startedAt: string;
   finishedAt: string;
 }

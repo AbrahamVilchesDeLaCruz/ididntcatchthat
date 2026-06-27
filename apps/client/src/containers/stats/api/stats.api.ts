@@ -4,16 +4,22 @@ import {
   mapModuleProgress,
   mapSubcategoryProgress,
   mapWeakFlashcard,
+  mapProgressSummary,
+  mapAchievement,
 } from '../stats.mapper';
 import type {
   ModuleProgressApiModel,
   SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
+  ProgressSummaryApiModel,
+  AchievementApiModel,
 } from './stats.api-model';
 import type {
   ModuleProgressVM,
   SubcategoryProgressVM,
   WeakFlashcardVM,
+  ProgressSummaryVM,
+  AchievementVM,
 } from '../stats.types';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
@@ -22,13 +28,16 @@ export const statsKeys = {
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
   subcategories: ['stats', 'subcategories'] as const,
+  summary: ['stats', 'summary'] as const,
+  achievements: ['stats', 'achievements'] as const,
 };
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useModuleProgress = () => {
+export const useModuleProgress = (enabled = true) => {
   return useQuery({
     queryKey: statsKeys.modules,
+    enabled,
     queryFn: async (): Promise<ModuleProgressVM[]> => {
       const res = await apiClient.get<{ data: ModuleProgressApiModel[] }>(
         '/progress/modules',
@@ -39,9 +48,10 @@ export const useModuleProgress = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useWeakestFlashcards = () => {
+export const useWeakestFlashcards = (enabled = true) => {
   return useQuery({
     queryKey: statsKeys.weakest,
+    enabled,
     queryFn: async (): Promise<WeakFlashcardVM[]> => {
       const res = await apiClient.get<{ data: WeakFlashcardApiModel[] }>(
         '/progress/flashcards/weakest',
@@ -52,14 +62,44 @@ export const useWeakestFlashcards = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useSubcategoryProgress = () => {
+export const useSubcategoryProgress = (enabled = true) => {
   return useQuery({
     queryKey: statsKeys.subcategories,
+    enabled,
     queryFn: async (): Promise<SubcategoryProgressVM[]> => {
       const res = await apiClient.get<{ data: SubcategoryProgressApiModel[] }>(
         '/progress/subcategories',
       );
       return res.data.data.map(mapSubcategoryProgress);
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useProgressSummary = (enabled = true) => {
+  return useQuery({
+    queryKey: statsKeys.summary,
+    enabled,
+    queryFn: async (): Promise<ProgressSummaryVM> => {
+      const res = await apiClient.get<{ data: ProgressSummaryApiModel }>(
+        '/progress/summary',
+      );
+      return mapProgressSummary(res.data.data);
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useAchievements = (since?: string, enabled = true) => {
+  return useQuery({
+    queryKey: [...statsKeys.achievements, since ?? 'all'] as const,
+    enabled,
+    queryFn: async (): Promise<AchievementVM[]> => {
+      const res = await apiClient.get<{ data: AchievementApiModel[] }>(
+        '/achievements',
+        { params: since ? { since } : undefined },
+      );
+      return res.data.data.map(mapAchievement);
     },
   });
 };

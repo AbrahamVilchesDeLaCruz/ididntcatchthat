@@ -1,8 +1,10 @@
 import { type ReactElement, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useStartGame } from '@/containers/game/api/game.api';
 import { useStatsState } from './hooks';
 import { StatsComponent } from './StatsComponent';
+import { GuestStatsPanel } from './components/GuestStatsPanel';
 import { StatsSectionSkeleton } from './components/StatsSectionSkeleton';
 import { useI18n } from '@/core/i18n';
 
@@ -15,8 +17,15 @@ export const StatsContainer = (): ReactElement => {
 
   const selectedCategory = searchParams.get('category');
 
-  const { moduleProgress, subcategoryProgress, weakestFlashcards } =
-    useStatsState();
+  const {
+    moduleProgress,
+    subcategoryProgress,
+    weakestFlashcards,
+    progressSummary,
+    achievements,
+  } = useStatsState({ enabled: !isGuest });
+
+  const { mutate: startGame, isPending: isStartingWeakest } = useStartGame();
 
   const setSelectedCategory = useCallback(
     (category: string | null): void => {
@@ -55,22 +64,47 @@ export const StatsContainer = (): ReactElement => {
     [isGuest, navigate],
   );
 
+  const handlePracticeWeakest = useCallback((): void => {
+    if (isGuest) {
+      void navigate('/auth/register');
+      return;
+    }
+    startGame(
+      { mode: 'game', module: null, cardCount: 10, source: 'weakest' },
+      {
+        onSuccess: ({ gameId, flashcardIds }) => {
+          void navigate(`/game/${gameId}`, {
+            state: { flashcardIds },
+          });
+        },
+      },
+    );
+  }, [isGuest, navigate, startGame]);
+
   const modules = moduleProgress.data ?? [];
   const subcategories = subcategoryProgress.data ?? [];
   const weakFlashcards = useMemo(
-    () => (weakestFlashcards.data ?? []).filter((w) => w.errorCount > 0),
+    () => weakestFlashcards.data ?? [],
     [weakestFlashcards.data],
   );
+
+  if (isGuest) {
+    return (
+      <GuestStatsPanel onRegister={() => void navigate('/auth/register')} />
+    );
+  }
 
   const isInitialLoading =
     moduleProgress.isLoading &&
     subcategoryProgress.isLoading &&
-    weakestFlashcards.isLoading;
+    weakestFlashcards.isLoading &&
+    progressSummary.isLoading;
 
   if (isInitialLoading) {
     return (
       <div className="space-y-8">
         <StatsSectionSkeleton height="h-8" />
+        <StatsSectionSkeleton height="h-24" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <StatsSectionSkeleton />
           <StatsSectionSkeleton />
@@ -81,6 +115,11 @@ export const StatsContainer = (): ReactElement => {
 
   return (
     <StatsComponent
+      summary={progressSummary.data ?? null}
+      summaryLoading={progressSummary.isLoading || isStartingWeakest}
+      summaryError={progressSummary.isError}
+      achievements={achievements.data ?? []}
+      achievementsLoading={achievements.isLoading}
       modules={modules}
       subcategories={subcategories}
       weakFlashcards={weakFlashcards}
@@ -91,12 +130,16 @@ export const StatsContainer = (): ReactElement => {
       subcategoryError={subcategoryProgress.isError}
       weakLoading={weakestFlashcards.isLoading}
       weakError={weakestFlashcards.isError}
+      isGuest={isGuest}
       onCategorySelect={setSelectedCategory}
       onCategoryClear={() => setSelectedCategory(null)}
       onRetryModules={() => void moduleProgress.refetch()}
       onRetrySubcategories={() => void subcategoryProgress.refetch()}
       onRetryWeak={() => void weakestFlashcards.refetch()}
+      onRetrySummary={() => void progressSummary.refetch()}
       onPractice={handlePractice}
+      onPracticeWeakest={handlePracticeWeakest}
+      onGuestRegister={() => void navigate('/auth/register')}
       emptyGlobalCta={() => void navigate('/game')}
       loadErrorLabel={t.stats.loadError}
       retryLabel={t.stats.retry}

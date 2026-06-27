@@ -11,8 +11,17 @@ export interface WeakestFlashcardDto {
   lastSeenAt: string;
 }
 
+export interface WeakestFlashcardFilters {
+  module?: string;
+  subcategory?: string;
+}
+
 export interface WeakestFlashcardQuery {
-  findWeakest(userId: UserId, limit: number): Promise<WeakestFlashcardDto[]>;
+  findWeakest(
+    userId: UserId,
+    limit: number,
+    filters?: WeakestFlashcardFilters,
+  ): Promise<WeakestFlashcardDto[]>;
 }
 
 export const WEAKEST_FLASHCARD_QUERY = Symbol('WeakestFlashcardQuery');

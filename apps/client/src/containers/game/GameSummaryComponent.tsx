@@ -10,6 +10,7 @@ interface GameSummaryComponentProps {
   onViewPaused?: () => void;
   onRegister: () => void;
   onViewStats: () => void;
+  onPracticeWeakest?: () => void;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -33,6 +34,7 @@ export const GameSummaryComponent = ({
   onViewPaused,
   onRegister,
   onViewStats,
+  onPracticeWeakest,
 }: GameSummaryComponentProps): ReactElement => {
   const { t } = useI18n();
   const gs = t.game.summary;
@@ -63,6 +65,19 @@ export const GameSummaryComponent = ({
             value={formatDuration(summary.duration)}
           />
         </div>
+
+        {(summary.failedCards?.length ?? 0) > 0 ? (
+          <div className="mb-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-4">
+            <p className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">
+              {gs.failedCardsTitle}
+            </p>
+            <ul className="space-y-1 text-sm text-[var(--color-text-secondary)]">
+              {summary.failedCards!.slice(0, 5).map((card) => (
+                <li key={card.id}>{card.expression}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {isGuest ? (
           <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-center">
@@ -120,6 +135,15 @@ export const GameSummaryComponent = ({
             >
               {gs.ctaViewStats}
             </button>
+            {onPracticeWeakest ? (
+              <button
+                type="button"
+                onClick={onPracticeWeakest}
+                className="w-full rounded-full border border-[var(--color-brand)] py-3 text-sm font-semibold text-[var(--color-brand-light)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
+              >
+                {gs.ctaPracticeWeakest}
+              </button>
+            ) : null}
           </div>
         )}
       </div>

@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
 import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
-import { useLogin, useRegister, useGuestAuth } from './api';
+import { useLogin, useRegister, useGuestAuth, useMigrateGuest } from './api';
+import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import type {
   AuthMode,
   LoginFormValues,
@@ -66,7 +67,40 @@ export const AuthContainer = (): ReactElement => {
   const { mutate: login, isPending: isLoginPending } = useLogin();
   const { mutate: register, isPending: isRegisterPending } = useRegister();
   const { mutate: guestAuth } = useGuestAuth();
+  const { mutate: migrateGuest } = useMigrateGuest();
   const guestAuthStarted = useRef(false);
+
+  const finishAuth = (
+    accessToken: string,
+    previousGuestDeviceId: string | null,
+  ): void => {
+    const navigateAfterAuth = (): void => {
+      void navigate(
+        getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
+        { replace: true },
+      );
+    };
+
+    if (!previousGuestDeviceId) {
+      navigateAfterAuth();
+      return;
+    }
+
+    const payload = useGuestStatsStore
+      .getState()
+      .buildMigratePayload(previousGuestDeviceId);
+    if (payload.guestGames.length === 0) {
+      navigateAfterAuth();
+      return;
+    }
+
+    migrateGuest(payload, {
+      onSettled: () => {
+        useGuestStatsStore.getState().reset();
+        navigateAfterAuth();
+      },
+    });
+  };
 
   // Obtener token de guest al montar si no hay uno ya guardado
   useEffect(() => {
@@ -95,12 +129,10 @@ export const AuthContainer = (): ReactElement => {
       { ...values, guestDeviceId: guestDeviceId ?? undefined },
       {
         onSuccess: ({ accessToken }) => {
+          const previousGuestDeviceId = guestDeviceId;
           setAccessToken(accessToken);
           clearGuestDeviceId();
-          void navigate(
-            getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
-            { replace: true },
-          );
+          finishAuth(accessToken, previousGuestDeviceId);
         },
         onError: (error) => {
           setServerError(mapAuthError(error));
@@ -115,12 +147,10 @@ export const AuthContainer = (): ReactElement => {
       { ...values, guestDeviceId: guestDeviceId ?? undefined },
       {
         onSuccess: ({ accessToken }) => {
+          const previousGuestDeviceId = guestDeviceId;
           setAccessToken(accessToken);
           clearGuestDeviceId();
-          void navigate(
-            getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
-            { replace: true },
-          );
+          finishAuth(accessToken, previousGuestDeviceId);
         },
         onError: (error) => {
           setServerError(mapAuthError(error));

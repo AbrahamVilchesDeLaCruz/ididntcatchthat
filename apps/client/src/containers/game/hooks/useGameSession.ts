@@ -18,6 +18,7 @@ interface UseGameSessionResult {
   correctCount: number;
   incorrectCount: number;
   wrongCount: number;
+  wrongFlashcardIds: string[];
   setIsFlipped: (flipped: boolean) => void;
   toggleFlip: () => void;
   recordAnswer: (correct: boolean) => void;
@@ -125,6 +126,7 @@ export function useGameSession({
     correctCount,
     incorrectCount,
     wrongCount: wrongIds.length,
+    wrongFlashcardIds: wrongIds,
     setIsFlipped,
     toggleFlip,
     recordAnswer,

@@ -4,6 +4,7 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { GameModeMother } from '@test/gaming/domain/game-mode-mother';
 import { GameModuleMother } from '@test/gaming/domain/game-module-mother';
 import { CardCountMother } from '@test/gaming/domain/card-count-mother';
+import { GameSourceValue } from '@/gaming/domain/game-source';
 
 export class GameMother {
   static randomFlashcardIds(count = 3): string[] {
@@ -16,6 +17,7 @@ export class GameMother {
       mode: string;
       module: string | null;
       subcategory: string | null;
+      source?: string;
       cardCount: string;
       flashcardIds: string[];
     }>,
@@ -25,6 +27,7 @@ export class GameMother {
       overrides?.mode ?? GameModeMother.study().value,
       overrides?.module ?? GameModuleMother.nativeSounds().value,
       overrides?.subcategory ?? null,
+      overrides?.source ?? GameSourceValue.Catalog,
       overrides?.cardCount ?? CardCountMother.ten().value,
       overrides?.flashcardIds ?? GameMother.randomFlashcardIds(),
     );
@@ -86,6 +89,7 @@ export class GameMother {
       mode: GameModeMother.study().value,
       module: GameModuleMother.nativeSounds().value,
       subcategory: null,
+      source: GameSourceValue.Catalog,
       cardCount: CardCountMother.ten().value,
       status: 'in_progress',
       flashcardIds,
