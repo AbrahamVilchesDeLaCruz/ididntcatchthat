@@ -25,3 +25,21 @@ export interface SubcategoryProgressVM {
   correctCount: number;
   accuracy: number;
 }
+
+export interface ProgressSummaryVM {
+  currentStreak: number;
+  longestStreak: number;
+  accuracy7d: number;
+  totalAttempts: number;
+  weakCount: number;
+  masteredCount: number;
+  gamesCompleted: number;
+  lastPlayedAt: Date | null;
+}
+
+export interface AchievementVM {
+  key: string;
+  title: string;
+  description: string;
+  unlockedAt: Date | null;
+}

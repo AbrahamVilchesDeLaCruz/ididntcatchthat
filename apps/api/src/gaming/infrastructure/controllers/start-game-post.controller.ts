@@ -31,6 +31,7 @@ export class StartGamePostController {
       module: body.module ?? null,
       subcategory: body.subcategory ?? null,
       cardCount: body.cardCount,
+      source: body.source,
     });
   }
 }

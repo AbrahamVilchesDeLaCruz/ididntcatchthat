@@ -11,6 +11,7 @@ import { ContentModule } from './content/shared/infrastructure/framework/content
 import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { ProgressModule } from './progress/infrastructure/framework/progress.module';
 import { RankingModule } from './ranking/infrastructure/framework/ranking.module';
+import { AchievementModule } from './achievement/infrastructure/framework/achievement.module';
 import { buildTypeOrmDataSourceOptions } from './shared/infrastructure/persistence/typeorm/typeorm-data-source-options';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 
@@ -49,6 +50,7 @@ import { envValidationSchema } from './shared/infrastructure/config/env.validati
     GamingModule,
     ProgressModule,
     RankingModule,
+    AchievementModule,
   ],
   providers: [
     {

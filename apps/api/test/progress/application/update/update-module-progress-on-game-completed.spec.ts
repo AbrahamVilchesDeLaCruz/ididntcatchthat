@@ -3,6 +3,7 @@ import { type DomainEventConsumer } from '@/shared/application/domain-event-cons
 import { type ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
 import { ModuleProgressUpdaterOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
 import { GameCompletedEvent } from '@/gaming/domain/events/game-completed.event';
+import { GameSourceValue } from '@/gaming/domain/game-source';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 
 describe('progress/application/update ModuleProgressUpdaterOnGameCompleted', () => {
@@ -24,7 +25,10 @@ describe('progress/application/update ModuleProgressUpdaterOnGameCompleted', () 
       module:
         overrides?.module !== undefined ? overrides.module : 'native_sounds',
       subcategory: null,
+      source: GameSourceValue.Catalog,
       cardCount: '10',
+      correctCount: 8,
+      totalCount: 10,
       startedAt: new Date().toISOString(),
       finishedAt: new Date().toISOString(),
     });

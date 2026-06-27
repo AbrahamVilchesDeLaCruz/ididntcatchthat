@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
   type WeakestFlashcardDto,
+  type WeakestFlashcardFilters,
   type WeakestFlashcardQuery,
 } from '@/progress/domain/weakest-flashcard.query';
 import { type UserId } from '@/shared/domain/user-id';
@@ -26,7 +27,27 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
   async findWeakest(
     userId: UserId,
     limit: number,
+    filters?: WeakestFlashcardFilters,
   ): Promise<WeakestFlashcardDto[]> {
+    const params: unknown[] = [userId.value];
+    const conditions = [
+      'ufs.user_id = $1',
+      'ufs.times_played > 0',
+      '(ufs.times_played - ufs.correct_count) > 0',
+    ];
+
+    if (filters?.module) {
+      params.push(filters.module);
+      conditions.push(`f.category = $${params.length}`);
+    }
+    if (filters?.subcategory) {
+      params.push(filters.subcategory);
+      conditions.push(`f.subcategory = $${params.length}`);
+    }
+
+    params.push(limit);
+    const limitParam = `$${params.length}`;
+
     const rows = await this.dataSource.query<WeakestFlashcardRow[]>(
       `SELECT
          ufs.flashcard_id,
@@ -37,12 +58,10 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
          ufs.last_seen_at
        FROM user_flashcard_stats ufs
        JOIN flashcards f ON f.id = ufs.flashcard_id
-       WHERE ufs.user_id = $1
-         AND ufs.times_played > 0
-         AND (ufs.times_played - ufs.correct_count) > 0
+       WHERE ${conditions.join(' AND ')}
        ORDER BY error_count DESC, ufs.accuracy_rate ASC
-       LIMIT $2`,
-      [userId.value, limit],
+       LIMIT ${limitParam}`,
+      params,
     );
 
     return rows.map((row) => ({

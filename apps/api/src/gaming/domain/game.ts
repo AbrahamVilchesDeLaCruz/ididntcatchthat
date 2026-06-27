@@ -14,6 +14,7 @@ import { GameNotInProgress } from './exceptions/game-not-in-progress';
 import { GameNotPaused } from './exceptions/game-not-paused';
 import { GameNotFinished } from './exceptions/game-not-finished';
 import { GameAlreadyFinished } from './exceptions/game-already-finished';
+import { GameSource, GameSourceValue } from './game-source';
 
 export interface GamePrimitives {
   id: string;
@@ -21,6 +22,7 @@ export interface GamePrimitives {
   mode: string;
   module: string | null;
   subcategory: string | null;
+  source: string;
   cardCount: string;
   status: string;
   flashcardIds: string[];
@@ -37,6 +39,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     readonly mode: GameMode,
     readonly module: GameModule | null,
     readonly subcategory: string | null,
+    readonly source: GameSource,
     readonly cardCount: CardCount,
     private _status: GameStatus,
     readonly flashcardIds: string[],
@@ -69,6 +72,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     mode: string,
     module: string | null,
     subcategory: string | null,
+    source: string,
     cardCount: string,
     flashcardIds: string[],
   ): Game {
@@ -78,6 +82,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       GameMode.create(mode),
       module ? GameModule.create(module) : null,
       subcategory,
+      GameSource.create(source),
       CardCount.create(cardCount),
       GameStatus.create(GameStatusValue.InProgress),
       flashcardIds,
@@ -140,6 +145,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     const finishedAt = new Date();
     this._finishedAt = finishedAt;
     this._status = GameStatus.create(GameStatusValue.Completed);
+    const stats = this.completionStats();
     this.record(
       new GameCompletedEvent(this.id.value, {
         gameId: this.id.value,
@@ -147,7 +153,10 @@ export class Game extends AggregateRoot<GamePrimitives> {
         mode: this.mode.value,
         module: this.module?.value ?? null,
         subcategory: this.subcategory,
+        source: this.source.value,
         cardCount: this.cardCount.value,
+        correctCount: stats.correctCount,
+        totalCount: stats.totalCount,
         startedAt: this.startedAt.toISOString(),
         finishedAt: finishedAt.toISOString(),
       }),
@@ -198,6 +207,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       GameMode.create(p.mode),
       p.module ? GameModule.create(p.module) : null,
       p.subcategory ?? null,
+      GameSource.create(p.source ?? GameSourceValue.Catalog),
       CardCount.create(p.cardCount),
       GameStatus.create(p.status),
       p.flashcardIds,
@@ -215,6 +225,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
       mode: this.mode.value,
       module: this.module?.value ?? null,
       subcategory: this.subcategory,
+      source: this.source.value,
       cardCount: this.cardCount.value,
       status: this._status.value,
       flashcardIds: this.flashcardIds,

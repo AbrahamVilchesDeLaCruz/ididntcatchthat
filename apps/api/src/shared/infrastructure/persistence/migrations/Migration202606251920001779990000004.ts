@@ -10,8 +10,8 @@ import {
  * Converts pre-refactor category/subcategory slugs (e.g. connecting_words_in_speech,
  * WANNA_AND_GONNA) to the unified LearningModule vocabulary.
  */
-export class Migration202606251920000000004 implements MigrationInterface {
-  name = 'Migration202606251920000000004';
+export class Migration202606251920001779990000004 implements MigrationInterface {
+  name = 'Migration202606251920001779990000004';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     for (const [legacyCategory, module] of Object.entries(

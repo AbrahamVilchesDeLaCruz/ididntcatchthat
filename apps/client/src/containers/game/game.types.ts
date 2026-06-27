@@ -30,6 +30,7 @@ export interface GameSummaryVM {
   totalCount: number;
   accuracy: number;
   duration: number;
+  failedCards?: { id: string; expression: string }[];
 }
 
 // ─── Resume ───────────────────────────────────────────────────────────────────
