@@ -9,6 +9,7 @@ import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/
 import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
 import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typeorm/ranking-user-score.entity';
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
+import { UserAchievementEntity } from '@/achievement/infrastructure/persistence/typeorm/user-achievement.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
@@ -18,7 +19,10 @@ import { Migration202605281913201779988375165 } from '../migrations/Migration202
 import { Migration202606200410001779990000001 } from '../migrations/Migration202606200410001779990000001';
 import { Migration202606200519001779990000002 } from '../migrations/Migration202606200519001779990000002';
 import { Migration202606200600001779990000003 } from '../migrations/Migration202606200600001779990000003';
+import { Migration202606251920000000004 } from '../migrations/Migration202606251920000000004';
+import { Migration202606260000000000005 } from '../migrations/Migration202606260000000000005';
 import { Migration202606261200001779990000005 } from '../migrations/Migration202606261200001779990000005';
+import { Migration202606270000000000006 } from '../migrations/Migration202606270000000000006';
 import { parseDatabaseUrl, resolveDbSsl } from './resolve-db-ssl';
 
 export const typeOrmEntities = [
@@ -32,6 +36,7 @@ export const typeOrmEntities = [
   ModuleProgressEntity,
   RankingUserScoreEntity,
   ProcessedEventEntity,
+  UserAchievementEntity,
 ];
 
 export const typeOrmMigrations = [
@@ -44,7 +49,10 @@ export const typeOrmMigrations = [
   Migration202606200410001779990000001,
   Migration202606200519001779990000002,
   Migration202606200600001779990000003,
+  Migration202606251920000000004,
+  Migration202606260000000000005,
   Migration202606261200001779990000005,
+  Migration202606270000000000006,
 ];
 
 export function buildTypeOrmDataSourceOptions(options?: {
