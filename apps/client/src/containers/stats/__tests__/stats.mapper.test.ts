@@ -78,4 +78,20 @@ describe('stats/mapWeakFlashcard', () => {
 
     expect(vm.expression).toBe('wanna');
   });
+
+  it('falls back to module when category is missing', () => {
+    const raw = {
+      flashcardId: 'fc-3',
+      expression: 'kinda',
+      module: 'real_talk',
+      subcategory: 'informal_kind_of',
+      errorCount: 4,
+      lastSeenAt: '2026-04-01T10:00:00.000Z',
+    } as WeakFlashcardApiModel;
+
+    const vm = mapWeakFlashcard(raw);
+
+    expect(vm.module).toBe('real_talk');
+    expect(vm.category).toBe('real_talk');
+  });
 });

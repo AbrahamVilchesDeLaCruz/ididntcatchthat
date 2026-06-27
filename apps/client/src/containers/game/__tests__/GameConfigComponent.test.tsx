@@ -57,6 +57,31 @@ describe('GameConfigComponent', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows guest error screen with retry action', () => {
+    const onGuestRetry = vi.fn();
+    render(
+      <GameConfigComponent
+        {...defaultProps}
+        guestError
+        onGuestRetry={onGuestRetry}
+      />,
+    );
+
+    expect(
+      screen.getByText('We could not start the guest game.'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(onGuestRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows paused saved banner when enabled', () => {
+    render(<GameConfigComponent {...defaultProps} pausedSavedBanner />);
+
+    expect(
+      screen.getByText('Game saved. You can resume it anytime.'),
+    ).toBeInTheDocument();
+  });
+
   it('calls onSubcategoryChange when a subcategory is selected', () => {
     const onSubcategoryChange = vi.fn();
     render(
@@ -69,5 +94,29 @@ describe('GameConfigComponent', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Soft T' }));
 
     expect(onSubcategoryChange).toHaveBeenCalledWith('t_soft_between_vowels');
+  });
+
+  it('uses single-column layout when paused panel is omitted', () => {
+    render(<GameConfigComponent {...defaultProps} />);
+
+    expect(screen.getByTestId('game-config-layout')).toHaveAttribute(
+      'data-layout',
+      'config-only',
+    );
+  });
+
+  it('uses two-column layout marker when paused panel is provided', () => {
+    render(
+      <GameConfigComponent
+        {...defaultProps}
+        pausedGamesPanel={<div data-testid="paused-panel">Paused</div>}
+      />,
+    );
+
+    expect(screen.getByTestId('game-config-layout')).toHaveAttribute(
+      'data-layout',
+      'with-paused',
+    );
+    expect(screen.getByTestId('paused-panel')).toBeInTheDocument();
   });
 });

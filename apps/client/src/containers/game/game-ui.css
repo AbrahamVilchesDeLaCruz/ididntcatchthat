@@ -1,0 +1,88 @@
+/* Minimal game UI — landing-aligned neon accents, no arcade animations */
+
+.game-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.game-glow::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  height: 420px;
+  width: 420px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: var(--color-brand);
+  opacity: 0.07;
+  filter: blur(100px);
+}
+
+.game-panel {
+  border-color: rgb(124 92 252 / 0.18);
+  background: linear-gradient(
+    180deg,
+    rgb(26 26 36 / 0.72) 0%,
+    rgb(9 9 15 / 0.92) 100%
+  );
+  backdrop-filter: blur(8px);
+}
+
+.game-label {
+  color: var(--color-brand);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.game-progress-fill {
+  background: linear-gradient(
+    90deg,
+    var(--color-brand-dim),
+    var(--color-brand-light)
+  );
+}
+
+.game-kbd {
+  border-color: rgb(124 92 252 / 0.28);
+  background: rgb(124 92 252 / 0.08);
+  color: var(--color-brand-light);
+}
+
+.game-shell-accent {
+  border-bottom-color: rgb(124 92 252 / 0.16);
+}
+
+.game-shell-logo {
+  background: linear-gradient(
+    90deg,
+    var(--color-brand-light),
+    var(--color-accent-green)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.game-card-stage {
+  border-radius: var(--radius-xl);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.game-card-feedback--correct {
+  box-shadow:
+    0 0 0 2px rgb(34 211 160 / 0.55),
+    0 0 32px rgb(34 211 160 / 0.2);
+}
+
+.game-card-feedback--incorrect {
+  box-shadow:
+    0 0 0 2px rgb(248 113 113 / 0.55),
+    0 0 32px rgb(248 113 113 / 0.18);
+}

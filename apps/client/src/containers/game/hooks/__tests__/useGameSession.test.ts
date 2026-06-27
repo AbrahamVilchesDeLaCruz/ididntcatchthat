@@ -38,6 +38,7 @@ describe('useGameSession', () => {
 
     expect(result.current.phase).toBe('repeat-prompt');
     expect(result.current.wrongCount).toBe(2);
+    expect(result.current.incorrectCount).toBe(2);
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -50,6 +51,7 @@ describe('useGameSession', () => {
     act(() => result.current.recordAnswer(true));
     act(() => result.current.recordAnswer(true));
 
+    expect(result.current.correctCount).toBe(2);
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
@@ -66,5 +68,23 @@ describe('useGameSession', () => {
     expect(result.current.phase).toBe('repeat');
     expect(result.current.totalCount).toBe(1);
     expect(result.current.currentFlashcard?.id).toBe('fc-1');
+  });
+
+  it('works with a filtered pending subset (resume path)', () => {
+    const onComplete = vi.fn();
+    const pendingOnly = [flashcards[1]];
+    const { result } = renderHook(() =>
+      useGameSession({
+        flashcards: pendingOnly,
+        onOriginalQueueComplete: onComplete,
+      }),
+    );
+
+    expect(result.current.totalCount).toBe(1);
+    expect(result.current.currentFlashcard?.id).toBe('fc-2');
+
+    act(() => result.current.recordAnswer(true));
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 });

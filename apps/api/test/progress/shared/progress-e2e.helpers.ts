@@ -1,6 +1,23 @@
 import { type INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { type App } from 'supertest/types';
+
+function decodeAccessTokenUserId(token: string): string {
+  const payloadSegment = token.split('.')[1];
+  if (!payloadSegment) {
+    throw new Error('Invalid access token');
+  }
+  const json = Buffer.from(
+    payloadSegment.replace(/-/g, '+').replace(/_/g, '/'),
+    'base64',
+  ).toString('utf8');
+  const payload = JSON.parse(json) as { userId?: string };
+  if (!payload.userId) {
+    throw new Error('Access token missing userId');
+  }
+  return payload.userId;
+}
 
 export async function registerAndLogin(
   app: INestApplication<App>,
@@ -82,17 +99,21 @@ export async function waitForUserFlashcardStatsCount(
   token: string,
   minCount: number,
 ): Promise<void> {
-  await waitUntil(async () => {
-    const res = await request(app.getHttpServer())
-      .get('/v1/progress/flashcards/weakest')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
+  const userId = decodeAccessTokenUserId(token);
+  const ds = app.get(DataSource);
 
-    const data = (res.body as { data: unknown[] }).data;
-    return data.length >= minCount;
+  await waitUntil(async () => {
+    const rows = await ds.query<{ count: string }[]>(
+      `SELECT COUNT(*)::int AS count
+       FROM user_flashcard_stats
+       WHERE user_id = $1 AND times_played > 0`,
+      [userId],
+    );
+    return Number(rows[0]?.count ?? 0) >= minCount;
   });
 }
 
+/** Waits until a flashcard with errors appears in weakest (requires incorrect attempts). */
 export async function waitForWeakestFlashcard(
   app: INestApplication<App>,
   token: string,

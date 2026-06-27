@@ -15,6 +15,8 @@ interface UseGameSessionResult {
   activeFlashcards: FlashcardGameVM[];
   totalCount: number;
   currentFlashcard: FlashcardGameVM | null;
+  correctCount: number;
+  incorrectCount: number;
   wrongCount: number;
   setIsFlipped: (flipped: boolean) => void;
   toggleFlip: () => void;
@@ -32,6 +34,8 @@ export function useGameSession({
   const [isFlipped, setIsFlipped] = useState(false);
   const [wrongIds, setWrongIds] = useState<string[]>([]);
   const [repeatIds, setRepeatIds] = useState<string[]>([]);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
 
   const activeFlashcards = useMemo(() => {
     if (phase === 'repeat') {
@@ -63,6 +67,12 @@ export function useGameSession({
             ? prev
             : [...prev, currentFlashcard.id],
         );
+      }
+
+      if (correct) {
+        setCorrectCount((prev) => prev + 1);
+      } else {
+        setIncorrectCount((prev) => prev + 1);
       }
 
       const isLast = currentIndex >= activeFlashcards.length - 1;
@@ -112,6 +122,8 @@ export function useGameSession({
     activeFlashcards,
     totalCount,
     currentFlashcard,
+    correctCount,
+    incorrectCount,
     wrongCount: wrongIds.length,
     setIsFlipped,
     toggleFlip,

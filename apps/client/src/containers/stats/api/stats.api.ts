@@ -18,6 +18,7 @@ import type {
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 export const statsKeys = {
+  all: ['stats'] as const,
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
   subcategories: ['stats', 'subcategories'] as const,

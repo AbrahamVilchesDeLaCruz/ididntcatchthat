@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   mapFlashcardForGame,
   mapGameSummary,
+  mapPausedGame,
   mapResumeGame,
 } from '../game.mapper';
 import type {
@@ -93,6 +94,7 @@ describe('game/mapResumeGame', () => {
         userId: 'user-1',
         mode: 'normal',
         module: null,
+        subcategory: null,
         cardCount: '10',
         status: 'paused',
         flashcardIds: ['fc-1', 'fc-2', 'fc-3', 'fc-4'],
@@ -109,5 +111,33 @@ describe('game/mapResumeGame', () => {
     expect(vm.gameId).toBe('game-1');
     expect(vm.lastFlashcardId).toBe('fc-3');
     expect(vm.pendingFlashcardIds).toEqual(['fc-3', 'fc-4']);
+  });
+});
+
+describe('game/mapPausedGame', () => {
+  it('maps paused game primitives to view model', () => {
+    const result = mapPausedGame({
+      id: 'game-1',
+      userId: 'user-1',
+      mode: 'game',
+      module: 'native_sounds',
+      subcategory: 't_soft',
+      cardCount: '10',
+      status: 'paused',
+      flashcardIds: ['fc-1'],
+      lastFlashcardId: 'fc-1',
+      startedAt: '2026-01-01T12:00:00.000Z',
+      finishedAt: null,
+      attempts: [],
+    });
+
+    expect(result).toEqual({
+      gameId: 'game-1',
+      module: 'native_sounds',
+      subcategory: 't_soft',
+      cardCount: 10,
+      startedAt: new Date('2026-01-01T12:00:00.000Z'),
+      lastFlashcardId: 'fc-1',
+    });
   });
 });

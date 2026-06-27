@@ -3,6 +3,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 import { useAuthStore } from '@/core/store/auth.store';
+import { ApiRequestError } from './apiError';
 import { resolveApiBaseUrl } from './resolveApiBaseUrl';
 
 export const apiBaseUrl = resolveApiBaseUrl();
@@ -29,9 +30,13 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
       headers: Record<string, string>;
     };
-    response?: { status: number };
+    response?: {
+      status: number;
+      data?: { message?: string; errorType?: string };
+    };
   }) => {
     const originalRequest = error.config;
+    const responseData = error.response?.data;
 
     const isGuest = useAuthStore.getState().guestDeviceId !== null;
 
@@ -54,8 +59,14 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(
-      new Error(
-        String((error as { message?: string }).message ?? 'Request failed'),
+      new ApiRequestError(
+        String(
+          responseData?.message ??
+            (error as { message?: string }).message ??
+            'Request failed',
+        ),
+        error.response?.status ?? 0,
+        responseData?.errorType,
       ),
     );
   },

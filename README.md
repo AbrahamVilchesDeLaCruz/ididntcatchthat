@@ -152,10 +152,16 @@ Requiere acceso a Doppler y servicios externos (Aiven, R2, ElevenLabs…).
 
 ```bash
 pnpm install
-make dev          # API :3000 + Client :5173 (hot-reload)
+make dev          # RabbitMQ en Docker + API :3000 + Client :5173 (hot-reload)
+# o por separado:
+make dev-infra    # solo RabbitMQ (:5672)
+make dev-api      # terminal 1
+make dev-client   # terminal 2
 # o
-make up           # Docker completo (:3001 / :4001)
+make up           # Docker completo (:3001 / :4001), sin hot-reload
 ```
+
+> **Nota:** `DATABASE_URL` apunta a Aiven (remoto). `AMQP_URI` en Doppler usa el host `rabbitmq` para contenedores; `make dev` lo reescribe a `localhost` y levanta Rabbit en Docker.
 
 ### 🎓 Evaluación local (sin Doppler ni servicios de pago)
 
@@ -202,6 +208,8 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 | `make local-up` | Infra local Docker (Postgres, RabbitMQ, MinIO) |
 | `make local-seed` | Migraciones + datos demo |
 | `make local-dev` | API + Client sin Doppler |
+| `make dev-infra` | Solo RabbitMQ Docker (para `make dev` con Doppler) |
+| `make dev` | RabbitMQ + API + Client hot-reload (Doppler) |
 | `make down` | Parar todos los servicios Docker |
 | `make deploy-dev` | Deploy a VPS — entorno dev |
 | `make deploy-prod` | Deploy a VPS — entorno prod |
