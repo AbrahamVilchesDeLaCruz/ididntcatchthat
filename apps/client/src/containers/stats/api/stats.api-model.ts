@@ -26,3 +26,21 @@ export interface SubcategoryProgressApiModel {
   correctCount: number;
   accuracy: number;
 }
+
+export interface ProgressSummaryApiModel {
+  currentStreak: number;
+  longestStreak: number;
+  accuracy7d: number;
+  totalAttempts: number;
+  weakCount: number;
+  masteredCount: number;
+  gamesCompleted: number;
+  lastPlayedAt: string | null;
+}
+
+export interface AchievementApiModel {
+  key: string;
+  title: string;
+  description: string;
+  unlockedAt: string | null;
+}

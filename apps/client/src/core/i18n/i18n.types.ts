@@ -157,6 +157,8 @@ export interface GameTranslations {
     registerHint: string;
     pausedGamesLink: string;
     hudVictoryLabel: string;
+    failedCardsTitle: string;
+    ctaPracticeWeakest: string;
   };
 }
 
@@ -178,6 +180,30 @@ export interface StatsTranslations {
   backToModules: string;
   subcategoryTitleSuffix: string;
   practice: string;
+  weakestCta: string;
+  weakestGuestCta: string;
+  hero: {
+    streak: string;
+    streakHint: string;
+    accuracy7d: string;
+    weakCount: string;
+    weakHint: string;
+    mastered: string;
+    gamesHint: string;
+  };
+  guest: {
+    title: string;
+    subtitle: string;
+    games: string;
+    attempts: string;
+    accuracy: string;
+    failed: string;
+    emptyTitle: string;
+    emptyBody: string;
+    registerTitle: string;
+    registerHint: string;
+    registerCta: string;
+  };
   table: {
     expression: string;
     module: string;
@@ -190,6 +216,10 @@ export interface StatsTranslations {
     solid: string;
     mastered: string;
   };
+}
+
+export interface AchievementsTranslations {
+  title: string;
 }
 
 export interface RankingTranslations {
@@ -245,5 +275,6 @@ export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
   stats: StatsTranslations;
+  achievements: AchievementsTranslations;
   ranking: RankingTranslations;
 }
