@@ -10,6 +10,8 @@ import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-
 import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
 import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
+import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
+import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
 
 @Injectable()
 export class GamingExceptionRegistry implements OnModuleInit {
@@ -28,6 +30,8 @@ export class GamingExceptionRegistry implements OnModuleInit {
         [MaxPausedGamesReached.name, HttpStatus.CONFLICT],
         [GuestLimitExceeded.name, HttpStatus.TOO_MANY_REQUESTS],
         [GameSubcategoryInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [InsufficientWeakFlashcards.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [WeakestSourceRequiresAuth.name, HttpStatus.FORBIDDEN],
       ]),
     );
   }

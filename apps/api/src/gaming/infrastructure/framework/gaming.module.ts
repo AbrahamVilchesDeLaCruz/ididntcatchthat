@@ -48,11 +48,15 @@ import { GameFlashcardsFetcher } from '@/gaming/application/fetch-flashcards/gam
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
+import { ProgressModule } from '@/progress/infrastructure/framework/progress.module';
+import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
+import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/providers/progress-weakest-flashcard-ids.provider';
 
 @Module({
   imports: [
     SharedModule,
     AuthModule,
+    ProgressModule,
     TypeOrmModule.forFeature([GameEntity, GameFlashcardEntity]),
   ],
   controllers: [
@@ -72,6 +76,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
+    {
+      provide: WEAKEST_FLASHCARD_IDS_PROVIDER,
+      useClass: ProgressWeakestFlashcardIdsProvider,
+    },
 
     // Queries
     { provide: GAME_STATS_QUERY, useClass: TypeOrmGameStatsQuery },

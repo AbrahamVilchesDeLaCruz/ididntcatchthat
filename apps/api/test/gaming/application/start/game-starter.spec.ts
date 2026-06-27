@@ -8,11 +8,13 @@ import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-gam
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
 import { GameMother } from '@test/gaming/domain/game-mother';
+import { type WeakestFlashcardIdsProvider } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { RequestGameStarterMother } from './request-game-starter-mother';
 
 describe('gaming/application/start GameStarter', () => {
   const gameRepository = mock<GameRepository>();
   const flashcardSelector = mock<FlashcardSelector>();
+  const weakestProvider = mock<WeakestFlashcardIdsProvider>();
   const logger = mock<Logger>();
   let starter: GameStarter;
 
@@ -20,7 +22,12 @@ describe('gaming/application/start GameStarter', () => {
     gameRepository.save.mockReset();
     gameRepository.match.mockReset();
     flashcardSelector.select.mockReset();
-    starter = new GameStarter(gameRepository, flashcardSelector, logger);
+    starter = new GameStarter(
+      gameRepository,
+      flashcardSelector,
+      weakestProvider,
+      logger,
+    );
   });
 
   it('should start a game for an authenticated user', async () => {

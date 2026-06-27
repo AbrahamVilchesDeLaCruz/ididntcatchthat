@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Game } from '@/gaming/domain/game';
 import { GameModule } from '@/gaming/domain/game-module';
+import { GameSource, GameSourceValue } from '@/gaming/domain/game-source';
 import { LearningModule } from '@/shared/domain/learning-module';
 import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
 import {
@@ -14,6 +15,12 @@ import {
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
+import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
+import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
+import {
+  type WeakestFlashcardIdsProvider,
+  WEAKEST_FLASHCARD_IDS_PROVIDER,
+} from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestGameStarter } from './request-game-starter';
@@ -28,14 +35,21 @@ export class GameStarter {
     private readonly gameRepository: GameRepository,
     @Inject(FLASHCARD_SELECTOR)
     private readonly flashcardSelector: FlashcardSelector,
+    @Inject(WEAKEST_FLASHCARD_IDS_PROVIDER)
+    private readonly weakestFlashcardIdsProvider: WeakestFlashcardIdsProvider,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
-    const { userId, mode, module, subcategory, cardCount } = request;
+    const { userId, mode, module, subcategory, cardCount, source } = request;
+    const gameSource = GameSource.create(source ?? GameSourceValue.Catalog);
 
     this.assertValidScope(module, subcategory);
+
+    if (gameSource.isWeakest() && userId === null) {
+      throw new WeakestSourceRequiresAuth();
+    }
 
     if (userId === null) {
       const today = new Date();
@@ -60,18 +74,33 @@ export class GameStarter {
       PausedGamePolicy.assertCanPauseAnother(pausedGames);
     }
 
-    const gameModule = module ? GameModule.create(module) : null;
-    const flashcardIds = await this.flashcardSelector.select(
-      gameModule,
-      subcategory,
-      cardCount,
-    );
+    let flashcardIds: string[];
+
+    if (gameSource.isWeakest()) {
+      flashcardIds = await this.weakestFlashcardIdsProvider.findWeakestIds(
+        userId!,
+        cardCount,
+        module,
+        subcategory,
+      );
+      if (flashcardIds.length === 0) {
+        throw new InsufficientWeakFlashcards();
+      }
+    } else {
+      const gameModule = module ? GameModule.create(module) : null;
+      flashcardIds = await this.flashcardSelector.select(
+        gameModule,
+        subcategory,
+        cardCount,
+      );
+    }
 
     const game = Game.start(
       userId,
       mode,
       module,
       subcategory,
+      gameSource.value,
       String(cardCount),
       flashcardIds,
     );
