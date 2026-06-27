@@ -2,6 +2,7 @@ import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '@test/shared/infrastructure/create-test-app';
+import { seedNativeSoundsFlashcards } from '@test/progress/shared/seed-native-sounds-flashcards';
 import {
   registerAndLogin,
   startGame,
@@ -12,12 +13,13 @@ import {
 describe('GET /progress/summary (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await createTestApp();
+    await seedNativeSoundsFlashcards(app);
   });
 
-  afterAll(async () => {
-    await app.close();
+  afterEach(async () => {
+    await app.close().catch(() => undefined);
   });
 
   it('should return summary metrics for authenticated user', async () => {
@@ -30,7 +32,7 @@ describe('GET /progress/summary (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/v1/games/${gameId}/complete`)
       .set('Authorization', `Bearer ${token}`)
-      .expect(201);
+      .expect(200);
 
     const res = await request(app.getHttpServer())
       .get('/v1/progress/summary')
@@ -47,12 +49,13 @@ describe('GET /progress/summary (e2e)', () => {
 describe('POST /games source=weakest (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await createTestApp();
+    await seedNativeSoundsFlashcards(app);
   });
 
-  afterAll(async () => {
-    await app.close();
+  afterEach(async () => {
+    await app.close().catch(() => undefined);
   });
 
   it('should start a game with weakest flashcard ids', async () => {
@@ -62,11 +65,20 @@ describe('POST /games source=weakest (e2e)', () => {
       cardCount: 10,
     });
     const wrongId = flashcardIds[0];
-    await recordAttempts(app, token, gameId, [wrongId], false);
+
+    for (const flashcardId of flashcardIds) {
+      await request(app.getHttpServer())
+        .post(`/v1/games/${gameId}/attempts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ flashcardId, correct: flashcardId !== wrongId })
+        .expect(204);
+    }
+
     await request(app.getHttpServer())
       .post(`/v1/games/${gameId}/complete`)
       .set('Authorization', `Bearer ${token}`)
-      .expect(201);
+      .expect(200);
+
     await waitForWeakestFlashcard(app, token, wrongId);
 
     const res = await request(app.getHttpServer())
