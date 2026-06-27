@@ -164,7 +164,7 @@ export const StatsComponent = ({
             <StatsSectionSkeleton />
           ) : selectedCategory === null ? (
             <>
-              <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-1">
+              <h2 className="mb-1 text-base font-semibold text-[var(--color-text-primary)]">
                 {st.moduleChartTitle}
               </h2>
               <p className="mb-4 text-xs text-[var(--color-text-muted)]">

@@ -167,6 +167,9 @@ export interface StatsTranslations {
   subtitle: string;
   moduleChartTitle: string;
   moduleChartHint: string;
+  attemptsLabel: string;
+  subcategoryHint: string;
+  practiceSubcategory: string;
   weakTableTitle: string;
   noModuleData: string;
   noWeakData: string;
