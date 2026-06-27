@@ -1,6 +1,9 @@
-import type { ConnectionOptions } from 'tls';
-
-export type DbSslConfig = false | ConnectionOptions;
+export type DbSslConfig =
+  | false
+  | {
+      rejectUnauthorized: boolean;
+      ca?: string;
+    };
 
 export function parseDatabaseUrl(databaseUrl?: string): URL {
   return new URL(databaseUrl ?? 'postgres://localhost/defaultdb');
