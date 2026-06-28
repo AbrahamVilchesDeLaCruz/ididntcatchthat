@@ -11,6 +11,14 @@ import {
 } from '@/common/components/ui/sheet';
 import { Button } from '@/common/components/ui/button';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
+import {
+  HeadphonesIcon,
+  WaveformIcon,
+  TrophyIcon,
+  ChartLineIcon,
+  FlashcardIcon,
+  PulseIcon,
+} from '@/common/components/NavIcons';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -66,7 +74,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
             Juego
           </p>
           <NavLink to="/game" className={navLinkClass} onClick={onNavigate}>
-            🎮 Jugar
+            <HeadphonesIcon /> Jugar
           </NavLink>
         </div>
 
@@ -77,14 +85,14 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               Mi progreso
             </p>
             <NavLink to="/stats" className={navLinkClass} onClick={onNavigate}>
-              📊 Estadísticas
+              <WaveformIcon /> Estadísticas
             </NavLink>
             <NavLink
               to="/ranking"
               className={navLinkClass}
               onClick={onNavigate}
             >
-              🏆 Ranking
+              <TrophyIcon /> Ranking
             </NavLink>
           </div>
         )}
@@ -100,7 +108,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               className={navLinkClass}
               onClick={onNavigate}
             >
-              📈 Métricas de juegos
+              <ChartLineIcon /> Métricas de juegos
             </NavLink>
             {canManageFlashcards && (
               <NavLink
@@ -108,7 +116,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
                 className={navLinkClass}
                 onClick={onNavigate}
               >
-                🃏 Flashcards
+                <FlashcardIcon /> Flashcards
               </NavLink>
             )}
           </div>
@@ -125,7 +133,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               className={navLinkClass}
               onClick={onNavigate}
             >
-              🔭 Observabilidad
+              <PulseIcon /> Observabilidad
             </NavLink>
           </div>
         )}
