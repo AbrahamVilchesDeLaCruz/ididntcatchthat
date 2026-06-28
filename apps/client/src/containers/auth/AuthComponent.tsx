@@ -48,10 +48,10 @@ export const AuthComponent = ({
       <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
             ididntcatchthat
           </h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-[var(--color-text-secondary)] text-sm">
             {mode === 'login'
               ? 'Accedé a tu cuenta'
               : 'Creá tu cuenta y empezá a aprender'}
@@ -59,16 +59,16 @@ export const AuthComponent = ({
         </div>
 
         {/* Card */}
-        <div className="bg-[var(--color-bg-surface,#1a1a2e)] rounded-2xl p-8 shadow-xl border border-white/10">
+        <div className="bg-[var(--color-bg-surface)] rounded-2xl p-8 shadow-xl border border-[var(--color-border)]">
           {/* Mode tabs */}
-          <div className="flex rounded-lg bg-white/5 p-1 mb-6">
+          <div className="flex rounded-lg bg-[var(--color-bg-elevated)] p-1 mb-6">
             <button
               type="button"
               onClick={() => onModeChange('login')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 mode === 'login'
-                  ? 'bg-white text-black'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-[var(--color-brand)] text-white'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               Iniciar sesión
@@ -78,8 +78,8 @@ export const AuthComponent = ({
               onClick={() => onModeChange('register')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 mode === 'register'
-                  ? 'bg-white text-black'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-[var(--color-brand)] text-white'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               Registrarse
@@ -88,7 +88,7 @@ export const AuthComponent = ({
 
           {/* Server error */}
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-2">
+            <div className="mb-4 p-3 rounded-lg bg-[var(--color-accent-green-dim)] border border-[var(--color-accent-red)]/20 text-[var(--color-accent-red)] text-sm flex items-start gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4 mt-0.5 shrink-0"
@@ -128,9 +128,11 @@ export const AuthComponent = ({
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-gray-500">o continuá con</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[var(--color-border)]" />
+            <span className="text-xs text-[var(--color-text-muted)]">
+              o continuá con
+            </span>
+            <div className="flex-1 h-px bg-[var(--color-border)]" />
           </div>
 
           {/* Google OAuth */}
@@ -138,11 +140,11 @@ export const AuthComponent = ({
             type="button"
             onClick={onGoogleLogin}
             disabled={isLoading || isGoogleLoading}
-            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] text-[var(--color-text-primary)] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGoogleLoading ? (
               <>
-                <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <span className="w-4 h-4 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
                 Redirigiendo…
               </>
             ) : (

@@ -1,6 +1,6 @@
 import { useState, type ReactElement } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, Moon, Sun, Monitor } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useLogout } from '@/containers/auth/api';
@@ -10,44 +10,14 @@ import {
   SheetTrigger,
 } from '@/common/components/ui/sheet';
 import { Button } from '@/common/components/ui/button';
-import { useTheme } from '@/core/store/useTheme';
+import { ThemeToggle } from '@/common/components/ThemeToggle';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
     isActive
-      ? 'bg-white/10 text-white'
-      : 'text-gray-400 hover:text-white hover:bg-white/5'
+      ? 'bg-[var(--color-brand-dim)] text-[var(--color-brand)]'
+      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]'
   }`;
-
-const ThemeToggle = (): ReactElement => {
-  const { preference, setPreference } = useTheme();
-
-  const options = [
-    { value: 'light', icon: Sun, label: 'Claro' },
-    { value: 'system', icon: Monitor, label: 'Sistema' },
-    { value: 'dark', icon: Moon, label: 'Oscuro' },
-  ] as const;
-
-  return (
-    <div className="flex items-center gap-1 px-3 py-2 rounded-lg border border-[var(--color-border)] mb-1">
-      {options.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          type="button"
-          aria-label={label}
-          onClick={() => setPreference(value)}
-          className={`flex-1 flex items-center justify-center p-1.5 rounded-md transition-colors ${
-            preference === value
-              ? 'bg-[var(--color-brand)] text-white'
-              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-          }`}
-        >
-          <Icon className="h-3.5 w-3.5" />
-        </button>
-      ))}
-    </div>
-  );
-};
 
 interface SidebarContentProps {
   onNavigate?: () => void;
@@ -81,7 +51,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
       <Link
         to="/"
         onClick={onNavigate}
-        className="text-white font-bold text-lg mb-8 px-3 block"
+        className="mb-8 block px-3 text-lg font-bold text-[var(--color-text-primary)]"
       >
         ididntcatchthat
       </Link>
@@ -90,7 +60,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
       <nav className="flex-1 space-y-1 overflow-y-auto">
         {/* Juego — siempre visible */}
         <div className="mb-2">
-          <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
             Juego
           </p>
           <NavLink to="/game" className={navLinkClass} onClick={onNavigate}>
@@ -101,7 +71,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
         {/* Mi progreso — user, teacher, admin */}
         {(isUser || isAdmin || canAccessBackoffice) && (
           <div className="mb-2">
-            <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Mi progreso
             </p>
             <NavLink to="/stats" className={navLinkClass} onClick={onNavigate}>
@@ -120,7 +90,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
         {/* Backoffice — teacher + admin */}
         {canAccessBackoffice && (
           <div className="mb-2">
-            <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Backoffice
             </p>
             <NavLink
@@ -145,7 +115,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
         {/* Observabilidad — admin only */}
         {canAccessObservability && (
           <div className="mb-2">
-            <p className="text-xs uppercase text-gray-500 px-3 mb-2 font-semibold tracking-wider">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Sistema
             </p>
             <NavLink
@@ -160,13 +130,15 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
       </nav>
 
       {/* Theme toggle */}
-      <ThemeToggle />
+      <div className="mb-1 px-3">
+        <ThemeToggle variant="pill" />
+      </div>
 
       {/* Logout */}
       <button
         type="button"
         onClick={handleLogout}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-primary)]"
       >
         Cerrar sesión
       </button>
@@ -180,7 +152,7 @@ export const AppSidebar = (): ReactElement => {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 min-h-svh bg-[var(--color-bg-surface)] border-r border-white/10 flex-col px-4 py-6 shrink-0">
+      <aside className="hidden md:flex w-60 min-h-svh bg-[var(--color-bg-surface)] border-r border-[var(--color-border)] flex-col px-4 py-6 shrink-0">
         <SidebarContent />
       </aside>
 
@@ -191,14 +163,14 @@ export const AppSidebar = (): ReactElement => {
             <Button
               variant="ghost"
               size="icon"
-              className="bg-[var(--color-bg-surface)] border border-white/10"
+              className="bg-[var(--color-bg-surface)] border border-[var(--color-border)]"
             >
-              <Menu className="h-5 w-5 text-white" />
+              <Menu className="h-5 w-5 text-[var(--color-text-primary)]" />
             </Button>
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-60 bg-[var(--color-bg-surface)] border-r border-white/10 flex flex-col px-4 py-6 p-0"
+            className="w-60 bg-[var(--color-bg-surface)] border-r border-[var(--color-border)] flex flex-col px-4 py-6 p-0"
           >
             <SidebarContent onNavigate={() => setOpen(false)} />
           </SheetContent>

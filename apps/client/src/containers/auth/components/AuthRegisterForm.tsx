@@ -32,7 +32,7 @@ export const AuthRegisterForm = ({
       <div>
         <label
           htmlFor="nickname"
-          className="block text-sm font-medium text-gray-300 mb-1"
+          className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
           Nickname
         </label>
@@ -43,17 +43,19 @@ export const AuthRegisterForm = ({
           autoFocus
           value={values.nickname}
           onChange={(e) => onFieldChange('nickname', e.target.value)}
-          className={`w-full px-4 py-2.5 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+          className={`w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:border-transparent transition ${
             fieldErrors.nickname
-              ? 'border-red-500/60 focus:ring-red-500/30'
-              : 'border-white/10 focus:ring-white/20'
+              ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
+              : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
           }`}
           placeholder="tu_nickname"
         />
         {fieldErrors.nickname ? (
-          <p className="mt-1 text-xs text-red-400">{fieldErrors.nickname}</p>
+          <p className="mt-1 text-xs text-[var(--color-accent-red)]">
+            {fieldErrors.nickname}
+          </p>
         ) : (
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
             3–30 caracteres. Solo letras, números y guiones bajos.
           </p>
         )}
@@ -63,7 +65,7 @@ export const AuthRegisterForm = ({
       <div>
         <label
           htmlFor="reg-email"
-          className="block text-sm font-medium text-gray-300 mb-1"
+          className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
           Email
         </label>
@@ -73,10 +75,10 @@ export const AuthRegisterForm = ({
           autoComplete="email"
           value={values.email}
           onChange={(e) => onFieldChange('email', e.target.value)}
-          className={`w-full px-4 py-2.5 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+          className={`w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:border-transparent transition ${
             fieldErrors.email
-              ? 'border-red-500/60 focus:ring-red-500/30'
-              : 'border-white/10 focus:ring-white/20'
+              ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
+              : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
           }`}
           placeholder="tu@email.com"
         />
@@ -89,7 +91,7 @@ export const AuthRegisterForm = ({
       <div>
         <label
           htmlFor="reg-password"
-          className="block text-sm font-medium text-gray-300 mb-1"
+          className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
           Contraseña
         </label>
@@ -100,17 +102,17 @@ export const AuthRegisterForm = ({
             autoComplete="new-password"
             value={values.password}
             onChange={(e) => onFieldChange('password', e.target.value)}
-            className={`w-full px-4 py-2.5 pr-10 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent transition ${
+            className={`w-full px-4 py-2.5 pr-10 rounded-lg bg-[var(--color-bg-elevated)] border text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:border-transparent transition ${
               fieldErrors.password
-                ? 'border-red-500/60 focus:ring-red-500/30'
-                : 'border-white/10 focus:ring-white/20'
+                ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
+                : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
             }`}
             placeholder="Mínimo 8 caracteres"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
           >
             {showPassword ? (
@@ -159,11 +161,11 @@ export const AuthRegisterForm = ({
       <button
         type="submit"
         disabled={isDisabled}
-        className="w-full py-2.5 px-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        className="w-full py-2.5 px-4 bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+            <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
             Creando cuenta…
           </span>
         ) : (
