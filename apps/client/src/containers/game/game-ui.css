@@ -1,4 +1,4 @@
-/* Minimal game UI — landing-aligned neon accents, no arcade animations */
+/* Minimal game UI — brand token-driven, responds to light/dark mode */
 
 .game-glow {
   pointer-events: none;
@@ -22,11 +22,11 @@
 }
 
 .game-panel {
-  border-color: rgb(124 92 252 / 0.18);
+  border-color: color-mix(in srgb, var(--color-brand) 18%, transparent);
   background: linear-gradient(
     180deg,
-    rgb(26 26 36 / 0.72) 0%,
-    rgb(9 9 15 / 0.92) 100%
+    color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg-base) 92%, transparent) 100%
   );
   backdrop-filter: blur(8px);
 }
@@ -48,13 +48,13 @@
 }
 
 .game-kbd {
-  border-color: rgb(124 92 252 / 0.28);
-  background: rgb(124 92 252 / 0.08);
+  border-color: color-mix(in srgb, var(--color-brand) 28%, transparent);
+  background: color-mix(in srgb, var(--color-brand) 8%, transparent);
   color: var(--color-brand-light);
 }
 
 .game-shell-accent {
-  border-bottom-color: rgb(124 92 252 / 0.16);
+  border-bottom-color: color-mix(in srgb, var(--color-brand) 16%, transparent);
 }
 
 .game-shell-logo {
@@ -77,12 +77,12 @@
 
 .game-card-feedback--correct {
   box-shadow:
-    0 0 0 2px rgb(34 211 160 / 0.55),
-    0 0 32px rgb(34 211 160 / 0.2);
+    0 0 0 2px color-mix(in srgb, var(--color-accent-green) 55%, transparent),
+    0 0 32px color-mix(in srgb, var(--color-accent-green) 20%, transparent);
 }
 
 .game-card-feedback--incorrect {
   box-shadow:
-    0 0 0 2px rgb(248 113 113 / 0.55),
-    0 0 32px rgb(248 113 113 / 0.18);
+    0 0 0 2px color-mix(in srgb, var(--color-accent-red) 55%, transparent),
+    0 0 32px color-mix(in srgb, var(--color-accent-red) 18%, transparent);
 }

@@ -23,10 +23,10 @@ const DEFAULT_VALUES: FlashcardFormValues = {
 };
 
 const selectClass =
-  'w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed';
+  'w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] disabled:opacity-40 disabled:cursor-not-allowed';
 
 const inputClass =
-  'w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20';
+  'w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)]';
 
 export const FlashcardFormModal = ({
   title,
@@ -90,14 +90,16 @@ export const FlashcardFormModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-start justify-center z-50 overflow-y-auto py-8 px-4">
-      <div className="w-full max-w-2xl bg-[var(--color-bg-surface,#1a1a2e)] rounded-2xl border border-white/10 shadow-2xl">
+      <div className="w-full max-w-2xl bg-[var(--color-bg-surface)] rounded-2xl border border-[var(--color-border)] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h2 className="text-white font-semibold text-lg">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)]">
+          <h2 className="text-[var(--color-text-primary)] font-semibold text-lg">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition text-xl leading-none"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition text-xl leading-none"
           >
             ×
           </button>
@@ -108,7 +110,7 @@ export const FlashcardFormModal = ({
           {/* Expresión + Significado */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Expresión *
               </label>
               <input
@@ -120,7 +122,7 @@ export const FlashcardFormModal = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Significado *
               </label>
               <input
@@ -136,7 +138,7 @@ export const FlashcardFormModal = ({
           {/* Categoría + Subcategoría — selects del catalog */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Categoría *
               </label>
               <select
@@ -156,7 +158,7 @@ export const FlashcardFormModal = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Subcategoría *
               </label>
               <select
@@ -183,13 +185,13 @@ export const FlashcardFormModal = ({
           {/* Ejemplos */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-300">
+              <label className="text-sm font-medium text-[var(--color-text-secondary)]">
                 Ejemplos
               </label>
               <button
                 type="button"
                 onClick={addExample}
-                className="text-xs text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition"
+                className="text-xs text-[var(--color-text-primary)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] px-2 py-1 rounded transition"
               >
                 + Agregar ejemplo
               </button>
@@ -198,9 +200,9 @@ export const FlashcardFormModal = ({
               {values.examples.map((ex, idx) => (
                 <div
                   key={ex.id}
-                  className="flex gap-2 items-start p-3 rounded-lg bg-white/5 border border-white/5"
+                  className="flex gap-2 items-start p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)]"
                 >
-                  <span className="text-gray-500 text-xs pt-2 w-4 shrink-0">
+                  <span className="text-[var(--color-text-muted)] text-xs pt-2 w-4 shrink-0">
                     {ex.position}
                   </span>
                   <div className="flex-1 grid grid-cols-2 gap-2">
@@ -211,7 +213,7 @@ export const FlashcardFormModal = ({
                       onChange={(e) =>
                         updateExample(idx, 'textEn', e.target.value)
                       }
-                      className="px-2 py-1.5 rounded bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-1 focus:ring-white/20"
+                      className="px-2 py-1.5 rounded bg-[var(--color-bg-card)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-dim)]"
                     />
                     <input
                       type="text"
@@ -220,7 +222,7 @@ export const FlashcardFormModal = ({
                       onChange={(e) =>
                         updateExample(idx, 'textEs', e.target.value)
                       }
-                      className="px-2 py-1.5 rounded bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-1 focus:ring-white/20"
+                      className="px-2 py-1.5 rounded bg-[var(--color-bg-card)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-dim)]"
                     />
                   </div>
                   <button
@@ -240,14 +242,14 @@ export const FlashcardFormModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition"
+              className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-5 py-2 text-sm bg-white text-black font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-5 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {isLoading ? 'Guardando...' : 'Guardar'}
             </button>

@@ -19,7 +19,7 @@ const AppRoutes = (): ReactElement => {
   if (!ready) {
     return (
       <div className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+        <div className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
       </div>
     );
   }

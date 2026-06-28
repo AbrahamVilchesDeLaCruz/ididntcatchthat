@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block private/app routes from indexing
+Disallow: /app/
+Disallow: /backoffice/
+Disallow: /auth/callback
+Disallow: /api/
+
+Sitemap: https://ididntcatchthat.com/sitemap.xml

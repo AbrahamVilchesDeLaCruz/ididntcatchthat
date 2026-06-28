@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
+import { ThemeToggle } from '@/common/components/ThemeToggle';
 
 interface LandingHeroProps {
   onPlay: () => void;
@@ -60,6 +61,8 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
             </Link>
           </>
         )}
+
+        <ThemeToggle variant="icon" />
 
         <button
           onClick={toggleLocale}

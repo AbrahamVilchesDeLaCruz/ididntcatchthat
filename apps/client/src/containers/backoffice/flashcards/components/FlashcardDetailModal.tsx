@@ -42,14 +42,14 @@ const AudioPlayerButton = ({
         onClick={handlePlay}
         className={`w-14 h-14 rounded-full text-2xl flex items-center justify-center border-2 transition-all ${
           isPlaying
-            ? 'border-white bg-white text-black scale-95'
-            : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40'
+            ? 'border-[var(--color-brand)] bg-[var(--color-brand)] text-white scale-95'
+            : 'border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] hover:border-[var(--color-brand)]'
         }`}
         aria-label={`Play ${label} accent`}
       >
         {isPlaying ? '⏹' : flag}
       </button>
-      <span className="text-xs text-gray-500">{label}</span>
+      <span className="text-xs text-[var(--color-text-muted)]">{label}</span>
     </div>
   );
 };
@@ -73,15 +73,15 @@ export const FlashcardDetailModal = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-[#12121f] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-[var(--color-bg-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4 border-b border-white/10">
+        <div className="flex items-start justify-between p-6 pb-4 border-b border-[var(--color-border)]">
           <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">
               {flashcard.expression}
             </h2>
             {flashcard.ipaNotation && (
-              <p className="text-sm text-gray-400 mt-1 font-mono">
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1 font-mono">
                 {flashcard.ipaNotation}
               </p>
             )}
@@ -89,7 +89,7 @@ export const FlashcardDetailModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-white transition text-xl leading-none ml-4 mt-1"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition text-xl leading-none ml-4 mt-1"
             aria-label="Cerrar"
           >
             ✕
@@ -99,40 +99,43 @@ export const FlashcardDetailModal = ({
         <div className="p-6 space-y-6">
           {/* Meaning + nativeSpeech */}
           <div className="space-y-1">
-            <p className="text-white/90 text-base">{flashcard.meaning}</p>
+            <p className="text-[var(--color-text-primary)] text-base">
+              {flashcard.meaning}
+            </p>
             {flashcard.nativeSpeech && (
-              <p className="text-gray-400 text-sm italic">
-                "{flashcard.nativeSpeech}"
+              <p className="text-[var(--color-text-secondary)] text-sm italic">
+                &ldquo;{flashcard.nativeSpeech}&rdquo;
               </p>
             )}
           </div>
 
           {/* Audio section */}
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 font-medium">
+            <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-3 font-medium">
               Pronunciación
             </p>
 
             {flashcard.audioStatus === 'pending' && (
-              <p className="text-gray-500 text-sm">
+              <p className="text-[var(--color-text-muted)] text-sm">
                 Audio pendiente de generar.
               </p>
             )}
 
             {flashcard.audioStatus === 'generating' && (
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <span className="w-3 h-3 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+              <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
+                <span className="w-3 h-3 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
                 Generando audio...
               </div>
             )}
 
             {flashcard.audioStatus === 'failed' && (
-              <p className="text-red-400 text-sm">Error al generar el audio.</p>
+              <p className="text-[var(--color-accent-red)] text-sm">
+                Error al generar el audio.
+              </p>
             )}
 
             {hasAudio && flashcard.audioUrls && (
               <div className="space-y-4">
-                {/* Expression audio — 3 accents */}
                 <div className="flex items-center gap-6">
                   <AudioPlayerButton
                     label="American"
@@ -151,9 +154,8 @@ export const FlashcardDetailModal = ({
                   />
                 </div>
 
-                {/* Examples audio */}
                 <div>
-                  <p className="text-xs text-gray-600 mb-2">
+                  <p className="text-xs text-[var(--color-text-muted)] mb-2">
                     Audio de ejemplos
                   </p>
                   <AudioPlayerButton
@@ -169,7 +171,7 @@ export const FlashcardDetailModal = ({
           {/* Examples */}
           {flashcard.examples.length > 0 && (
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 font-medium">
+              <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-3 font-medium">
                 Ejemplos
               </p>
               <ul className="space-y-3">
@@ -179,10 +181,12 @@ export const FlashcardDetailModal = ({
                   .map((ex) => (
                     <li
                       key={ex.id}
-                      className="bg-white/5 rounded-lg px-4 py-3 border border-white/5"
+                      className="bg-[var(--color-bg-elevated)] rounded-lg px-4 py-3 border border-[var(--color-border)]"
                     >
-                      <p className="text-white text-sm">{ex.textEn}</p>
-                      <p className="text-gray-400 text-sm mt-0.5">
+                      <p className="text-[var(--color-text-primary)] text-sm">
+                        {ex.textEn}
+                      </p>
+                      <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
                         {ex.textEs}
                       </p>
                     </li>
@@ -191,12 +195,12 @@ export const FlashcardDetailModal = ({
             </div>
           )}
 
-          {/* Meta */}
-          <div className="flex gap-2 flex-wrap pt-2 border-t border-white/5">
-            <span className="px-2.5 py-1 rounded-full bg-white/5 text-xs text-gray-400 border border-white/10">
+          {/* Meta chips */}
+          <div className="flex gap-2 flex-wrap pt-2 border-t border-[var(--color-border)]">
+            <span className="px-2.5 py-1 rounded-full bg-[var(--color-bg-elevated)] text-xs text-[var(--color-text-secondary)] border border-[var(--color-border)]">
               {flashcard.category}
             </span>
-            <span className="px-2.5 py-1 rounded-full bg-white/5 text-xs text-gray-400 border border-white/10">
+            <span className="px-2.5 py-1 rounded-full bg-[var(--color-bg-elevated)] text-xs text-[var(--color-text-secondary)] border border-[var(--color-border)]">
               {flashcard.subcategory}
             </span>
           </div>
