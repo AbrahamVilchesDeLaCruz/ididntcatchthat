@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ididntcatchthat.com — Brand Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  /* ---------- TOKENS ---------- */
+  :root{
+    --bg:#F5F3F9;
+    --surface:#FFFFFF;
+    --text:#15131D;
+    --text-muted:#6B6478;
+    --border:#E4DFEE;
+    --ink:#15131D;
+    --mist:#F5F3F9;
+    --signal:#F2A93B;
+    --signal-text:#A66A12;
+    --static:#E1503B;
+    --link:#2F9C92;
+    --radius:18px;
+    --radius-sm:10px;
+    --container:1180px;
+    --font-display:'Instrument Sans',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#120F1A;
+    --surface:#1D1828;
+    --text:#F5F3F9;
+    --text-muted:#A89FBC;
+    --border:#2C273A;
+    --ink:#F5F3F9;
+    --mist:#120F1A;
+    --signal:#F2A93B;
+    --signal-text:#F2A93B;
+    --static:#FF6B53;
+    --link:#4FC2B8;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease,color .25s ease;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+  h1,h2,h3,p,ul{margin:0;}
+  .signal-bit{stroke:var(--signal);fill:var(--signal);}
+  .link-bit{stroke:var(--link);fill:var(--link);}
+  .static-bit{stroke:var(--static);fill:var(--static);}
+
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 clamp(20px,4vw,48px) 80px;}
+
+  /* ---------- TOGGLE ---------- */
+  .toggle{
+    position:fixed;top:18px;right:18px;z-index:50;
+    display:flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:8px 14px;
+    font-family:var(--font-mono);font-size:12px;color:var(--text-muted);
+    cursor:pointer;box-shadow:0 6px 20px rgba(20,16,30,.08);
+  }
+  .toggle svg{width:14px;height:14px;color:var(--text);}
+
+  /* ---------- EYEBROW / SECTION HEADER ---------- */
+  .eyebrow{
+    display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .eyebrow .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--signal);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--signal) 25%, transparent);
+  }
+  .eyebrow .freq{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);letter-spacing:.05em;}
+  .section-title{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(22px,2.6vw,30px);letter-spacing:-0.01em;
+    text-transform:lowercase;margin-bottom:22px;
+  }
+  .section{padding-top:64px;border-top:1px solid var(--border);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;padding-top:90px;padding-bottom:56px;overflow:hidden;
+  }
+  .hero-arc{
+    position:absolute;right:-120px;top:-160px;width:560px;height:560px;
+    border:1px solid var(--border);border-radius:50%;
+    z-index:0;
+  }
+  .hero-arc.small{right:-40px;top:60px;width:300px;height:300px;}
+  .hero-inner{position:relative;z-index:1;}
+  .domain-tag{
+    font-family:var(--font-mono);font-size:13px;color:var(--text-muted);
+    border:1px solid var(--border);border-radius:999px;padding:6px 14px;
+    display:inline-block;margin-bottom:28px;
+  }
+  .lockup{display:flex;align-items:center;gap:18px;margin-bottom:26px;}
+  .lockup svg{width:64px;height:64px;color:var(--ink);flex:none;}
+  .wordmark{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(34px,5.2vw,56px);letter-spacing:-0.02em;line-height:1;
+  }
+  .wordmark .accent{color:var(--signal);}
+  .tagline-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:18px;}
+  .tagline-en{font-family:var(--font-display);font-weight:600;font-size:20px;color:var(--text-muted);}
+  .tagline-punch{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--text);}
+  .tagline-es{font-size:16px;color:var(--text-muted);margin-bottom:26px;max-width:560px;}
+  .desc{font-size:16px;line-height:1.6;max-width:620px;color:var(--text);margin-bottom:28px;}
+  .desc b{color:var(--text);font-weight:600;}
+  .flags{display:flex;gap:10px;flex-wrap:wrap;}
+  .flag-pill{
+    display:flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:8px 14px;font-size:13px;color:var(--text-muted);
+    font-family:var(--font-mono);
+  }
+
+  /* ---------- LOGO GRID ---------- */
+  .logo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:26px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;
+    text-align:center;
+  }
+  .card .label{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);}
+  .card .sub{font-size:12px;color:var(--text-muted);line-height:1.4;}
+  .card-icon{width:72px;height:72px;color:var(--ink);}
+  .card-wordmark-only{font-family:var(--font-display);font-weight:700;font-size:22px;}
+  .card-wordmark-only .accent{color:var(--signal);}
+
+  .contrast-card{
+    grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  @media (max-width:640px){.contrast-card{grid-template-columns:1fr;}}
+  .swatch-bg{
+    border-radius:var(--radius);padding:30px 20px;
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+  }
+  .swatch-bg.light{background:#FFFFFF;}
+  .swatch-bg.dark{background:#15131D;}
+  .swatch-bg .label{font-family:var(--font-mono);font-size:12px;}
+  .swatch-bg.light .label{color:#6B6478;}
+  .swatch-bg.dark .label{color:#A89FBC;}
+  .lockup-mini{display:flex;align-items:center;gap:10px;}
+  .lockup-mini svg{width:38px;height:38px;}
+  .lockup-mini .wm{font-family:var(--font-display);font-weight:700;font-size:20px;}
+
+  .clearspace-note{
+    grid-column:1/-1;font-size:13px;color:var(--text-muted);
+    border-left:2px solid var(--signal);padding-left:14px;margin-top:4px;
+  }
+
+  /* ---------- COLOR ---------- */
+  .palette{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:36px;}
+  .swatch{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);}
+  .swatch .chip{height:78px;}
+  .swatch .info{background:var(--surface);padding:12px 14px;}
+  .swatch .name{font-weight:600;font-size:14px;}
+  .swatch .hex{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+  .swatch .role{font-size:12px;color:var(--text-muted);line-height:1.4;}
+
+  .token-rows{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media (max-width:720px){.token-rows{grid-template-columns:1fr;}}
+  .token-group h4{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+  .token-list{display:flex;flex-direction:column;gap:8px;}
+  .token-item{display:flex;align-items:center;gap:10px;font-size:13px;}
+  .token-dot{width:18px;height:18px;border-radius:6px;border:1px solid var(--border);flex:none;}
+  .token-item .t-name{color:var(--text);min-width:90px;}
+  .token-item .t-hex{font-family:var(--font-mono);color:var(--text-muted);}
+
+  /* ---------- TYPE ---------- */
+  .type-row{display:grid;grid-template-columns:1fr;gap:34px;margin-bottom:40px;}
+  .type-sample-display{font-family:var(--font-display);font-weight:700;font-size:clamp(36px,6vw,68px);letter-spacing:-0.02em;line-height:1;}
+  .type-meta{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:10px;}
+  .type-sample-body{font-size:17px;line-height:1.6;max-width:640px;margin-top:14px;}
+  .type-ladder{display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-top:18px;}
+  .type-ladder span{font-family:var(--font-display);font-weight:600;}
+  .type-ladder .meta{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-top:4px;}
+
+  .duality{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:28px;margin-top:8px;
+  }
+  .duality-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:10px 0;border-bottom:1px dashed var(--border);}
+  .duality-row:last-child{border-bottom:none;}
+  .written{font-family:var(--font-display);font-size:18px;color:var(--text-muted);text-decoration:line-through;text-decoration-color:var(--static);}
+  .arrow{color:var(--text-muted);font-family:var(--font-mono);font-size:14px;}
+  .spoken{font-family:var(--font-mono);font-size:18px;color:var(--signal-text);font-weight:500;}
+  .duality-tag{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-left:auto;border:1px solid var(--border);border-radius:999px;padding:3px 10px;}
+
+  /* ---------- PILLARS ---------- */
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media (max-width:780px){.pillars{grid-template-columns:1fr;}}
+  .pillar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px;}
+  .pillar svg{width:36px;height:36px;color:var(--text);margin-bottom:16px;}
+  .pillar h3{font-family:var(--font-display);font-weight:700;font-size:18px;margin-bottom:8px;text-transform:lowercase;}
+  .pillar p{font-size:14px;line-height:1.55;color:var(--text-muted);}
+  .pillar .ipa{font-family:var(--font-mono);color:var(--signal-text);}
+
+  /* ---------- ICON / FAVICON ---------- */
+  .icon-grid{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-end;margin-bottom:30px;}
+  .tab-mock{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .tab{
+    display:flex;align-items:center;gap:6px;border-radius:10px 10px 0 0;
+    padding:8px 16px 8px 10px;min-width:140px;
+  }
+  .tab.light{background:#EDEAF4;border:1px solid #DDD7EA;}
+  .tab.dark{background:#241F30;border:1px solid #322B40;}
+  .tab svg{width:14px;height:14px;flex:none;}
+  .tab.light svg{color:#15131D;}
+  .tab.dark svg{color:#F5F3F9;}
+  .tab-line{height:6px;border-radius:3px;flex:1;}
+  .tab.light .tab-line{background:#C9C2D9;}
+  .tab.dark .tab-line{background:#433A55;}
+  .tab-caption{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+
+  .app-icon-mock{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .app-tile{
+    width:88px;height:88px;border-radius:22px;display:flex;align-items:center;justify-content:center;
+  }
+  .app-tile.dark-tile{background:#15131D;}
+  .app-tile.light-tile{background:#FFFFFF;border:1px solid var(--border);}
+  .app-tile svg{width:46px;height:46px;}
+  .app-tile.dark-tile svg{color:#F5F3F9;}
+  .app-tile.light-tile svg{color:#15131D;}
+
+  .icon-note{font-size:13px;color:var(--text-muted);max-width:640px;line-height:1.6;}
+
+  /* ---------- VOICE ---------- */
+  .voice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-bottom:32px;}
+  @media (max-width:680px){.voice-grid{grid-template-columns:1fr;}}
+  .voice-item{padding:18px 0;border-bottom:1px solid var(--border);}
+  .voice-item h4{font-family:var(--font-display);font-weight:700;font-size:16px;margin-bottom:6px;text-transform:lowercase;}
+  .voice-item p{font-size:13.5px;color:var(--text-muted);line-height:1.5;}
+
+  .before-after{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:680px){.before-after{grid-template-columns:1fr;}}
+  .ba-card{border-radius:var(--radius-sm);padding:18px;border:1px solid var(--border);}
+  .ba-card.no{background:color-mix(in srgb, var(--static) 8%, var(--surface));}
+  .ba-card.yes{background:color-mix(in srgb, var(--signal) 10%, var(--surface));}
+  .ba-tag{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block;}
+  .ba-card.no .ba-tag{color:var(--static);}
+  .ba-card.yes .ba-tag{color:var(--signal-text);}
+  .ba-card p{font-size:15px;line-height:1.5;font-family:var(--font-display);font-weight:600;}
+
+  /* ---------- FOOTER PREVIEW ---------- */
+  .preview-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:30px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between;
+    margin-top:10px;
+  }
+  .preview-word{font-family:var(--font-display);font-weight:700;font-size:40px;}
+  .preview-ipa{font-family:var(--font-mono);color:var(--signal-text);font-size:18px;margin-top:4px;}
+  .preview-note{font-size:13px;color:var(--text-muted);margin-top:8px;max-width:260px;}
+  .preview-accents{display:flex;gap:10px;}
+  .accent-chip{
+    display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);
+    border-radius:999px;padding:8px 12px;font-size:13px;
+  }
+  .accent-chip .play{color:var(--signal-text);font-size:10px;}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-family:var(--font-mono);font-size:12px;color:var(--text-muted);}
+</style>
+</head>
+<body data-theme="light">
+
+<!-- ============ SVG SYMBOLS ============ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="mark-abstract" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="3" opacity="0.9"/>
+      <g stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.4">
+        <line x1="50" y1="16" x2="50" y2="8"/>
+        <line x1="70" y1="22.5" x2="74.7" y2="16"/>
+        <line x1="82.3" y1="60.5" x2="90" y2="63"/>
+        <line x1="70" y1="77.5" x2="74.7" y2="84"/>
+        <line x1="50" y1="84" x2="50" y2="92"/>
+        <line x1="30" y1="77.5" x2="25.3" y2="84"/>
+        <line x1="17.7" y1="60.5" x2="10" y2="63"/>
+        <line x1="17.7" y1="39.5" x2="10" y2="37"/>
+        <line x1="30" y1="22.5" x2="25.3" y2="16"/>
+      </g>
+      <line class="signal-bit" x1="77.6" y1="41" x2="92.8" y2="36.1" stroke-width="5" stroke-linecap="round"/>
+      <line x1="50" y1="50" x2="72.8" y2="42.6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+      <circle class="signal-bit" cx="50" cy="50" r="7"/>
+    </symbol>
+
+    <symbol id="mark-letter" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="3" opacity="0.9"/>
+      <line class="signal-bit" x1="77.6" y1="41" x2="92.8" y2="36.1" stroke-width="5" stroke-linecap="round"/>
+      <rect x="45.5" y="46" width="9" height="32" rx="4.5" fill="currentColor"/>
+      <circle class="signal-bit" cx="55" cy="34" r="7"/>
+    </symbol>
+
+    <symbol id="pillar-phonetics" viewBox="0 0 40 40">
+      <g stroke-linecap="round" stroke-width="4">
+        <line x1="8" y1="26" x2="8" y2="14" stroke="currentColor"/>
+        <line class="signal-bit" x1="16" y1="30" x2="16" y2="8" stroke-width="4"/>
+        <line x1="24" y1="24" x2="24" y2="16" stroke="currentColor"/>
+        <line x1="32" y1="28" x2="32" y2="10" stroke="currentColor" opacity="0.55"/>
+      </g>
+    </symbol>
+
+    <symbol id="pillar-connected" viewBox="0 0 40 40">
+      <rect x="4" y="14" width="16" height="16" rx="8" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <rect class="link-bit" x="20" y="14" width="16" height="16" rx="8" fill="none" stroke-width="2.5"/>
+      <line class="link-bit" x1="14" y1="22" x2="26" y2="22" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+
+    <symbol id="pillar-expressions" viewBox="0 0 40 40">
+      <path d="M6 10 h28 a2 2 0 0 1 2 2 v14 a2 2 0 0 1 -2 2 h-18 l-6 6 v-6 h-4 a2 2 0 0 1 -2 -2 v-14 a2 2 0 0 1 2 -2 z"
+        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+      <path class="signal-bit" d="M24 16 l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2 z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============ TOGGLE ============ -->
+<button class="toggle" id="themeToggle" aria-label="Cambiar a modo oscuro">
+  <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2 2M17.8 17.8l2 2M2 12h3M19 12h3M4.2 19.8l2-2M17.8 6.2l2-2"/></svg>
+  <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
+  <span id="toggleLabel">modo oscuro</span>
+</button>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-arc"></div>
+    <div class="hero-arc small"></div>
+    <div class="hero-inner">
+      <span class="domain-tag">ididntcatchthat.com · brand sheet · v1.0</span>
+
+      <div class="lockup">
+        <svg><use href="#mark-abstract"/></svg>
+        <div class="wordmark">i didn't <span class="accent">catch</span> that</div>
+      </div>
+
+      <div class="tagline-row">
+        <span class="tagline-en">"I Didn't Catch That."</span>
+        <span class="tagline-punch">— Not anymore.</span>
+      </div>
+      <p class="tagline-es">El inglés que de verdad se habla.</p>
+
+      <p class="desc">
+        Plataforma gamificada de inglés que entrena el oído, no la memoria. Mientras otras apps apuestan por
+        vocabulario y reglas de gramática, aquí el foco está en <b>cómo suena</b> el inglés real: los 23 sonidos
+        que de verdad existen, lo que pasa cuando las palabras se pegan al hablar rápido, y las expresiones que
+        un nativo usa y un libro de texto nunca enseña.
+      </p>
+
+      <div class="flags">
+        <span class="flag-pill">🇺🇸 acento americano</span>
+        <span class="flag-pill">🇬🇧 acento británico</span>
+        <span class="flag-pill">🇦🇺 acento australiano</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LOGO ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.1 — LOGOTIPO</span></div>
+    <h2 class="section-title">sistema de marca</h2>
+
+    <div class="logo-grid">
+
+      <div class="card contrast-card">
+        <div class="swatch-bg light">
+          <div class="lockup-mini" style="color:#15131D">
+            <svg><use href="#mark-abstract"/></svg>
+            <span class="wm">i didn't <span style="color:#F2A93B">catch</span> that</span>
+          </div>
+          <span class="label">sobre claro</span>
+        </div>
+        <div class="swatch-bg dark">
+          <div class="lockup-mini" style="color:#F5F3F9">
+            <svg><use href="#mark-abstract"/></svg>
+            <span class="wm">i didn't <span style="color:#F2A93B">catch</span> that</span>
+          </div>
+          <span class="label">sobre oscuro</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <svg class="card-icon"><use href="#mark-letter"/></svg>
+        <span class="label">icono con letra</span>
+        <span class="sub">monograma "i" — el punto marca la frecuencia sintonizada. Úsalo desde 48px: app icon, sello, avatar.</span>
+      </div>
+
+      <div class="card">
+        <svg class="card-icon"><use href="#mark-abstract"/></svg>
+        <span class="label">icono sin letra</span>
+        <span class="sub">el dial puro — un aro, una marca, una aguja. El favicon y los espacios diminutos viven aquí.</span>
+      </div>
+
+      <div class="card">
+        <span class="card-wordmark-only">i didn't <span class="accent">catch</span> that</span>
+        <span class="label">wordmark solo</span>
+        <span class="sub">para contextos donde el icono ya está presente en otro lugar (header, footer, firma de email).</span>
+      </div>
+
+      <div class="card">
+        <svg class="card-icon" style="color:var(--text-muted)"><use href="#mark-abstract"/></svg>
+        <span class="label">versión monocromática</span>
+        <span class="sub">para grabado, impresión a una tinta o marcas de agua. Un solo color, sin ámbar.</span>
+      </div>
+
+      <p class="clearspace-note">
+        Espacio de protección: deja alrededor del icono un margen mínimo igual a la altura de la "i" del wordmark.
+        Nunca lo encierres en una caja más ajustada que eso, ni lo apoyes sobre fondos con texturas que compitan con el aro.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ COLOR ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.2 — COLOR</span></div>
+    <h2 class="section-title">paleta de identidad</h2>
+
+    <div class="palette">
+      <div class="swatch">
+        <div class="chip" style="background:#F2A93B"></div>
+        <div class="info">
+          <div class="name">Signal</div>
+          <div class="hex">#F2A93B</div>
+          <div class="role">la frecuencia bien sintonizada: CTAs, aciertos, el icono.</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#E1503B"></div>
+        <div class="info">
+          <div class="name">Static</div>
+          <div class="hex">#E1503B</div>
+          <div class="role">el ruido de no entender: errores, tachados, alertas.</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#2F9C92"></div>
+        <div class="info">
+          <div class="name">Link</div>
+          <div class="hex">#2F9C92</div>
+          <div class="role">palabras conectándose: connected speech, líneas de unión.</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#15131D"></div>
+        <div class="info">
+          <div class="name">Ink</div>
+          <div class="hex">#15131D</div>
+          <div class="role">texto y trazo principal en modo claro.</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#F5F3F9;border-bottom:1px solid #E4DFEE"></div>
+        <div class="info">
+          <div class="name">Mist</div>
+          <div class="hex">#F5F3F9</div>
+          <div class="role">fondo en modo claro, texto en modo oscuro.</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#6B6478"></div>
+        <div class="info">
+          <div class="name">Fog</div>
+          <div class="hex">#6B6478</div>
+          <div class="role">texto secundario, bordes, silencio entre frases.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="token-rows">
+      <div class="token-group">
+        <h4>modo claro</h4>
+        <div class="token-list">
+          <div class="token-item"><span class="token-dot" style="background:#F5F3F9"></span><span class="t-name">bg</span><span class="t-hex">#F5F3F9</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#FFFFFF"></span><span class="t-name">surface</span><span class="t-hex">#FFFFFF</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#15131D"></span><span class="t-name">text</span><span class="t-hex">#15131D</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#6B6478"></span><span class="t-name">text-muted</span><span class="t-hex">#6B6478</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#E4DFEE"></span><span class="t-name">border</span><span class="t-hex">#E4DFEE</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#A66A12"></span><span class="t-name">signal-text</span><span class="t-hex">#A66A12 (texto accesible)</span></div>
+        </div>
+      </div>
+      <div class="token-group">
+        <h4>modo oscuro</h4>
+        <div class="token-list">
+          <div class="token-item"><span class="token-dot" style="background:#120F1A"></span><span class="t-name">bg</span><span class="t-hex">#120F1A</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#1D1828"></span><span class="t-name">surface</span><span class="t-hex">#1D1828</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#F5F3F9"></span><span class="t-name">text</span><span class="t-hex">#F5F3F9</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#A89FBC"></span><span class="t-name">text-muted</span><span class="t-hex">#A89FBC</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#2C273A"></span><span class="t-name">border</span><span class="t-hex">#2C273A</span></div>
+          <div class="token-item"><span class="token-dot" style="background:#F2A93B"></span><span class="t-name">signal-text</span><span class="t-hex">#F2A93B (ya con contraste de sobra)</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TYPE ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.3 — TIPOGRAFÍA</span></div>
+    <h2 class="section-title">cómo se escribe la marca</h2>
+
+    <div class="type-row">
+      <div>
+        <div class="type-sample-display">catch it.</div>
+        <div class="type-meta">INSTRUMENT SANS · 600/700 · titulares, wordmark, números grandes</div>
+      </div>
+      <div>
+        <p class="type-sample-body">
+          Inter es la voz de todos los días: la que explica una regla de pronunciación, la que aparece en un botón,
+          la que escribe el cuerpo de un email. Funciona igual de bien en español que en inglés, con buen soporte
+          para tildes y eñes.
+        </p>
+        <div class="type-meta">INTER · 400/500/600 · cuerpo de texto, UI</div>
+      </div>
+      <div>
+        <div class="type-ladder">
+          <span style="font-size:40px">Aa</span>
+          <span style="font-size:28px">Aa</span>
+          <span style="font-size:20px">Aa</span>
+          <span style="font-size:16px">Aa</span>
+          <span style="font-size:14px">Aa</span>
+          <span style="font-size:12px">Aa</span>
+        </div>
+        <div class="type-meta">escala — 40 / 28 / 20 / 16 / 14 / 12 px</div>
+      </div>
+    </div>
+
+    <div class="eyebrow" style="margin-top:8px"><span class="dot"></span><span class="freq">tipografía de soporte</span></div>
+    <p class="sub" style="color:var(--text-muted);font-size:13px;margin-bottom:6px">
+      JetBrains Mono es la fuente que usamos solo para una cosa: transcripción fonética. Es la pieza que distingue
+      a esta marca de cualquier otra app de inglés — lo que se escribe nunca es igual a lo que se dice.
+    </p>
+    <div class="duality">
+      <div class="duality-row">
+        <span class="written">want to</span><span class="arrow">se dice como</span><span class="spoken">/ˈwɑnə/</span>
+        <span class="duality-tag">reduction</span>
+      </div>
+      <div class="duality-row">
+        <span class="written">water</span><span class="arrow">se dice como</span><span class="spoken">/ˈwɑɾɚ/</span>
+        <span class="duality-tag">flap T</span>
+      </div>
+      <div class="duality-row">
+        <span class="written">think / this</span><span class="arrow">se dice como</span><span class="spoken">/θɪŋk/ /ðɪs/</span>
+        <span class="duality-tag">sonidos sin equivalente en español</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PILLARS ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.4 — LOS TRES PILARES</span></div>
+    <h2 class="section-title">en qué se diferencia</h2>
+
+    <div class="pillars">
+      <div class="pillar">
+        <svg><use href="#pillar-phonetics"/></svg>
+        <h3>fonética real</h3>
+        <p>Los 23 sonidos del inglés, con foco en los que más le cuestan a un hispanohablante:
+          <span class="ipa">/θ/ /ð/ /ɹ/</span> y las vocales que en español simplemente no existen.</p>
+      </div>
+      <div class="pillar">
+        <svg><use href="#pillar-connected"/></svg>
+        <h3>connected speech</h3>
+        <p>Cómo cambian las palabras cuando se hablan rápido: flap T, linking, reducciones.
+          El inglés que se <i>oye</i>, no el que se escribe en el libro.</p>
+      </div>
+      <div class="pillar">
+        <svg><use href="#pillar-expressions"/></svg>
+        <h3>expresiones nativas</h3>
+        <p>Vocabulario coloquial real, el que usan los nativos en una conversación de verdad
+          — y que ningún libro de texto enseña.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ICON / FAVICON ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.5 — ICONOGRAFÍA Y FAVICON</span></div>
+    <h2 class="section-title">la marca en miniatura</h2>
+
+    <div class="icon-grid">
+      <div class="tab-mock">
+        <div class="tab light">
+          <svg><use href="#mark-abstract"/></svg>
+          <div class="tab-line"></div>
+        </div>
+        <span class="tab-caption">favicon · navegador claro</span>
+      </div>
+      <div class="tab-mock">
+        <div class="tab dark">
+          <svg><use href="#mark-abstract"/></svg>
+          <div class="tab-line"></div>
+        </div>
+        <span class="tab-caption">favicon · navegador oscuro</span>
+      </div>
+
+      <div class="app-icon-mock">
+        <div class="app-tile dark-tile"><svg><use href="#mark-abstract"/></svg></div>
+        <span class="tab-caption">app icon · abstracto</span>
+      </div>
+      <div class="app-icon-mock">
+        <div class="app-tile light-tile"><svg><use href="#mark-letter"/></svg></div>
+        <span class="tab-caption">app icon · con letra</span>
+      </div>
+    </div>
+
+    <p class="icon-note">
+      Usa el <b>icono sin letra</b> en cualquier espacio de 32px o menos: favicon, avatar de chat, ícono de
+      notificación. El <b>icono con letra</b> funciona a partir de 48px, donde el monograma respira: app icon,
+      sello de certificado, marca de agua en redes.
+    </p>
+  </section>
+
+  <!-- ============ VOICE ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.6 — VOZ DE MARCA</span></div>
+    <h2 class="section-title">cómo habla la marca</h2>
+
+    <div class="voice-grid">
+      <div class="voice-item">
+        <h4>directa</h4>
+        <p>Dice lo que pasa, sin inflarlo. "No vas a entender el 'gonna' si nadie te explica por qué suena así" — no "¡desbloquea tu potencial!"</p>
+      </div>
+      <div class="voice-item">
+        <h4>técnica pero clara</h4>
+        <p>Puede nombrar un fonema o una regla de connected speech sin sonar a manual de lingüística.</p>
+      </div>
+      <div class="voice-item">
+        <h4>cómplice</h4>
+        <p>Le habla a alguien que ya estudió inglés diez años y sigue sin entender una serie sin subtítulos. No lo sermonea, lo entiende.</p>
+      </div>
+      <div class="voice-item">
+        <h4>segura de su nicho</h4>
+        <p>No compite en vocabulario ni gramática — ni lo intenta. Su territorio es el sonido, y lo dice sin pedir disculpas.</p>
+      </div>
+    </div>
+
+    <div class="before-after">
+      <div class="ba-card no">
+        <span class="ba-tag">genérico</span>
+        <p>"¡Mejora tu pronunciación hoy mismo!"</p>
+      </div>
+      <div class="ba-card yes">
+        <span class="ba-tag">ididntcatchthat</span>
+        <p>"Deja de adivinar lo que dicen. Empieza a entenderlo."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER PREVIEW ============ -->
+  <section class="section">
+    <div class="eyebrow"><span class="dot"></span><span class="freq">100.7 — VISTA PREVIA</span></div>
+    <h2 class="section-title">todo junto, en una tarjeta</h2>
+
+    <div class="preview-card">
+      <div>
+        <div class="preview-word">gonna</div>
+        <div class="preview-ipa">/ˈɡənə/</div>
+        <p class="preview-note">going to → gonna. Una reducción tan común que casi nunca se oye la versión completa.</p>
+      </div>
+      <div class="preview-accents">
+        <span class="accent-chip"><span class="play">▶</span> 🇺🇸</span>
+        <span class="accent-chip"><span class="play">▶</span> 🇬🇧</span>
+        <span class="accent-chip"><span class="play">▶</span> 🇦🇺</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>ididntcatchthat.com</span>
+    <span>brand sheet v1.0 — junio 2026</span>
+  </footer>
+
+</div>
+
+<script>
+  const body = document.body;
+  const btn = document.getElementById('themeToggle');
+  const sun = document.getElementById('iconSun');
+  const moon = document.getElementById('iconMoon');
+  const label = document.getElementById('toggleLabel');
+
+  btn.addEventListener('click', () => {
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    sun.style.display = isDark ? 'block' : 'none';
+    moon.style.display = isDark ? 'none' : 'block';
+    label.textContent = isDark ? 'modo oscuro' : 'modo claro';
+    btn.setAttribute('aria-label', isDark ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+  });
+</script>
+
+</body>
+</html>
