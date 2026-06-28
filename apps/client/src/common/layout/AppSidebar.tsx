@@ -47,13 +47,15 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
 
   return (
     <>
-      {/* Logo */}
+      {/* Wordmark */}
       <Link
         to="/"
         onClick={onNavigate}
-        className="mb-8 block px-3 text-lg font-bold text-[var(--color-text-primary)]"
+        className="mb-8 block px-3 text-lg font-bold leading-none tracking-tight text-[var(--color-text-primary)]"
+        style={{ fontFamily: 'var(--font-display)' }}
       >
-        ididntcatchthat
+        i didn&apos;t <span className="text-[var(--color-brand)]">catch</span>{' '}
+        that
       </Link>
 
       {/* Navigation */}
