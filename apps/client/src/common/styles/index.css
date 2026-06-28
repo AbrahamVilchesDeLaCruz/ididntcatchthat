@@ -43,16 +43,15 @@
   --radius-full: 9999px;
 }
 
-/* ─── Light mode token overrides ────────────────────────────────────────────── */
+/* ─── Light mode: sistema preferencia (sin override explícito) ──────────────── */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme="dark"]) {
     --color-bg-base:     #F5F3F9;
     --color-bg-surface:  #FFFFFF;
     --color-bg-elevated: #EDEAF6;
     --color-bg-card:     #FFFFFF;
 
     --color-brand-dim:        #FEF0D6;
-    --color-accent-green:     #2F9C92;
     --color-accent-green-dim: #E5F5F4;
     --color-accent-red:       #E1503B;
 
@@ -64,27 +63,106 @@
     --color-text-muted:     #9D96B0;
     --color-signal-text:    #A66A12;
 
-    /* shadcn/ui — light */
-    --background:         270 33% 96%;
-    --foreground:         252 21% 9%;
-    --card:               0 0% 100%;
-    --card-foreground:    252 21% 9%;
-    --popover:            0 0% 100%;
-    --popover-foreground: 252 21% 9%;
-    --primary:            38 88% 59%;
-    --primary-foreground: 252 21% 9%;
-    --secondary:          265 24% 90%;
-    --secondary-foreground: 252 21% 9%;
-    --muted:              265 24% 90%;
-    --muted-foreground:   270 9% 43%;
-    --accent:             265 24% 90%;
-    --accent-foreground:  252 21% 9%;
-    --destructive:        7 72% 56%;
+    --background:             270 33% 96%;
+    --foreground:             252 21% 9%;
+    --card:                   0 0% 100%;
+    --card-foreground:        252 21% 9%;
+    --popover:                0 0% 100%;
+    --popover-foreground:     252 21% 9%;
+    --primary:                38 88% 59%;
+    --primary-foreground:     252 21% 9%;
+    --secondary:              265 24% 90%;
+    --secondary-foreground:   252 21% 9%;
+    --muted:                  265 24% 90%;
+    --muted-foreground:       270 9% 43%;
+    --accent:                 265 24% 90%;
+    --accent-foreground:      252 21% 9%;
+    --destructive:            7 72% 56%;
     --destructive-foreground: 0 0% 100%;
-    --border:             265 24% 90%;
-    --input:              265 24% 90%;
-    --ring:               38 88% 59%;
+    --border:                 265 24% 90%;
+    --input:                  265 24% 90%;
+    --ring:                   38 88% 59%;
   }
+}
+
+/* ─── Light mode explícito — data-theme="light" en <html> ───────────────────── */
+[data-theme="light"] {
+  --color-bg-base:     #F5F3F9;
+  --color-bg-surface:  #FFFFFF;
+  --color-bg-elevated: #EDEAF6;
+  --color-bg-card:     #FFFFFF;
+
+  --color-brand-dim:        #FEF0D6;
+  --color-accent-green-dim: #E5F5F4;
+  --color-accent-red:       #E1503B;
+
+  --color-border:        #E4DFEE;
+  --color-border-strong: #CBC4DC;
+
+  --color-text-primary:   #15131D;
+  --color-text-secondary: #6B6478;
+  --color-text-muted:     #9D96B0;
+  --color-signal-text:    #A66A12;
+
+  --background:             270 33% 96%;
+  --foreground:             252 21% 9%;
+  --card:                   0 0% 100%;
+  --card-foreground:        252 21% 9%;
+  --popover:                0 0% 100%;
+  --popover-foreground:     252 21% 9%;
+  --primary:                38 88% 59%;
+  --primary-foreground:     252 21% 9%;
+  --secondary:              265 24% 90%;
+  --secondary-foreground:   252 21% 9%;
+  --muted:                  265 24% 90%;
+  --muted-foreground:       270 9% 43%;
+  --accent:                 265 24% 90%;
+  --accent-foreground:      252 21% 9%;
+  --destructive:            7 72% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border:                 265 24% 90%;
+  --input:                  265 24% 90%;
+  --ring:                   38 88% 59%;
+}
+
+/* ─── Dark mode explícito — data-theme="dark" en <html> (fuerza oscuro) ─────── */
+[data-theme="dark"] {
+  --color-bg-base:     #120F1A;
+  --color-bg-surface:  #1D1828;
+  --color-bg-elevated: #251F35;
+  --color-bg-card:     #1D1828;
+
+  --color-brand-dim:        #3D2A08;
+  --color-accent-green-dim: #0D3534;
+  --color-accent-red:       #FF6B53;
+
+  --color-border:        #2C273A;
+  --color-border-strong: #3D3650;
+
+  --color-text-primary:   #F5F3F9;
+  --color-text-secondary: #A89FBC;
+  --color-text-muted:     #6B6478;
+  --color-signal-text:    #F2A93B;
+
+  --background:             262 27% 8%;
+  --foreground:             270 33% 96%;
+  --card:                   265 25% 13%;
+  --card-foreground:        270 33% 96%;
+  --popover:                265 25% 13%;
+  --popover-foreground:     270 33% 96%;
+  --primary:                38 88% 59%;
+  --primary-foreground:     252 21% 9%;
+  --secondary:              262 20% 19%;
+  --secondary-foreground:   270 33% 96%;
+  --muted:                  262 20% 19%;
+  --muted-foreground:       265 19% 68%;
+  --accent:                 262 20% 19%;
+  --accent-foreground:      270 33% 96%;
+  --destructive:            9 100% 66%;
+  --destructive-foreground: 0 0% 100%;
+  --border:                 262 20% 19%;
+  --input:                  262 20% 19%;
+  --ring:                   38 88% 59%;
 }
 
 /* ─── shadcn/ui CSS variables — dark theme (mapped to new tokens) ────────────── */

@@ -40,6 +40,18 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
     />
 
+    <!-- ─── Theme init (evita flash) ────────────────────────────────────── -->
+    <script>
+      (function () {
+        var stored = localStorage.getItem('idct-theme');
+        var pref = stored ? JSON.parse(stored).state?.preference : 'system';
+        var isLight =
+          pref === 'light' ||
+          (pref !== 'dark' && window.matchMedia('(prefers-color-scheme: light)').matches);
+        document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+      })();
+    </script>
+
     <!-- ─── Favicon ───────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

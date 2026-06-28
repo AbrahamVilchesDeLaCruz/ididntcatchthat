@@ -1,6 +1,6 @@
 import { useState, type ReactElement } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, Moon, Sun, Monitor } from 'lucide-react';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useLogout } from '@/containers/auth/api';
@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/common/components/ui/sheet';
 import { Button } from '@/common/components/ui/button';
+import { useTheme } from '@/core/store/useTheme';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -17,6 +18,36 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
       ? 'bg-white/10 text-white'
       : 'text-gray-400 hover:text-white hover:bg-white/5'
   }`;
+
+const ThemeToggle = (): ReactElement => {
+  const { preference, setPreference } = useTheme();
+
+  const options = [
+    { value: 'light', icon: Sun, label: 'Claro' },
+    { value: 'system', icon: Monitor, label: 'Sistema' },
+    { value: 'dark', icon: Moon, label: 'Oscuro' },
+  ] as const;
+
+  return (
+    <div className="flex items-center gap-1 px-3 py-2 rounded-lg border border-[var(--color-border)] mb-1">
+      {options.map(({ value, icon: Icon, label }) => (
+        <button
+          key={value}
+          type="button"
+          aria-label={label}
+          onClick={() => setPreference(value)}
+          className={`flex-1 flex items-center justify-center p-1.5 rounded-md transition-colors ${
+            preference === value
+              ? 'bg-[var(--color-brand)] text-white'
+              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+          }`}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </button>
+      ))}
+    </div>
+  );
+};
 
 interface SidebarContentProps {
   onNavigate?: () => void;
@@ -127,6 +158,9 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
           </div>
         )}
       </nav>
+
+      {/* Theme toggle */}
+      <ThemeToggle />
 
       {/* Logout */}
       <button
