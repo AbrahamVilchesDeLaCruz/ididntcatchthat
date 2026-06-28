@@ -118,8 +118,10 @@ export const BackofficeFlashcardsComponent = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Flashcards</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+            Flashcards
+          </h1>
+          <p className="text-[var(--color-text-secondary)] text-sm mt-1">
             {total} flashcards en total
           </p>
         </div>
@@ -127,21 +129,21 @@ export const BackofficeFlashcardsComponent = ({
           <button
             type="button"
             onClick={() => setIsAiModalOpen(true)}
-            className="px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition text-sm border border-white/10"
+            className="px-4 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium rounded-lg hover:bg-[var(--color-bg-card)] transition text-sm border border-[var(--color-border)]"
           >
             ✨ Generar con IA
           </button>
           <button
             type="button"
             onClick={() => setIsBulkModalOpen(true)}
-            className="px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition text-sm border border-white/10"
+            className="px-4 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium rounded-lg hover:bg-[var(--color-bg-card)] transition text-sm border border-[var(--color-border)]"
           >
             + Bloque
           </button>
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition text-sm"
+            className="px-4 py-2 bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 transition text-sm"
           >
             + Nueva flashcard
           </button>
@@ -170,7 +172,7 @@ export const BackofficeFlashcardsComponent = ({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-400">
+        <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
           <span>
             Página {page} de {totalPages}
           </span>
@@ -179,7 +181,7 @@ export const BackofficeFlashcardsComponent = ({
               type="button"
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
               Anterior
             </button>
@@ -187,7 +189,7 @@ export const BackofficeFlashcardsComponent = ({
               type="button"
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
-              className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
               Siguiente
             </button>
@@ -235,18 +237,18 @@ export const BackofficeFlashcardsComponent = ({
       {/* Delete confirm */}
       {deletingId && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[var(--color-bg-surface,#1a1a2e)] rounded-xl p-6 w-full max-w-sm border border-white/10">
-            <h3 className="text-white font-semibold text-lg mb-2">
+          <div className="bg-[var(--color-bg-surface)] rounded-xl p-6 w-full max-w-sm border border-[var(--color-border)]">
+            <h3 className="text-[var(--color-text-primary)] font-semibold text-lg mb-2">
               ¿Eliminar flashcard?
             </h3>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-[var(--color-text-secondary)] text-sm mb-6">
               Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 type="button"
                 onClick={() => setDeletingId(null)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition"
+                className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
               >
                 Cancelar
               </button>

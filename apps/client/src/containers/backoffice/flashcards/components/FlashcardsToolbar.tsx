@@ -12,7 +12,7 @@ const AUDIO_STATUS_LABELS: Record<AudioStatus, string> = {
 };
 
 const selectClass =
-  'px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed';
+  'px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] disabled:opacity-40 disabled:cursor-not-allowed';
 
 interface FlashcardsToolbarProps {
   catalog: FlashcardCatalogApiModel | undefined;
@@ -125,7 +125,7 @@ export const FlashcardsToolbar = ({
         <button
           type="button"
           onClick={handleClearFilters}
-          className="text-sm text-gray-400 hover:text-white transition"
+          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
         >
           Limpiar filtros
         </button>
