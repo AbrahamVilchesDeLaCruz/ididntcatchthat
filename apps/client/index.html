@@ -2,9 +2,105 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+
+    <!-- ─── Primary SEO ──────────────────────────────────────────────────── -->
+    <title>ididntcatchthat — English pronunciation for real conversations</title>
+    <meta name="description" content="Learn the English you actually hear. Real connected speech, native expressions, and phonetics — gamified." />
+    <meta name="keywords" content="english pronunciation, connected speech, phonetics, language learning, ESL, listening skills" />
+    <meta name="author" content="ididntcatchthat" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://ididntcatchthat.com/" />
+
+    <!-- ─── Open Graph (Facebook, LinkedIn, WhatsApp) ────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ididntcatchthat" />
+    <meta property="og:title" content="ididntcatchthat — English pronunciation for real conversations" />
+    <meta property="og:description" content="Learn the English you actually hear. Real connected speech, native expressions, and phonetics — gamified." />
+    <meta property="og:url" content="https://ididntcatchthat.com/" />
+    <meta property="og:image" content="https://ididntcatchthat.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ididntcatchthat — English pronunciation platform" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ─── Twitter / X Card ──────────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@ididntcatchthat" />
+    <meta name="twitter:title" content="ididntcatchthat — English pronunciation for real conversations" />
+    <meta name="twitter:description" content="Learn the English you actually hear. Real connected speech, native expressions, and phonetics — gamified." />
+    <meta name="twitter:image" content="https://ididntcatchthat.com/og-image.png" />
+    <meta name="twitter:image:alt" content="ididntcatchthat — English pronunciation platform" />
+
+    <!-- ─── Fonts ────────────────────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    />
+
+    <!-- ─── Theme init (evita flash) ────────────────────────────────────── -->
+    <script>
+      (function () {
+        var stored = localStorage.getItem('idct-theme');
+        var pref = stored ? JSON.parse(stored).state?.preference : 'system';
+        var isLight =
+          pref === 'light' ||
+          (pref !== 'dark' && window.matchMedia('(prefers-color-scheme: light)').matches);
+        document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+      })();
+    </script>
+
+    <!-- ─── Favicon ───────────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- ─── Structured Data (JSON-LD) ─────────────────────────────────────── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://ididntcatchthat.com/#website",
+            "url": "https://ididntcatchthat.com/",
+            "name": "ididntcatchthat",
+            "description": "English pronunciation platform focused on real connected speech and native expressions.",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "EducationalOrganization",
+            "@id": "https://ididntcatchthat.com/#organization",
+            "name": "ididntcatchthat",
+            "url": "https://ididntcatchthat.com/",
+            "description": "Gamified English pronunciation learning platform focused on connected speech and real listening skills.",
+            "sameAs": [
+              "https://twitter.com/ididntcatchthat"
+            ]
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://ididntcatchthat.com/#webapp",
+            "name": "ididntcatchthat",
+            "url": "https://ididntcatchthat.com/",
+            "applicationCategory": "EducationApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "featureList": [
+              "Phonetic pronunciation training",
+              "Connected speech patterns",
+              "Spaced repetition flashcards",
+              "Native audio samples",
+              "Gamified learning sessions"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

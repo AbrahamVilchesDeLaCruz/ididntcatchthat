@@ -64,8 +64,12 @@ export const AuthCallbackContainer = (): ReactElement => {
               />
             </svg>
           </div>
-          <p className="text-white font-medium mb-1">{errorMessage}</p>
-          <p className="text-gray-500 text-sm">Redirigiendo al login…</p>
+          <p className="text-[var(--color-text-primary)] font-medium mb-1">
+            {errorMessage}
+          </p>
+          <p className="text-[var(--color-text-muted)] text-sm">
+            Redirigiendo al login…
+          </p>
         </div>
       </div>
     );
@@ -74,8 +78,10 @@ export const AuthCallbackContainer = (): ReactElement => {
   return (
     <div className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center">
       <div className="text-center">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin mx-auto mb-3" />
-        <p className="text-gray-400 text-sm">Iniciando sesión con Google…</p>
+        <div className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin mx-auto mb-3" />
+        <p className="text-[var(--color-text-secondary)] text-sm">
+          Iniciando sesión con Google…
+        </p>
       </div>
     </div>
   );

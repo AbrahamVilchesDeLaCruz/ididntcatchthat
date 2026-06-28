@@ -60,21 +60,21 @@ export const BulkCreateModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-[var(--color-bg-surface,#1a1a2e)] rounded-xl w-full max-w-2xl border border-white/10 flex flex-col max-h-[90vh]">
+      <div className="bg-[var(--color-bg-surface)] rounded-xl w-full max-w-2xl border border-[var(--color-border)] flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div>
-            <h2 className="text-white font-semibold text-lg">
+            <h2 className="text-[var(--color-text-primary)] font-semibold text-lg">
               Crear flashcards en bloque
             </h2>
-            <p className="text-gray-400 text-sm mt-0.5">
+            <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
               Pegá un array JSON con las flashcards a crear
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition text-xl leading-none"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition text-xl leading-none"
           >
             ✕
           </button>
@@ -83,7 +83,7 @@ export const BulkCreateModal = ({
         {/* Body */}
         <div className="p-6 flex-1 overflow-y-auto space-y-4">
           {parseError && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <div className="p-3 rounded-lg bg-[var(--color-accent-red)]/10 border border-[var(--color-accent-red)]/20 text-[var(--color-accent-red)] text-sm">
               {parseError}
             </div>
           )}
@@ -91,7 +91,7 @@ export const BulkCreateModal = ({
           <div>
             <label
               htmlFor="bulk-json"
-              className="block text-sm text-gray-400 mb-2"
+              className="block text-sm text-[var(--color-text-secondary)] mb-2"
             >
               JSON array de flashcards
             </label>
@@ -101,18 +101,18 @@ export const BulkCreateModal = ({
               onChange={(e) => setJsonText(e.target.value)}
               placeholder={PLACEHOLDER}
               rows={18}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-white/20 resize-none placeholder-gray-600"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] resize-none placeholder-[var(--color-text-muted)]"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-white/10">
+        <div className="flex justify-end gap-3 p-6 border-t border-[var(--color-border)]">
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white transition disabled:opacity-50"
+            className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -120,7 +120,7 @@ export const BulkCreateModal = ({
             type="button"
             onClick={handleSubmit}
             disabled={isLoading || !jsonText.trim()}
-            className="px-4 py-2 text-sm bg-white text-black font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="px-4 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {isLoading ? 'Creando…' : 'Crear flashcards'}
           </button>

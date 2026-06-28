@@ -13,31 +13,35 @@ export const DraftPreviewPanel = ({
       {drafts.map((draft, idx) => (
         <div
           key={`${draft.expression}-${String(idx)}`}
-          className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-3"
+          className="p-4 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] space-y-3"
         >
           <div className="flex items-start justify-between gap-2">
-            <p className="text-white font-medium text-sm">{draft.expression}</p>
-            <span className="text-xs text-gray-500 shrink-0">
+            <p className="text-[var(--color-text-primary)] font-medium text-sm">
+              {draft.expression}
+            </p>
+            <span className="text-xs text-[var(--color-text-muted)] shrink-0">
               {draft.subcategory}
             </span>
           </div>
 
-          <p className="text-gray-400 text-xs">{draft.meaning}</p>
+          <p className="text-[var(--color-text-secondary)] text-xs">
+            {draft.meaning}
+          </p>
 
           {draft.nativeSpeech && (
-            <p className="text-gray-500 text-xs italic">
+            <p className="text-[var(--color-text-muted)] text-xs italic">
               &ldquo;{draft.nativeSpeech}&rdquo;
             </p>
           )}
 
           {draft.ipaNotation && (
-            <p className="text-gray-500 text-xs font-mono">
+            <p className="text-[var(--color-text-muted)] text-xs font-mono">
               {draft.ipaNotation}
             </p>
           )}
 
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-2 font-medium">
+            <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-2 font-medium">
               Ejemplos
             </p>
             {draft.examples.length > 0 ? (
@@ -45,15 +49,21 @@ export const DraftPreviewPanel = ({
                 {draft.examples.map((ex, exIdx) => (
                   <li
                     key={`${ex.textEn}-${String(exIdx)}`}
-                    className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2"
+                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] px-3 py-2"
                   >
-                    <p className="text-white text-sm">{ex.textEn}</p>
-                    <p className="text-gray-400 text-sm mt-0.5">{ex.textEs}</p>
+                    <p className="text-[var(--color-text-primary)] text-sm">
+                      {ex.textEn}
+                    </p>
+                    <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
+                      {ex.textEs}
+                    </p>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-600 text-xs">Sin ejemplos generados.</p>
+              <p className="text-[var(--color-text-muted)] text-xs">
+                Sin ejemplos generados.
+              </p>
             )}
           </div>
         </div>
