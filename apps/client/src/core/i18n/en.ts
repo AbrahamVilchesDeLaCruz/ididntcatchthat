@@ -309,18 +309,24 @@ export const en: Translations = {
   achievements: {
     title: 'Achievements',
   },
+  profileMenu: {
+    title: 'Your player profile',
+    description:
+      'Choose the nickname shown in rankings and whether you appear publicly.',
+    fallbackNickname: 'Player',
+    nicknameLabel: 'Public nickname',
+    nicknamePlaceholder: 'Your ranking nickname',
+    showInRankingLabel: 'Show me in rankings',
+    showInRankingHint:
+      'When enabled, your nickname and score can appear on leaderboards.',
+    save: 'Save profile',
+    saving: 'Saving...',
+    saved: 'Profile saved',
+    saveError: 'Could not save profile',
+  },
   ranking: {
     title: 'Ranking',
-    subtitle: 'Compete with other players and control your public visibility',
-    profile: {
-      title: 'Your ranking profile',
-      showNickname: 'Show my nickname in rankings',
-      nicknamePlaceholder: 'Public nickname',
-      save: 'Save preferences',
-      saving: 'Saving...',
-      saved: 'Preferences saved',
-      saveError: 'Could not save preferences',
-    },
+    subtitle: 'Compete with other players and track your position',
     filters: {
       type: 'Ranking type',
       period: 'Period',
@@ -344,6 +350,21 @@ export const en: Translations = {
       score: 'Score',
       you: 'You',
     },
+    podium: {
+      first: '1st',
+      second: '2nd',
+      third: '3rd',
+    },
+    viewer: {
+      hiddenTitle: 'You are hidden from rankings',
+      hiddenDescription:
+        'Set a nickname and enable public visibility to appear on leaderboards.',
+      hiddenAction: 'Open profile settings',
+      visibleUnrankedTitle: 'You are visible in rankings',
+      visibleUnrankedDescription:
+        'Play a game session to earn a score and appear on the board.',
+      rankedOutsideTitle: 'You are ranked outside the top 10',
+    },
     scoreUnits: {
       most_active: 'games',
       most_accurate: 'accuracy',
@@ -354,12 +375,44 @@ export const en: Translations = {
     loading: 'Loading ranking...',
     error: 'Failed to load ranking. Please try again.',
     empty: 'No players in this ranking yet.',
-    emptyOptInHint: 'Enable "Show my nickname" and save your preferences.',
     emptyMostActiveHint: 'Only completed Game-mode sessions count (not Study).',
     outsideTopHint:
       'You are ranked but outside the top 10. Your position is shown below.',
     yourPosition: 'Your position',
     periodIgnoredHint:
       'This ranking ignores the period filter — showing all-time data.',
+  },
+  common: {
+    theme: {
+      lightMode: 'Light mode',
+      darkMode: 'Dark mode',
+      activateLight: 'Switch to light mode',
+      activateDark: 'Switch to dark mode',
+    },
+    locale: {
+      switchLanguage: 'Switch language',
+      english: 'EN',
+      spanish: 'ES',
+    },
+  },
+  sidebar: {
+    sections: {
+      game: 'Game',
+      study: 'Learn',
+      progress: 'My progress',
+      backoffice: 'Backoffice',
+      system: 'System',
+    },
+    nav: {
+      play: 'Play',
+      study: 'Study',
+      stats: 'Stats',
+      ranking: 'Ranking',
+      gameMetrics: 'Game metrics',
+      userMetrics: 'User metrics',
+      flashcards: 'Flashcards',
+      observability: 'Observability',
+    },
+    logout: 'Log out',
   },
 };

@@ -1,60 +1,59 @@
 import { type ReactElement } from 'react';
 import { useI18n } from '@/core/i18n';
+import { useProfileDialogStore } from '@/core/profile/useProfileDialogStore';
+import { Button } from '@/common/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/common/components/ui/card';
 import { RankingFilters } from './components/RankingFilters';
 import { RankingLeaderboard } from './components/RankingLeaderboard';
-import { RankingProfileCard } from './components/RankingProfileCard';
 import { formatRankingScore } from './ranking.mapper';
 import type {
   RankingEntryVM,
   RankingModule,
   RankingPeriod,
-  RankingProfileVM,
   RankingType,
+  RankingViewerVM,
 } from './ranking.types';
 
 interface RankingComponentProps {
   type: RankingType;
   period: RankingPeriod;
   module: RankingModule;
-  profile: RankingProfileVM;
   entries: RankingEntryVM[];
-  currentUser: RankingEntryVM | null;
-  isProfileLoading: boolean;
+  currentUser: Omit<RankingEntryVM, 'isMe'> | null;
+  viewer: RankingViewerVM;
   isRankingsLoading: boolean;
   isRankingsFetching: boolean;
-  isSavingProfile: boolean;
-  profileSaveStatus: 'idle' | 'success' | 'error';
   onTypeChange: (type: RankingType) => void;
   onPeriodChange: (period: RankingPeriod) => void;
   onModuleChange: (module: RankingModule) => void;
-  onProfileChange: (profile: RankingProfileVM) => void;
-  onSaveProfile: () => void;
 }
 
 export const RankingComponent = ({
   type,
   period,
   module,
-  profile,
   entries,
   currentUser,
-  isProfileLoading,
+  viewer,
   isRankingsLoading,
   isRankingsFetching,
-  isSavingProfile,
-  profileSaveStatus,
   onTypeChange,
   onPeriodChange,
   onModuleChange,
-  onProfileChange,
-  onSaveProfile,
 }: RankingComponentProps): ReactElement => {
   const { t } = useI18n();
   const r = t.ranking;
+  const openProfileDialog = useProfileDialogStore((s) => s.openProfileDialog);
+
+  const isRankedInList = entries.some((entry) => entry.isMe);
   const showOutsideTopBanner =
-    profile.showInRanking &&
-    currentUser !== null &&
-    !entries.some((e) => e.userId === currentUser.userId);
+    viewer.status === 'ranked' && currentUser !== null && !isRankedInList;
 
   return (
     <div className="space-y-8">
@@ -67,14 +66,30 @@ export const RankingComponent = ({
         </p>
       </div>
 
-      <RankingProfileCard
-        profile={profile}
-        isLoading={isProfileLoading}
-        isSaving={isSavingProfile}
-        saveStatus={profileSaveStatus}
-        onProfileChange={onProfileChange}
-        onSaveProfile={onSaveProfile}
-      />
+      {viewer.status === 'hidden' ? (
+        <Card className="border-[var(--color-border)] bg-[var(--color-bg-card)]">
+          <CardHeader>
+            <CardTitle>{r.viewer.hiddenTitle}</CardTitle>
+            <CardDescription>{r.viewer.hiddenDescription}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button type="button" onClick={openProfileDialog}>
+              {r.viewer.hiddenAction}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {viewer.status === 'visible_unranked' ? (
+        <Card className="border-[var(--color-brand)]/30 bg-[var(--color-brand)]/8">
+          <CardHeader>
+            <CardTitle>{r.viewer.visibleUnrankedTitle}</CardTitle>
+            <CardDescription>
+              {r.viewer.visibleUnrankedDescription}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      ) : null}
 
       <RankingFilters
         type={type}
@@ -96,39 +111,48 @@ export const RankingComponent = ({
         ) : entries.length === 0 ? (
           <div className="py-16 px-6 text-center text-[var(--color-text-secondary)] space-y-2">
             <p>{r.empty}</p>
-            {!profile.showInRanking && (
-              <p className="text-xs">{r.emptyOptInHint}</p>
-            )}
-            {profile.showInRanking && type === 'most_active' && (
+            {type === 'most_active' ? (
               <p className="text-xs">{r.emptyMostActiveHint}</p>
-            )}
+            ) : null}
           </div>
         ) : (
           <RankingLeaderboard
             type={type}
             entries={entries}
-            currentUser={currentUser}
             isFetching={isRankingsFetching}
           />
         )}
       </div>
 
-      {showOutsideTopBanner && (
-        <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-[var(--color-text-secondary)]">
-          {r.outsideTopHint}
-        </div>
-      )}
+      {showOutsideTopBanner && currentUser ? (
+        <Card className="border-yellow-500/30 bg-yellow-500/10">
+          <CardHeader>
+            <CardTitle>{r.viewer.rankedOutsideTitle}</CardTitle>
+            <CardDescription>{r.outsideTopHint}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+            <span className="font-semibold text-[var(--color-text-primary)]">
+              {r.yourPosition}: #{currentUser.rank}
+            </span>
+            <span className="text-[var(--color-text-secondary)]">
+              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+            </span>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      {currentUser && (
-        <div className="rounded-xl border border-[var(--color-brand)]/40 bg-[var(--color-brand)]/10 px-4 py-3 text-sm flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="font-semibold text-[var(--color-text-primary)]">
-            {r.yourPosition}: #{currentUser.rank}
-          </span>
-          <span className="text-[var(--color-text-secondary)]">
-            {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
-          </span>
-        </div>
-      )}
+      {viewer.status === 'ranked' && isRankedInList && currentUser ? (
+        <Card className="border-[var(--color-brand)]/40 bg-[var(--color-brand)]/10">
+          <CardContent className="flex flex-wrap items-center gap-x-2 gap-y-1 py-4 text-sm">
+            <span className="font-semibold text-[var(--color-text-primary)]">
+              {r.yourPosition}: #{currentUser.rank}
+            </span>
+            <span className="text-[var(--color-text-secondary)]">
+              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+            </span>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 };

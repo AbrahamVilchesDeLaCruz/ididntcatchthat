@@ -233,18 +233,23 @@ export interface AchievementsTranslations {
   title: string;
 }
 
+export interface ProfileMenuTranslations {
+  title: string;
+  description: string;
+  fallbackNickname: string;
+  nicknameLabel: string;
+  nicknamePlaceholder: string;
+  showInRankingLabel: string;
+  showInRankingHint: string;
+  save: string;
+  saving: string;
+  saved: string;
+  saveError: string;
+}
+
 export interface RankingTranslations {
   title: string;
   subtitle: string;
-  profile: {
-    title: string;
-    showNickname: string;
-    nicknamePlaceholder: string;
-    save: string;
-    saving: string;
-    saved: string;
-    saveError: string;
-  };
   filters: {
     type: string;
     period: string;
@@ -265,6 +270,19 @@ export interface RankingTranslations {
     score: string;
     you: string;
   };
+  podium: {
+    first: string;
+    second: string;
+    third: string;
+  };
+  viewer: {
+    hiddenTitle: string;
+    hiddenDescription: string;
+    hiddenAction: string;
+    visibleUnrankedTitle: string;
+    visibleUnrankedDescription: string;
+    rankedOutsideTitle: string;
+  };
   scoreUnits: {
     most_active: string;
     most_accurate: string;
@@ -275,7 +293,6 @@ export interface RankingTranslations {
   loading: string;
   error: string;
   empty: string;
-  emptyOptInHint: string;
   emptyMostActiveHint: string;
   outsideTopHint: string;
   yourPosition: string;
@@ -314,11 +331,49 @@ export interface StudyTranslations {
   };
 }
 
+export interface CommonTranslations {
+  theme: {
+    lightMode: string;
+    darkMode: string;
+    activateLight: string;
+    activateDark: string;
+  };
+  locale: {
+    switchLanguage: string;
+    english: string;
+    spanish: string;
+  };
+}
+
+export interface SidebarTranslations {
+  sections: {
+    game: string;
+    study: string;
+    progress: string;
+    backoffice: string;
+    system: string;
+  };
+  nav: {
+    play: string;
+    study: string;
+    stats: string;
+    ranking: string;
+    gameMetrics: string;
+    userMetrics: string;
+    flashcards: string;
+    observability: string;
+  };
+  logout: string;
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
   study: StudyTranslations;
   stats: StatsTranslations;
   achievements: AchievementsTranslations;
+  profileMenu: ProfileMenuTranslations;
   ranking: RankingTranslations;
+  common: CommonTranslations;
+  sidebar: SidebarTranslations;
 }

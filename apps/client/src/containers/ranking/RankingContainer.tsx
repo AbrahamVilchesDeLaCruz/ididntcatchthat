@@ -5,20 +5,8 @@ import { RankingComponent } from './RankingComponent';
 
 export const RankingContainer = (): ReactElement => {
   const { t } = useI18n();
-  const {
-    type,
-    setType,
-    period,
-    setPeriod,
-    module,
-    setModule,
-    profile,
-    setProfile,
-    profileQuery,
-    rankingsQuery,
-    updateProfile,
-    profileSaveStatus,
-  } = useRankingState();
+  const { type, setType, period, setPeriod, module, setModule, rankingsQuery } =
+    useRankingState();
 
   if (rankingsQuery.isError) {
     return (
@@ -33,21 +21,22 @@ export const RankingContainer = (): ReactElement => {
       type={type}
       period={period}
       module={module}
-      profile={profile}
       entries={rankingsQuery.data?.entries ?? []}
       currentUser={rankingsQuery.data?.currentUser ?? null}
-      isProfileLoading={profileQuery.isLoading}
+      viewer={
+        rankingsQuery.data?.viewer ?? {
+          showInRanking: false,
+          nickname: '',
+          rank: null,
+          score: null,
+          status: 'hidden',
+        }
+      }
       isRankingsLoading={rankingsQuery.isLoading}
       isRankingsFetching={rankingsQuery.isFetching}
-      isSavingProfile={updateProfile.isPending}
-      profileSaveStatus={profileSaveStatus}
       onTypeChange={setType}
       onPeriodChange={setPeriod}
       onModuleChange={setModule}
-      onProfileChange={setProfile}
-      onSaveProfile={() => {
-        updateProfile.mutate(profile);
-      }}
     />
   );
 };

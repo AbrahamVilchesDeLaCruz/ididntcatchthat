@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
   type RankingEligibleUser,
+  type RankingUserPreferences,
   type RankingUserReader,
 } from '@/ranking/domain/ranking-user.reader';
 
@@ -28,6 +29,26 @@ export class TypeOrmRankingUserReader implements RankingUserReader {
     return {
       nickname: row.nickname,
       currentStreak: Number(row.current_streak),
+    };
+  }
+
+  async findUserRankingPreferences(
+    userId: string,
+  ): Promise<RankingUserPreferences | null> {
+    const [row] = await this.dataSource.query<
+      { nickname: string; show_in_ranking: boolean }[]
+    >(
+      `SELECT nickname, show_in_ranking
+       FROM users
+       WHERE id = $1`,
+      [userId],
+    );
+
+    if (!row) return null;
+
+    return {
+      nickname: row.nickname,
+      showInRanking: row.show_in_ranking,
     };
   }
 }

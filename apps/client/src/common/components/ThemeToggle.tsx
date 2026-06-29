@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { useI18n } from '@/core/i18n';
 import { useTheme } from '@/core/store/useTheme';
 
 interface ThemeToggleProps {
@@ -11,6 +12,8 @@ interface ThemeToggleProps {
 export const ThemeToggle = ({
   variant = 'icon',
 }: ThemeToggleProps): ReactElement => {
+  const { t } = useI18n();
+  const themeLabels = t.common.theme;
   const { isDark, setPreference } = useTheme();
 
   const toggle = (): void => setPreference(isDark ? 'light' : 'dark');
@@ -20,7 +23,7 @@ export const ThemeToggle = ({
       <div className="flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-1 py-1">
         <button
           type="button"
-          aria-label="Modo claro"
+          aria-label={themeLabels.lightMode}
           aria-pressed={!isDark}
           onClick={() => setPreference('light')}
           className={`flex flex-1 items-center justify-center rounded-md p-1.5 transition-colors ${
@@ -33,7 +36,7 @@ export const ThemeToggle = ({
         </button>
         <button
           type="button"
-          aria-label="Modo oscuro"
+          aria-label={themeLabels.darkMode}
           aria-pressed={isDark}
           onClick={() => setPreference('dark')}
           className={`flex flex-1 items-center justify-center rounded-md p-1.5 transition-colors ${
@@ -51,7 +54,7 @@ export const ThemeToggle = ({
   return (
     <button
       type="button"
-      aria-label={isDark ? 'Activar modo claro' : 'Activar modo oscuro'}
+      aria-label={isDark ? themeLabels.activateLight : themeLabels.activateDark}
       onClick={toggle}
       className="flex items-center justify-center rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] p-1.5 text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
     >

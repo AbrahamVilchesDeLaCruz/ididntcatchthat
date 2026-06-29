@@ -1,6 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { RankingFinder } from '@/ranking/application/find/ranking-finder';
 import { type RankingSelector } from '@/ranking/domain/ranking-selector';
+import { type RankingUserReader } from '@/ranking/domain/ranking-user.reader';
 import { RankingEntry } from '@/ranking/domain/ranking-entry';
 import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 import { NicknameMother } from '@test/identity/user/domain/nickname-mother';
@@ -10,15 +11,21 @@ import { RequestRankingFinderMother } from './request-ranking-finder-mother';
 
 describe('ranking/application/find RankingFinder', () => {
   const selector = mock<RankingSelector>();
+  const userReader = mock<RankingUserReader>();
   let finder: RankingFinder;
 
   beforeEach(() => {
     selector.selectLeaderboard.mockReset();
     selector.selectUserEntry.mockReset();
-    finder = new RankingFinder(selector);
+    userReader.findUserRankingPreferences.mockReset();
+    userReader.findUserRankingPreferences.mockResolvedValue({
+      nickname: NicknameMother.random().value,
+      showInRanking: true,
+    });
+    finder = new RankingFinder(selector, userReader);
   });
 
-  it('should return entries and current user rank from top results', async () => {
+  it('should return entries with isMe and current user rank from top results', async () => {
     const userId = UserIdMother.random().value;
     selector.selectLeaderboard.mockResolvedValue([
       new RankingEntry(
@@ -35,7 +42,11 @@ describe('ranking/application/find RankingFinder', () => {
     );
 
     expect(result.entries).toHaveLength(2);
+    expect(result.entries[1].isMe).toBe(true);
+    expect(result.entries[0].isMe).toBe(false);
     expect(result.currentUser?.rank).toBe(2);
+    expect(result.viewer.status).toBe('ranked');
+    expect(result.viewer.rank).toBe(2);
     expect(selector.selectUserEntry).not.toHaveBeenCalled();
   });
 
@@ -58,7 +69,49 @@ describe('ranking/application/find RankingFinder', () => {
     );
 
     expect(result.currentUser?.rank).toBe(15);
+    expect(result.viewer.status).toBe('ranked');
+    expect(result.viewer.rank).toBe(15);
     expect(selector.selectUserEntry).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return viewer hidden when user opted out', async () => {
+    const userId = UserIdMother.random().value;
+    selector.selectLeaderboard.mockResolvedValue([]);
+    userReader.findUserRankingPreferences.mockResolvedValue({
+      nickname: 'hidden-user',
+      showInRanking: false,
+    });
+
+    const result = await finder.execute(
+      RequestRankingFinderMother.random({ userId }),
+    );
+
+    expect(result.viewer).toEqual({
+      showInRanking: false,
+      nickname: 'hidden-user',
+      rank: null,
+      score: null,
+      status: 'hidden',
+    });
+    expect(result.currentUser).toBeNull();
+  });
+
+  it('should return viewer visible_unranked when opted in without score', async () => {
+    const userId = UserIdMother.random().value;
+    selector.selectLeaderboard.mockResolvedValue([]);
+    selector.selectUserEntry.mockResolvedValue(null);
+    userReader.findUserRankingPreferences.mockResolvedValue({
+      nickname: 'new-player',
+      showInRanking: true,
+    });
+
+    const result = await finder.execute(
+      RequestRankingFinderMother.random({ userId }),
+    );
+
+    expect(result.viewer.status).toBe('visible_unranked');
+    expect(result.viewer.rank).toBeNull();
+    expect(result.currentUser).toBeNull();
   });
 
   it('should use all_time period for best_streak regardless of request', async () => {
