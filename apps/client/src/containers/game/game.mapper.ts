@@ -44,6 +44,7 @@ export const mapGameSummary = (raw: GameSummaryApiModel): GameSummaryVM => ({
   // API returns accuracy as 0–100; VM uses 0–1 for display helpers.
   accuracy: raw.accuracy / 100,
   duration: raw.duration,
+  cardsViewed: raw.cardsViewed ?? raw.totalCount,
 });
 
 export const mapResumeGame = (raw: ResumeGameApiResponse): ResumeGameVM => ({
@@ -54,6 +55,7 @@ export const mapResumeGame = (raw: ResumeGameApiResponse): ResumeGameVM => ({
 
 export const mapPausedGame = (raw: PausedGameApiModel): PausedGameVM => ({
   gameId: raw.id,
+  mode: raw.mode,
   module: raw.module,
   subcategory: raw.subcategory,
   cardCount: Number(raw.cardCount),

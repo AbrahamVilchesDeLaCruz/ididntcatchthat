@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
 import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
@@ -53,6 +53,7 @@ function mapAuthError(error: unknown): string {
 
 export const AuthContainer = (): ReactElement => {
   const { mode } = useParams<{ mode: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setGuestDeviceId = useAuthStore((s) => s.setGuestDeviceId);
@@ -70,14 +71,21 @@ export const AuthContainer = (): ReactElement => {
   const { mutate: migrateGuest } = useMigrateGuest();
   const guestAuthStarted = useRef(false);
 
+  const authRedirectState =
+    (location.state as { returnTo?: string } | null) ?? null;
+
   const finishAuth = (
     accessToken: string,
     previousGuestDeviceId: string | null,
   ): void => {
+    const returnTo = authRedirectState?.returnTo;
     const navigateAfterAuth = (): void => {
       void navigate(
-        getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
-        { replace: true },
+        returnTo ??
+          getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
+        {
+          replace: true,
+        },
       );
     };
 
@@ -161,7 +169,12 @@ export const AuthContainer = (): ReactElement => {
 
   const handleModeChange = (newMode: AuthMode): void => {
     setServerError(null);
-    void navigate(`/auth/${newMode}`, { replace: true });
+    void navigate(`/auth/${newMode}`, {
+      replace: true,
+      state: authRedirectState?.returnTo
+        ? { returnTo: authRedirectState.returnTo }
+        : undefined,
+    });
   };
 
   const handleGoogleLogin = (): void => {

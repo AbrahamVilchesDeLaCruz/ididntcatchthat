@@ -51,6 +51,7 @@ export interface GameSummaryApiModel {
   totalCount: number;
   accuracy: number;
   duration: number;
+  cardsViewed?: number;
 }
 
 // ─── Patch game (PATCH /v1/games/:id) ────────────────────────────────────────

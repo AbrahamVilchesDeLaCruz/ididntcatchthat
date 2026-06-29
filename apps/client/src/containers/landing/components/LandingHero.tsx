@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
 
@@ -15,6 +16,11 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   const h = t.landing.hero;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const roles = useAuthStore((s) => s.roles);
+  const { canStudy } = useCurrentUser();
+
+  const studyLink = canStudy
+    ? '/study'
+    : { pathname: '/auth/login', state: { returnTo: '/study' } };
 
   const authNavLink = isAuthenticated
     ? {
@@ -118,6 +124,12 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         >
           {h.ctaPlay}
         </button>
+        <Link
+          to={studyLink}
+          className="inline-flex items-center justify-center rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+        >
+          {h.ctaStudy}
+        </Link>
         <a
           href="#how-it-works"
           className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"

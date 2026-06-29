@@ -1,0 +1,91 @@
+/* Calm study play UI — softer accents than game mode */
+
+.study-shell-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.study-shell-glow::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  height: 360px;
+  width: 360px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: var(--color-brand);
+  opacity: 0.04;
+  filter: blur(90px);
+}
+
+.study-play-toolbar {
+  border-bottom-color: color-mix(in srgb, var(--color-border) 80%, transparent);
+}
+
+.study-progress-fill {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brand) 35%, transparent),
+    color-mix(in srgb, var(--color-brand-light) 55%, transparent)
+  );
+}
+
+.study-card-stage {
+  border-radius: var(--radius-xl);
+  animation: study-card-enter 0.35s ease-out;
+}
+
+.study-card-wrapper {
+  border-color: color-mix(in srgb, var(--color-border) 85%, transparent);
+}
+
+.study-next-bar {
+  border-top-color: color-mix(in srgb, var(--color-border) 80%, transparent);
+}
+
+.study-summary-card {
+  animation: study-summary-enter 0.45s ease-out;
+}
+
+.study-streak-badge {
+  animation: study-streak-pop 0.5s ease-out 0.15s both;
+}
+
+@keyframes study-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes study-summary-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes study-streak-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

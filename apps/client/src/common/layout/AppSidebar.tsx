@@ -42,6 +42,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
     canManageFlashcards,
     isUser,
     isAdmin,
+    canStudy,
   } = useCurrentUser();
 
   const handleLogout = (): void => {
@@ -78,6 +79,18 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
             <HeadphonesIcon /> Jugar
           </NavLink>
         </div>
+
+        {/* Aprender — usuarios registrados (no invitados) */}
+        {canStudy && (
+          <div className="mb-2">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              Aprender
+            </p>
+            <NavLink to="/study" className={navLinkClass} onClick={onNavigate}>
+              <FlashcardIcon /> Estudiar
+            </NavLink>
+          </div>
+        )}
 
         {/* Mi progreso — user, teacher, admin */}
         {(isUser || isAdmin || canAccessBackoffice) && (

@@ -13,6 +13,9 @@ import { RankingView } from '@/views/RankingView';
 import { GameConfigView } from '@/views/GameConfigView';
 import { GameView } from '@/views/GameView';
 import { GameSummaryView } from '@/views/GameSummaryView';
+import { StudyConfigView } from '@/views/StudyConfigView';
+import { StudyView } from '@/views/StudyView';
+import { StudySummaryView } from '@/views/StudySummaryView';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
@@ -38,6 +41,12 @@ const AppRoutes = (): ReactElement => {
         <Route path="/game" element={<GameConfigView />} />
         <Route path="/game/:gameId" element={<GameView />} />
         <Route path="/game/:gameId/summary" element={<GameSummaryView />} />
+        <Route path="/study" element={<StudyConfigView />} />
+        <Route path="/study/:sessionId" element={<StudyView />} />
+        <Route
+          path="/study/:sessionId/summary"
+          element={<StudySummaryView />}
+        />
       </Route>
 
       {/* ── App shell (sidebar, protegido — redirige a /auth/login) ────────── */}

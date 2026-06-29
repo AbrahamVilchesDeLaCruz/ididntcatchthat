@@ -7,6 +7,7 @@ import type { PausedGameVM } from '../../game.types';
 
 const pausedGame: PausedGameVM = {
   gameId: 'game-1',
+  mode: 'game',
   module: 'native_sounds',
   subcategory: null,
   cardCount: 10,
