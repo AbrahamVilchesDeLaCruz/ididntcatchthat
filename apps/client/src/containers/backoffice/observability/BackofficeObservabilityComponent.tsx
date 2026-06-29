@@ -139,6 +139,7 @@ export const BackofficeObservabilityComponent = ({
     <BusinessMetricsSection
       business={isLoading ? null : businessMetrics}
       isLoading={isLoading}
+      serverStartLabel={serverStartLabel ?? undefined}
     />
   );
 

@@ -9,11 +9,13 @@ import {
 interface BusinessMetricsSectionProps {
   business: BusinessMetrics | null;
   isLoading: boolean;
+  serverStartLabel?: string;
 }
 
 export const BusinessMetricsSection = ({
   business,
   isLoading,
+  serverStartLabel,
 }: BusinessMetricsSectionProps): ReactElement => {
   if (isLoading || !business) {
     return (
@@ -21,22 +23,6 @@ export const BusinessMetricsSection = ({
         {Array.from({ length: 6 }, (_, i) => (
           <InsightCardSkeleton key={i} />
         ))}
-      </div>
-    );
-  }
-
-  const noData =
-    business.gamesStarted === 0 &&
-    business.flashcardsCreated === 0 &&
-    business.totalLogins === 0;
-
-  if (noData) {
-    return (
-      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] px-6 py-12 text-center">
-        <p className="text-[var(--color-text-secondary)] text-sm">
-          Sin métricas de negocio — los contadores se incrementan cuando los
-          usuarios interactúan con la app.
-        </p>
       </div>
     );
   }
@@ -88,66 +74,79 @@ export const BusinessMetricsSection = ({
         : `${totalRegs} nuevos registros desde el arranque`;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      <InsightCard
-        label="Partidas iniciadas"
-        value={business.gamesStarted.toLocaleString('es-ES')}
-        insight={`${business.gamesStarted.toLocaleString('es-ES')} partidas iniciadas desde el arranque`}
-        variant="neutral"
-      />
+    <div className="space-y-6">
+      {serverStartLabel && (
+        <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2.5 text-xs text-[var(--color-text-muted)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand)] shrink-0" />
+          Contadores globales acumulados desde el arranque del servidor:{' '}
+          <span className="font-medium text-[var(--color-text-secondary)]">
+            {serverStartLabel}
+          </span>
+        </div>
+      )}
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <InsightCard
+          label="Partidas iniciadas"
+          value={business.gamesStarted.toLocaleString('es-ES')}
+          insight={`${business.gamesStarted.toLocaleString('es-ES')} partidas iniciadas desde el arranque`}
+          variant="neutral"
+        />
 
-      <InsightCard
-        label="Tasa de completado"
-        value={
-          business.completionRate !== null
-            ? `${business.completionRate.toFixed(1)}%`
-            : '—'
-        }
-        insight={completionInsight}
-        variant={completionVariant}
-        progress={business.completionRate ?? undefined}
-        sub={`${business.gamesCompleted} / ${business.gamesStarted} partidas`}
-      />
+        <InsightCard
+          label="Tasa de completado"
+          value={
+            business.completionRate !== null
+              ? `${business.completionRate.toFixed(1)}%`
+              : '—'
+          }
+          insight={completionInsight}
+          variant={completionVariant}
+          progress={business.completionRate ?? undefined}
+          sub={`${business.gamesCompleted} / ${business.gamesStarted} partidas`}
+        />
 
-      {business.flashcardsCreated > 0 && (
         <InsightCard
           label="Flashcards creadas"
           value={business.flashcardsCreated.toLocaleString('es-ES')}
-          insight={`${business.flashcardsCreated.toLocaleString('es-ES')} flashcards gestionadas`}
+          insight={
+            business.flashcardsCreated > 0
+              ? `${business.flashcardsCreated.toLocaleString('es-ES')} flashcards gestionadas`
+              : 'Sin actividad de flashcards desde el arranque'
+          }
           variant="neutral"
         />
-      )}
 
-      <InsightCard
-        label="Audio generado"
-        value={business.audioGenerated.toLocaleString('es-ES')}
-        insight={audioInsight}
-        variant={audioVariant}
-        sub={
-          business.audioErrors > 0
-            ? `${business.audioErrors} errores`
-            : undefined
-        }
-      />
+        <InsightCard
+          label="Audio generado"
+          value={business.audioGenerated.toLocaleString('es-ES')}
+          insight={audioInsight}
+          variant={audioVariant}
+          sub={
+            business.audioErrors > 0
+              ? `${business.audioErrors} errores`
+              : undefined
+          }
+        />
 
-      <InsightCard
-        label="Logins"
-        value={totalLogins.toLocaleString('es-ES')}
-        insight={loginInsight}
-        variant="neutral"
-        sub={
-          totalLogins > 0
-            ? `Google: ${googleLogins} · email: ${emailLogins}`
-            : undefined
-        }
-      />
+        <InsightCard
+          label="Logins"
+          value={totalLogins.toLocaleString('es-ES')}
+          insight={loginInsight}
+          variant="neutral"
+          sub={
+            totalLogins > 0
+              ? `Google: ${googleLogins} · email: ${emailLogins}`
+              : undefined
+          }
+        />
 
-      <InsightCard
-        label="Registros"
-        value={totalRegs.toLocaleString('es-ES')}
-        insight={regInsight}
-        variant="neutral"
-      />
+        <InsightCard
+          label="Registros"
+          value={totalRegs.toLocaleString('es-ES')}
+          insight={regInsight}
+          variant="neutral"
+        />
+      </div>
     </div>
   );
 };
