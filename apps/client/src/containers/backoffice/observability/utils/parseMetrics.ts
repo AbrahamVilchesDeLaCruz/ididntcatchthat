@@ -38,18 +38,38 @@ export function parseHttpStats(metrics: MetricVM[]): HttpStats | null {
   }
 
   const errorRequests = samples
-    .filter((s) => (s.labels.status ?? s.labels.code ?? '').startsWith('5'))
+    .filter((s) =>
+      (
+        s.labels.status_code ??
+        s.labels.status ??
+        s.labels.code ??
+        ''
+      ).startsWith('5'),
+    )
     .reduce((sum, s) => sum + s.value, 0);
 
   const successRequests = samples
-    .filter((s) => (s.labels.status ?? s.labels.code ?? '').startsWith('2'))
+    .filter((s) =>
+      (
+        s.labels.status_code ??
+        s.labels.status ??
+        s.labels.code ??
+        ''
+      ).startsWith('2'),
+    )
     .reduce((sum, s) => sum + s.value, 0);
 
   const breakdown: HttpBreakdownRow[] = samples
     .map((s) => {
-      const status = s.labels.status ?? s.labels.code ?? '—';
+      const status =
+        s.labels.status_code ?? s.labels.status ?? s.labels.code ?? '—';
       return {
-        handler: s.labels.handler ?? s.labels.endpoint ?? s.labels.path ?? '—',
+        handler:
+          s.labels.route ??
+          s.labels.handler ??
+          s.labels.endpoint ??
+          s.labels.path ??
+          '—',
         method: s.labels.method ?? '—',
         status,
         count: s.value,
