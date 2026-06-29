@@ -5,6 +5,7 @@ import { type ViewRepository } from '@/gaming/domain/view.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { ViewRecorder } from '@/gaming/application/view/view-recorder';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
+import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { FlashcardViewedEvent } from '@/gaming/domain/events/flashcard-viewed.event';
 import { View } from '@/gaming/domain/view';
 import { GameMother } from '@test/gaming/domain/game-mother';
@@ -66,5 +67,23 @@ describe('gaming/application/view ViewRecorder', () => {
         userId: 'user-1',
       }),
     ).rejects.toThrow(GameNotFound);
+  });
+
+  it('should throw GameAccessDenied when userId does not match the game owner', async () => {
+    const game = GameMother.inStudyProgress({
+      flashcardIds: ['fc-1'],
+      mode: GameModeMother.study().value,
+    });
+    gameRepository.search.mockResolvedValue(game);
+
+    await expect(
+      recorder.execute({
+        gameId: game.toPrimitives().id,
+        flashcardId: 'fc-1',
+        userId: 'other-user',
+      }),
+    ).rejects.toThrow(GameAccessDenied);
+
+    expect(viewRepository.save).not.toHaveBeenCalled();
   });
 });
