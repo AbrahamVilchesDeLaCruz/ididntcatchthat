@@ -7,8 +7,8 @@ vi.mock('@/core/auth/useCurrentUser', () => ({
   useCurrentUser: vi.fn(),
 }));
 
-vi.mock('../components/ProfileAccountSection', () => ({
-  ProfileAccountSection: () => <div>Account section</div>,
+vi.mock('../components/ProfileHero', () => ({
+  ProfileHero: () => <div>Profile hero</div>,
 }));
 
 vi.mock('../components/ProfileRankingSection', () => ({
@@ -30,7 +30,9 @@ describe('ProfileComponent', () => {
 
     render(<ProfileComponent />);
 
+    expect(screen.getByText('Profile hero')).toBeInTheDocument();
     expect(screen.getByText('Ranking section')).toBeInTheDocument();
+    expect(screen.getByText('Preferences section')).toBeInTheDocument();
   });
 
   it('hides ranking section for guests', () => {
@@ -42,7 +44,8 @@ describe('ProfileComponent', () => {
     render(<ProfileComponent />);
 
     expect(screen.queryByText('Ranking section')).not.toBeInTheDocument();
-    expect(screen.getByText('Account section')).toBeInTheDocument();
+    expect(screen.getByText('Profile hero')).toBeInTheDocument();
+    expect(screen.getByText('Preferences section')).toBeInTheDocument();
   });
 
   it('shows ranking section for admin accounts', () => {

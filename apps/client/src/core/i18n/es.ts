@@ -389,22 +389,41 @@ export const es: Translations = {
   profile: {
     title: 'Tu perfil',
     subtitle: 'Gestiona tu cuenta, visibilidad en rankings y preferencias.',
+    sections: {
+      ranking: 'Identidad pública',
+      preferences: 'Ajustes',
+    },
+    hero: {
+      visibleInRanking: 'Visible en rankings',
+      hiddenInRanking: 'Oculto en rankings',
+    },
     account: {
       title: 'Cuenta',
       roleUser: 'Jugador',
       roleTeacher: 'Profesor',
       roleAdmin: 'Administrador',
+      roleGuest: 'Invitado',
       userIdLabel: 'ID de usuario',
     },
     preferences: {
       title: 'Preferencias',
       themeLabel: 'Tema',
+      themeDescription: 'Claro u oscuro según tu entorno o preferencia.',
       localeLabel: 'Idioma',
+      localeDescription: 'Interfaz en español o inglés.',
     },
     ranking: {
       title: 'Ranking',
       description:
         'Elige tu nickname público y si quieres aparecer en las tablas de clasificación.',
+      previewTitle: 'Así te verán en el ranking',
+      previewHidden: 'Estás oculto: no aparecerás en las tablas públicas.',
+      previewRankPlaceholder: '—',
+      nicknameHint: 'Entre 3 y 30 caracteres.',
+      nicknameTooShort: 'El nickname necesita al menos 3 caracteres.',
+      viewRanking: 'Ver tablas de clasificación',
+      discard: 'Descartar',
+      unsavedHint: 'Tienes cambios sin guardar',
     },
   },
   home: {

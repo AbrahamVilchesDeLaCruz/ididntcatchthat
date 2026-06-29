@@ -385,22 +385,41 @@ export const en: Translations = {
   profile: {
     title: 'Your profile',
     subtitle: 'Manage your account, ranking visibility, and preferences.',
+    sections: {
+      ranking: 'Public identity',
+      preferences: 'Settings',
+    },
+    hero: {
+      visibleInRanking: 'Visible on leaderboards',
+      hiddenInRanking: 'Hidden from leaderboards',
+    },
     account: {
       title: 'Account',
       roleUser: 'Player',
       roleTeacher: 'Teacher',
       roleAdmin: 'Administrator',
+      roleGuest: 'Guest',
       userIdLabel: 'User ID',
     },
     preferences: {
       title: 'Preferences',
       themeLabel: 'Theme',
+      themeDescription: 'Light or dark, matching your system or preference.',
       localeLabel: 'Language',
+      localeDescription: 'Interface in English or Spanish.',
     },
     ranking: {
       title: 'Ranking',
       description:
         'Choose your public nickname and whether you appear on leaderboards.',
+      previewTitle: 'How you will appear on leaderboards',
+      previewHidden: 'You are hidden and will not appear on public tables.',
+      previewRankPlaceholder: '—',
+      nicknameHint: 'Between 3 and 30 characters.',
+      nicknameTooShort: 'Nickname must be at least 3 characters.',
+      viewRanking: 'View leaderboards',
+      discard: 'Discard',
+      unsavedHint: 'You have unsaved changes',
     },
   },
   home: {

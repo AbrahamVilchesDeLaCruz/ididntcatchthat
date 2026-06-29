@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   useRankingProfile,
@@ -21,9 +22,11 @@ const renderSection = (): ReturnType<typeof render> => {
   });
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <ProfileRankingSection />
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <ProfileRankingSection />
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 };
 
@@ -70,5 +73,27 @@ describe('ProfileRankingSection', () => {
       nickname: 'Ace',
       showInRanking: false,
     });
+  });
+
+  it('keeps save disabled until the form changes', () => {
+    renderSection();
+
+    expect(
+      screen.getByRole('button', { name: /save profile/i }),
+    ).toBeDisabled();
+  });
+
+  it('discards unsaved changes', () => {
+    renderSection();
+
+    fireEvent.change(screen.getByLabelText(/public nickname/i), {
+      target: { value: 'DraftNick' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByLabelText(/public nickname/i)).toHaveValue('Ace');
+    expect(
+      screen.getByRole('button', { name: /save profile/i }),
+    ).toBeDisabled();
   });
 });

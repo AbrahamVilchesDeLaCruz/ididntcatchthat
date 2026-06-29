@@ -370,21 +370,40 @@ export interface SidebarTranslations {
 export interface ProfileTranslations {
   title: string;
   subtitle: string;
+  sections: {
+    ranking: string;
+    preferences: string;
+  };
+  hero: {
+    visibleInRanking: string;
+    hiddenInRanking: string;
+  };
   account: {
     title: string;
     roleUser: string;
     roleTeacher: string;
     roleAdmin: string;
+    roleGuest: string;
     userIdLabel: string;
   };
   preferences: {
     title: string;
     themeLabel: string;
+    themeDescription: string;
     localeLabel: string;
+    localeDescription: string;
   };
   ranking: {
     title: string;
     description: string;
+    previewTitle: string;
+    previewHidden: string;
+    previewRankPlaceholder: string;
+    nicknameHint: string;
+    nicknameTooShort: string;
+    viewRanking: string;
+    discard: string;
+    unsavedHint: string;
   };
 }
 
