@@ -6,6 +6,7 @@ import { type PasswordHasher } from '@/identity/user/domain/password-hasher';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { EmailAlreadyTakenException } from '@/identity/user/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/user/domain/exceptions/nickname-already-taken.exception';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
@@ -24,6 +25,7 @@ describe('identity/application/register UserRegistrar', () => {
   const generator = mock<TokenGenerator>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
+  const metrics = mock<AppMetrics>();
   let useCase: UserRegistrar;
 
   beforeEach(() => {
@@ -51,6 +53,7 @@ describe('identity/application/register UserRegistrar', () => {
       generator,
       publisher,
       logger,
+      metrics,
     );
   });
 

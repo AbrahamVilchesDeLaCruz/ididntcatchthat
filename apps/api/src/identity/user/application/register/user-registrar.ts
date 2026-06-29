@@ -25,6 +25,7 @@ import {
 } from '@/identity/session/domain/user-session.repository';
 import { UserSession } from '@/identity/session/domain/user-session';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { type RequestUserRegistrar } from './request-user-registrar';
 import { type ResponseUserRegistrar } from './response-user-registrar';
 
@@ -45,6 +46,8 @@ export class UserRegistrar {
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(request: RequestUserRegistrar): Promise<ResponseUserRegistrar> {
@@ -104,6 +107,9 @@ export class UserRegistrar {
     this.logger.info('User registered', {
       userId: user.id.value,
       email,
+    });
+    this.metrics.increment('app_auth_registrations_total', {
+      provider: 'email',
     });
 
     return { accessToken, refreshTokenId };

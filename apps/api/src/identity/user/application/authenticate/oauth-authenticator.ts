@@ -20,6 +20,7 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { UserSession } from '@/identity/session/domain/user-session';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { UserSearcher } from '@/identity/user/domain/user-searcher';
 import { type RequestOAuthAuthenticator } from './request-oauth-authenticator';
 import { type ResponseOAuthAuthenticator } from './response-oauth-authenticator';
@@ -43,6 +44,8 @@ export class OAuthAuthenticator {
     private readonly logger: Logger,
     @Inject(UserSearcher) /* istanbul ignore next */
     private readonly searcher: UserSearcher,
+    @Inject(APP_METRICS) /* istanbul ignore next */
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(
@@ -80,6 +83,13 @@ export class OAuthAuthenticator {
     }
 
     this.logUserAuthentication(isNewUser, user, email);
+    if (isNewUser) {
+      this.metrics.increment('app_auth_registrations_total', {
+        provider: 'google',
+      });
+    } else {
+      this.metrics.increment('app_auth_logins_total', { provider: 'google' });
+    }
 
     const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: user.role.value,

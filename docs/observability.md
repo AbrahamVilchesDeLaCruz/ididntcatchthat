@@ -124,6 +124,71 @@ Prometheus no tiene autenticación propia — está protegido porque:
 
 ---
 
+## Fase 2 — Backoffice UI ✅
+
+### UI de observabilidad en el backoffice (4 tabs)
+
+La página `/backoffice/observability` expone los datos de Prometheus y del DB en una interfaz organizada en cuatro pestañas:
+
+| Tab | Fuente | Qué muestra |
+|---|---|---|
+| **HTTP** | `/admin/metrics/summary` | Total requests, tasa éxito/error (2xx/4xx/5xx separados), latencia p50/p95/p99, tabla de breakdown por ruta/método/status paginada |
+| **Runtime** | `/admin/metrics/summary` | Heap usado %, event loop lag p95, pausas de GC, uptime, handles activos, CPU acumulado |
+| **Negocio** | `/admin/metrics/summary` | Contadores `app_*`: partidas iniciadas/completadas, flashcards creadas, audio generado/errores, logins/registros por proveedor |
+| **Usuarios** | `/admin/users/stats` | Total usuarios, nuevos 7d/30d, activos 7d/30d, canal Google vs email, engagement rate, rachas |
+
+Todos los tabs usan el componente `InsightCard` que muestra el valor numérico junto a una frase contextual y un indicador semántico verde/ámbar/rojo basado en umbrales predefinidos.
+
+### collectDefaultMetrics activado
+
+`ObservabilityModule` llama a `collectDefaultMetrics({ register: registry })` al crear el Registry. Esto activa automáticamente las métricas Node.js runtime de prom-client:
+
+- `nodejs_heap_size_used_bytes`, `nodejs_heap_size_total_bytes`
+- `nodejs_gc_duration_seconds` (histogram por tipo de GC)
+- `nodejs_eventloop_lag_seconds`, `_p50_seconds`, `_p95_seconds`
+- `nodejs_active_handles_total`, `nodejs_active_requests_total`
+- `process_cpu_seconds_total`, `process_resident_memory_bytes`
+- `process_start_time_seconds`, `process_open_fds`
+
+### Métricas de negocio `app_*`
+
+La interfaz `AppMetrics` (en `shared/domain/`) permite que los use cases incrementen contadores sin acoplarse a prom-client. La implementación `PrometheusAppMetrics` (en `shared/infrastructure/`) registra contadores en el Registry:
+
+| Métrica | Use case |
+|---|---|
+| `app_games_started_total` | `game-starter.ts` |
+| `app_games_completed_total` | `game-completer.ts` |
+| `app_flashcards_created_total` | CreateFlashcard use case |
+| `app_audio_generated_total{provider}` | Audio generation use case |
+| `app_audio_errors_total{provider}` | Audio generation use case (catch) |
+| `app_auth_logins_total{provider}` | `user-authenticator.ts` + OAuth callback |
+| `app_auth_registrations_total{provider}` | `user-registrar.ts` + OAuth |
+
+### Endpoint de stats de usuarios
+
+`GET /v1/admin/users/stats` — requiere JWT + rol `admin`. Hace queries TypeORM sobre la tabla `users` existente:
+
+```typescript
+{
+  totalUsers: number;
+  newUsersLast7Days: number;
+  newUsersLast30Days: number;
+  activeUsersLast7Days: number;
+  activeUsersLast30Days: number;
+  googleUsers: number;       // oauthProvider = 'google'
+  emailUsers: number;        // oauthProvider IS NULL
+  usersWithStreak: number;
+  avgLongestStreak: number;
+  engagementRate: number;    // activeUsersLast30Days / totalUsers * 100
+}
+```
+
+Ver spec completa: [docs/spec/backoffice-observability-v2.md](spec/backoffice-observability-v2.md)  
+Ver ADR de decisiones: [docs/adr/025-backoffice-metrics-ux.md](adr/025-backoffice-metrics-ux.md)  
+Ver diagrama de flujo: [docs/diagrams/observability-backoffice.md](diagrams/observability-backoffice.md)
+
+---
+
 ## Fase 3 — Pendiente 🔲
 
 ### OpenTelemetry — Traces

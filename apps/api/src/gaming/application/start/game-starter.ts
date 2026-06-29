@@ -23,6 +23,7 @@ import {
 } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { type RequestGameStarter } from './request-game-starter';
 import { type ResponseGameStarter } from './response-game-starter';
 
@@ -39,6 +40,8 @@ export class GameStarter {
     private readonly weakestFlashcardIdsProvider: WeakestFlashcardIdsProvider,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
@@ -115,6 +118,8 @@ export class GameStarter {
       subcategory,
       cardCount,
     });
+
+    this.metrics.increment('app_games_started_total');
 
     return {
       gameId: game.id.value,

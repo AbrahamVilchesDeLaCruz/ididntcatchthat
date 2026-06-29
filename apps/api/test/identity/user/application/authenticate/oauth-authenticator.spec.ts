@@ -6,6 +6,7 @@ import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { type NicknameResolver } from '@/identity/user/domain/nickname-resolver';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type User } from '@/identity/user/domain/user';
@@ -24,6 +25,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
   const nicknameResolver = mock<NicknameResolver>();
   const logger = mock<Logger>();
   const searcher = mock<UserSearcher>();
+  const metrics = mock<AppMetrics>();
   let authenticator: OAuthAuthenticator;
 
   beforeEach((): void => {
@@ -50,6 +52,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
       nicknameResolver,
       logger,
       searcher,
+      metrics,
     );
   });
 

@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { Registry } from 'prom-client';
+import { Registry, collectDefaultMetrics } from 'prom-client';
 import { MetricsGetController } from '../controllers/metrics-get.controller';
 import { MetricsSummaryGetController } from '../controllers/metrics-summary-get.controller';
 import { MetricsInterceptor } from './metrics.interceptor';
@@ -9,7 +9,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 import { METRICS_SUMMARY_QUERY } from '@/observability/application/summary/metrics-summary.query';
 import { PrometheusMetricsSummaryQuery } from '@/observability/infrastructure/prometheus-metrics-summary.query';
 import { MetricsSummaryRetriever } from '@/observability/application/summary/metrics-summary-retriever';
+import { PrometheusAppMetrics } from '@/shared/infrastructure/metrics/prometheus-app-metrics';
+import { APP_METRICS } from '@/shared/domain/app-metrics';
 
+@Global()
 @Module({
   imports: [AuthModule],
   controllers: [MetricsGetController, MetricsSummaryGetController],
@@ -19,6 +22,7 @@ import { MetricsSummaryRetriever } from '@/observability/application/summary/met
       useFactory: (): Registry => {
         const registry = new Registry();
         registry.setDefaultLabels({ app: 'ididntcatchthat-api' });
+        collectDefaultMetrics({ register: registry });
         return registry;
       },
     },
@@ -32,7 +36,10 @@ import { MetricsSummaryRetriever } from '@/observability/application/summary/met
     { provide: METRICS_SUMMARY_QUERY, useClass: PrometheusMetricsSummaryQuery },
     // Use cases
     MetricsSummaryRetriever,
+    // App metrics (business counters)
+    PrometheusAppMetrics,
+    { provide: APP_METRICS, useExisting: PrometheusAppMetrics },
   ],
-  exports: [METRICS_REGISTRY],
+  exports: [METRICS_REGISTRY, APP_METRICS],
 })
 export class ObservabilityModule {}

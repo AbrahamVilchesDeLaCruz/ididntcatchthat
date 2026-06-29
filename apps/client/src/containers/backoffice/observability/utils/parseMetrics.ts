@@ -1,6 +1,25 @@
 import type { MetricVM } from '../observability.types';
 
-// ─── HTTP requests ─────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getMetric(metrics: MetricVM[], name: string): MetricVM | undefined {
+  return metrics.find((x) => x.name === name);
+}
+
+function sumAllSamples(m: MetricVM | undefined): number {
+  if (!m) return 0;
+  return m.samples.reduce((acc, s) => acc + s.value, 0);
+}
+
+function statusClass(status: string): '2xx' | '3xx' | '4xx' | '5xx' | 'other' {
+  if (status.startsWith('2')) return '2xx';
+  if (status.startsWith('3')) return '3xx';
+  if (status.startsWith('4')) return '4xx';
+  if (status.startsWith('5')) return '5xx';
+  return 'other';
+}
+
+// ─── HTTP ─────────────────────────────────────────────────────────────────────
 
 export interface HttpBreakdownRow {
   handler: string;
@@ -12,57 +31,50 @@ export interface HttpBreakdownRow {
 
 export interface HttpStats {
   totalRequests: number;
-  errorRate: number;
   successRate: number;
+  clientErrorRate: number;
+  serverErrorRate: number;
+  /** @deprecated use serverErrorRate */
+  errorRate: number;
   breakdown: HttpBreakdownRow[];
 }
 
-function statusClass(status: string): HttpBreakdownRow['statusClass'] {
-  if (status.startsWith('2')) return '2xx';
-  if (status.startsWith('3')) return '3xx';
-  if (status.startsWith('4')) return '4xx';
-  if (status.startsWith('5')) return '5xx';
-  return 'other';
-}
-
 export function parseHttpStats(metrics: MetricVM[]): HttpStats | null {
-  const m = metrics.find((x) => x.name === 'http_requests_total');
+  const m = getMetric(metrics, 'http_requests_total');
   if (!m) return null;
 
-  // Exclude histogram bucket samples (they have a `le` label)
   const samples = m.samples.filter((s) => !('le' in s.labels));
   const totalRequests = samples.reduce((sum, s) => sum + s.value, 0);
 
   if (totalRequests === 0) {
-    return { totalRequests: 0, errorRate: 0, successRate: 0, breakdown: [] };
+    return {
+      totalRequests: 0,
+      errorRate: 0,
+      serverErrorRate: 0,
+      clientErrorRate: 0,
+      successRate: 0,
+      breakdown: [],
+    };
   }
 
-  const errorRequests = samples
-    .filter((s) =>
-      (
-        s.labels.status_code ??
-        s.labels.status ??
-        s.labels.code ??
-        ''
-      ).startsWith('5'),
-    )
+  const getStatus = (s: (typeof samples)[0]): string =>
+    s.labels.status_code ?? s.labels.status ?? s.labels.code ?? '';
+
+  const serverErrors = samples
+    .filter((s) => getStatus(s).startsWith('5'))
     .reduce((sum, s) => sum + s.value, 0);
 
-  const successRequests = samples
-    .filter((s) =>
-      (
-        s.labels.status_code ??
-        s.labels.status ??
-        s.labels.code ??
-        ''
-      ).startsWith('2'),
-    )
+  const clientErrors = samples
+    .filter((s) => getStatus(s).startsWith('4'))
+    .reduce((sum, s) => sum + s.value, 0);
+
+  const successes = samples
+    .filter((s) => getStatus(s).startsWith('2'))
     .reduce((sum, s) => sum + s.value, 0);
 
   const breakdown: HttpBreakdownRow[] = samples
     .map((s) => {
-      const status =
-        s.labels.status_code ?? s.labels.status ?? s.labels.code ?? '—';
+      const status = getStatus(s) || '—';
       return {
         handler:
           s.labels.route ??
@@ -80,13 +92,15 @@ export function parseHttpStats(metrics: MetricVM[]): HttpStats | null {
 
   return {
     totalRequests,
-    errorRate: (errorRequests / totalRequests) * 100,
-    successRate: (successRequests / totalRequests) * 100,
+    successRate: (successes / totalRequests) * 100,
+    clientErrorRate: (clientErrors / totalRequests) * 100,
+    serverErrorRate: (serverErrors / totalRequests) * 100,
+    errorRate: (serverErrors / totalRequests) * 100,
     breakdown,
   };
 }
 
-// ─── Latency (histogram) ───────────────────────────────────────────────────────
+// ─── Latency (histogram) ──────────────────────────────────────────────────────
 
 export interface LatencyPercentiles {
   p50Ms: number | null;
@@ -98,12 +112,9 @@ export interface LatencyPercentiles {
 export function parseLatencyPercentiles(
   metrics: MetricVM[],
 ): LatencyPercentiles | null {
-  const m = metrics.find((x) =>
-    x.name.includes('http_request_duration_seconds'),
-  );
+  const m = getMetric(metrics, 'http_request_duration_seconds');
   if (!m) return null;
 
-  // Bucket samples have `le` label; aggregate across all handlers
   const buckets = m.samples
     .filter((s) => 'le' in s.labels)
     .reduce<Map<number, number>>((acc, s) => {
@@ -123,16 +134,16 @@ export function parseLatencyPercentiles(
     const target = totalCount * p;
     const entry = sorted.find(([, count]) => count >= target);
     if (!entry || entry[0] === Infinity) return null;
-    return entry[0] * 1000; // seconds → ms
+    return entry[0] * 1000;
   };
 
-  // avgMs from _sum / _count if available as unlabelled samples
-  const sumSamples = m.samples.filter(
-    (s) => !('le' in s.labels) && !('quantile' in s.labels),
-  );
-  const totalSum = sumSamples.reduce((acc, s) => acc + s.value, 0);
+  // prom-client exports _sum and _count as separate metric entries
+  const sumMetric = getMetric(metrics, 'http_request_duration_seconds_sum');
+  const countMetric = getMetric(metrics, 'http_request_duration_seconds_count');
+  const totalSum = sumAllSamples(sumMetric);
+  const metricCount = sumAllSamples(countMetric);
   const avgMs =
-    totalSum > 0 && totalCount > 0 ? (totalSum / totalCount) * 1000 : null;
+    totalSum > 0 && metricCount > 0 ? (totalSum / metricCount) * 1000 : null;
 
   return {
     p50Ms: findPercentile(0.5),
@@ -142,7 +153,147 @@ export function parseLatencyPercentiles(
   };
 }
 
-// ─── Metric grouping ──────────────────────────────────────────────────────────
+// ─── Runtime (Node.js) ───────────────────────────────────────────────────────
+
+export interface RuntimeMetrics {
+  heapUsedBytes: number | null;
+  heapTotalBytes: number | null;
+  heapUsedPct: number | null;
+  eventLoopLagP95Ms: number | null;
+  gcDurationTotalSeconds: number | null;
+  processStartTimestamp: number | null;
+  uptimeSeconds: number | null;
+  activeHandles: number | null;
+  cpuSecondsTotal: number | null;
+  residentMemoryBytes: number | null;
+}
+
+export function parseRuntimeMetrics(metrics: MetricVM[]): RuntimeMetrics {
+  const heapUsed = sumAllSamples(
+    getMetric(metrics, 'nodejs_heap_size_used_bytes'),
+  );
+  const heapTotal = sumAllSamples(
+    getMetric(metrics, 'nodejs_heap_size_total_bytes'),
+  );
+
+  const eventLoopMetric = getMetric(
+    metrics,
+    'nodejs_eventloop_lag_p95_seconds',
+  );
+  const eventLoopLagP95Ms = eventLoopMetric
+    ? sumAllSamples(eventLoopMetric) * 1000
+    : null;
+
+  const gcSumMetric = getMetric(metrics, 'nodejs_gc_duration_seconds_sum');
+  const gcDurationTotalSeconds = gcSumMetric
+    ? sumAllSamples(gcSumMetric)
+    : null;
+
+  const startMetric = getMetric(metrics, 'process_start_time_seconds');
+  const processStartTimestamp = startMetric
+    ? sumAllSamples(startMetric) * 1000
+    : null;
+  const uptimeSeconds =
+    processStartTimestamp !== null
+      ? (Date.now() - processStartTimestamp) / 1000
+      : null;
+
+  const activeHandles = sumAllSamples(
+    getMetric(metrics, 'nodejs_active_handles_total'),
+  );
+  const cpuSecondsTotal = sumAllSamples(
+    getMetric(metrics, 'process_cpu_seconds_total'),
+  );
+  const residentMemoryBytes = sumAllSamples(
+    getMetric(metrics, 'process_resident_memory_bytes'),
+  );
+
+  return {
+    heapUsedBytes: heapUsed || null,
+    heapTotalBytes: heapTotal || null,
+    heapUsedPct: heapUsed && heapTotal ? (heapUsed / heapTotal) * 100 : null,
+    eventLoopLagP95Ms: eventLoopMetric ? eventLoopLagP95Ms : null,
+    gcDurationTotalSeconds,
+    processStartTimestamp,
+    uptimeSeconds,
+    activeHandles: activeHandles || null,
+    cpuSecondsTotal: cpuSecondsTotal || null,
+    residentMemoryBytes: residentMemoryBytes || null,
+  };
+}
+
+// ─── Business metrics ─────────────────────────────────────────────────────────
+
+export interface BusinessMetrics {
+  gamesStarted: number;
+  gamesCompleted: number;
+  completionRate: number | null;
+  flashcardsCreated: number;
+  audioGenerated: number;
+  audioErrors: number;
+  loginsByProvider: Record<string, number>;
+  registrationsByProvider: Record<string, number>;
+  totalLogins: number;
+  totalRegistrations: number;
+}
+
+export function parseBusinessMetrics(metrics: MetricVM[]): BusinessMetrics {
+  const gamesStarted = sumAllSamples(
+    getMetric(metrics, 'app_games_started_total'),
+  );
+  const gamesCompleted = sumAllSamples(
+    getMetric(metrics, 'app_games_completed_total'),
+  );
+
+  const completionRate =
+    gamesStarted > 0 ? (gamesCompleted / gamesStarted) * 100 : null;
+
+  const flashcardsCreated = sumAllSamples(
+    getMetric(metrics, 'app_flashcards_created_total'),
+  );
+
+  const audioMetric = getMetric(metrics, 'app_audio_generated_total');
+  const audioErrorMetric = getMetric(metrics, 'app_audio_errors_total');
+  const audioGenerated = sumAllSamples(audioMetric);
+  const audioErrors = sumAllSamples(audioErrorMetric);
+
+  const loginsByProvider: Record<string, number> = {};
+  const loginsMetric = getMetric(metrics, 'app_auth_logins_total');
+  if (loginsMetric) {
+    for (const s of loginsMetric.samples) {
+      const provider = s.labels.provider ?? 'unknown';
+      loginsByProvider[provider] = (loginsByProvider[provider] ?? 0) + s.value;
+    }
+  }
+
+  const registrationsByProvider: Record<string, number> = {};
+  const regsMetric = getMetric(metrics, 'app_auth_registrations_total');
+  if (regsMetric) {
+    for (const s of regsMetric.samples) {
+      const provider = s.labels.provider ?? 'unknown';
+      registrationsByProvider[provider] =
+        (registrationsByProvider[provider] ?? 0) + s.value;
+    }
+  }
+
+  return {
+    gamesStarted,
+    gamesCompleted,
+    completionRate,
+    flashcardsCreated,
+    audioGenerated,
+    audioErrors,
+    loginsByProvider,
+    registrationsByProvider,
+    totalLogins: Object.values(loginsByProvider).reduce((a, b) => a + b, 0),
+    totalRegistrations: Object.values(registrationsByProvider).reduce(
+      (a, b) => a + b,
+      0,
+    ),
+  };
+}
+
+// ─── Metric grouping ─────────────────────────────────────────────────────────
 
 const CATEGORY_PREFIXES: Array<{ prefix: string; label: string }> = [
   { prefix: 'http_', label: 'HTTP' },
@@ -166,7 +317,6 @@ export function groupMetricsByCategory(
     grouped.get(category)!.push(metric);
   }
 
-  // Keep HTTP first, then alphabetical
   const order = [
     'HTTP',
     'NestJS',
@@ -184,5 +334,5 @@ export function groupMetricsByCategory(
       if (ib === -1) return -1;
       return ia - ib;
     })
-    .map(([category, metrics]) => ({ category, metrics }));
+    .map(([category, items]) => ({ category, metrics: items }));
 }

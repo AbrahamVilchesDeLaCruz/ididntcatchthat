@@ -5,6 +5,7 @@ import { type UserSessionRepository } from '@/identity/session/domain/user-sessi
 import { type PasswordHasher } from '@/identity/user/domain/password-hasher';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { InvalidCredentialsException } from '@/identity/user/domain/exceptions/invalid-credentials.exception';
 import { UserMother } from '@test/identity/user/domain/user-mother';
 import { RequestUserAuthenticatorMother } from './request-user-authenticator-mother';
@@ -17,6 +18,7 @@ describe('identity/application/login UserAuthenticator', () => {
   const hasher = mock<PasswordHasher>();
   const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
+  const metrics = mock<AppMetrics>();
   let useCase: UserAuthenticator;
 
   beforeEach(() => {
@@ -37,6 +39,7 @@ describe('identity/application/login UserAuthenticator', () => {
       hasher,
       generator,
       logger,
+      metrics,
     );
   });
 

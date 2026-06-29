@@ -6,18 +6,25 @@ import {
   SummaryCardSkeleton,
 } from './components/HttpSummaryCards';
 import { HttpBreakdownTable } from './components/HttpBreakdownTable';
-import { MetricsGroup } from './components/MetricsGroup';
+import { RuntimeMetricsSection } from './components/RuntimeMetricsSection';
+import { BusinessMetricsSection } from './components/BusinessMetricsSection';
+import { UsersStatsSection } from './components/UsersStatsSection';
+import { ObservabilityTabs } from './components/ObservabilityTabs';
 import {
   parseHttpStats,
   parseLatencyPercentiles,
-  groupMetricsByCategory,
+  parseRuntimeMetrics,
+  parseBusinessMetrics,
 } from './utils/parseMetrics';
-import type { MetricsSummaryVM } from './observability.types';
+import type { MetricsSummaryVM, UserStatsVM } from './observability.types';
 
 interface BackofficeObservabilityComponentProps {
   summary: MetricsSummaryVM | null;
+  userStats: UserStatsVM | null;
   isLoading: boolean;
   isError: boolean;
+  isUserStatsLoading: boolean;
+  isUserStatsError: boolean;
   lastUpdatedAt?: number;
   onRetry: () => void;
 }
@@ -31,7 +38,7 @@ const LiveBadge = (): ReactElement => (
 
 const TableSkeleton = (): ReactElement => (
   <div className="space-y-2 animate-pulse">
-    {Array.from({ length: 5 }).map((_, i) => (
+    {Array.from({ length: 5 }, (_, i) => (
       <div key={i} className="h-9 bg-[var(--color-bg-elevated)] rounded" />
     ))}
   </div>
@@ -39,30 +46,25 @@ const TableSkeleton = (): ReactElement => (
 
 export const BackofficeObservabilityComponent = ({
   summary,
+  userStats,
   isLoading,
   isError,
+  isUserStatsLoading,
+  isUserStatsError,
   lastUpdatedAt,
   onRetry,
 }: BackofficeObservabilityComponentProps): ReactElement => {
   const metrics = summary?.metrics ?? [];
   const httpStats = parseHttpStats(metrics);
   const latencyStats = parseLatencyPercentiles(metrics);
-  const groups = groupMetricsByCategory(metrics);
-  const nonHttpGroups = groups.filter((g) => g.category !== 'HTTP');
+  const runtimeMetrics = parseRuntimeMetrics(metrics);
+  const businessMetrics = parseBusinessMetrics(metrics);
 
-  return (
-    <BackofficePageShell
-      title="Observabilidad"
-      subtitle="Métricas del sistema en tiempo real"
-      isError={isError}
-      onRetry={onRetry}
-      lastUpdatedAt={lastUpdatedAt}
-      headerExtra={!isLoading && !isError ? <LiveBadge /> : undefined}
-    >
-      {/* HTTP Summary KPIs */}
+  const httpTab = (
+    <div className="space-y-6">
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 4 }, (_, i) => (
             <SummaryCardSkeleton key={i} />
           ))}
         </div>
@@ -74,7 +76,6 @@ export const BackofficeObservabilityComponent = ({
         </p>
       )}
 
-      {/* HTTP Breakdown by endpoint */}
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
         <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
           Requests por endpoint
@@ -92,23 +93,46 @@ export const BackofficeObservabilityComponent = ({
           </p>
         )}
       </div>
+    </div>
+  );
 
-      {/* All other metric groups */}
-      {!isLoading && nonHttpGroups.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
-            Todas las métricas
-          </h2>
-          {groups.map(({ category, metrics: groupMetrics }) => (
-            <MetricsGroup
-              key={category}
-              category={category}
-              metrics={groupMetrics}
-              defaultOpen={category === 'HTTP'}
-            />
-          ))}
-        </div>
-      )}
+  const runtimeTab = (
+    <RuntimeMetricsSection
+      runtime={isLoading ? null : runtimeMetrics}
+      isLoading={isLoading}
+    />
+  );
+
+  const businessTab = (
+    <BusinessMetricsSection
+      business={isLoading ? null : businessMetrics}
+      isLoading={isLoading}
+    />
+  );
+
+  const usersTab = (
+    <UsersStatsSection
+      stats={userStats}
+      isLoading={isUserStatsLoading}
+      isError={isUserStatsError}
+    />
+  );
+
+  return (
+    <BackofficePageShell
+      title="Observabilidad"
+      subtitle="Métricas del sistema en tiempo real"
+      isError={isError}
+      onRetry={onRetry}
+      lastUpdatedAt={lastUpdatedAt}
+      headerExtra={!isLoading && !isError ? <LiveBadge /> : undefined}
+    >
+      <ObservabilityTabs
+        httpContent={httpTab}
+        runtimeContent={runtimeTab}
+        businessContent={businessTab}
+        usersContent={usersTab}
+      />
     </BackofficePageShell>
   );
 };
