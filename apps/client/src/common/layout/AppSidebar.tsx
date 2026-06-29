@@ -22,6 +22,7 @@ import {
 import { BrandWordmark } from '@/common/components/BrandWordmark';
 import { Button } from '@/common/components/ui/button';
 import { SidebarFooter } from '@/common/layout/SidebarFooter';
+import { SidebarHeaderControls } from '@/common/layout/SidebarHeaderControls';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -51,9 +52,11 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
 
   return (
     <>
-      <Link to="/home" onClick={onNavigate} className="mb-8 block px-3">
+      <Link to="/home" onClick={onNavigate} className="mb-4 block px-3">
         <BrandWordmark className="text-lg" />
       </Link>
+
+      <SidebarHeaderControls />
 
       <nav className="flex-1 space-y-1 overflow-y-auto">
         <div className="mb-2">

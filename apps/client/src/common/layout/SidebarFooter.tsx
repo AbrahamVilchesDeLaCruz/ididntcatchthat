@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useLogout } from '@/containers/auth/api';
-import { ThemeToggle } from '@/common/components/ThemeToggle';
-import { LocaleToggle } from '@/common/components/LocaleToggle';
 import { SidebarUserBlock } from '@/common/layout/SidebarUserBlock';
 
 interface SidebarFooterProps {
@@ -31,26 +29,20 @@ export const SidebarFooter = ({
   };
 
   return (
-    <div className="mt-auto shrink-0 border-t border-[var(--color-border)] pt-4">
-      <SidebarUserBlock onNavigate={onNavigate} />
+    <div className="mt-auto shrink-0 border-t border-[var(--color-border)] px-3 pt-4">
+      <div className="flex items-center gap-2">
+        <SidebarUserBlock onNavigate={onNavigate} variant="compact" />
 
-      <div className="mb-3 flex gap-2 px-3">
-        <div className="flex-1">
-          <ThemeToggle variant="pill" />
-        </div>
-        <div className="flex-1">
-          <LocaleToggle variant="pill" />
-        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          aria-label={t.sidebar.logout}
+          title={t.sidebar.logout}
+          className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] p-2.5 text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-primary)]"
+        >
+          <LogOut size={18} aria-hidden />
+        </button>
       </div>
-
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-primary)]"
-      >
-        <LogOut size={18} aria-hidden />
-        {t.sidebar.logout}
-      </button>
     </div>
   );
 };
