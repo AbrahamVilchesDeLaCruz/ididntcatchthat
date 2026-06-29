@@ -34,89 +34,6 @@ const ChartCard = ({
   </div>
 );
 
-// ─── Games section ────────────────────────────────────────────────────────────
-const GamesSubSection = ({
-  data,
-}: {
-  data: DbStatsVM['games'];
-}): ReactElement => {
-  const completionVariant =
-    data.completionRate >= 70
-      ? 'success'
-      : data.completionRate >= 50
-        ? 'warning'
-        : 'danger';
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <InsightCard
-          label="Partidas"
-          value={data.total.toLocaleString('es-ES')}
-          insight={`${data.total.toLocaleString('es-ES')} partidas iniciadas en el período`}
-          variant="neutral"
-        />
-        <InsightCard
-          label="Completadas"
-          value={`${data.completionRate.toFixed(1)}%`}
-          insight={`${data.completed} de ${data.total} partidas completadas`}
-          variant={completionVariant}
-          progress={data.completionRate}
-          sub={`${data.completed} / ${data.total}`}
-        />
-        {data.byMode.length > 0 && (
-          <InsightCard
-            label="Modo top"
-            value={data.byMode[0].mode}
-            insight={`${data.byMode[0].count} partidas en modo "${data.byMode[0].mode}"`}
-            variant="neutral"
-          />
-        )}
-      </div>
-      {data.byPeriod.length > 0 && (
-        <ChartCard title="Partidas por período">
-          <DailyTrendChart
-            data={data.byPeriod}
-            series={[
-              {
-                key: 'started',
-                label: 'Iniciadas',
-                type: 'bar',
-                color: 'var(--color-brand)',
-              },
-              {
-                key: 'completed',
-                label: 'Completadas',
-                type: 'line',
-                color: 'var(--color-accent-green)',
-              },
-            ]}
-          />
-        </ChartCard>
-      )}
-      {data.byMode.length > 0 && (
-        <ChartCard title="Distribución por modo">
-          <DistributionChart
-            data={data.byMode.map((m) => ({ name: m.mode, value: m.count }))}
-            height={160}
-          />
-        </ChartCard>
-      )}
-      {data.topModules.length > 0 && (
-        <ChartCard title="Módulos más jugados">
-          <DistributionChart
-            data={data.topModules
-              .slice(0, 8)
-              .map((m) => ({ name: m.module, value: m.count }))}
-            height={160}
-            horizontal
-          />
-        </ChartCard>
-      )}
-    </div>
-  );
-};
-
 // ─── Users section ────────────────────────────────────────────────────────────
 const UsersSubSection = ({
   data,
@@ -327,11 +244,10 @@ const PageViewsSubSection = ({
 };
 
 // ─── Sub-tabs ─────────────────────────────────────────────────────────────────
-type SubTab = 'visitas' | 'partidas' | 'usuarios' | 'contenido';
+type SubTab = 'visitas' | 'usuarios' | 'contenido';
 
 const SUB_TABS: { key: SubTab; label: string }[] = [
   { key: 'visitas', label: 'Visitas web' },
-  { key: 'partidas', label: 'Partidas' },
   { key: 'usuarios', label: 'Usuarios' },
   { key: 'contenido', label: 'Contenido' },
 ];
@@ -381,7 +297,6 @@ export const DbStatsSection = (): ReactElement => {
           {subTab === 'visitas' && (
             <PageViewsSubSection data={data.pageViews} />
           )}
-          {subTab === 'partidas' && <GamesSubSection data={data.games} />}
           {subTab === 'usuarios' && <UsersSubSection data={data.users} />}
           {subTab === 'contenido' && (
             <FlashcardsSubSection data={data.flashcards} />

@@ -7,7 +7,6 @@ import {
 } from './components/HttpSummaryCards';
 import { HttpBreakdownTable } from './components/HttpBreakdownTable';
 import { RuntimeMetricsSection } from './components/RuntimeMetricsSection';
-import { BusinessMetricsSection } from './components/BusinessMetricsSection';
 import { UsersStatsSection } from './components/UsersStatsSection';
 import { DbStatsSection } from './components/DbStatsSection';
 import { ObservabilityTabs } from './components/ObservabilityTabs';
@@ -15,7 +14,6 @@ import {
   parseHttpStats,
   parseLatencyPercentiles,
   parseRuntimeMetrics,
-  parseBusinessMetrics,
 } from './utils/parseMetrics';
 import type { MetricsSummaryVM, UserStatsVM } from './observability.types';
 
@@ -59,8 +57,6 @@ export const BackofficeObservabilityComponent = ({
   const httpStats = parseHttpStats(metrics);
   const latencyStats = parseLatencyPercentiles(metrics);
   const runtimeMetrics = parseRuntimeMetrics(metrics);
-  const businessMetrics = parseBusinessMetrics(metrics);
-
   const serverStartedAt = runtimeMetrics.processStartTimestamp;
   const serverStartLabel = serverStartedAt
     ? new Date(serverStartedAt).toLocaleString('es-ES', {
@@ -136,14 +132,6 @@ export const BackofficeObservabilityComponent = ({
     />
   );
 
-  const businessTab = (
-    <BusinessMetricsSection
-      business={isLoading ? null : businessMetrics}
-      isLoading={isLoading}
-      serverStartLabel={serverStartLabel ?? undefined}
-    />
-  );
-
   const usersTab = (
     <UsersStatsSection
       stats={userStats}
@@ -166,7 +154,6 @@ export const BackofficeObservabilityComponent = ({
       <ObservabilityTabs
         httpContent={httpTab}
         runtimeContent={runtimeTab}
-        businessContent={businessTab}
         usersContent={usersTab}
         analyticsContent={analyticsTab}
       />
