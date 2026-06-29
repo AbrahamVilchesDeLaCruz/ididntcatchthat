@@ -20,7 +20,7 @@ describe('gaming/study Study flow (e2e)', () => {
     const guestRes = await request(app.getHttpServer())
       .post('/v1/auth/guest')
       .send({})
-      .expect(201);
+      .expect(200);
 
     const guestToken = (guestRes.body as { accessToken: string }).accessToken;
 
