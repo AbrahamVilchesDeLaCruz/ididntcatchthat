@@ -39,9 +39,11 @@ export const SidebarUserBlock = ({
 
   const avatarNickname = nickname ?? displayName;
 
+  const profilePath = isUser ? '/profile#ranking' : '/profile';
+
   return (
     <NavLink
-      to="/profile"
+      to={profilePath}
       className={profileLinkClass}
       onClick={onNavigate}
       aria-label={displayName}

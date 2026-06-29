@@ -16,6 +16,7 @@ export interface CurrentUser {
   canAccessBackoffice: boolean;
   canManageFlashcards: boolean;
   canAccessObservability: boolean;
+  canAccessRanking: boolean;
 }
 
 export function useCurrentUser(): CurrentUser {
@@ -27,6 +28,11 @@ export function useCurrentUser(): CurrentUser {
   const isTeacher = roles.includes('teacher');
   const isUser = roles.includes('user') && !isAdmin && !isTeacher;
   const canStudy = userType !== null && userType !== 'guest' && userId !== null;
+  const canAccessBackoffice = canAccessBackofficeFromRoles(roles);
+  const canAccessRanking =
+    userId !== null &&
+    userType !== 'guest' &&
+    (isUser || isAdmin || canAccessBackoffice);
 
   return {
     userId,
@@ -37,8 +43,9 @@ export function useCurrentUser(): CurrentUser {
     isTeacher,
     isAdmin,
     canStudy,
-    canAccessBackoffice: canAccessBackofficeFromRoles(roles),
+    canAccessBackoffice,
     canManageFlashcards: canManageFlashcardsFromRoles(roles),
     canAccessObservability: isAdmin,
+    canAccessRanking,
   };
 }

@@ -17,6 +17,7 @@ export const HomeContainer = (): ReactElement => {
     canAccessBackoffice,
     canManageFlashcards,
     canAccessObservability,
+    canAccessRanking,
   } = useCurrentUser();
   const profileQuery = useRankingProfile({ enabled: isUser });
 
@@ -74,7 +75,7 @@ export const HomeContainer = (): ReactElement => {
       to: '/stats',
     });
 
-    if (isUser) {
+    if (canAccessRanking) {
       cards.push({
         id: 'ranking',
         title: h.actions.ranking.title,
@@ -87,7 +88,7 @@ export const HomeContainer = (): ReactElement => {
       id: 'profile',
       title: h.actions.profile.title,
       description: h.actions.profile.description,
-      to: '/profile',
+      to: isUser ? '/profile#ranking' : '/profile',
     });
 
     if (canAccessBackoffice) {
@@ -122,6 +123,7 @@ export const HomeContainer = (): ReactElement => {
     h,
     canStudy,
     isUser,
+    canAccessRanking,
     canAccessBackoffice,
     canManageFlashcards,
     canAccessObservability,

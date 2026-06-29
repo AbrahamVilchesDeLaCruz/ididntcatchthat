@@ -46,6 +46,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
     isUser,
     isAdmin,
     canStudy,
+    canAccessRanking,
   } = useCurrentUser();
 
   return (
@@ -90,7 +91,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               <LineChart className={navIconClass} aria-hidden />
               {s.nav.stats}
             </NavLink>
-            {isUser ? (
+            {canAccessRanking ? (
               <NavLink
                 to="/ranking"
                 className={navLinkClass}
