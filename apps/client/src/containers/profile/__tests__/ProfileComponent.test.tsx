@@ -33,7 +33,7 @@ describe('ProfileComponent', () => {
     expect(screen.getByText('Ranking section')).toBeInTheDocument();
   });
 
-  it('hides ranking section for admin users', () => {
+  it('hides ranking section for guests', () => {
     mockedUseCurrentUser.mockReturnValue({
       isUser: false,
       canEditRankingProfile: false,
@@ -43,5 +43,16 @@ describe('ProfileComponent', () => {
 
     expect(screen.queryByText('Ranking section')).not.toBeInTheDocument();
     expect(screen.getByText('Account section')).toBeInTheDocument();
+  });
+
+  it('shows ranking section for admin accounts', () => {
+    mockedUseCurrentUser.mockReturnValue({
+      isUser: false,
+      canEditRankingProfile: true,
+    } as ReturnType<typeof useCurrentUser>);
+
+    render(<ProfileComponent />);
+
+    expect(screen.getByText('Ranking section')).toBeInTheDocument();
   });
 });

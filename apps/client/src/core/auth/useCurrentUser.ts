@@ -28,8 +28,8 @@ export function useCurrentUser(): CurrentUser {
   const isAdmin = roles.includes('admin');
   const isTeacher = roles.includes('teacher');
   const isUser = userType === 'user';
-  const canEditRankingProfile = isUser;
   const canStudy = userType !== null && userType !== 'guest' && userId !== null;
+  const canEditRankingProfile = canStudy;
   const canAccessBackoffice = canAccessBackofficeFromRoles(roles);
   const canAccessRanking =
     userId !== null &&

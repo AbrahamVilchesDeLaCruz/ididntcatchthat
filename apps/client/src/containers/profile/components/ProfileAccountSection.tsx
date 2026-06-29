@@ -9,8 +9,8 @@ export const ProfileAccountSection = (): ReactElement => {
   const { t } = useI18n();
   const p = t.profile.account;
   const userId = useAuthStore((s) => s.userId);
-  const { isUser, isTeacher, isAdmin } = useCurrentUser();
-  const profileQuery = useRankingProfile({ enabled: isUser });
+  const { isTeacher, isAdmin, canEditRankingProfile } = useCurrentUser();
+  const profileQuery = useRankingProfile({ enabled: canEditRankingProfile });
 
   const roleLabel = isAdmin
     ? p.roleAdmin
@@ -18,10 +18,9 @@ export const ProfileAccountSection = (): ReactElement => {
       ? p.roleTeacher
       : p.roleUser;
 
-  const nickname =
-    isUser && profileQuery.data?.nickname.trim()
-      ? profileQuery.data.nickname
-      : roleLabel;
+  const nickname = profileQuery.data?.nickname.trim()
+    ? profileQuery.data.nickname
+    : null;
 
   return (
     <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-6">
@@ -29,10 +28,13 @@ export const ProfileAccountSection = (): ReactElement => {
         {p.title}
       </h2>
       <div className="flex items-center gap-4">
-        <UserAvatar nickname={nickname} className="size-16 text-lg" />
+        <UserAvatar
+          nickname={nickname ?? roleLabel}
+          className="size-16 text-lg"
+        />
         <div className="min-w-0">
           <p className="truncate text-base font-medium text-[var(--color-text-primary)]">
-            {nickname}
+            {nickname ?? roleLabel}
           </p>
           <p className="text-sm text-[var(--color-text-secondary)]">
             {roleLabel}

@@ -19,7 +19,7 @@
 | Sección | user | teacher | admin |
 | ------- | :--: | :-----: | :---: |
 | Cuenta (avatar, rol, userId) | ✓ | ✓ | ✓ |
-| Ranking (nickname, opt-in) | ✓ | — | — |
+| Ranking (nickname, opt-in) | ✓ | ✓ | ✓ |
 | Preferencias (tema, idioma) | ✓ | ✓ | ✓ |
 
 Ranking usa `PATCH /users/me/ranking-profile` vía `useRankingProfile`.

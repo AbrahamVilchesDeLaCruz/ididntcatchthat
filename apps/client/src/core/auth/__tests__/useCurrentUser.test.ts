@@ -24,7 +24,7 @@ describe('useCurrentUser', () => {
     expect(result.current.canAccessRanking).toBe(true);
   });
 
-  it('allows ranking access for admin accounts', () => {
+  it('allows ranking access and profile editing for admin accounts', () => {
     useAuthStore.setState({
       userType: 'admin',
       userId: 'admin-1',
@@ -33,6 +33,7 @@ describe('useCurrentUser', () => {
 
     const { result } = renderHook(() => useCurrentUser());
     expect(result.current.canAccessRanking).toBe(true);
+    expect(result.current.canEditRankingProfile).toBe(true);
   });
 
   it('denies ranking access for guests', () => {

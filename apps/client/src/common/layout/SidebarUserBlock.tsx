@@ -16,15 +16,13 @@ export const SidebarUserBlock = ({
   variant = 'default',
 }: SidebarUserBlockProps): ReactElement => {
   const { t } = useI18n();
-  const { isUser, isTeacher, isAdmin, canEditRankingProfile } =
-    useCurrentUser();
+  const { isTeacher, isAdmin, canEditRankingProfile } = useCurrentUser();
   const profileQuery = useRankingProfile({ enabled: canEditRankingProfile });
   const isCompact = variant === 'compact';
 
-  const nickname =
-    isUser && profileQuery.data?.nickname.trim()
-      ? profileQuery.data.nickname
-      : null;
+  const nickname = profileQuery.data?.nickname.trim()
+    ? profileQuery.data.nickname
+    : null;
 
   const displayName =
     nickname ??

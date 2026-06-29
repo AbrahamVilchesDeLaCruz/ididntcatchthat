@@ -10,7 +10,6 @@ export const HomeContainer = (): ReactElement => {
   const { t } = useI18n();
   const h = t.home;
   const {
-    isUser,
     isTeacher,
     isAdmin,
     canStudy,
@@ -18,8 +17,9 @@ export const HomeContainer = (): ReactElement => {
     canManageFlashcards,
     canAccessObservability,
     canAccessRanking,
+    canEditRankingProfile,
   } = useCurrentUser();
-  const profileQuery = useRankingProfile({ enabled: isUser });
+  const profileQuery = useRankingProfile({ enabled: canEditRankingProfile });
 
   useEffect(() => {
     markHomeEntered();
@@ -31,10 +31,9 @@ export const HomeContainer = (): ReactElement => {
       ? h.roles.teacher
       : h.roles.user;
 
-  const welcomeName =
-    isUser && profileQuery.data?.nickname.trim()
-      ? profileQuery.data.nickname
-      : roleLabel;
+  const welcomeName = profileQuery.data?.nickname.trim()
+    ? profileQuery.data.nickname
+    : roleLabel;
 
   const quickStartSteps = useMemo((): [string, string, string] => {
     if (isAdmin || isTeacher) {
