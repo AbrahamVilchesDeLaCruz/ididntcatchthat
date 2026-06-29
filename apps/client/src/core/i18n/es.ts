@@ -386,6 +386,73 @@ export const es: Translations = {
     periodIgnoredHint:
       'Este ranking no usa filtro de período — muestra datos históricos.',
   },
+  profile: {
+    title: 'Tu perfil',
+    subtitle: 'Gestiona tu cuenta, visibilidad en rankings y preferencias.',
+    account: {
+      title: 'Cuenta',
+      roleUser: 'Jugador',
+      roleTeacher: 'Profesor',
+      roleAdmin: 'Administrador',
+      userIdLabel: 'ID de usuario',
+    },
+    preferences: {
+      title: 'Preferencias',
+      themeLabel: 'Tema',
+      localeLabel: 'Idioma',
+    },
+  },
+  home: {
+    title: 'Bienvenido',
+    subtitle: 'Empieza por aquí y elige qué quieres hacer hoy.',
+    quickStartTitle: 'Primeros pasos',
+    quickStartSteps: [
+      'Escucha una expresión en el juego y entrena tu oído.',
+      'Revisa tu progreso en estadísticas.',
+      'Configura tu perfil y nickname para el ranking.',
+    ],
+    actionsTitle: 'Accesos rápidos',
+    navApp: 'Ir a la app →',
+    roles: {
+      user: 'Jugador',
+      teacher: 'Profesor',
+      admin: 'Administrador',
+    },
+    actions: {
+      play: {
+        title: 'Jugar',
+        description: 'Modo arcade con flashcards y puntuación.',
+      },
+      study: {
+        title: 'Estudiar',
+        description: 'Repasa cartas sin presión competitiva.',
+      },
+      stats: {
+        title: 'Mi progreso',
+        description: 'Módulos, logros y cartas débiles.',
+      },
+      ranking: {
+        title: 'Ranking',
+        description: 'Tu posición frente a otros jugadores.',
+      },
+      profile: {
+        title: 'Perfil',
+        description: 'Nickname, visibilidad y preferencias.',
+      },
+      backofficeGames: {
+        title: 'Backoffice',
+        description: 'Métricas de juegos y usuarios.',
+      },
+      flashcards: {
+        title: 'Flashcards',
+        description: 'Gestiona el contenido del catálogo.',
+      },
+      observability: {
+        title: 'Observabilidad',
+        description: 'Métricas y salud del sistema.',
+      },
+    },
+  },
   common: {
     theme: {
       lightMode: 'Modo claro',
@@ -408,6 +475,7 @@ export const es: Translations = {
       system: 'Sistema',
     },
     nav: {
+      home: 'Inicio',
       play: 'Jugar',
       study: 'Estudiar',
       stats: 'Estadísticas',
