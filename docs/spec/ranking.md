@@ -132,16 +132,49 @@ PK: `(user_id, type, period, period_bucket, module)`
 {
   "data": {
     "entries": [
-      { "rank": 1, "userId": "uuid", "nickname": "player1", "score": 42 }
+      {
+        "rank": 1,
+        "userId": "uuid",
+        "nickname": "player1",
+        "score": 42,
+        "isMe": false
+      }
     ],
-    "currentUser": { "rank": 3, "userId": "uuid", "nickname": "me", "score": 30 }
+    "currentUser": { "rank": 3, "userId": "uuid", "nickname": "me", "score": 30 },
+    "viewer": {
+      "showInRanking": true,
+      "nickname": "me",
+      "rank": 3,
+      "score": 30,
+      "status": "ranked"
+    }
   }
 }
 ```
 
-`currentUser` es `null` si el usuario no tiene `show_in_ranking`, no tiene score en la proyección, o su score es 0.
+| Campo | Descripción |
+| ----- | ----------- |
+| `entries[].isMe` | `true` si la fila corresponde al caller JWT |
+| `currentUser` | Posición del caller; `null` si no está rankeado (score 0 o sin fila) |
+| `viewer` | Siempre presente para el caller autenticado |
+
+### `viewer.status`
+
+| Valor | Condición |
+| ----- | --------- |
+| `hidden` | `show_in_ranking = false` |
+| `visible_unranked` | Opt-in pero sin fila en proyección o `score <= 0` |
+| `ranked` | Tiene rank y score > 0 en la proyección para el scope solicitado |
+
+`currentUser` es `null` si el usuario no tiene score en la proyección o su score es 0. `viewer` sigue reflejando opt-in y nickname aunque `currentUser` sea null.
 
 Si el usuario está en la proyección pero fuera del top N devuelto, `currentUser` se resuelve con una query adicional por `user_id`.
+
+---
+
+## Cliente
+
+Ver [docs/spec/ranking-client.md](./ranking-client.md).
 
 ---
 
