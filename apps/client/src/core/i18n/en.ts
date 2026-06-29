@@ -382,4 +382,37 @@ export const en: Translations = {
     periodIgnoredHint:
       'This ranking ignores the period filter — showing all-time data.',
   },
+  common: {
+    theme: {
+      lightMode: 'Light mode',
+      darkMode: 'Dark mode',
+      activateLight: 'Switch to light mode',
+      activateDark: 'Switch to dark mode',
+    },
+    locale: {
+      switchLanguage: 'Switch language',
+      english: 'EN',
+      spanish: 'ES',
+    },
+  },
+  sidebar: {
+    sections: {
+      game: 'Game',
+      study: 'Learn',
+      progress: 'My progress',
+      backoffice: 'Backoffice',
+      system: 'System',
+    },
+    nav: {
+      play: 'Play',
+      study: 'Study',
+      stats: 'Stats',
+      ranking: 'Ranking',
+      gameMetrics: 'Game metrics',
+      userMetrics: 'User metrics',
+      flashcards: 'Flashcards',
+      observability: 'Observability',
+    },
+    logout: 'Log out',
+  },
 };

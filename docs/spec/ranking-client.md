@@ -22,7 +22,7 @@ El nickname y el opt-in **no** se editan en la página de ranking.
 
 - Componente global: `UserProfileMenu` en [`AppSidebar`](../../apps/client/src/common/layout/AppSidebar.tsx).
 - Visible solo para `userType === 'user'`.
-- Avatar DiceBear determinista (`seed = userId`) vía `@dicebear/avataaars`.
+- Avatar circular shadcn con icono Lucide `User` (sin librería externa de avatares).
 - Dialog shadcn: nickname (3–30), switch `showInRanking`, guardar → `PATCH /users/me/ranking-profile`.
 - Hook compartido: `core/profile/useRankingProfile.ts`.
 

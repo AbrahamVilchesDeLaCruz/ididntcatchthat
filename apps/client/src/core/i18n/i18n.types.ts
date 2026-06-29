@@ -331,6 +331,41 @@ export interface StudyTranslations {
   };
 }
 
+export interface CommonTranslations {
+  theme: {
+    lightMode: string;
+    darkMode: string;
+    activateLight: string;
+    activateDark: string;
+  };
+  locale: {
+    switchLanguage: string;
+    english: string;
+    spanish: string;
+  };
+}
+
+export interface SidebarTranslations {
+  sections: {
+    game: string;
+    study: string;
+    progress: string;
+    backoffice: string;
+    system: string;
+  };
+  nav: {
+    play: string;
+    study: string;
+    stats: string;
+    ranking: string;
+    gameMetrics: string;
+    userMetrics: string;
+    flashcards: string;
+    observability: string;
+  };
+  logout: string;
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
@@ -339,4 +374,6 @@ export interface Translations {
   achievements: AchievementsTranslations;
   profileMenu: ProfileMenuTranslations;
   ranking: RankingTranslations;
+  common: CommonTranslations;
+  sidebar: SidebarTranslations;
 }

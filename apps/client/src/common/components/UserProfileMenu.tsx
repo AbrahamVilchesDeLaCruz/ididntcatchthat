@@ -77,11 +77,7 @@ export const UserProfileMenu = (): ReactElement | null => {
         }}
         className="mb-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-bg-elevated)]"
       >
-        <UserAvatar
-          userId={userId}
-          nickname={draft.nickname}
-          className="size-9"
-        />
+        <UserAvatar nickname={draft.nickname} className="size-9" />
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--color-text-primary)]">
           {displayNickname}
         </span>
@@ -110,11 +106,7 @@ export const UserProfileMenu = (): ReactElement | null => {
           </DialogHeader>
 
           <div className="flex flex-col items-center gap-3 py-2">
-            <UserAvatar
-              userId={userId}
-              nickname={draft.nickname}
-              className="size-20"
-            />
+            <UserAvatar nickname={draft.nickname} className="size-20" />
           </div>
 
           <div className="space-y-4">

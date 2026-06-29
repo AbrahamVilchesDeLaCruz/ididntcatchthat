@@ -70,11 +70,7 @@ const PodiumSlot = ({
       <span className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
         {label}
       </span>
-      <UserAvatar
-        userId={entry.userId}
-        nickname={entry.nickname}
-        className="size-12"
-      />
+      <UserAvatar nickname={entry.nickname} className="size-12" />
       <div className="min-w-0 space-y-1">
         <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">
           {entry.nickname}

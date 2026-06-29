@@ -70,11 +70,7 @@ export const RankingLeaderboard = ({
                 <TableCell className="font-medium">{entry.rank}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <UserAvatar
-                      userId={entry.userId}
-                      nickname={entry.nickname}
-                      className="size-8"
-                    />
+                    <UserAvatar nickname={entry.nickname} className="size-8" />
                     <div className="min-w-0">
                       <span className="font-medium text-[var(--color-text-primary)]">
                         {entry.nickname}
