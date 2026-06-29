@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
+import { usePageView } from '@/core/analytics/usePageView';
 import { AppShell } from '@/common/layout/AppShell';
 import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
@@ -15,6 +16,7 @@ import { GameSummaryView } from '@/views/GameSummaryView';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
+  usePageView();
 
   if (!ready) {
     return (

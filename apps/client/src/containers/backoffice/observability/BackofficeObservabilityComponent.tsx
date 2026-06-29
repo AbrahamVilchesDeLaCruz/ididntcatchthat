@@ -9,6 +9,7 @@ import { HttpBreakdownTable } from './components/HttpBreakdownTable';
 import { RuntimeMetricsSection } from './components/RuntimeMetricsSection';
 import { BusinessMetricsSection } from './components/BusinessMetricsSection';
 import { UsersStatsSection } from './components/UsersStatsSection';
+import { DbStatsSection } from './components/DbStatsSection';
 import { ObservabilityTabs } from './components/ObservabilityTabs';
 import {
   parseHttpStats,
@@ -151,6 +152,8 @@ export const BackofficeObservabilityComponent = ({
     />
   );
 
+  const analyticsTab = <DbStatsSection />;
+
   return (
     <BackofficePageShell
       title="Observabilidad"
@@ -165,6 +168,7 @@ export const BackofficeObservabilityComponent = ({
         runtimeContent={runtimeTab}
         businessContent={businessTab}
         usersContent={usersTab}
+        analyticsContent={analyticsTab}
       />
     </BackofficePageShell>
   );

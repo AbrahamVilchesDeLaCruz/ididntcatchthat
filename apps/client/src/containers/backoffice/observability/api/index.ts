@@ -1,6 +1,7 @@
 export {
   useMetricsSummary,
   useUserStats,
+  useDbStats,
   observabilityKeys,
 } from './observability.api';
 export type {
@@ -9,3 +10,4 @@ export type {
   MetricSampleApiModel,
   UserStatsApiModel,
 } from './observability.api-model';
+export type { DbStatsApiModel } from './db-stats.api-model';

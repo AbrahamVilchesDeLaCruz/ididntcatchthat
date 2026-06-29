@@ -1,25 +1,10 @@
-// ─── ViewModel types ──────────────────────────────────────────────────────────
-
-export interface MetricSampleVM {
-  labels: Record<string, string>;
-  value: number;
+export interface DbStatsDailyPoint {
+  date: string;
+  [key: string]: string | number;
 }
 
-export interface MetricVM {
-  name: string;
-  help: string;
-  type: string;
-  samples: MetricSampleVM[];
-}
-
-export interface MetricsSummaryVM {
-  metrics: MetricVM[];
-}
-
-export type StatPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
-
-export interface DbStatsVM {
-  period: StatPeriod;
+export interface DbStatsApiModel {
+  period: string;
   pageViews: {
     total: number;
     uniqueVisitors: number;
@@ -49,17 +34,4 @@ export interface DbStatsVM {
     audioStatus: { pending: number; done: number; error: number };
     byCategory: { category: string; count: number }[];
   };
-}
-
-export interface UserStatsVM {
-  totalUsers: number;
-  newUsersLast7Days: number;
-  newUsersLast30Days: number;
-  activeUsersLast7Days: number;
-  activeUsersLast30Days: number;
-  googleUsers: number;
-  emailUsers: number;
-  usersWithStreak: number;
-  avgLongestStreak: number;
-  engagementRate: number;
 }

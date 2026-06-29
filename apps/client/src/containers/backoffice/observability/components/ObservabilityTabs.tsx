@@ -1,6 +1,6 @@
 import { type ReactElement, useState } from 'react';
 
-type TabId = 'http' | 'runtime' | 'business' | 'users';
+type TabId = 'http' | 'runtime' | 'business' | 'users' | 'analytics';
 
 interface Tab {
   id: TabId;
@@ -10,8 +10,9 @@ interface Tab {
 const TABS: Tab[] = [
   { id: 'http', label: 'HTTP' },
   { id: 'runtime', label: 'Runtime' },
-  { id: 'business', label: 'Negocio' },
+  { id: 'business', label: 'Negocio (live)' },
   { id: 'users', label: 'Usuarios' },
+  { id: 'analytics', label: 'Analytics DB' },
 ];
 
 interface ObservabilityTabsProps {
@@ -19,6 +20,7 @@ interface ObservabilityTabsProps {
   runtimeContent: ReactElement;
   businessContent: ReactElement;
   usersContent: ReactElement;
+  analyticsContent: ReactElement;
 }
 
 export const ObservabilityTabs = ({
@@ -26,14 +28,16 @@ export const ObservabilityTabs = ({
   runtimeContent,
   businessContent,
   usersContent,
+  analyticsContent,
 }: ObservabilityTabsProps): ReactElement => {
-  const [active, setActive] = useState<TabId>('http');
+  const [active, setActive] = useState<TabId>('analytics');
 
   const contentMap: Record<TabId, ReactElement> = {
     http: httpContent,
     runtime: runtimeContent,
     business: businessContent,
     users: usersContent,
+    analytics: analyticsContent,
   };
 
   return (

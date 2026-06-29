@@ -221,3 +221,95 @@ OTEL_SERVICE_NAME=ididntcatchthat-api
 
 Añadir dashboards en `infra/grafana/provisioning/dashboards/` como JSON.
 El directorio ya está configurado en el provisioning — solo falta añadir los archivos.
+
+---
+
+## Fase 3 — Analytics basada en DB y tracking de visitas
+
+> Ver ADR-026 para las decisiones arquitectónicas completas.
+
+### Módulo `analytics/`
+
+Nuevo bounded context en `apps/api/src/analytics/` con Clean Architecture:
+
+```
+analytics/
+  application/
+    record-page-view/    ← comando + puerto PageViewRepository
+    db-stats/            ← query + puerto DbStatsQuery + DTO ResponseDbStats
+  infrastructure/
+    persistence/         ← TypeOrmPageViewRepository, TypeOrmDbStatsQuery
+    controllers/         ← POST /api/analytics/pageview, GET /admin/analytics/db-stats
+    framework/           ← AnalyticsModule + tokens DI
+```
+
+### Endpoints
+
+| Endpoint | Auth | Descripción |
+|---|---|---|
+| `POST /api/analytics/pageview` | Ninguna | Registra una visita web (SPA route change) |
+| `GET /admin/analytics/db-stats?period=` | Admin | Estadísticas completas de DB con período |
+
+### Tabla `page_views`
+
+```sql
+CREATE TABLE page_views (
+  id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  path        VARCHAR(500) NOT NULL,
+  visitor_id  VARCHAR(100) NOT NULL,   -- UUID en localStorage
+  user_id     UUID         REFERENCES users(id) ON DELETE SET NULL,
+  referrer    VARCHAR(500),
+  created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+```
+
+### Períodos soportados en `db-stats`
+
+| Período | Granularidad serie |
+|---|---|
+| `24h` | por hora |
+| `7d` | por día |
+| `15d` | por día |
+| `30d` | por día |
+| `6m` | por semana |
+| `all` | por mes |
+
+Las series usan `generate_series` de PostgreSQL → sin huecos incluso si no hay actividad.
+
+### Datos disponibles por período
+
+- **Visitas**: total, visitantes únicos, registeredVisitors, tasa de conversión, top páginas, serie temporal
+- **Partidas**: total, completadas, tasa de completado, por modo, top módulos, serie temporal
+- **Usuarios**: nuevos registros, usuarios activos, por proveedor (email/google), serie temporal
+- **Flashcards**: total, creadas en período, estado audio (pending/done/error), por categoría
+
+### `usePageView()` — tracking en frontend
+
+El hook se activa en cada cambio de ruta (React Router) y envía el pageview de forma silenciosa:
+
+```typescript
+// apps/client/src/core/analytics/usePageView.ts
+export function usePageView(): void {
+  const location = useLocation();
+  const userId = useAuthStore((s) => s.userId);
+
+  useEffect(() => {
+    const visitorId = getOrCreateVisitorId(); // UUID en localStorage
+    apiClient.post('/analytics/pageview', {
+      path: location.pathname,
+      visitorId,
+      userId: userId ?? null,
+      referrer: document.referrer || null,
+    }).catch(() => {}); // silencioso — nunca rompe la UX
+  }, [location.pathname]);
+}
+```
+
+### Tab "Analytics DB" en el backoffice
+
+El tab `Analytics DB` en el backoffice reemplaza las métricas de negocio de Prometheus
+(que se pierden con reinicios). Incluye:
+
+- Selector de período (24h / 7d / 15d / 30d / 6m / Total)
+- Sub-tabs: **Visitas web** · **Partidas** · **Usuarios** · **Contenido**
+- Gráficas de tendencia (`DailyTrendChart`) y distribución (`DistributionChart`) con Recharts
