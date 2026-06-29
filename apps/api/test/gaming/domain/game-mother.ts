@@ -24,7 +24,7 @@ export class GameMother {
   ): Game {
     return Game.start(
       overrides?.userId ?? UserIdMother.random().value,
-      overrides?.mode ?? GameModeMother.study().value,
+      overrides?.mode ?? GameModeMother.game().value,
       overrides?.module ?? GameModuleMother.nativeSounds().value,
       overrides?.subcategory ?? null,
       overrides?.source ?? GameSourceValue.Catalog,
@@ -74,8 +74,16 @@ export class GameMother {
     }>,
   ): Game {
     const flashcardIds = [UuidMother.random()];
-    const game = GameMother.random({ ...overrides, flashcardIds });
-    game.recordAttempt(flashcardIds[0], true);
+    const game = GameMother.random({
+      ...overrides,
+      flashcardIds,
+      mode: overrides?.mode ?? GameModeMother.game().value,
+    });
+    if (game.mode.isStudy()) {
+      game.recordView(flashcardIds[0]);
+    } else {
+      game.recordAttempt(flashcardIds[0], true);
+    }
     game.complete();
     game.pullDomainEvents();
     return game;
@@ -86,7 +94,7 @@ export class GameMother {
     return Game.fromPrimitives({
       id,
       userId: UserIdMother.random().value,
-      mode: GameModeMother.study().value,
+      mode: GameModeMother.game().value,
       module: GameModuleMother.nativeSounds().value,
       subcategory: null,
       source: GameSourceValue.Catalog,
@@ -97,6 +105,22 @@ export class GameMother {
       startedAt: new Date(),
       finishedAt: null,
       attempts: [],
+      views: [],
+    });
+  }
+
+  static inStudyProgress(
+    overrides?: Partial<{
+      userId: string | null;
+      module: string | null;
+      subcategory: string | null;
+      cardCount: string;
+      flashcardIds: string[];
+    }>,
+  ): Game {
+    return GameMother.random({
+      mode: GameModeMother.study().value,
+      ...overrides,
     });
   }
 }

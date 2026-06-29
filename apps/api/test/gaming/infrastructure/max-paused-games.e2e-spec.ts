@@ -29,7 +29,7 @@ async function startAndPauseGame(
   const res = await request(app.getHttpServer())
     .post('/v1/games')
     .set('Authorization', `Bearer ${token}`)
-    .send({ mode: 'study', cardCount: 10 })
+    .send({ mode: 'game', cardCount: 10 })
     .expect(201);
 
   const { gameId, flashcardIds } = res.body as {
@@ -69,7 +69,7 @@ describe('gaming/game MaxPausedGamesController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/v1/games')
         .set('Authorization', `Bearer ${userToken}`)
-        .send({ mode: 'study', cardCount: 10 })
+        .send({ mode: 'game', cardCount: 10 })
         .expect(409);
     });
 
@@ -83,7 +83,7 @@ describe('gaming/game MaxPausedGamesController (e2e)', () => {
         const res = await request(app.getHttpServer())
           .post('/v1/games')
           .set('Authorization', `Bearer ${userToken}`)
-          .send({ mode: 'study', cardCount: 10 })
+          .send({ mode: 'game', cardCount: 10 })
           .expect(201);
 
         const { gameId, flashcardIds } = res.body as {
@@ -111,7 +111,7 @@ describe('gaming/game MaxPausedGamesController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/v1/games')
         .set('Authorization', `Bearer ${userToken}`)
-        .send({ mode: 'study', cardCount: 10 })
+        .send({ mode: 'game', cardCount: 10 })
         .expect(201);
     });
   });
