@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
-import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
+import { getPostAuthPath, persistReturnTo } from '@/core/navigation/sessionNav';
 import { useLogin, useRegister, useGuestAuth, useMigrateGuest } from './api';
 import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import type {
@@ -75,18 +74,15 @@ export const AuthContainer = (): ReactElement => {
     (location.state as { returnTo?: string } | null) ?? null;
 
   const finishAuth = (
-    accessToken: string,
+    _accessToken: string,
     previousGuestDeviceId: string | null,
   ): void => {
     const returnTo = authRedirectState?.returnTo;
+    if (returnTo) {
+      persistReturnTo(returnTo);
+    }
     const navigateAfterAuth = (): void => {
-      void navigate(
-        returnTo ??
-          getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
-        {
-          replace: true,
-        },
-      );
+      void navigate(getPostAuthPath({ returnTo }), { replace: true });
     };
 
     if (!previousGuestDeviceId) {
@@ -179,6 +175,9 @@ export const AuthContainer = (): ReactElement => {
 
   const handleGoogleLogin = (): void => {
     setIsGoogleLoading(true);
+    if (authRedirectState?.returnTo) {
+      persistReturnTo(authRedirectState.returnTo);
+    }
     // OAuth Google es un redirect de servidor — salimos de la SPA
     window.location.href = '/api/v1/auth/google';
   };

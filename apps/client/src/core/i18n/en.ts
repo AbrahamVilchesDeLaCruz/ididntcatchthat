@@ -382,6 +382,97 @@ export const en: Translations = {
     periodIgnoredHint:
       'This ranking ignores the period filter — showing all-time data.',
   },
+  profile: {
+    title: 'Your profile',
+    subtitle: 'Manage your account, ranking visibility, and preferences.',
+    sections: {
+      ranking: 'Public identity',
+      preferences: 'Settings',
+    },
+    hero: {
+      visibleInRanking: 'Visible on leaderboards',
+      hiddenInRanking: 'Hidden from leaderboards',
+    },
+    account: {
+      title: 'Account',
+      roleUser: 'Player',
+      roleTeacher: 'Teacher',
+      roleAdmin: 'Administrator',
+      roleGuest: 'Guest',
+      userIdLabel: 'User ID',
+    },
+    preferences: {
+      title: 'Preferences',
+      themeLabel: 'Theme',
+      themeDescription: 'Light or dark, matching your system or preference.',
+      localeLabel: 'Language',
+      localeDescription: 'Interface in English or Spanish.',
+    },
+    ranking: {
+      title: 'Ranking',
+      description:
+        'Choose your public nickname and whether you appear on leaderboards.',
+      previewTitle: 'How you will appear on leaderboards',
+      previewHidden: 'You are hidden and will not appear on public tables.',
+      previewRankPlaceholder: '—',
+      nicknameHint: 'Between 3 and 30 characters.',
+      nicknameTooShort: 'Nickname must be at least 3 characters.',
+      viewRanking: 'View leaderboards',
+      discard: 'Discard',
+      unsavedHint: 'You have unsaved changes',
+    },
+  },
+  home: {
+    title: 'Welcome',
+    subtitle: 'Start here and choose what you want to do today.',
+    quickStartTitle: 'Getting started',
+    quickStartSteps: [
+      'Listen to a native expression in the game and train your ear.',
+      'Review your progress in stats.',
+      'Set up your profile and ranking nickname.',
+    ],
+    actionsTitle: 'Quick access',
+    navApp: 'Go to app →',
+    roles: {
+      user: 'Player',
+      teacher: 'Teacher',
+      admin: 'Administrator',
+    },
+    actions: {
+      play: {
+        title: 'Play',
+        description: 'Arcade mode with flashcards and scoring.',
+      },
+      study: {
+        title: 'Study',
+        description: 'Review cards without competitive pressure.',
+      },
+      stats: {
+        title: 'My progress',
+        description: 'Modules, achievements, and weak cards.',
+      },
+      ranking: {
+        title: 'Ranking',
+        description: 'Your position against other players.',
+      },
+      profile: {
+        title: 'Profile',
+        description: 'Nickname, visibility, and preferences.',
+      },
+      backofficeGames: {
+        title: 'Backoffice',
+        description: 'Game and user metrics.',
+      },
+      flashcards: {
+        title: 'Flashcards',
+        description: 'Manage catalog content.',
+      },
+      observability: {
+        title: 'Observability',
+        description: 'System metrics and health.',
+      },
+    },
+  },
   common: {
     theme: {
       lightMode: 'Light mode',
@@ -404,6 +495,7 @@ export const en: Translations = {
       system: 'System',
     },
     nav: {
+      home: 'Home',
       play: 'Play',
       study: 'Study',
       stats: 'Stats',

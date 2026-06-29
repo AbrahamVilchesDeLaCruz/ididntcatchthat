@@ -354,6 +354,7 @@ export interface SidebarTranslations {
     system: string;
   };
   nav: {
+    home: string;
     play: string;
     study: string;
     stats: string;
@@ -366,6 +367,70 @@ export interface SidebarTranslations {
   logout: string;
 }
 
+export interface ProfileTranslations {
+  title: string;
+  subtitle: string;
+  sections: {
+    ranking: string;
+    preferences: string;
+  };
+  hero: {
+    visibleInRanking: string;
+    hiddenInRanking: string;
+  };
+  account: {
+    title: string;
+    roleUser: string;
+    roleTeacher: string;
+    roleAdmin: string;
+    roleGuest: string;
+    userIdLabel: string;
+  };
+  preferences: {
+    title: string;
+    themeLabel: string;
+    themeDescription: string;
+    localeLabel: string;
+    localeDescription: string;
+  };
+  ranking: {
+    title: string;
+    description: string;
+    previewTitle: string;
+    previewHidden: string;
+    previewRankPlaceholder: string;
+    nicknameHint: string;
+    nicknameTooShort: string;
+    viewRanking: string;
+    discard: string;
+    unsavedHint: string;
+  };
+}
+
+export interface HomeTranslations {
+  title: string;
+  subtitle: string;
+  quickStartTitle: string;
+  quickStartSteps: [string, string, string];
+  actionsTitle: string;
+  navApp: string;
+  roles: {
+    user: string;
+    teacher: string;
+    admin: string;
+  };
+  actions: {
+    play: { title: string; description: string };
+    study: { title: string; description: string };
+    stats: { title: string; description: string };
+    ranking: { title: string; description: string };
+    profile: { title: string; description: string };
+    backofficeGames: { title: string; description: string };
+    flashcards: { title: string; description: string };
+    observability: { title: string; description: string };
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
@@ -373,6 +438,8 @@ export interface Translations {
   stats: StatsTranslations;
   achievements: AchievementsTranslations;
   profileMenu: ProfileMenuTranslations;
+  profile: ProfileTranslations;
+  home: HomeTranslations;
   ranking: RankingTranslations;
   common: CommonTranslations;
   sidebar: SidebarTranslations;

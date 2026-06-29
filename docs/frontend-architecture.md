@@ -362,7 +362,21 @@ export const useClickOutside = (ref: RefObject<HTMLElement>, handler: () => void
 
 ---
 
-## 10. Flujo de datos
+## 10. Rutas autenticadas (`AppShell`)
+
+| Ruta | Pod / vista | Notas |
+| ---- | ----------- | ----- |
+| `/home` | `containers/home` | Hub post-login; cards por rol |
+| `/profile` | `containers/profile` | Cuenta, ranking (user), preferencias |
+| `/stats` | `containers/stats` | Progreso del jugador |
+| `/ranking` | `containers/ranking` | Leaderboard |
+| `/backoffice/*` | backoffice | teacher / admin |
+
+Post-login por defecto: `/home` (ver `core/navigation/sessionNav.ts`).
+
+---
+
+## 11. Flujo de datos
 
 ```
 API → api.ts (TanStack Query) → mapper → ViewModel → Container → Component

@@ -11,19 +11,20 @@
 | Ruta | Vista | Layout |
 | ---- | ----- | ------ |
 | `/ranking` | `RankingView` | `AppShell` (sidebar) |
+| `/home` | `HomeView` | `AppShell` — hub post-login |
+| `/profile` | `ProfileView` | `AppShell` — cuenta, ranking, preferencias |
 
 Acceso: usuarios registrados, admin y backoffice (`Mi progreso → Ranking`).
 
 ---
 
-## Perfil de ranking (sidebar)
+## Perfil de ranking
 
 El nickname y el opt-in **no** se editan en la página de ranking.
 
-- Componente global: `UserProfileMenu` en [`AppSidebar`](../../apps/client/src/common/layout/AppSidebar.tsx).
-- Visible solo para `userType === 'user'`.
-- Avatar circular shadcn con icono Lucide `User` (sin librería externa de avatares).
-- Dialog shadcn: nickname (3–30), switch `showInRanking`, guardar → `PATCH /users/me/ranking-profile`.
+- Página dedicada: [`/profile`](../../apps/client/src/views/ProfileView.tsx) — sección ranking (`#ranking`).
+- Footer sidebar: `SidebarUserBlock` → `/profile`.
+- CTAs en ranking con `viewer.status === 'hidden'` navegan a `/profile#ranking`.
 - Hook compartido: `core/profile/useRankingProfile.ts`.
 
 ---
@@ -49,7 +50,7 @@ El nickname y el opt-in **no** se editan en la página de ranking.
 
 | status | UI |
 | ------ | -- |
-| `hidden` | CTA «Configura tu perfil» → abre dialog sidebar |
+| `hidden` | CTA «Configura tu perfil» → `/profile#ranking` |
 | `visible_unranked` | Info «Visible en rankings — juega para aparecer» |
 | `ranked` + fuera top N | Card con posición `#N` y score |
 | `ranked` + en lista | Highlight en podio/tabla |

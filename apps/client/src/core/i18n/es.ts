@@ -386,6 +386,97 @@ export const es: Translations = {
     periodIgnoredHint:
       'Este ranking no usa filtro de período — muestra datos históricos.',
   },
+  profile: {
+    title: 'Tu perfil',
+    subtitle: 'Gestiona tu cuenta, visibilidad en rankings y preferencias.',
+    sections: {
+      ranking: 'Identidad pública',
+      preferences: 'Ajustes',
+    },
+    hero: {
+      visibleInRanking: 'Visible en rankings',
+      hiddenInRanking: 'Oculto en rankings',
+    },
+    account: {
+      title: 'Cuenta',
+      roleUser: 'Jugador',
+      roleTeacher: 'Profesor',
+      roleAdmin: 'Administrador',
+      roleGuest: 'Invitado',
+      userIdLabel: 'ID de usuario',
+    },
+    preferences: {
+      title: 'Preferencias',
+      themeLabel: 'Tema',
+      themeDescription: 'Claro u oscuro según tu entorno o preferencia.',
+      localeLabel: 'Idioma',
+      localeDescription: 'Interfaz en español o inglés.',
+    },
+    ranking: {
+      title: 'Ranking',
+      description:
+        'Elige tu nickname público y si quieres aparecer en las tablas de clasificación.',
+      previewTitle: 'Así te verán en el ranking',
+      previewHidden: 'Estás oculto: no aparecerás en las tablas públicas.',
+      previewRankPlaceholder: '—',
+      nicknameHint: 'Entre 3 y 30 caracteres.',
+      nicknameTooShort: 'El nickname necesita al menos 3 caracteres.',
+      viewRanking: 'Ver tablas de clasificación',
+      discard: 'Descartar',
+      unsavedHint: 'Tienes cambios sin guardar',
+    },
+  },
+  home: {
+    title: 'Bienvenido',
+    subtitle: 'Empieza por aquí y elige qué quieres hacer hoy.',
+    quickStartTitle: 'Primeros pasos',
+    quickStartSteps: [
+      'Escucha una expresión en el juego y entrena tu oído.',
+      'Revisa tu progreso en estadísticas.',
+      'Configura tu perfil y nickname para el ranking.',
+    ],
+    actionsTitle: 'Accesos rápidos',
+    navApp: 'Ir a la app →',
+    roles: {
+      user: 'Jugador',
+      teacher: 'Profesor',
+      admin: 'Administrador',
+    },
+    actions: {
+      play: {
+        title: 'Jugar',
+        description: 'Modo arcade con flashcards y puntuación.',
+      },
+      study: {
+        title: 'Estudiar',
+        description: 'Repasa cartas sin presión competitiva.',
+      },
+      stats: {
+        title: 'Mi progreso',
+        description: 'Módulos, logros y cartas débiles.',
+      },
+      ranking: {
+        title: 'Ranking',
+        description: 'Tu posición frente a otros jugadores.',
+      },
+      profile: {
+        title: 'Perfil',
+        description: 'Nickname, visibilidad y preferencias.',
+      },
+      backofficeGames: {
+        title: 'Backoffice',
+        description: 'Métricas de juegos y usuarios.',
+      },
+      flashcards: {
+        title: 'Flashcards',
+        description: 'Gestiona el contenido del catálogo.',
+      },
+      observability: {
+        title: 'Observabilidad',
+        description: 'Métricas y salud del sistema.',
+      },
+    },
+  },
   common: {
     theme: {
       lightMode: 'Modo claro',
@@ -408,6 +499,7 @@ export const es: Translations = {
       system: 'Sistema',
     },
     nav: {
+      home: 'Inicio',
       play: 'Jugar',
       study: 'Estudiar',
       stats: 'Estadísticas',

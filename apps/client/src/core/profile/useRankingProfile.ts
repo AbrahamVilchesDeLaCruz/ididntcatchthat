@@ -17,9 +17,12 @@ export const rankingProfileKeys = {
   profile: ['ranking', 'profile'] as const,
 };
 
-export const useRankingProfile = (): UseQueryResult<RankingProfileVM> => {
+export const useRankingProfile = (options?: {
+  enabled?: boolean;
+}): UseQueryResult<RankingProfileVM> => {
   return useQuery({
     queryKey: rankingProfileKeys.profile,
+    enabled: options?.enabled ?? true,
     queryFn: async (): Promise<RankingProfileVM> => {
       const res = await apiClient.get<{ data: RankingProfileApiModel }>(
         '/users/me/ranking-profile',

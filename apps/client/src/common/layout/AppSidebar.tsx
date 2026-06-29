@@ -1,29 +1,28 @@
 import { useState, type ReactElement } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Link, NavLink } from 'react-router-dom';
+import {
+  Activity,
+  BarChart3,
+  BookOpen,
+  Headphones,
+  Home,
+  Layers,
+  LineChart,
+  Menu,
+  Trophy,
+  Users,
+} from 'lucide-react';
 import { useI18n } from '@/core/i18n';
-import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
-import { useLogout } from '@/containers/auth/api';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from '@/common/components/ui/sheet';
 import { BrandWordmark } from '@/common/components/BrandWordmark';
-import { UserProfileMenu } from '@/common/components/UserProfileMenu';
 import { Button } from '@/common/components/ui/button';
-import { ThemeToggle } from '@/common/components/ThemeToggle';
-import { LocaleToggle } from '@/common/components/LocaleToggle';
-import {
-  HeadphonesIcon,
-  WaveformIcon,
-  TrophyIcon,
-  ChartLineIcon,
-  FlashcardIcon,
-  PulseIcon,
-  UsersIcon,
-} from '@/common/components/NavIcons';
+import { SidebarFooter } from '@/common/layout/SidebarFooter';
+import { SidebarHeaderControls } from '@/common/layout/SidebarHeaderControls';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -32,6 +31,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
       : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]'
   }`;
 
+const navIconClass = 'h-[18px] w-[18px] shrink-0';
+
 interface SidebarContentProps {
   onNavigate?: () => void;
 }
@@ -39,9 +40,6 @@ interface SidebarContentProps {
 const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
   const { t } = useI18n();
   const s = t.sidebar;
-  const navigate = useNavigate();
-  const logout = useAuthStore((s) => s.logout);
-  const { mutate: logoutApi } = useLogout();
   const {
     canAccessBackoffice,
     canAccessObservability,
@@ -49,31 +47,29 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
     isUser,
     isAdmin,
     canStudy,
+    canAccessRanking,
   } = useCurrentUser();
-
-  const handleLogout = (): void => {
-    logoutApi(undefined, {
-      onSettled: () => {
-        logout();
-        void navigate('/', { replace: true });
-      },
-    });
-    onNavigate?.();
-  };
 
   return (
     <>
-      <Link to="/" onClick={onNavigate} className="mb-8 block px-3">
+      <Link to="/home" onClick={onNavigate} className="mb-4 block px-3">
         <BrandWordmark className="text-lg" />
       </Link>
+
+      <SidebarHeaderControls />
 
       <nav className="flex-1 space-y-1 overflow-y-auto">
         <div className="mb-2">
           <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
             {s.sections.game}
           </p>
+          <NavLink to="/home" className={navLinkClass} onClick={onNavigate}>
+            <Home className={navIconClass} aria-hidden />
+            {s.nav.home}
+          </NavLink>
           <NavLink to="/game" className={navLinkClass} onClick={onNavigate}>
-            <HeadphonesIcon /> {s.nav.play}
+            <Headphones className={navIconClass} aria-hidden />
+            {s.nav.play}
           </NavLink>
         </div>
 
@@ -83,7 +79,8 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               {s.sections.study}
             </p>
             <NavLink to="/study" className={navLinkClass} onClick={onNavigate}>
-              <FlashcardIcon /> {s.nav.study}
+              <BookOpen className={navIconClass} aria-hidden />
+              {s.nav.study}
             </NavLink>
           </div>
         )}
@@ -94,15 +91,19 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               {s.sections.progress}
             </p>
             <NavLink to="/stats" className={navLinkClass} onClick={onNavigate}>
-              <WaveformIcon /> {s.nav.stats}
+              <LineChart className={navIconClass} aria-hidden />
+              {s.nav.stats}
             </NavLink>
-            <NavLink
-              to="/ranking"
-              className={navLinkClass}
-              onClick={onNavigate}
-            >
-              <TrophyIcon /> {s.nav.ranking}
-            </NavLink>
+            {canAccessRanking ? (
+              <NavLink
+                to="/ranking"
+                className={navLinkClass}
+                onClick={onNavigate}
+              >
+                <Trophy className={navIconClass} aria-hidden />
+                {s.nav.ranking}
+              </NavLink>
+            ) : null}
           </div>
         )}
 
@@ -116,14 +117,16 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               className={navLinkClass}
               onClick={onNavigate}
             >
-              <ChartLineIcon /> {s.nav.gameMetrics}
+              <BarChart3 className={navIconClass} aria-hidden />
+              {s.nav.gameMetrics}
             </NavLink>
             <NavLink
               to="/backoffice/users"
               className={navLinkClass}
               onClick={onNavigate}
             >
-              <UsersIcon /> {s.nav.userMetrics}
+              <Users className={navIconClass} aria-hidden />
+              {s.nav.userMetrics}
             </NavLink>
             {canManageFlashcards && (
               <NavLink
@@ -131,7 +134,8 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
                 className={navLinkClass}
                 onClick={onNavigate}
               >
-                <FlashcardIcon /> {s.nav.flashcards}
+                <Layers className={navIconClass} aria-hidden />
+                {s.nav.flashcards}
               </NavLink>
             )}
           </div>
@@ -147,30 +151,14 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               className={navLinkClass}
               onClick={onNavigate}
             >
-              <PulseIcon /> {s.nav.observability}
+              <Activity className={navIconClass} aria-hidden />
+              {s.nav.observability}
             </NavLink>
           </div>
         )}
       </nav>
 
-      <UserProfileMenu />
-
-      <div className="mb-2 flex gap-2 px-3">
-        <div className="flex-1">
-          <ThemeToggle variant="pill" />
-        </div>
-        <div className="flex-1">
-          <LocaleToggle variant="pill" />
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-primary)]"
-      >
-        {s.logout}
-      </button>
+      <SidebarFooter onNavigate={onNavigate} />
     </>
   );
 };

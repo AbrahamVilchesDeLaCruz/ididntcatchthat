@@ -1,13 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useAuthStore } from '@/core/store/auth.store';
-import { useProfileDialogStore } from '@/core/profile/useProfileDialogStore';
 import {
   useRankingProfile,
   useUpdateRankingProfile,
 } from '@/core/profile/useRankingProfile';
-import { UserProfileMenu } from '../UserProfileMenu';
+import { ProfileRankingSection } from '../ProfileRankingSection';
 
 vi.mock('@/core/profile/useRankingProfile', () => ({
   useRankingProfile: vi.fn(),
@@ -17,28 +16,25 @@ vi.mock('@/core/profile/useRankingProfile', () => ({
 const mockedUseRankingProfile = vi.mocked(useRankingProfile);
 const mockedUseUpdateRankingProfile = vi.mocked(useUpdateRankingProfile);
 
-const renderMenu = (): ReturnType<typeof render> => {
+const renderSection = (): ReturnType<typeof render> => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <UserProfileMenu />
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <ProfileRankingSection />
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 };
 
-describe('UserProfileMenu', () => {
+describe('ProfileRankingSection', () => {
   const mutate = vi.fn();
 
   beforeEach(() => {
     mutate.mockReset();
-    useProfileDialogStore.setState({ open: false });
-    useAuthStore.setState({
-      userType: 'user',
-      userId: 'user-123',
-    });
     mockedUseRankingProfile.mockReturnValue({
       data: { nickname: 'Ace', showInRanking: true },
       isLoading: false,
@@ -49,13 +45,8 @@ describe('UserProfileMenu', () => {
     } as unknown as ReturnType<typeof useUpdateRankingProfile>);
   });
 
-  it('opens profile dialog and saves nickname', async () => {
-    renderMenu();
-
-    fireEvent.click(screen.getByRole('button', { name: /ace/i }));
-
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByText('Your player profile')).toBeInTheDocument();
+  it('saves nickname from profile form', async () => {
+    renderSection();
 
     fireEvent.change(screen.getByLabelText(/public nickname/i), {
       target: { value: 'NewNick' },
@@ -70,10 +61,9 @@ describe('UserProfileMenu', () => {
     });
   });
 
-  it('updates show in ranking preference from the switch', () => {
-    renderMenu();
+  it('updates show in ranking from switch', () => {
+    renderSection();
 
-    fireEvent.click(screen.getByRole('button', { name: /ace/i }));
     fireEvent.click(
       screen.getByRole('switch', { name: /show me in rankings/i }),
     );
@@ -85,11 +75,25 @@ describe('UserProfileMenu', () => {
     });
   });
 
-  it('does not render for guest users', () => {
-    useAuthStore.setState({ userType: 'guest', userId: 'guest-1' });
+  it('keeps save disabled until the form changes', () => {
+    renderSection();
 
-    const { container } = renderMenu();
+    expect(
+      screen.getByRole('button', { name: /save profile/i }),
+    ).toBeDisabled();
+  });
 
-    expect(container).toBeEmptyDOMElement();
+  it('discards unsaved changes', () => {
+    renderSection();
+
+    fireEvent.change(screen.getByLabelText(/public nickname/i), {
+      target: { value: 'DraftNick' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByLabelText(/public nickname/i)).toHaveValue('Ace');
+    expect(
+      screen.getByRole('button', { name: /save profile/i }),
+    ).toBeDisabled();
   });
 });

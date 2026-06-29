@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
-import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
+import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
 import { LocaleToggle } from '@/common/components/LocaleToggle';
 
@@ -16,7 +16,6 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   const { t } = useI18n();
   const h = t.landing.hero;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const roles = useAuthStore((s) => s.roles);
   const { canStudy } = useCurrentUser();
 
   const studyLink = canStudy
@@ -25,11 +24,8 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
 
   const authNavLink = isAuthenticated
     ? {
-        to: getAuthenticatedHomePathFromRoles(roles),
-        label:
-          roles.includes('admin') || roles.includes('teacher')
-            ? h.navDashboard
-            : h.navStats,
+        to: DEFAULT_AUTHENTICATED_HOME,
+        label: t.home.navApp,
       }
     : null;
 
