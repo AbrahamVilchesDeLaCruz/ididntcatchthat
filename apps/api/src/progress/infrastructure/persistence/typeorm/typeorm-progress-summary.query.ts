@@ -77,7 +77,7 @@ export class TypeOrmProgressSummaryQuery implements ProgressSummaryQuery {
       this.dataSource.query<GamesRow[]>(
         `SELECT COUNT(*)::int AS games_completed
          FROM games
-         WHERE user_id = $1 AND status = 'completed'`,
+         WHERE user_id = $1 AND status = 'completed' AND mode = 'game'`,
         [userId.value],
       ),
     ]);

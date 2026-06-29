@@ -18,6 +18,7 @@ export class AchievementGameCompletedEvaluator {
 
   async evaluate(attrs: GameCompletedAttributes): Promise<void> {
     if (attrs.userId === null) return;
+    if (attrs.mode !== 'game') return;
 
     await this.unlocker.unlock(attrs.userId, 'first_game');
 

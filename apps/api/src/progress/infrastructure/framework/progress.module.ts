@@ -46,7 +46,10 @@ import { ModuleProgressUpdater } from '@/progress/application/update/module-prog
 import { GuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 
 // Application — event subscribers
+import { STUDY_LEVEL_QUERY } from '@/progress/domain/study-level.query';
+import { TypeOrmStudyLevelQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-study-level.query';
 import { FlashcardStatsUpdaterOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
+import { FlashcardStatsUpdaterOnFlashcardViewed } from '@/progress/application/update/update-flashcard-stats-on-flashcard-viewed';
 import { ModuleProgressUpdaterOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
 import { GuestProgressImporterOnGuestProgressMigrated } from '@/progress/application/import/import-guest-progress-on-guest-progress-migrated';
 
@@ -101,6 +104,10 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
       provide: PROGRESS_SUMMARY_QUERY,
       useClass: TypeOrmProgressSummaryQuery,
     },
+    {
+      provide: STUDY_LEVEL_QUERY,
+      useClass: TypeOrmStudyLevelQuery,
+    },
 
     // Use cases
     ModuleProgressFinder,
@@ -113,17 +120,20 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
     // Event subscribers
     FlashcardStatsUpdaterOnAttemptRecorded,
+    FlashcardStatsUpdaterOnFlashcardViewed,
     ModuleProgressUpdaterOnGameCompleted,
     GuestProgressImporterOnGuestProgressMigrated,
     {
       provide: SUBSCRIBERS,
       useFactory: (
         s1: FlashcardStatsUpdaterOnAttemptRecorded,
-        s2: ModuleProgressUpdaterOnGameCompleted,
-        s3: GuestProgressImporterOnGuestProgressMigrated,
-      ): Subscriber[] => [s1, s2, s3],
+        s2: FlashcardStatsUpdaterOnFlashcardViewed,
+        s3: ModuleProgressUpdaterOnGameCompleted,
+        s4: GuestProgressImporterOnGuestProgressMigrated,
+      ): Subscriber[] => [s1, s2, s3, s4],
       inject: [
         FlashcardStatsUpdaterOnAttemptRecorded,
+        FlashcardStatsUpdaterOnFlashcardViewed,
         ModuleProgressUpdaterOnGameCompleted,
         GuestProgressImporterOnGuestProgressMigrated,
       ],
