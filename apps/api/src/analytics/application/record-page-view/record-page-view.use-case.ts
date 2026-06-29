@@ -1,5 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { type PageViewRepository } from './page-view-repository';
+import { PageView } from '@/analytics/domain/page-view';
+import { PagePath } from '@/analytics/domain/page-path';
+import { VisitorId } from '@/analytics/domain/visitor-id';
+import { UserId } from '@/shared/domain/user-id';
+import { type PageViewRepository } from '@/analytics/domain/page-view.repository';
 import { ANALYTICS_TOKENS } from '@/analytics/infrastructure/framework/analytics.tokens';
 
 export interface RecordPageViewCommand {
@@ -17,11 +21,13 @@ export class RecordPageViewUseCase {
   ) {}
 
   async execute(command: RecordPageViewCommand): Promise<void> {
-    await this.repository.save({
-      path: command.path,
-      visitorId: command.visitorId,
-      userId: command.userId,
-      referrer: command.referrer,
-    });
+    const pageView = PageView.record(
+      new PagePath(command.path),
+      new VisitorId(command.visitorId),
+      command.userId ? new UserId(command.userId) : null,
+      command.referrer,
+    );
+
+    await this.repository.save(pageView);
   }
 }

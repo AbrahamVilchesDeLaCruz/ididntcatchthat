@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { type PageViewRepository } from '@/analytics/application/record-page-view/page-view-repository';
+import { type PageViewRepository } from '@/analytics/domain/page-view.repository';
+import { type PageView } from '@/analytics/domain/page-view';
 import { PageViewEntity } from './page-view.entity';
 
 @Injectable()
@@ -11,17 +12,15 @@ export class TypeOrmPageViewRepository implements PageViewRepository {
     private readonly repo: Repository<PageViewEntity>,
   ) {}
 
-  async save(pageView: {
-    path: string;
-    visitorId: string;
-    userId: string | null;
-    referrer: string | null;
-  }): Promise<void> {
+  async save(pageView: PageView): Promise<void> {
+    const primitives = pageView.toPrimitives();
     const entity = this.repo.create({
-      path: pageView.path,
-      visitorId: pageView.visitorId,
-      userId: pageView.userId,
-      referrer: pageView.referrer,
+      id: primitives.id,
+      path: primitives.path,
+      visitorId: primitives.visitorId,
+      userId: primitives.userId,
+      referrer: primitives.referrer,
+      createdAt: primitives.recordedAt,
     });
     await this.repo.save(entity);
   }
