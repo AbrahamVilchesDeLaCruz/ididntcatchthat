@@ -162,7 +162,7 @@ export const AppSidebar = (): ReactElement => {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 min-h-svh bg-[var(--color-bg-surface)] border-r border-[var(--color-border)] flex-col px-4 py-6 shrink-0">
+      <aside className="hidden md:flex w-60 h-svh sticky top-0 bg-[var(--color-bg-surface)] border-r border-[var(--color-border)] flex-col px-4 py-6 shrink-0 overflow-y-auto">
         <SidebarContent />
       </aside>
 
