@@ -8,19 +8,13 @@ import { BackofficePageShell } from '@/common/components/BackofficePageShell';
 import { PeriodSelector } from '@/containers/backoffice/observability/components/PeriodSelector';
 import { DailyTrendChart } from '@/containers/backoffice/observability/components/DailyTrendChart';
 import { DistributionChart } from '@/containers/backoffice/observability/components/DistributionChart';
-import type { GamesStatsVM } from './backoffice-games.types';
-import type {
-  DbStatsVM,
-  StatPeriod,
-} from '@/containers/backoffice/observability/observability.types';
+import type { GamesStatsVM, GameStatsPeriod } from './backoffice-games.types';
 
 interface BackofficeGamesComponentProps {
   stats: GamesStatsVM | null;
-  dbStats: DbStatsVM | null;
-  period: StatPeriod;
-  onPeriodChange: (p: StatPeriod) => void;
+  period: GameStatsPeriod;
+  onPeriodChange: (p: GameStatsPeriod) => void;
   isLoading: boolean;
-  isDbStatsLoading: boolean;
   isError: boolean;
   lastUpdatedAt?: number;
   onRetry: () => void;
@@ -58,17 +52,13 @@ const ChartCard = ({
 
 export const BackofficeGamesComponent = ({
   stats,
-  dbStats,
   period,
   onPeriodChange,
   isLoading,
-  isDbStatsLoading,
   isError,
   lastUpdatedAt,
   onRetry,
 }: BackofficeGamesComponentProps): ReactElement => {
-  const games = dbStats?.games;
-
   return (
     <BackofficePageShell
       title="Métricas de partidas"
@@ -76,8 +66,9 @@ export const BackofficeGamesComponent = ({
       isError={isError}
       onRetry={onRetry}
       lastUpdatedAt={lastUpdatedAt}
+      headerExtra={<PeriodSelector value={period} onChange={onPeriodChange} />}
     >
-      {/* ── Quality KPIs (all-time, from attempts table) ─────────────────── */}
+      {/* ── KPIs globales del período ────────────────────────────────────── */}
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -89,15 +80,12 @@ export const BackofficeGamesComponent = ({
       )}
 
       {/* ── Tendencia temporal ────────────────────────────────────────────── */}
-      <ChartCard
-        title="Tendencia de partidas"
-        action={<PeriodSelector value={period} onChange={onPeriodChange} />}
-      >
-        {isDbStatsLoading ? (
+      <ChartCard title="Tendencia de partidas">
+        {isLoading ? (
           <ChartSkeleton />
-        ) : games && games.byPeriod.length > 0 ? (
+        ) : stats && stats.byPeriod.length > 0 ? (
           <DailyTrendChart
-            data={games.byPeriod}
+            data={stats.byPeriod}
             series={[
               {
                 key: 'started',
@@ -122,14 +110,14 @@ export const BackofficeGamesComponent = ({
       </ChartCard>
 
       {/* ── Distribución por modo + top módulos ──────────────────────────── */}
-      {(games?.byMode.length ?? 0) > 0 && (
+      {(stats?.byMode.length ?? 0) > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ChartCard title="Distribución por modo de juego">
-            {isDbStatsLoading ? (
+            {isLoading ? (
               <ChartSkeleton height="h-44" />
             ) : (
               <DistributionChart
-                data={(games?.byMode ?? []).map((m) => ({
+                data={(stats?.byMode ?? []).map((m) => ({
                   name: m.mode,
                   value: m.count,
                 }))}
@@ -138,18 +126,18 @@ export const BackofficeGamesComponent = ({
             )}
           </ChartCard>
 
-          {(games?.topModules.length ?? 0) > 0 && (
+          {(stats?.byModule.length ?? 0) > 0 && (
             <ChartCard title="Módulos más jugados">
-              {isDbStatsLoading ? (
+              {isLoading ? (
                 <ChartSkeleton height="h-44" />
               ) : (
                 <DistributionChart
-                  data={(games?.topModules ?? [])
+                  data={(stats?.byModule ?? [])
                     .slice(0, 6)
-                    .map((m) => ({ name: m.module, value: m.count }))}
+                    .map((m) => ({ name: m.module, value: m.totalGames }))}
                   height={Math.max(
                     176,
-                    (games?.topModules.slice(0, 6).length ?? 0) * 32,
+                    (stats?.byModule.slice(0, 6).length ?? 0) * 32,
                   )}
                   horizontal
                 />
@@ -159,7 +147,7 @@ export const BackofficeGamesComponent = ({
         </div>
       )}
 
-      {/* ── Calidad por módulo (accuracy de attempts) ────────────────────── */}
+      {/* ── Calidad por módulo (accuracy) ────────────────────────────────── */}
       <ChartCard
         title="Calidad por módulo"
         action={

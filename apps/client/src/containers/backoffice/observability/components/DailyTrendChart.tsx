@@ -19,7 +19,8 @@ export interface TrendSeries {
 }
 
 interface DailyTrendChartProps {
-  data: Record<string, string | number>[];
+  // Recharts accepts any object array — we keep it loose to avoid casting at call sites
+  data: object[];
   series: TrendSeries[];
   height?: number;
 }

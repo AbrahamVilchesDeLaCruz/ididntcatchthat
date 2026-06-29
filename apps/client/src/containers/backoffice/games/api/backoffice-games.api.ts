@@ -2,20 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
 import { mapGamesStats } from '../backoffice-games.mapper';
 import type { GamesStatsApiModel } from './backoffice-games.api-model';
+import type { GameStatsPeriod } from '../backoffice-games.types';
 
-// ─── Query Keys ───────────────────────────────────────────────────────────────
 export const backofficeGamesKeys = {
-  stats: ['backoffice', 'games', 'stats'] as const,
+  stats: (period: GameStatsPeriod) =>
+    ['backoffice', 'games', 'stats', period] as const,
 };
 
-// ─── Queries ──────────────────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useGamesStats = () => {
+export const useGamesStats = (period: GameStatsPeriod = '7d') => {
   return useQuery({
-    queryKey: backofficeGamesKeys.stats,
+    queryKey: backofficeGamesKeys.stats(period),
     queryFn: () =>
       apiClient
-        .get<GamesStatsApiModel>('/admin/games/stats')
+        .get<GamesStatsApiModel>(`/admin/games/stats?period=${period}`)
         .then((res) => res.data),
     select: mapGamesStats,
   });

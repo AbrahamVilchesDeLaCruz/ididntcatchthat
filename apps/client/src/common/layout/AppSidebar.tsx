@@ -18,6 +18,7 @@ import {
   ChartLineIcon,
   FlashcardIcon,
   PulseIcon,
+  UsersIcon,
 } from '@/common/components/NavIcons';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
@@ -109,6 +110,13 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
               onClick={onNavigate}
             >
               <ChartLineIcon /> Métricas de juegos
+            </NavLink>
+            <NavLink
+              to="/backoffice/users"
+              className={navLinkClass}
+              onClick={onNavigate}
+            >
+              <UsersIcon /> Métricas de usuarios
             </NavLink>
             {canManageFlashcards && (
               <NavLink

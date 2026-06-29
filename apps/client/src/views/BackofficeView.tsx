@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BackofficeFlashcardsContainer } from '@/containers/backoffice/flashcards';
 import { BackofficeGamesContainer } from '@/containers/backoffice/games';
+import { BackofficeUsersContainer } from '@/containers/backoffice/users';
 import { BackofficeObservabilityContainer } from '@/containers/backoffice/observability';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 
@@ -39,6 +40,16 @@ const BackofficeGamesRoute = (): ReactElement => {
   return <BackofficeGamesContainer />;
 };
 
+const BackofficeUsersRoute = (): ReactElement => {
+  const { canAccessBackoffice } = useCurrentUser();
+
+  if (!canAccessBackoffice) {
+    return <Navigate to="/stats" replace />;
+  }
+
+  return <BackofficeUsersContainer />;
+};
+
 export const BackofficeView = (): ReactElement => {
   const { canAccessBackoffice, isAdmin } = useCurrentUser();
 
@@ -46,6 +57,7 @@ export const BackofficeView = (): ReactElement => {
     <Routes>
       <Route path="flashcards" element={<AdminFlashcardsRoute />} />
       <Route path="games" element={<BackofficeGamesRoute />} />
+      <Route path="users" element={<BackofficeUsersRoute />} />
       <Route path="observability" element={<AdminObservabilityRoute />} />
       <Route
         path="*"

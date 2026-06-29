@@ -50,9 +50,7 @@ export const GamesStatsCards = ({
   stats,
 }: GamesStatsCardsProps): ReactElement => {
   const completionRate =
-    stats.totalGames > 0
-      ? ((stats.completedGames / stats.totalGames) * 100).toFixed(1)
-      : '—';
+    stats.totalGames > 0 ? stats.completionRate.toFixed(1) : '—';
 
   const attemptsPerGame =
     stats.totalGames > 0

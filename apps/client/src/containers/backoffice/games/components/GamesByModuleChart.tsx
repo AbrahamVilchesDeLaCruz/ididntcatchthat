@@ -69,11 +69,13 @@ export const GamesByModuleChart = ({
           />
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={(value: number, name: string) =>
-              name === 'Precisión media'
-                ? [`${value.toFixed(1)}%`, name]
-                : [value.toLocaleString('es-ES'), name]
-            }
+            formatter={(value, name) => {
+              const n = typeof value === 'number' ? value : Number(value ?? 0);
+              const label = String(name ?? '');
+              return label === 'Precisión media'
+                ? [`${n.toFixed(1)}%`, label]
+                : [n.toLocaleString('es-ES'), label];
+            }}
           />
           <Legend
             wrapperStyle={{

@@ -1,21 +1,21 @@
 import { type ReactElement } from 'react';
-import { useBackofficeGamesState } from './hooks';
-import { BackofficeGamesComponent } from './BackofficeGamesComponent';
+import { useBackofficeUsersState } from './hooks';
+import { BackofficeUsersComponent } from './BackofficeUsersComponent';
 
-export const BackofficeGamesContainer = (): ReactElement => {
+export const BackofficeUsersContainer = (): ReactElement => {
   const {
-    gamesStats,
+    userStats,
     period,
     setPeriod,
     isLoading,
     isError,
     dataUpdatedAt,
     refetch,
-  } = useBackofficeGamesState();
+  } = useBackofficeUsersState();
 
   return (
-    <BackofficeGamesComponent
-      stats={gamesStats.data ?? null}
+    <BackofficeUsersComponent
+      stats={userStats.data ?? null}
       period={period}
       onPeriodChange={setPeriod}
       isLoading={isLoading}

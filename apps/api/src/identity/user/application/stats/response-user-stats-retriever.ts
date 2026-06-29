@@ -1,12 +1,18 @@
-export interface ResponseUserStatsRetriever {
+export type UserStatsByPeriod = { date: string; count: number };
+export type UserStatsByProvider = { provider: string; count: number };
+
+export type ResponseUserStatsRetriever = {
+  period: string;
+  // All-time snapshot — these don't change with period
   totalUsers: number;
-  newUsersLast7Days: number;
-  newUsersLast30Days: number;
-  activeUsersLast7Days: number;
-  activeUsersLast30Days: number;
   googleUsers: number;
   emailUsers: number;
   usersWithStreak: number;
   avgLongestStreak: number;
+  // Period-aware
+  newRegistrations: number;
+  activeUsers: number;
   engagementRate: number;
-}
+  byProvider: UserStatsByProvider[];
+  byPeriod: UserStatsByPeriod[];
+};

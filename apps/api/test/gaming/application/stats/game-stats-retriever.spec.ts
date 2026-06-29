@@ -14,8 +14,10 @@ describe('gaming/application/stats GameStatsRetriever', () => {
 
   it('should return the result from the query', async () => {
     const expected: ResponseGameStatsRetriever = {
+      period: '7d',
       totalGames: 10,
       completedGames: 7,
+      completionRate: 70,
       avgAccuracy: 82.5,
       totalAttempts: 120,
       byModule: [
@@ -27,12 +29,14 @@ describe('gaming/application/stats GameStatsRetriever', () => {
         },
         { module: null, totalGames: 5, completedGames: 3, avgAccuracy: 80 },
       ],
+      byPeriod: [],
+      byMode: [],
     };
     query.execute.mockResolvedValue(expected);
 
-    const result = await retriever.execute();
+    const result = await retriever.execute('7d');
 
     expect(result).toEqual(expected);
-    expect(query.execute).toHaveBeenCalledTimes(1);
+    expect(query.execute).toHaveBeenCalledWith('7d');
   });
 });

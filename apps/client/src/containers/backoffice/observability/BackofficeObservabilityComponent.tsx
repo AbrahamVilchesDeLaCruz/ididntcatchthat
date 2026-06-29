@@ -7,23 +7,18 @@ import {
 } from './components/HttpSummaryCards';
 import { HttpBreakdownTable } from './components/HttpBreakdownTable';
 import { RuntimeMetricsSection } from './components/RuntimeMetricsSection';
-import { UsersStatsSection } from './components/UsersStatsSection';
-import { DbStatsSection } from './components/DbStatsSection';
 import { ObservabilityTabs } from './components/ObservabilityTabs';
 import {
   parseHttpStats,
   parseLatencyPercentiles,
   parseRuntimeMetrics,
 } from './utils/parseMetrics';
-import type { MetricsSummaryVM, UserStatsVM } from './observability.types';
+import type { MetricsSummaryVM } from './observability.types';
 
 interface BackofficeObservabilityComponentProps {
   summary: MetricsSummaryVM | null;
-  userStats: UserStatsVM | null;
   isLoading: boolean;
   isError: boolean;
-  isUserStatsLoading: boolean;
-  isUserStatsError: boolean;
   lastUpdatedAt?: number;
   onRetry: () => void;
 }
@@ -45,11 +40,8 @@ const TableSkeleton = (): ReactElement => (
 
 export const BackofficeObservabilityComponent = ({
   summary,
-  userStats,
   isLoading,
   isError,
-  isUserStatsLoading,
-  isUserStatsError,
   lastUpdatedAt,
   onRetry,
 }: BackofficeObservabilityComponentProps): ReactElement => {
@@ -132,16 +124,6 @@ export const BackofficeObservabilityComponent = ({
     />
   );
 
-  const usersTab = (
-    <UsersStatsSection
-      stats={userStats}
-      isLoading={isUserStatsLoading}
-      isError={isUserStatsError}
-    />
-  );
-
-  const analyticsTab = <DbStatsSection />;
-
   return (
     <BackofficePageShell
       title="Observabilidad"
@@ -151,12 +133,7 @@ export const BackofficeObservabilityComponent = ({
       lastUpdatedAt={lastUpdatedAt}
       headerExtra={!isLoading && !isError ? <LiveBadge /> : undefined}
     >
-      <ObservabilityTabs
-        httpContent={httpTab}
-        runtimeContent={runtimeTab}
-        usersContent={usersTab}
-        analyticsContent={analyticsTab}
-      />
+      <ObservabilityTabs httpContent={httpTab} runtimeContent={runtimeTab} />
     </BackofficePageShell>
   );
 };
