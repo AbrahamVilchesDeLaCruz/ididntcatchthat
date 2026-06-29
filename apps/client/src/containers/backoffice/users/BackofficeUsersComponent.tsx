@@ -36,13 +36,13 @@ const ChartCard = ({
 
 const KpiSkeleton = (): ReactElement => (
   <div className="space-y-6 animate-pulse">
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }, (_, i) => (
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      {Array.from({ length: 5 }, (_, i) => (
         <InsightCardSkeleton key={i} />
       ))}
     </div>
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }, (_, i) => (
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: 3 }, (_, i) => (
         <InsightCardSkeleton key={i} />
       ))}
     </div>
@@ -85,12 +85,26 @@ export const BackofficeUsersComponent = ({
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
                 Instantánea global
               </p>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 <InsightCard
                   label="Total usuarios"
                   value={stats.totalUsers.toLocaleString('es-ES')}
                   insight="Usuarios registrados acumulados"
                   variant="neutral"
+                />
+                <InsightCard
+                  label="Nunca jugaron"
+                  value={stats.neverPlayed.toLocaleString('es-ES')}
+                  insight={
+                    stats.totalUsers > 0
+                      ? `${((stats.neverPlayed / stats.totalUsers) * 100).toFixed(1)}% se registró pero no activó`
+                      : 'Sin usuarios registrados'
+                  }
+                  variant={
+                    stats.neverPlayed / Math.max(stats.totalUsers, 1) > 0.5
+                      ? 'warning'
+                      : 'neutral'
+                  }
                 />
                 <InsightCard
                   label="Con racha activa"

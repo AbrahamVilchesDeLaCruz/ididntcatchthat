@@ -1,5 +1,3 @@
-// ─── ViewModel types ──────────────────────────────────────────────────────────
-
 export interface MetricSampleVM {
   labels: Record<string, string>;
   value: number;
@@ -36,12 +34,6 @@ export interface DbStatsVM {
     byMode: { mode: string; count: number }[];
     topModules: { module: string; count: number }[];
   };
-  users: {
-    newRegistrations: number;
-    activeUsers: number;
-    byPeriod: { date: string; count: number }[];
-    byProvider: { provider: string; count: number }[];
-  };
   flashcards: {
     total: number;
     createdInPeriod: number;
@@ -49,17 +41,4 @@ export interface DbStatsVM {
     audioStatus: { pending: number; done: number; error: number };
     byCategory: { category: string; count: number }[];
   };
-}
-
-export interface UserStatsVM {
-  totalUsers: number;
-  newUsersLast7Days: number;
-  newUsersLast30Days: number;
-  activeUsersLast7Days: number;
-  activeUsersLast30Days: number;
-  googleUsers: number;
-  emailUsers: number;
-  usersWithStreak: number;
-  avgLongestStreak: number;
-  engagementRate: number;
 }

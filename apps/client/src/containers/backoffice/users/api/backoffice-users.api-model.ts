@@ -16,6 +16,7 @@ export interface UserStatsApiModel {
   emailUsers: number;
   usersWithStreak: number;
   avgLongestStreak: number;
+  neverPlayed: number;
   // Period-aware
   newRegistrations: number;
   activeUsers: number;

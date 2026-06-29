@@ -9,6 +9,7 @@ export function mapUserStats(raw: UserStatsApiModel): UserStatsVM {
     emailUsers: raw.emailUsers,
     usersWithStreak: raw.usersWithStreak,
     avgLongestStreak: raw.avgLongestStreak,
+    neverPlayed: raw.neverPlayed,
     newRegistrations: raw.newRegistrations,
     activeUsers: raw.activeUsers,
     engagementRate: raw.engagementRate,

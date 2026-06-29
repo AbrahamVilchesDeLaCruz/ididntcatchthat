@@ -86,6 +86,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
           email_users: string;
           users_with_streak: string;
           avg_longest_streak: string;
+          never_played: string;
         }[]
       >(`
         SELECT
@@ -93,7 +94,12 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
           COUNT(*) FILTER (WHERE oauth_provider = 'google')              AS google_users,
           COUNT(*) FILTER (WHERE oauth_provider IS NULL)                  AS email_users,
           COUNT(*) FILTER (WHERE longest_streak > 0)                     AS users_with_streak,
-          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak
+          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak,
+          COUNT(*) FILTER (
+            WHERE id NOT IN (
+              SELECT DISTINCT user_id FROM games WHERE user_id IS NOT NULL
+            )
+          )                                                               AS never_played
         FROM users
       `),
 
@@ -157,6 +163,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
       emailUsers: parseInt(snap.email_users, 10),
       usersWithStreak: parseInt(snap.users_with_streak, 10),
       avgLongestStreak: parseFloat(snap.avg_longest_streak),
+      neverPlayed: parseInt(snap.never_played, 10),
       newRegistrations: parseInt(ps.new_registrations, 10),
       activeUsers,
       engagementRate,

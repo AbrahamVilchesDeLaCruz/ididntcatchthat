@@ -16,6 +16,12 @@ interface GamesByModuleChartProps {
   data: GamesByModuleVM[];
 }
 
+const EmptyChart = (): ReactElement => (
+  <div className="flex items-center justify-center h-64 text-xs text-[var(--color-text-muted)]">
+    Sin datos de módulos para este período
+  </div>
+);
+
 const tooltipStyle = {
   backgroundColor: 'var(--color-bg-surface)',
   border: '1px solid var(--color-border)',
@@ -32,6 +38,8 @@ const axisTickStyle = {
 export const GamesByModuleChart = ({
   data,
 }: GamesByModuleChartProps): ReactElement => {
+  if (data.length === 0) return <EmptyChart />;
+
   return (
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">

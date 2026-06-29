@@ -27,11 +27,24 @@ interface DistributionChartProps {
   horizontal?: boolean;
 }
 
+const EmptyChart = ({ height }: { height: number }): ReactElement => (
+  <div
+    className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
+    style={{ height }}
+  >
+    Sin datos para este período
+  </div>
+);
+
 export const DistributionChart = ({
   data,
   height = 180,
   horizontal = false,
 }: DistributionChartProps): ReactElement => {
+  if (data.length === 0 || data.every((d) => d.value === 0)) {
+    return <EmptyChart height={height} />;
+  }
+
   if (horizontal) {
     return (
       <ResponsiveContainer
