@@ -78,7 +78,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
       : '';
 
     const [snapshot, periodStats, byProvider, byPeriod] = await Promise.all([
-      // All-time snapshot
+      // All-time snapshot — uses actual column names: oauth_provider, longest_streak
       this.dataSource.query<
         {
           total: string;
@@ -89,11 +89,11 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
         }[]
       >(`
         SELECT
-          COUNT(*)                                              AS total,
-          COUNT(*) FILTER (WHERE provider = 'google')          AS google_users,
-          COUNT(*) FILTER (WHERE provider = 'email')           AS email_users,
-          COUNT(*) FILTER (WHERE longest_streak > 0)           AS users_with_streak,
-          COALESCE(ROUND(AVG(longest_streak), 1), 0)           AS avg_longest_streak
+          COUNT(*)                                                        AS total,
+          COUNT(*) FILTER (WHERE oauth_provider = 'google')              AS google_users,
+          COUNT(*) FILTER (WHERE oauth_provider IS NULL)                  AS email_users,
+          COUNT(*) FILTER (WHERE longest_streak > 0)                     AS users_with_streak,
+          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak
         FROM users
       `),
 
@@ -102,8 +102,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
         { new_registrations: string; active_users: string }[]
       >(`
         SELECT
-          COUNT(*) FILTER (${whereClause ? whereClause.replace('WHERE', 'WHERE') : 'WHERE TRUE'})
-            AS new_registrations,
+          COUNT(*) AS new_registrations,
           (
             SELECT COUNT(DISTINCT user_id)
             FROM games
@@ -114,12 +113,14 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
         ${whereClause}
       `),
 
-      // By provider for the period
+      // By provider for the period — normalise NULL → 'email'
       this.dataSource.query<{ provider: string; count: string }[]>(`
-        SELECT provider, COUNT(*) AS count
+        SELECT
+          COALESCE(oauth_provider, 'email') AS provider,
+          COUNT(*) AS count
         FROM users
         ${whereClause}
-        GROUP BY provider
+        GROUP BY oauth_provider
         ORDER BY count DESC
       `),
 
