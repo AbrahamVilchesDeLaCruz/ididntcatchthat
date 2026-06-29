@@ -30,57 +30,73 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-const axisTickStyle = {
-  fill: 'var(--color-text-secondary)',
-  fontSize: 12,
-};
+const tickStyle = { fill: 'var(--color-text-secondary)', fontSize: 11 };
+
+function formatModuleName(name: string): string {
+  return name.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export const GamesByModuleChart = ({
   data,
 }: GamesByModuleChartProps): ReactElement => {
   if (data.length === 0) return <EmptyChart />;
 
+  const chartData = data.map((d) => ({
+    ...d,
+    module: formatModuleName(d.module),
+  }));
+
   return (
-    <div className="w-full h-80">
+    <div
+      style={{ width: '100%', height: Math.max(240, chartData.length * 52) }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
-          data={data}
-          margin={{ top: 8, right: 48, left: 0, bottom: 8 }}
+          layout="vertical"
+          data={chartData}
+          margin={{ top: 8, right: 64, left: 8, bottom: 8 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
             stroke="var(--color-border)"
-            strokeOpacity={0.6}
+            strokeOpacity={0.5}
+            horizontal={false}
           />
-          <XAxis
+          {/* Module names on Y-axis — readable in horizontal layout */}
+          <YAxis
+            type="category"
             dataKey="module"
-            tick={axisTickStyle}
+            tick={tickStyle}
             axisLine={false}
             tickLine={false}
+            width={130}
           />
-          {/* Left axis — counts */}
-          <YAxis
-            yAxisId="left"
-            tick={axisTickStyle}
-            axisLine={false}
+          {/* Left X-axis — game counts */}
+          <XAxis
+            xAxisId="count"
+            type="number"
+            tick={tickStyle}
             tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
           />
-          {/* Right axis — accuracy % */}
-          <YAxis
-            yAxisId="right"
-            orientation="right"
+          {/* Right X-axis — accuracy % */}
+          <XAxis
+            xAxisId="accuracy"
+            type="number"
+            orientation="top"
             domain={[0, 100]}
             tickFormatter={(v: number) => `${v}%`}
-            tick={axisTickStyle}
-            axisLine={false}
+            tick={tickStyle}
             tickLine={false}
+            axisLine={false}
           />
           <Tooltip
             contentStyle={tooltipStyle}
             formatter={(value, name) => {
               const n = typeof value === 'number' ? value : Number(value ?? 0);
               const label = String(name ?? '');
-              return label === 'Precisión media'
+              return label === 'Precisión %'
                 ? [`${n.toFixed(1)}%`, label]
                 : [n.toLocaleString('es-ES'), label];
             }}
@@ -88,30 +104,23 @@ export const GamesByModuleChart = ({
           <Legend
             wrapperStyle={{
               color: 'var(--color-text-secondary)',
-              fontSize: 12,
+              fontSize: 11,
             }}
           />
           <Bar
-            yAxisId="left"
+            xAxisId="count"
             dataKey="totalGames"
-            name="Total partidas"
+            name="Partidas"
             fill="var(--color-brand)"
-            opacity={0.85}
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            yAxisId="left"
-            dataKey="completedGames"
-            name="Completadas"
-            fill="var(--color-accent-green)"
-            opacity={0.85}
-            radius={[4, 4, 0, 0]}
+            fillOpacity={0.8}
+            radius={[0, 4, 4, 0]}
+            maxBarSize={18}
           />
           <Line
-            yAxisId="right"
+            xAxisId="accuracy"
             type="monotone"
             dataKey="avgAccuracy"
-            name="Precisión media"
+            name="Precisión %"
             stroke="var(--color-accent-red)"
             strokeWidth={2}
             dot={{ fill: 'var(--color-accent-red)', r: 4, strokeWidth: 0 }}

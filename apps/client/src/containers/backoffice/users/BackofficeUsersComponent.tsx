@@ -173,7 +173,7 @@ export const BackofficeUsersComponent = ({
               </ChartCard>
             )}
 
-            {/* ── Canal de registro ─────────────────────────────────────────── */}
+            {/* ── Canal de registro — horizontal compacto para 2 items ─────── */}
             {stats.byProvider.length > 0 && (
               <ChartCard title="Canal de registro (período)">
                 <DistributionChart
@@ -181,7 +181,8 @@ export const BackofficeUsersComponent = ({
                     name: p.provider === 'google' ? 'Google' : 'Email',
                     value: p.count,
                   }))}
-                  height={160}
+                  height={90}
+                  horizontal
                 />
               </ChartCard>
             )}
