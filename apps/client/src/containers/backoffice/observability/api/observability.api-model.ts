@@ -1,5 +1,3 @@
-// ─── Raw API models ───────────────────────────────────────────────────────────
-
 export interface MetricSampleApiModel {
   labels: Record<string, string>;
   value: number;

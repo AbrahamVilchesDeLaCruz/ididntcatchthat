@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type GameStatsQuery, GAME_STATS_QUERY } from './game-stats.query';
-import { type ResponseGameStatsRetriever } from './response-game-stats-retriever';
+import {
+  type ResponseGameStatsRetriever,
+  type StatPeriod,
+} from './response-game-stats-retriever';
 
 @Injectable()
 export class GameStatsRetriever {
@@ -9,7 +12,7 @@ export class GameStatsRetriever {
     private readonly query: GameStatsQuery,
   ) {}
 
-  async execute(): Promise<ResponseGameStatsRetriever> {
-    return this.query.execute();
+  async execute(period: StatPeriod): Promise<ResponseGameStatsRetriever> {
+    return this.query.execute(period);
   }
 }

@@ -28,9 +28,9 @@ export const AppShell = (): ReactElement => {
   }
 
   return (
-    <div className="flex min-h-svh bg-[var(--color-bg-base)]">
+    <div className="flex h-svh overflow-hidden bg-[var(--color-bg-base)]">
       <AppSidebar />
-      <main className="flex-1 overflow-auto p-4 pt-16 md:p-8 md:pt-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-16 md:p-8 md:pt-8">
         <Outlet />
       </main>
     </div>

@@ -1,5 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { type GameRepository } from '@/gaming/domain/game.repository';
 import { type FlashcardSelector } from '@/gaming/domain/flashcard-selector';
 import { GameStarter } from '@/gaming/application/start/game-starter';
@@ -19,6 +20,7 @@ describe('gaming/application/start GameStarter', () => {
   const flashcardSelector = mock<FlashcardSelector>();
   const weakestProvider = mock<WeakestFlashcardIdsProvider>();
   const logger = mock<Logger>();
+  const metrics = mock<AppMetrics>();
   let starter: GameStarter;
 
   beforeEach(() => {
@@ -31,6 +33,7 @@ describe('gaming/application/start GameStarter', () => {
       flashcardSelector,
       weakestProvider,
       logger,
+      metrics,
     );
   });
 

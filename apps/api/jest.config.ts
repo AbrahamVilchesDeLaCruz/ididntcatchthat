@@ -54,10 +54,13 @@ const config: Config = {
   collectCoverageFrom: [
     // ─── Application: 100% obligatorio ───────────────────────────────────────
     'src/**/application/**/*.ts',
-    // Request/Response son `type` aliases — TypeScript los borra en compilación.
-    // No hay código ejecutable: excluirlos evita falsos 0% en coverage.
+    // Request/Response/Query son `type` aliases o interfaces puras.
+    // TypeScript los borra en compilación — no hay código ejecutable.
+    // Excluirlos evita falsos 0% en coverage.
     '!src/**/application/**/request-*.ts',
     '!src/**/application/**/response-*.ts',
+    '!src/**/application/**/*.query.ts', // Query port — interfaz pura sin runtime
+    '!src/**/application/**/*.response.ts', // Response DTO — tipos puros sin runtime
     // ─── Domain: solo clases con lógica ejercitada desde application ─────────
     // user.ts y refresh-token.ts se ejercitan vía use cases — pero fromPrimitives
     // y toPrimitives son responsabilidad de infrastructure (persistencia).

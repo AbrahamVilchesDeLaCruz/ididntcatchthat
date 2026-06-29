@@ -104,3 +104,15 @@ export const PulseIcon = ({ className }: IconProps): ReactElement => (
     <polyline points="1,10 5,10 7,3.5 9,16.5 11,7 13,13 15,10 19,10" />
   </svg>
 );
+
+/** Two people — "Métricas de usuarios". */
+export const UsersIcon = ({ className }: IconProps): ReactElement => (
+  <svg {...STROKE} className={className}>
+    {/* Front person */}
+    <circle cx="8" cy="6" r="3" />
+    <path d="M2 18c0-3.314 2.686-6 6-6s6 2.686 6 6" />
+    {/* Back person (offset) */}
+    <circle cx="14.5" cy="5.5" r="2.5" opacity="0.5" />
+    <path d="M14 12c1.5 0 3 .8 3.8 2" opacity="0.5" />
+  </svg>
+);

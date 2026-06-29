@@ -9,6 +9,7 @@ import {
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { type RequestGameCompleter } from './request-game-completer';
@@ -25,6 +26,8 @@ export class GameCompleter {
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(request: RequestGameCompleter): Promise<ResponseGameCompleter> {
@@ -50,6 +53,8 @@ export class GameCompleter {
       totalCount: stats.totalCount,
       correctCount: stats.correctCount,
     });
+
+    this.metrics.increment('app_games_completed_total');
 
     return stats;
   }
