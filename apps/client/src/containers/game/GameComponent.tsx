@@ -150,7 +150,7 @@ export const GameComponent = ({
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                 }}
-                className="absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)]"
+                className="flashcard-card-face absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-bg-card)]"
               >
                 <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 overflow-y-auto p-6 text-center md:p-8">
                   <span className="text-4xl font-bold text-[var(--color-text-primary)] md:text-5xl lg:text-6xl">
@@ -178,7 +178,7 @@ export const GameComponent = ({
                   WebkitBackfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
-                className="absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)]"
+                className="flashcard-card-face absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-bg-card)]"
               >
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                   <div className="flex min-h-full flex-col items-center justify-center gap-5 px-5 py-5 md:gap-6 md:px-6 md:py-6">

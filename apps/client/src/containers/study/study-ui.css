@@ -38,10 +38,6 @@
   animation: study-card-enter 0.35s ease-out;
 }
 
-.study-card-wrapper {
-  border-color: color-mix(in srgb, var(--color-border) 85%, transparent);
-}
-
 .study-next-bar {
   border-top-color: color-mix(in srgb, var(--color-border) 80%, transparent);
 }

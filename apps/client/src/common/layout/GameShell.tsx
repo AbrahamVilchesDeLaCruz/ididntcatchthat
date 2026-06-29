@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { BrandWordmark } from '@/common/components/BrandWordmark';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
@@ -62,9 +63,9 @@ export const GameShell = (): ReactElement => {
 
           <Link
             to="/"
-            className="game-shell-logo truncate text-center font-semibold transition-opacity hover:opacity-90"
+            className="truncate text-center transition-opacity hover:opacity-90"
           >
-            ididntcatchthat
+            <BrandWordmark className="text-sm sm:text-base" />
           </Link>
 
           <div className="flex justify-end gap-2">
