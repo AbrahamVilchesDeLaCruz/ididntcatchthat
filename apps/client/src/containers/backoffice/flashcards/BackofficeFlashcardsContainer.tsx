@@ -29,7 +29,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
   const { data, isLoading, isError } = useFlashcards(
     {
       page,
-      pageSize: 20,
+      pageSize: 10,
       category: categoryFilter,
       subcategory: subcategoryFilter,
       audioStatus: audioStatusFilter,

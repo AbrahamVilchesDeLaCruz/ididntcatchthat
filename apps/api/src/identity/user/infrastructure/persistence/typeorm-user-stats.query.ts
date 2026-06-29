@@ -1,0 +1,180 @@
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import {
+  type UserStatsQuery,
+  type UserStatPeriod,
+} from '@/identity/user/application/stats/user-stats.query';
+import { type ResponseUserStatsRetriever } from '@/identity/user/application/stats/response-user-stats-retriever';
+
+interface PeriodCfg {
+  interval: string | null;
+  seriesStep: string;
+  dateTrunc: string;
+  dateFormat: string;
+}
+
+function periodCfg(period: UserStatPeriod): PeriodCfg {
+  switch (period) {
+    case '24h':
+      return {
+        interval: '24 hours',
+        seriesStep: '1 hour',
+        dateTrunc: 'hour',
+        dateFormat: 'HH24:MI',
+      };
+    case '7d':
+      return {
+        interval: '7 days',
+        seriesStep: '1 day',
+        dateTrunc: 'day',
+        dateFormat: 'DD/MM',
+      };
+    case '15d':
+      return {
+        interval: '15 days',
+        seriesStep: '1 day',
+        dateTrunc: 'day',
+        dateFormat: 'DD/MM',
+      };
+    case '30d':
+      return {
+        interval: '30 days',
+        seriesStep: '1 day',
+        dateTrunc: 'day',
+        dateFormat: 'DD/MM',
+      };
+    case '6m':
+      return {
+        interval: '6 months',
+        seriesStep: '1 week',
+        dateTrunc: 'week',
+        dateFormat: 'DD/MM',
+      };
+    case 'all':
+      return {
+        interval: null,
+        seriesStep: '1 month',
+        dateTrunc: 'month',
+        dateFormat: 'MM/YYYY',
+      };
+  }
+}
+
+@Injectable()
+export class TypeOrmUserStatsQuery implements UserStatsQuery {
+  constructor(
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+  ) {}
+
+  async execute(period: UserStatPeriod): Promise<ResponseUserStatsRetriever> {
+    const pc = periodCfg(period);
+    const startExpr = pc.interval
+      ? `NOW() - INTERVAL '${pc.interval}'`
+      : `'2024-01-01'::timestamp`;
+    const whereClause = pc.interval
+      ? `WHERE created_at >= NOW() - INTERVAL '${pc.interval}'`
+      : '';
+
+    const [snapshot, periodStats, byProvider, byPeriod] = await Promise.all([
+      // All-time snapshot — uses actual column names: oauth_provider, longest_streak
+      this.dataSource.query<
+        {
+          total: string;
+          google_users: string;
+          email_users: string;
+          users_with_streak: string;
+          avg_longest_streak: string;
+          never_played: string;
+        }[]
+      >(`
+        SELECT
+          COUNT(*)                                                        AS total,
+          COUNT(*) FILTER (WHERE oauth_provider = 'google')              AS google_users,
+          COUNT(*) FILTER (WHERE oauth_provider IS NULL)                  AS email_users,
+          COUNT(*) FILTER (WHERE longest_streak > 0)                     AS users_with_streak,
+          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak,
+          COUNT(*) FILTER (
+            WHERE id NOT IN (
+              SELECT DISTINCT user_id FROM games WHERE user_id IS NOT NULL
+            )
+          )                                                               AS never_played
+        FROM users
+      `),
+
+      // Period-aware aggregate
+      this.dataSource.query<
+        { new_registrations: string; active_users: string }[]
+      >(`
+        SELECT
+          COUNT(*) AS new_registrations,
+          (
+            SELECT COUNT(DISTINCT user_id)
+            FROM games
+            WHERE user_id IS NOT NULL
+            ${pc.interval ? `AND started_at >= NOW() - INTERVAL '${pc.interval}'` : ''}
+          ) AS active_users
+        FROM users
+        ${whereClause}
+      `),
+
+      // By provider for the period — normalise NULL → 'email'
+      this.dataSource.query<{ provider: string; count: string }[]>(`
+        SELECT
+          COALESCE(oauth_provider, 'email') AS provider,
+          COUNT(*) AS count
+        FROM users
+        ${whereClause}
+        GROUP BY oauth_provider
+        ORDER BY count DESC
+      `),
+
+      // Time-series of registrations
+      this.dataSource.query<{ date: string; count: string }[]>(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('${pc.dateTrunc}', gs.bucket), '${pc.dateFormat}') AS date,
+          COALESCE(SUM(d.cnt), 0) AS count
+        FROM generate_series(${startExpr}, NOW(), '${pc.seriesStep}'::interval) AS gs(bucket)
+        LEFT JOIN (
+          SELECT DATE_TRUNC('${pc.dateTrunc}', created_at) AS bucket, COUNT(*) AS cnt
+          FROM users
+          ${whereClause}
+          GROUP BY bucket
+        ) d ON d.bucket = gs.bucket
+        GROUP BY DATE_TRUNC('${pc.dateTrunc}', gs.bucket)
+        ORDER BY DATE_TRUNC('${pc.dateTrunc}', gs.bucket)
+      `),
+    ]);
+
+    const snap = snapshot[0];
+    const ps = periodStats[0];
+    const totalUsers = parseInt(snap.total, 10);
+    const activeUsers = parseInt(ps.active_users, 10);
+    const engagementRate =
+      totalUsers > 0
+        ? parseFloat(((activeUsers / totalUsers) * 100).toFixed(1))
+        : 0;
+
+    return {
+      period,
+      totalUsers,
+      googleUsers: parseInt(snap.google_users, 10),
+      emailUsers: parseInt(snap.email_users, 10),
+      usersWithStreak: parseInt(snap.users_with_streak, 10),
+      avgLongestStreak: parseFloat(snap.avg_longest_streak),
+      neverPlayed: parseInt(snap.never_played, 10),
+      newRegistrations: parseInt(ps.new_registrations, 10),
+      activeUsers,
+      engagementRate,
+      byProvider: byProvider.map((r) => ({
+        provider: r.provider,
+        count: parseInt(r.count, 10),
+      })),
+      byPeriod: byPeriod.map((r) => ({
+        date: r.date,
+        count: parseInt(r.count, 10),
+      })),
+    };
+  }
+}

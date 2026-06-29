@@ -1,0 +1,26 @@
+.profile-hero-surface {
+  background:
+    radial-gradient(
+      ellipse 70% 80% at 100% 0%,
+      color-mix(in srgb, var(--color-brand) 14%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 0% 100%,
+      color-mix(in srgb, var(--color-accent-green) 8%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-bg-elevated) 92%, transparent),
+      var(--color-bg-base)
+    );
+}
+
+.profile-settings-row {
+  transition: background-color 0.15s ease;
+}
+
+.profile-settings-row:hover {
+  background: color-mix(in srgb, var(--color-bg-base) 40%, transparent);
+}

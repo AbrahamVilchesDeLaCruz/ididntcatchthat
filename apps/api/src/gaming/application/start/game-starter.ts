@@ -14,6 +14,9 @@ import {
 } from '@/gaming/domain/flashcard-selector';
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
+import { GameMode } from '@/gaming/domain/game-mode';
+import { StudyRequiresAuth } from '@/gaming/domain/exceptions/study-requires-auth';
+import { WeakestSourceRequiresGameMode } from '@/gaming/domain/exceptions/weakest-source-requires-game-mode';
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
 import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
@@ -23,6 +26,7 @@ import {
 } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { type RequestGameStarter } from './request-game-starter';
 import { type ResponseGameStarter } from './response-game-starter';
 
@@ -39,11 +43,22 @@ export class GameStarter {
     private readonly weakestFlashcardIdsProvider: WeakestFlashcardIdsProvider,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
     const { userId, mode, module, subcategory, cardCount, source } = request;
     const gameSource = GameSource.create(source ?? GameSourceValue.Catalog);
+
+    if (GameMode.create(mode).isStudy()) {
+      if (userId === null) {
+        throw new StudyRequiresAuth();
+      }
+      if (gameSource.isWeakest()) {
+        throw new WeakestSourceRequiresGameMode();
+      }
+    }
 
     this.assertValidScope(module, subcategory);
 
@@ -115,6 +130,8 @@ export class GameStarter {
       subcategory,
       cardCount,
     });
+
+    this.metrics.increment('app_games_started_total');
 
     return {
       gameId: game.id.value,

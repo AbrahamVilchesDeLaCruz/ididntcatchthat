@@ -1,26 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_AUTHENTICATED_HOME,
   getAuthenticatedHomePath,
   getPostLoginPath,
 } from '../postLoginRedirect';
 
 describe('postLoginRedirect', () => {
-  it('envía admin al backoffice de flashcards', () => {
-    expect(getPostLoginPath('admin')).toBe('/backoffice/flashcards');
+  it('envía todos los roles al hub /home', () => {
+    expect(getPostLoginPath('admin')).toBe('/home');
+    expect(getPostLoginPath('teacher')).toBe('/home');
+    expect(getPostLoginPath('user')).toBe('/home');
+    expect(getPostLoginPath('guest')).toBe('/home');
+    expect(getPostLoginPath(null)).toBe('/home');
   });
 
-  it('envía teacher a métricas de juegos', () => {
-    expect(getPostLoginPath('teacher')).toBe('/backoffice/games');
-  });
-
-  it('envía user y guest a estadísticas', () => {
-    expect(getPostLoginPath('user')).toBe('/stats');
-    expect(getPostLoginPath('guest')).toBe('/stats');
-    expect(getPostLoginPath(null)).toBe('/stats');
-  });
-
-  it('getAuthenticatedHomePath usa la misma lógica que post-login', () => {
-    expect(getAuthenticatedHomePath('admin')).toBe('/backoffice/flashcards');
-    expect(getAuthenticatedHomePath('user')).toBe('/stats');
+  it('getAuthenticatedHomePath apunta al hub', () => {
+    expect(getAuthenticatedHomePath('admin')).toBe(DEFAULT_AUTHENTICATED_HOME);
+    expect(getAuthenticatedHomePath('user')).toBe(DEFAULT_AUTHENTICATED_HOME);
   });
 });

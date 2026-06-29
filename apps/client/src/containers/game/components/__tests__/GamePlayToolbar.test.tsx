@@ -72,4 +72,27 @@ describe('GamePlayToolbar', () => {
 
     expect(onPause).toHaveBeenCalledTimes(1);
   });
+
+  it('renders study shortcuts and viewed progress when variant is study', () => {
+    render(
+      <GamePlayToolbar
+        variant="study"
+        currentIndex={2}
+        totalCount={10}
+        correctCount={0}
+        incorrectCount={0}
+        viewedCount={3}
+        canPause
+        onPause={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/Review · 3 of 10/)).toBeInTheDocument();
+    expect(screen.getByText('Next card')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '3',
+    );
+    expect(screen.queryByText('Mark correct')).not.toBeInTheDocument();
+  });
 });

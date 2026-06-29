@@ -79,13 +79,58 @@ describe('ranking/search-rankings (e2e)', () => {
           userId: string;
           nickname: string;
           score: number;
+          isMe: boolean;
         }[];
         currentUser: { rank: number; userId: string } | null;
+        viewer: {
+          showInRanking: boolean;
+          status: string;
+          rank: number | null;
+        };
       };
     };
 
     expect(body.data.entries.length).toBeGreaterThan(0);
     expect(body.data.currentUser?.userId).toBeDefined();
     expect(body.data.entries[0].score).toBeGreaterThanOrEqual(1);
+    expect(body.data.entries.some((entry) => entry.isMe)).toBe(true);
+    expect(body.data.viewer.status).toBe('ranked');
+    expect(body.data.viewer.showInRanking).toBe(true);
+  });
+
+  it('should return viewer visible_unranked when opted in without playing', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: true, nickname: 'visible-only' })
+      .expect(200);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({ type: 'most_active', period: 'all_time', limit: 10 })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const body = res.body as {
+      data: {
+        entries: { userId: string }[];
+        currentUser: null;
+        viewer: {
+          showInRanking: boolean;
+          status: string;
+          nickname: string;
+        };
+      };
+    };
+
+    expect(body.data.viewer.status).toBe('visible_unranked');
+    expect(body.data.viewer.showInRanking).toBe(true);
+    expect(body.data.viewer.nickname).toBe('visible-only');
+    expect(body.data.currentUser).toBeNull();
+    expect(body.data.entries.every((entry) => entry.userId !== undefined)).toBe(
+      true,
+    );
   });
 });

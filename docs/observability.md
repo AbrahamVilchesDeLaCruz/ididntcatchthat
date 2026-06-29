@@ -124,6 +124,71 @@ Prometheus no tiene autenticación propia — está protegido porque:
 
 ---
 
+## Fase 2 — Backoffice UI ✅
+
+### UI de observabilidad en el backoffice (4 tabs)
+
+La página `/backoffice/observability` expone los datos de Prometheus y del DB en una interfaz organizada en cuatro pestañas:
+
+| Tab | Fuente | Qué muestra |
+|---|---|---|
+| **HTTP** | `/admin/metrics/summary` | Total requests, tasa éxito/error (2xx/4xx/5xx separados), latencia p50/p95/p99, tabla de breakdown por ruta/método/status paginada |
+| **Runtime** | `/admin/metrics/summary` | Heap usado %, event loop lag p95, pausas de GC, uptime, handles activos, CPU acumulado |
+| **Negocio** | `/admin/metrics/summary` | Contadores `app_*`: partidas iniciadas/completadas, flashcards creadas, audio generado/errores, logins/registros por proveedor |
+| **Usuarios** | `/admin/users/stats` | Total usuarios, nuevos 7d/30d, activos 7d/30d, canal Google vs email, engagement rate, rachas |
+
+Todos los tabs usan el componente `InsightCard` que muestra el valor numérico junto a una frase contextual y un indicador semántico verde/ámbar/rojo basado en umbrales predefinidos.
+
+### collectDefaultMetrics activado
+
+`ObservabilityModule` llama a `collectDefaultMetrics({ register: registry })` al crear el Registry. Esto activa automáticamente las métricas Node.js runtime de prom-client:
+
+- `nodejs_heap_size_used_bytes`, `nodejs_heap_size_total_bytes`
+- `nodejs_gc_duration_seconds` (histogram por tipo de GC)
+- `nodejs_eventloop_lag_seconds`, `_p50_seconds`, `_p95_seconds`
+- `nodejs_active_handles_total`, `nodejs_active_requests_total`
+- `process_cpu_seconds_total`, `process_resident_memory_bytes`
+- `process_start_time_seconds`, `process_open_fds`
+
+### Métricas de negocio `app_*`
+
+La interfaz `AppMetrics` (en `shared/domain/`) permite que los use cases incrementen contadores sin acoplarse a prom-client. La implementación `PrometheusAppMetrics` (en `shared/infrastructure/`) registra contadores en el Registry:
+
+| Métrica | Use case |
+|---|---|
+| `app_games_started_total` | `game-starter.ts` |
+| `app_games_completed_total` | `game-completer.ts` |
+| `app_flashcards_created_total` | CreateFlashcard use case |
+| `app_audio_generated_total{provider}` | Audio generation use case |
+| `app_audio_errors_total{provider}` | Audio generation use case (catch) |
+| `app_auth_logins_total{provider}` | `user-authenticator.ts` + OAuth callback |
+| `app_auth_registrations_total{provider}` | `user-registrar.ts` + OAuth |
+
+### Endpoint de stats de usuarios
+
+`GET /v1/admin/users/stats` — requiere JWT + rol `admin`. Hace queries TypeORM sobre la tabla `users` existente:
+
+```typescript
+{
+  totalUsers: number;
+  newUsersLast7Days: number;
+  newUsersLast30Days: number;
+  activeUsersLast7Days: number;
+  activeUsersLast30Days: number;
+  googleUsers: number;       // oauthProvider = 'google'
+  emailUsers: number;        // oauthProvider IS NULL
+  usersWithStreak: number;
+  avgLongestStreak: number;
+  engagementRate: number;    // activeUsersLast30Days / totalUsers * 100
+}
+```
+
+Ver spec completa: [docs/spec/backoffice-observability-v2.md](spec/backoffice-observability-v2.md)  
+Ver ADR de decisiones: [docs/adr/025-backoffice-metrics-ux.md](adr/025-backoffice-metrics-ux.md)  
+Ver diagrama de flujo: [docs/diagrams/observability-backoffice.md](diagrams/observability-backoffice.md)
+
+---
+
 ## Fase 3 — Pendiente 🔲
 
 ### OpenTelemetry — Traces
@@ -156,3 +221,95 @@ OTEL_SERVICE_NAME=ididntcatchthat-api
 
 Añadir dashboards en `infra/grafana/provisioning/dashboards/` como JSON.
 El directorio ya está configurado en el provisioning — solo falta añadir los archivos.
+
+---
+
+## Fase 3 — Analytics basada en DB y tracking de visitas
+
+> Ver ADR-026 para las decisiones arquitectónicas completas.
+
+### Módulo `analytics/`
+
+Nuevo bounded context en `apps/api/src/analytics/` con Clean Architecture:
+
+```
+analytics/
+  application/
+    record-page-view/    ← comando + puerto PageViewRepository
+    db-stats/            ← query + puerto DbStatsQuery + DTO ResponseDbStats
+  infrastructure/
+    persistence/         ← TypeOrmPageViewRepository, TypeOrmDbStatsQuery
+    controllers/         ← POST /api/analytics/pageview, GET /admin/analytics/db-stats
+    framework/           ← AnalyticsModule + tokens DI
+```
+
+### Endpoints
+
+| Endpoint | Auth | Descripción |
+|---|---|---|
+| `POST /api/analytics/pageview` | Ninguna | Registra una visita web (SPA route change) |
+| `GET /admin/analytics/db-stats?period=` | Admin | Estadísticas completas de DB con período |
+
+### Tabla `page_views`
+
+```sql
+CREATE TABLE page_views (
+  id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  path        VARCHAR(500) NOT NULL,
+  visitor_id  VARCHAR(100) NOT NULL,   -- UUID en localStorage
+  user_id     UUID         REFERENCES users(id) ON DELETE SET NULL,
+  referrer    VARCHAR(500),
+  created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+```
+
+### Períodos soportados en `db-stats`
+
+| Período | Granularidad serie |
+|---|---|
+| `24h` | por hora |
+| `7d` | por día |
+| `15d` | por día |
+| `30d` | por día |
+| `6m` | por semana |
+| `all` | por mes |
+
+Las series usan `generate_series` de PostgreSQL → sin huecos incluso si no hay actividad.
+
+### Datos disponibles por período
+
+- **Visitas**: total, visitantes únicos, registeredVisitors, tasa de conversión, top páginas, serie temporal
+- **Partidas**: total, completadas, tasa de completado, por modo, top módulos, serie temporal
+- **Usuarios**: nuevos registros, usuarios activos, por proveedor (email/google), serie temporal
+- **Flashcards**: total, creadas en período, estado audio (pending/done/error), por categoría
+
+### `usePageView()` — tracking en frontend
+
+El hook se activa en cada cambio de ruta (React Router) y envía el pageview de forma silenciosa:
+
+```typescript
+// apps/client/src/core/analytics/usePageView.ts
+export function usePageView(): void {
+  const location = useLocation();
+  const userId = useAuthStore((s) => s.userId);
+
+  useEffect(() => {
+    const visitorId = getOrCreateVisitorId(); // UUID en localStorage
+    apiClient.post('/analytics/pageview', {
+      path: location.pathname,
+      visitorId,
+      userId: userId ?? null,
+      referrer: document.referrer || null,
+    }).catch(() => {}); // silencioso — nunca rompe la UX
+  }, [location.pathname]);
+}
+```
+
+### Tab "Analytics DB" en el backoffice
+
+El tab `Analytics DB` en el backoffice reemplaza las métricas de negocio de Prometheus
+(que se pierden con reinicios). Incluye:
+
+- Selector de período (24h / 7d / 15d / 30d / 6m / Total)
+- Sub-tabs: **Visitas web** · **Partidas** · **Usuarios** · **Contenido**
+- Gráficas de tendencia (`DailyTrendChart`) y distribución (`DistributionChart`) con Recharts

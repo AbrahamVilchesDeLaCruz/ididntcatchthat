@@ -1,0 +1,49 @@
+/* Ranking leaderboard visuals */
+
+.ranking-podium-stage {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 100%,
+      color-mix(in srgb, var(--color-brand) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg-elevated) 40%, transparent),
+      transparent
+    );
+}
+
+.ranking-podium-slot {
+  animation: ranking-podium-enter 0.45s ease-out both;
+}
+
+.ranking-podium-slot--first {
+  animation-delay: 0.08s;
+}
+
+.ranking-podium-slot--second {
+  animation-delay: 0s;
+}
+
+.ranking-podium-slot--third {
+  animation-delay: 0.16s;
+}
+
+.ranking-podium-slot--me {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand) 55%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-brand) 18%, transparent);
+}
+
+@keyframes ranking-podium-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

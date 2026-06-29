@@ -3,26 +3,29 @@ import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
-import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
+import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
+import { LocaleToggle } from '@/common/components/LocaleToggle';
 
 interface LandingHeroProps {
   onPlay: () => void;
 }
 
 export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
-  const { t, locale, toggleLocale } = useI18n();
+  const { t } = useI18n();
   const h = t.landing.hero;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const roles = useAuthStore((s) => s.roles);
+  const { canStudy } = useCurrentUser();
+
+  const studyLink = canStudy
+    ? '/study'
+    : { pathname: '/auth/login', state: { returnTo: '/study' } };
 
   const authNavLink = isAuthenticated
     ? {
-        to: getAuthenticatedHomePathFromRoles(roles),
-        label:
-          roles.includes('admin') || roles.includes('teacher')
-            ? h.navDashboard
-            : h.navStats,
+        to: DEFAULT_AUTHENTICATED_HOME,
+        label: t.home.navApp,
       }
     : null;
 
@@ -63,32 +66,7 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         )}
 
         <ThemeToggle variant="icon" />
-
-        <button
-          onClick={toggleLocale}
-          className="flex items-center gap-1.5 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-          aria-label="Switch language"
-        >
-          <span
-            className={
-              locale === 'en'
-                ? 'text-[var(--color-text-primary)]'
-                : 'opacity-40'
-            }
-          >
-            EN
-          </span>
-          <span className="text-[var(--color-text-muted)]">/</span>
-          <span
-            className={
-              locale === 'es'
-                ? 'text-[var(--color-text-primary)]'
-                : 'opacity-40'
-            }
-          >
-            ES
-          </span>
-        </button>
+        <LocaleToggle variant="icon" />
       </div>
 
       {/* Badge */}
@@ -118,6 +96,12 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         >
           {h.ctaPlay}
         </button>
+        <Link
+          to={studyLink}
+          className="inline-flex items-center justify-center rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+        >
+          {h.ctaStudy}
+        </Link>
         <a
           href="#how-it-works"
           className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"

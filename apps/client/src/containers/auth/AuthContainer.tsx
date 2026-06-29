@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
-import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
+import { getPostAuthPath, persistReturnTo } from '@/core/navigation/sessionNav';
 import { useLogin, useRegister, useGuestAuth, useMigrateGuest } from './api';
 import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import type {
@@ -53,6 +52,7 @@ function mapAuthError(error: unknown): string {
 
 export const AuthContainer = (): ReactElement => {
   const { mode } = useParams<{ mode: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setGuestDeviceId = useAuthStore((s) => s.setGuestDeviceId);
@@ -70,15 +70,19 @@ export const AuthContainer = (): ReactElement => {
   const { mutate: migrateGuest } = useMigrateGuest();
   const guestAuthStarted = useRef(false);
 
+  const authRedirectState =
+    (location.state as { returnTo?: string } | null) ?? null;
+
   const finishAuth = (
-    accessToken: string,
+    _accessToken: string,
     previousGuestDeviceId: string | null,
   ): void => {
+    const returnTo = authRedirectState?.returnTo;
+    if (returnTo) {
+      persistReturnTo(returnTo);
+    }
     const navigateAfterAuth = (): void => {
-      void navigate(
-        getPostLoginPath(resolveUserTypeFromAccessToken(accessToken)),
-        { replace: true },
-      );
+      void navigate(getPostAuthPath({ returnTo }), { replace: true });
     };
 
     if (!previousGuestDeviceId) {
@@ -161,11 +165,19 @@ export const AuthContainer = (): ReactElement => {
 
   const handleModeChange = (newMode: AuthMode): void => {
     setServerError(null);
-    void navigate(`/auth/${newMode}`, { replace: true });
+    void navigate(`/auth/${newMode}`, {
+      replace: true,
+      state: authRedirectState?.returnTo
+        ? { returnTo: authRedirectState.returnTo }
+        : undefined,
+    });
   };
 
   const handleGoogleLogin = (): void => {
     setIsGoogleLoading(true);
+    if (authRedirectState?.returnTo) {
+      persistReturnTo(authRedirectState.returnTo);
+    }
     // OAuth Google es un redirect de servidor — salimos de la SPA
     window.location.href = '/api/v1/auth/google';
   };

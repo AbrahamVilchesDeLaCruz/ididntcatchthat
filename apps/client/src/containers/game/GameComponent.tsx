@@ -2,15 +2,20 @@ import {
   type MouseEvent,
   type ReactElement,
   useCallback,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-import { Volume2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { GamePlayToolbar } from './components/GamePlayToolbar';
+import { FlashcardDialectButtons } from './components/FlashcardDialectButtons';
+import { FlashcardExampleSection } from './components/FlashcardExampleSection';
+import { FlashcardIpaBadge } from './components/FlashcardIpaBadge';
+import { FlashcardNativeSpeechButton } from './components/FlashcardNativeSpeechButton';
 import { getExampleAudioUrl, getNativeAudioUrl } from './game.audio';
 import { useGameTouchGestures } from './hooks/useGameTouchGestures';
 import { useGamePlayLabels } from './hooks/useGamePlayLabels';
+import { useFlashcardAudio } from './hooks/useFlashcardAudio';
+import { useCardFlipTransition } from './hooks/useCardFlipTransition';
 import { capitalizeFirst } from './game.text';
 import type { FlashcardGameVM } from './game.types';
 
@@ -28,14 +33,7 @@ interface GameComponentProps {
   onPause?: () => void;
 }
 
-type AudioDialect = 'us' | 'uk' | 'au';
 type AnswerFeedback = 'correct' | 'incorrect' | null;
-
-const DIALECT_FLAGS: Record<AudioDialect, string> = {
-  us: '🇺🇸',
-  uk: '🇬🇧',
-  au: '🇦🇺',
-};
 
 const FEEDBACK_MS = 320;
 
@@ -53,49 +51,23 @@ export const GameComponent = ({
   onPause,
 }: GameComponentProps): ReactElement => {
   const labels = useGamePlayLabels();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { playAudio } = useFlashcardAudio();
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const prevFlashcardIdRef = useRef<string | null>(null);
+  const skipFlipTransition = useCardFlipTransition(flashcard?.id);
   const [feedback, setFeedback] = useState<AnswerFeedback>(null);
-  const [skipFlipTransition, setSkipFlipTransition] = useState(false);
 
-  useLayoutEffect(() => {
-    const nextId = flashcard?.id ?? null;
-    if (
-      prevFlashcardIdRef.current !== null &&
-      prevFlashcardIdRef.current !== nextId
-    ) {
-      setSkipFlipTransition(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setSkipFlipTransition(false));
-      });
-    }
-    prevFlashcardIdRef.current = nextId;
-  }, [flashcard?.id]);
-
-  const dialectLabel = (dialect: AudioDialect): string => {
-    if (dialect === 'us') return labels.audioDialectUs;
-    if (dialect === 'uk') return labels.audioDialectUk;
-    return labels.audioDialectAu;
-  };
-
-  const playAudio = useCallback((url: string, e: MouseEvent): void => {
-    e.stopPropagation();
-    if (!url) return;
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = url;
-      void audioRef.current.play();
-    } else {
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      void audio.play();
-    }
-  }, []);
+  const dialectLabel = useCallback(
+    (dialect: 'us' | 'uk' | 'au'): string => {
+      if (dialect === 'us') return labels.audioDialectUs;
+      if (dialect === 'uk') return labels.audioDialectUk;
+      return labels.audioDialectAu;
+    },
+    [labels.audioDialectAu, labels.audioDialectUk, labels.audioDialectUs],
+  );
 
   const handleAnswer = useCallback(
-    (correct: boolean, e?: MouseEvent): void => {
-      e?.stopPropagation();
+    (correct: boolean, event?: MouseEvent): void => {
+      event?.stopPropagation();
       if (feedback !== null) return;
       setFeedback(correct ? 'correct' : 'incorrect');
       window.setTimeout(() => {
@@ -112,39 +84,6 @@ export const GameComponent = ({
     onCorrect: () => handleAnswer(true),
     onIncorrect: () => handleAnswer(false),
   });
-
-  const renderDialectButtons = (
-    audioUrls: NonNullable<FlashcardGameVM['audioUrls']>,
-  ): ReactElement => (
-    <div
-      className="flex flex-wrap justify-center gap-2"
-      onClick={(e) => e.stopPropagation()}
-    >
-      {(['us', 'uk', 'au'] as AudioDialect[]).map((dialect) => {
-        const url = audioUrls.expression[dialect];
-        if (!url) return null;
-        return (
-          <button
-            key={dialect}
-            type="button"
-            onClick={(e) => playAudio(url, e)}
-            className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-1.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] active:scale-95"
-            title={dialectLabel(dialect)}
-            aria-label={dialectLabel(dialect)}
-          >
-            <span>{DIALECT_FLAGS[dialect]}</span>
-            <span aria-hidden>▶</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-
-  const renderIpaBadge = (notation: string): ReactElement => (
-    <span className="inline-block rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-1 font-mono text-sm text-[var(--color-brand-light)]">
-      {notation}
-    </span>
-  );
 
   if (isLoading || !flashcard) {
     return (
@@ -172,6 +111,7 @@ export const GameComponent = ({
       <div className="game-glow" aria-hidden />
 
       <GamePlayToolbar
+        variant="game"
         currentIndex={currentIndex}
         totalCount={totalCount}
         correctCount={correctCount}
@@ -189,7 +129,7 @@ export const GameComponent = ({
         >
           <div
             ref={cardRef}
-            className="game-card-wrapper h-[min(560px,72vh)] min-h-[480px] w-full cursor-pointer"
+            className="flashcard-play-wrapper game-card-wrapper h-[min(520px,65vh)] min-h-[360px] w-full cursor-pointer sm:min-h-[420px] md:h-[min(560px,72vh)] md:min-h-[480px]"
             style={{ perspective: '1400px' }}
             onClick={() => {
               if (feedback === null) onFlip();
@@ -205,36 +145,40 @@ export const GameComponent = ({
                 transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
               }}
             >
-              {/* Front — word + phoneme */}
               <div
                 style={{
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                 }}
-                className="absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)]"
+                className="flashcard-card-face absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-bg-card)]"
               >
                 <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 overflow-y-auto p-6 text-center md:p-8">
                   <span className="text-4xl font-bold text-[var(--color-text-primary)] md:text-5xl lg:text-6xl">
                     {expression}
                   </span>
-                  {flashcard.ipaNotation
-                    ? renderIpaBadge(flashcard.ipaNotation)
-                    : null}
-                  {audioUrls ? renderDialectButtons(audioUrls) : null}
+                  {flashcard.ipaNotation ? (
+                    <FlashcardIpaBadge notation={flashcard.ipaNotation} />
+                  ) : null}
+                  {audioUrls ? (
+                    <FlashcardDialectButtons
+                      audioUrls={audioUrls}
+                      dialectLabel={dialectLabel}
+                      onPlay={playAudio}
+                    />
+                  ) : null}
                   <span className="text-sm text-[var(--color-text-muted)]">
                     {labels.clickToReveal}
                   </span>
                 </div>
               </div>
 
-              {/* Back — scrollable content + fixed thumbs */}
               <div
                 style={{
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
-                className="absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)]"
+                className="flashcard-card-face absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-bg-card)]"
               >
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                   <div className="flex min-h-full flex-col items-center justify-center gap-5 px-5 py-5 md:gap-6 md:px-6 md:py-6">
@@ -245,50 +189,31 @@ export const GameComponent = ({
                       <p className="text-lg font-semibold text-[var(--color-brand-light)]">
                         {meaning}
                       </p>
-                      {flashcard.ipaNotation
-                        ? renderIpaBadge(flashcard.ipaNotation)
-                        : null}
-                      {audioUrls ? renderDialectButtons(audioUrls) : null}
+                      {flashcard.ipaNotation ? (
+                        <FlashcardIpaBadge notation={flashcard.ipaNotation} />
+                      ) : null}
+                      {audioUrls ? (
+                        <FlashcardDialectButtons
+                          audioUrls={audioUrls}
+                          dialectLabel={dialectLabel}
+                          onPlay={playAudio}
+                        />
+                      ) : null}
                     </div>
 
-                    {flashcard.examples.length > 0 ? (
-                      <div className="w-full max-w-md shrink-0">
-                        {exampleAudioUrl !== null ? (
-                          <div className="mb-3 flex justify-center">
-                            <button
-                              type="button"
-                              onClick={(e) => playAudio(exampleAudioUrl, e)}
-                              className="inline-flex items-center justify-center rounded-full border border-[var(--color-border)] p-2 text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
-                              title={labels.playExample}
-                              aria-label={labels.playExample}
-                            >
-                              <Volume2 size={16} strokeWidth={2} />
-                            </button>
-                          </div>
-                        ) : null}
-                        <ul className="flex flex-col gap-4">
-                          {flashcard.examples.map((ex) => (
-                            <li key={ex.id} className="text-center">
-                              <p className="text-[15px] italic text-[var(--color-text-primary)]">
-                                "{capitalizeFirst(ex.textEn)}"
-                              </p>
-                              <p className="mt-1 text-[13px] text-[var(--color-text-muted)]">
-                                {capitalizeFirst(ex.textEs)}
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
+                    <FlashcardExampleSection
+                      examples={flashcard.examples}
+                      exampleAudioUrl={exampleAudioUrl}
+                      playExampleLabel={labels.playExample}
+                      onPlayExample={playAudio}
+                    />
 
                     {flashcard.nativeSpeech && nativeAudioUrl !== null ? (
-                      <button
-                        type="button"
-                        onClick={(e) => playAudio(nativeAudioUrl, e)}
-                        className="flex shrink-0 items-center justify-center gap-2 rounded-full border border-[var(--color-border)] px-4 py-1.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
-                      >
-                        🗣 {labels.listenNative}
-                      </button>
+                      <FlashcardNativeSpeechButton
+                        label={labels.listenNative}
+                        audioUrl={nativeAudioUrl}
+                        onPlay={playAudio}
+                      />
                     ) : null}
                   </div>
                 </div>
@@ -300,11 +225,11 @@ export const GameComponent = ({
                       ? 'opacity-100'
                       : 'pointer-events-none opacity-40',
                   ].join(' ')}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(event) => event.stopPropagation()}
                 >
                   <button
                     type="button"
-                    onClick={(e) => handleAnswer(false, e)}
+                    onClick={(event) => handleAnswer(false, event)}
                     className="flex size-14 items-center justify-center rounded-full border-2 border-[var(--color-accent-red)]/60 text-[var(--color-accent-red)] transition-all hover:border-[var(--color-accent-red)] hover:bg-[var(--color-accent-red)] hover:text-white active:scale-95"
                     aria-label={labels.incorrect}
                     title={labels.incorrect}
@@ -313,7 +238,7 @@ export const GameComponent = ({
                   </button>
                   <button
                     type="button"
-                    onClick={(e) => handleAnswer(true, e)}
+                    onClick={(event) => handleAnswer(true, event)}
                     className="flex size-14 items-center justify-center rounded-full border-2 border-[var(--color-accent-green)]/60 text-[var(--color-accent-green)] transition-all hover:border-[var(--color-accent-green)] hover:bg-[var(--color-accent-green)] hover:text-[var(--color-bg-base)] active:scale-95"
                     aria-label={labels.correct}
                     title={labels.correct}

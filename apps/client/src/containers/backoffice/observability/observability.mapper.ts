@@ -3,17 +3,16 @@ import type {
   MetricApiModel,
   MetricSampleApiModel,
 } from './api/observability.api-model';
+import type { DbStatsApiModel } from './api/db-stats.api-model';
 import type {
   MetricsSummaryVM,
   MetricVM,
   MetricSampleVM,
+  DbStatsVM,
 } from './observability.types';
 
 function mapMetricSample(raw: MetricSampleApiModel): MetricSampleVM {
-  return {
-    labels: raw.labels,
-    value: raw.value,
-  };
+  return { labels: raw.labels, value: raw.value };
 }
 
 function mapMetric(raw: MetricApiModel): MetricVM {
@@ -28,7 +27,9 @@ function mapMetric(raw: MetricApiModel): MetricVM {
 export function mapMetricsSummary(
   raw: MetricsSummaryApiModel,
 ): MetricsSummaryVM {
-  return {
-    metrics: raw.metrics.map(mapMetric),
-  };
+  return { metrics: raw.metrics.map(mapMetric) };
+}
+
+export function mapDbStats(raw: DbStatsApiModel): DbStatsVM {
+  return raw as DbStatsVM;
 }

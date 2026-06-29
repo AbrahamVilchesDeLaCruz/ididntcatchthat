@@ -7,6 +7,7 @@ const EMPTY_SUMMARY: GameSummaryVM = {
   totalCount: 0,
   accuracy: 0,
   duration: 0,
+  cardsViewed: 0,
 };
 
 function storageKey(gameId: string): string {
@@ -20,7 +21,8 @@ function isGameSummaryVM(value: unknown): value is GameSummaryVM {
     typeof v.correctCount === 'number' &&
     typeof v.totalCount === 'number' &&
     typeof v.accuracy === 'number' &&
-    typeof v.duration === 'number'
+    typeof v.duration === 'number' &&
+    typeof v.cardsViewed === 'number'
   );
 }
 

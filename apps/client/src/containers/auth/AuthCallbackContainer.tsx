@@ -1,8 +1,7 @@
 import { useEffect, useMemo, type ReactElement } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
-import { getPostLoginPath } from '@/core/auth/postLoginRedirect';
-import { resolveUserTypeFromAccessToken } from '@/core/auth/resolveUserRole';
+import { getPostAuthPath } from '@/core/navigation/sessionNav';
 
 /**
  * Landing page after Google OAuth redirect.
@@ -30,9 +29,7 @@ export const AuthCallbackContainer = (): ReactElement => {
   useEffect(() => {
     if (token) {
       setAccessToken(token);
-      void navigate(getPostLoginPath(resolveUserTypeFromAccessToken(token)), {
-        replace: true,
-      });
+      void navigate(getPostAuthPath(), { replace: true });
       return;
     }
 

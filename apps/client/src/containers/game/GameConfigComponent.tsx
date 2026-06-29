@@ -15,6 +15,7 @@ const CARD_COUNTS = [10, 20, 50] as const;
 type CardCount = (typeof CARD_COUNTS)[number];
 
 interface GameConfigComponentProps {
+  variant?: 'game' | 'study';
   selectedModule: GameModule;
   selectedSubcategory: string | null;
   selectedCount: CardCount;
@@ -31,6 +32,7 @@ interface GameConfigComponentProps {
 }
 
 export const GameConfigComponent = ({
+  variant = 'game',
   selectedModule,
   selectedSubcategory,
   selectedCount,
@@ -47,6 +49,9 @@ export const GameConfigComponent = ({
 }: GameConfigComponentProps): ReactElement => {
   const { t, locale } = useI18n();
   const gc = t.game.config;
+  const sc = t.study.config;
+  const isStudy = variant === 'study';
+  const copy = isStudy ? sc : gc;
 
   const subcategories = useMemo(() => {
     if (selectedModule === 'random' || !catalog) {
@@ -80,10 +85,17 @@ export const GameConfigComponent = ({
 
   return (
     <div className="relative flex flex-1 flex-col items-center overflow-hidden bg-[var(--color-bg-base)] px-5 py-12 md:py-16 lg:px-8">
-      <div className="game-glow" aria-hidden />
+      {!isStudy ? <div className="game-glow" aria-hidden /> : null}
       {pausedSavedBanner ? (
-        <div className="relative mb-6 w-full max-w-5xl rounded-[var(--radius-md)] border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] px-4 py-3 text-center text-sm text-[var(--color-brand-light)]">
-          {gc.pausedSaved}
+        <div
+          className={[
+            'relative mb-6 w-full max-w-5xl rounded-[var(--radius-md)] border px-4 py-3 text-center text-sm',
+            isStudy
+              ? 'border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]'
+              : 'border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] text-[var(--color-brand-light)]',
+          ].join(' ')}
+        >
+          {copy.pausedSaved}
         </div>
       ) : null}
 
@@ -106,15 +118,17 @@ export const GameConfigComponent = ({
         <div className="flex flex-col">
           <div className="mb-8 text-center lg:mb-10 lg:text-left">
             <h1 className="mb-2 text-3xl font-bold text-[var(--color-text-primary)] md:text-4xl">
-              {gc.title}
+              {copy.title}
             </h1>
-            <p className="text-[var(--color-text-secondary)]">{gc.subtitle}</p>
+            <p className="text-[var(--color-text-secondary)]">
+              {copy.subtitle}
+            </p>
           </div>
 
           <div className="space-y-8">
             <div>
               <label className="mb-3 block text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
-                {gc.moduleLabel}
+                {copy.moduleLabel}
               </label>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {MODULES.map((mod) => (
@@ -138,7 +152,7 @@ export const GameConfigComponent = ({
             {showSubcategoryStep && (
               <div>
                 <label className="mb-3 block text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
-                  {gc.subcategoryLabel}
+                  {copy.subcategoryLabel}
                 </label>
                 <div className="grid max-h-48 grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2 md:max-h-none md:overflow-visible lg:grid-cols-3">
                   <button
@@ -151,7 +165,7 @@ export const GameConfigComponent = ({
                         : 'border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]',
                     ].join(' ')}
                   >
-                    {gc.wholeCategory}
+                    {copy.wholeCategory}
                   </button>
                   {subcategories.map((sub) => (
                     <button
@@ -174,7 +188,7 @@ export const GameConfigComponent = ({
 
             <div>
               <label className="mb-3 block text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
-                {gc.countLabel}
+                {copy.countLabel}
               </label>
               <div className="flex gap-3 md:max-w-md">
                 {CARD_COUNTS.map((count) => (
@@ -202,12 +216,16 @@ export const GameConfigComponent = ({
               className="w-full rounded-full bg-[var(--color-brand)] py-4 text-base font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 md:max-w-md lg:max-w-none"
             >
               {isPending ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  {gc.ctaStart}
-                </span>
+                isStudy ? (
+                  sc.ctaStarting
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    {gc.ctaStart}
+                  </span>
+                )
               ) : (
-                gc.ctaStart
+                copy.ctaStart
               )}
             </button>
           </div>

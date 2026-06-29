@@ -141,12 +141,14 @@ Al terminar un juego, el usuario puede repasar las flashcards que falló.
 
 ## Modo estudio — tracking
 
-El modo estudio actualiza:
+El modo estudio usa el mismo aggregate `Game` con `mode: study`, pero registra **views** (no attempts con evaluación):
 
-- **Streak** del usuario (día activo).
-- **`user_flashcard_stats.times_studied`** y `last_seen_at` por cada carta vista.
+- **Streak** del usuario (día activo) — vía `GameCompletedEvent` al completar la sesión.
+- **`user_flashcard_stats.times_studied`** y `last_seen_at` por cada carta vista — vía `FlashcardViewedEvent`.
 
-No genera `Game` ni `Attempt`. El historial de estudio se puede derivar de `user_flashcard_stats` (last_seen_at, times_studied por módulo).
+No genera `Attempt` ni afecta `accuracy_rate`. El historial de estudio se deriva de `user_flashcard_stats` (last_seen_at, times_studied por módulo).
+
+> Decisión arquitectónica: [ADR-027](../adr/027-study-mode-architecture.md)
 
 ---
 

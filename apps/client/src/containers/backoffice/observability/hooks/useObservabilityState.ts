@@ -8,5 +8,7 @@ export function useObservabilityState() {
     metricsSummary,
     isLoading: metricsSummary.isLoading,
     isError: metricsSummary.isError,
+    dataUpdatedAt: metricsSummary.dataUpdatedAt,
+    refetch: metricsSummary.refetch,
   };
 }

@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { isMaxPausedGamesError } from '@/core/api/apiError';
@@ -36,6 +36,10 @@ export const GameConfigContainer = (): ReactElement => {
   const { mutate: startGame, isPending: isStarting } = useStartGame();
   const { mutate: guestAuth, isPending: isAuthenticating } = useGuestAuth();
   const { data: pausedGames = [] } = usePausedGames(canPause);
+  const gamePausedGames = useMemo(
+    () => pausedGames.filter((game) => game.mode === 'game'),
+    [pausedGames],
+  );
   const { mutate: abandonGame, isPending: isAbandoning } = useAbandonGame();
 
   const [selectedModule, setSelectedModule] = useState<GameModule>(
@@ -210,9 +214,9 @@ export const GameConfigContainer = (): ReactElement => {
         guestError={false}
         pausedSavedBanner={showPausedSavedBanner && !isGuest}
         pausedGamesPanel={
-          canPause && pausedGames.length > 0 ? (
+          canPause && gamePausedGames.length > 0 ? (
             <PausedGamesPanel
-              games={pausedGames}
+              games={gamePausedGames}
               catalog={catalog}
               onContinue={handleContinuePaused}
               onAbandon={(gameId) => abandonGame(gameId)}

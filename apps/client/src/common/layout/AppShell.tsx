@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
+import { useSessionRouteTracking } from '@/core/navigation/useSessionRouteTracking';
 import { AppSidebar } from '@/common/layout/AppSidebar';
 
 /**
@@ -13,6 +14,7 @@ export const AppShell = (): ReactElement => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const location = useLocation();
   const { canManageFlashcards, canAccessBackoffice } = useCurrentUser();
+  useSessionRouteTracking();
 
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
 
@@ -20,17 +22,17 @@ export const AppShell = (): ReactElement => {
     location.pathname.startsWith('/backoffice/flashcards') &&
     !canManageFlashcards
   ) {
-    return <Navigate to="/stats" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   if (location.pathname.startsWith('/backoffice') && !canAccessBackoffice) {
-    return <Navigate to="/stats" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return (
-    <div className="flex min-h-svh bg-[var(--color-bg-base)]">
+    <div className="flex h-svh overflow-hidden bg-[var(--color-bg-base)]">
       <AppSidebar />
-      <main className="flex-1 overflow-auto p-4 pt-16 md:p-8 md:pt-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-16 md:p-8 md:pt-8">
         <Outlet />
       </main>
     </div>

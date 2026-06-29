@@ -12,6 +12,7 @@ const summary: GameSummaryVM = {
   totalCount: 10,
   accuracy: 0.8,
   duration: 120,
+  cardsViewed: 0,
 };
 
 afterEach(() => {
@@ -32,6 +33,7 @@ describe('game-summary.storage', () => {
       totalCount: 10,
       accuracy: 0.5,
       duration: 60,
+      cardsViewed: 0,
     };
 
     expect(resolveGameSummary('game-1', fromNav)).toEqual(fromNav);
@@ -49,6 +51,7 @@ describe('game-summary.storage', () => {
       totalCount: 0,
       accuracy: 0,
       duration: 0,
+      cardsViewed: 0,
     });
   });
 });

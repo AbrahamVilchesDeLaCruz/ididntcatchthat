@@ -57,15 +57,8 @@
   border-bottom-color: color-mix(in srgb, var(--color-brand) 16%, transparent);
 }
 
-.game-shell-logo {
-  background: linear-gradient(
-    90deg,
-    var(--color-brand-light),
-    var(--color-accent-green)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.flashcard-card-face {
+  border: 1px solid color-mix(in srgb, var(--color-brand) 38%, transparent);
 }
 
 .game-card-stage {

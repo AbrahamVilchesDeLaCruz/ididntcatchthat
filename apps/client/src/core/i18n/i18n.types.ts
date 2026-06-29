@@ -9,6 +9,7 @@ export interface LandingTranslations {
     ctaPrimary: string;
     ctaSecondary: string;
     ctaPlay: string;
+    ctaStudy: string;
     ctaHowItWorks: string;
     navBackoffice: string;
     navStats: string;
@@ -168,6 +169,7 @@ export interface StatsTranslations {
   moduleChartTitle: string;
   moduleChartHint: string;
   attemptsLabel: string;
+  studyCoverageLabel: string;
   subcategoryHint: string;
   practiceSubcategory: string;
   weakTableTitle: string;
@@ -219,24 +221,35 @@ export interface StatsTranslations {
     solid: string;
     mastered: string;
   };
+  studyLevel: {
+    novice: string;
+    progressing: string;
+    solid: string;
+    explored: string;
+  };
 }
 
 export interface AchievementsTranslations {
   title: string;
 }
 
+export interface ProfileMenuTranslations {
+  title: string;
+  description: string;
+  fallbackNickname: string;
+  nicknameLabel: string;
+  nicknamePlaceholder: string;
+  showInRankingLabel: string;
+  showInRankingHint: string;
+  save: string;
+  saving: string;
+  saved: string;
+  saveError: string;
+}
+
 export interface RankingTranslations {
   title: string;
   subtitle: string;
-  profile: {
-    title: string;
-    showNickname: string;
-    nicknamePlaceholder: string;
-    save: string;
-    saving: string;
-    saved: string;
-    saveError: string;
-  };
   filters: {
     type: string;
     period: string;
@@ -257,6 +270,19 @@ export interface RankingTranslations {
     score: string;
     you: string;
   };
+  podium: {
+    first: string;
+    second: string;
+    third: string;
+  };
+  viewer: {
+    hiddenTitle: string;
+    hiddenDescription: string;
+    hiddenAction: string;
+    visibleUnrankedTitle: string;
+    visibleUnrankedDescription: string;
+    rankedOutsideTitle: string;
+  };
   scoreUnits: {
     most_active: string;
     most_accurate: string;
@@ -267,17 +293,154 @@ export interface RankingTranslations {
   loading: string;
   error: string;
   empty: string;
-  emptyOptInHint: string;
   emptyMostActiveHint: string;
   outsideTopHint: string;
   yourPosition: string;
   periodIgnoredHint: string;
 }
 
+export interface StudyTranslations {
+  config: {
+    title: string;
+    subtitle: string;
+    moduleLabel: string;
+    subcategoryLabel: string;
+    wholeCategory: string;
+    countLabel: string;
+    ctaStart: string;
+    ctaStarting: string;
+    pausedSaved: string;
+  };
+  play: {
+    next: string;
+    sessionLabel: string;
+    progressLabel: string;
+    shortcutNext: string;
+    tapNext: string;
+    markAndContinue: string;
+    pause: string;
+  };
+  summary: {
+    title: string;
+    subtitle: string;
+    cardsViewed: string;
+    duration: string;
+    streak: string;
+    studyAgain: string;
+    playGame: string;
+  };
+}
+
+export interface CommonTranslations {
+  theme: {
+    lightMode: string;
+    darkMode: string;
+    activateLight: string;
+    activateDark: string;
+  };
+  locale: {
+    switchLanguage: string;
+    english: string;
+    spanish: string;
+  };
+}
+
+export interface SidebarTranslations {
+  sections: {
+    game: string;
+    study: string;
+    progress: string;
+    backoffice: string;
+    system: string;
+  };
+  nav: {
+    home: string;
+    play: string;
+    study: string;
+    stats: string;
+    ranking: string;
+    gameMetrics: string;
+    userMetrics: string;
+    flashcards: string;
+    observability: string;
+  };
+  logout: string;
+}
+
+export interface ProfileTranslations {
+  title: string;
+  subtitle: string;
+  sections: {
+    ranking: string;
+    preferences: string;
+  };
+  hero: {
+    visibleInRanking: string;
+    hiddenInRanking: string;
+  };
+  account: {
+    title: string;
+    roleUser: string;
+    roleTeacher: string;
+    roleAdmin: string;
+    roleGuest: string;
+    userIdLabel: string;
+  };
+  preferences: {
+    title: string;
+    themeLabel: string;
+    themeDescription: string;
+    localeLabel: string;
+    localeDescription: string;
+  };
+  ranking: {
+    title: string;
+    description: string;
+    previewTitle: string;
+    previewHidden: string;
+    previewRankPlaceholder: string;
+    nicknameHint: string;
+    nicknameTooShort: string;
+    viewRanking: string;
+    discard: string;
+    unsavedHint: string;
+  };
+}
+
+export interface HomeTranslations {
+  title: string;
+  subtitle: string;
+  quickStartTitle: string;
+  quickStartSteps: [string, string, string];
+  actionsTitle: string;
+  navApp: string;
+  roles: {
+    user: string;
+    teacher: string;
+    admin: string;
+  };
+  actions: {
+    play: { title: string; description: string };
+    study: { title: string; description: string };
+    stats: { title: string; description: string };
+    ranking: { title: string; description: string };
+    profile: { title: string; description: string };
+    backofficeGames: { title: string; description: string };
+    flashcards: { title: string; description: string };
+    observability: { title: string; description: string };
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
+  study: StudyTranslations;
   stats: StatsTranslations;
   achievements: AchievementsTranslations;
+  profileMenu: ProfileMenuTranslations;
+  profile: ProfileTranslations;
+  home: HomeTranslations;
   ranking: RankingTranslations;
+  common: CommonTranslations;
+  sidebar: SidebarTranslations;
 }

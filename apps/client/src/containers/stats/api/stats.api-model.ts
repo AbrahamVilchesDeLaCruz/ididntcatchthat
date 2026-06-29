@@ -7,6 +7,8 @@ export interface ModuleProgressApiModel {
   correctCount: number;
   accuracy: number;
   masteryLevel: number;
+  studyLevel: number;
+  studyCoverage: number;
 }
 
 export interface WeakFlashcardApiModel {

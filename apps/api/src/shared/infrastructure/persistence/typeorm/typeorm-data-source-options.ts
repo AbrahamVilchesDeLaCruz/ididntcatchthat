@@ -10,6 +10,7 @@ import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/type
 import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typeorm/ranking-user-score.entity';
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
 import { UserAchievementEntity } from '@/achievement/infrastructure/persistence/typeorm/user-achievement.entity';
+import { PageViewEntity } from '@/analytics/infrastructure/persistence/page-view.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
@@ -22,6 +23,8 @@ import { Migration202606200600001779990000003 } from '../migrations/Migration202
 import { Migration202606251920001779990000004 } from '../migrations/Migration202606251920001779990000004';
 import { Migration202606261200001779990000005 } from '../migrations/Migration202606261200001779990000005';
 import { Migration202606271200001779990000006 } from '../migrations/Migration202606271200001779990000006';
+import { Migration202606291000001779990000007 } from '../migrations/Migration202606291000001779990000007';
+import { Migration202606291200001779990000008 } from '../migrations/Migration202606291200001779990000008';
 import { parseDatabaseUrl, resolveDbSsl } from './resolve-db-ssl';
 
 export const typeOrmEntities = [
@@ -36,6 +39,7 @@ export const typeOrmEntities = [
   RankingUserScoreEntity,
   ProcessedEventEntity,
   UserAchievementEntity,
+  PageViewEntity,
 ];
 
 export const typeOrmMigrations = [
@@ -51,6 +55,8 @@ export const typeOrmMigrations = [
   Migration202606251920001779990000004,
   Migration202606261200001779990000005,
   Migration202606271200001779990000006,
+  Migration202606291000001779990000007,
+  Migration202606291200001779990000008,
 ];
 
 export function buildTypeOrmDataSourceOptions(options?: {

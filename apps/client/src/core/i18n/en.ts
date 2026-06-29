@@ -11,6 +11,7 @@ export const en: Translations = {
       ctaPrimary: "Notify me when it's ready",
       ctaSecondary: 'See how it works',
       ctaPlay: 'Play now',
+      ctaStudy: 'Study',
       ctaHowItWorks: 'See how it works',
       navBackoffice: 'Go to backoffice →',
       navStats: 'My stats →',
@@ -209,12 +210,44 @@ export const en: Translations = {
       ctaPracticeWeakest: 'Practice my weak cards globally',
     },
   },
+  study: {
+    config: {
+      title: 'Study mode',
+      subtitle: 'Review without pressure. Listen, read, and go at your pace.',
+      moduleLabel: 'Module',
+      subcategoryLabel: 'Scope',
+      wholeCategory: 'Whole category',
+      countLabel: 'Cards',
+      ctaStart: 'Start studying',
+      ctaStarting: 'Starting session…',
+      pausedSaved: 'Session saved. You can resume anytime.',
+    },
+    play: {
+      next: 'Next',
+      sessionLabel: 'Review',
+      progressLabel: 'Cards reviewed',
+      shortcutNext: 'Next card',
+      tapNext: 'Tap Next to continue',
+      markAndContinue: 'Mark viewed and continue',
+      pause: 'Pause session',
+    },
+    summary: {
+      title: 'Session complete',
+      subtitle: 'Nice review. Consistency builds the habit.',
+      cardsViewed: 'Cards viewed',
+      duration: 'Duration',
+      streak: 'Current streak: {count} days',
+      studyAgain: 'Study again',
+      playGame: 'Play now',
+    },
+  },
   stats: {
     title: 'My progress',
     subtitle: 'Overview of your progress by module',
     moduleChartTitle: 'Accuracy by module',
     moduleChartHint: 'Tap a module to drill into subcategories',
     attemptsLabel: '{count} attempts',
+    studyCoverageLabel: '{percent}% seen',
     subcategoryHint: 'Accuracy breakdown by subcategory',
     practiceSubcategory: 'Practice {name}',
     weakTableTitle: 'Hardest flashcards',
@@ -266,22 +299,34 @@ export const en: Translations = {
       solid: 'Solid',
       mastered: 'Mastered',
     },
+    studyLevel: {
+      novice: 'Unexplored',
+      progressing: 'Exploring',
+      solid: 'Reviewing',
+      explored: 'Explored',
+    },
   },
   achievements: {
     title: 'Achievements',
   },
+  profileMenu: {
+    title: 'Your player profile',
+    description:
+      'Choose the nickname shown in rankings and whether you appear publicly.',
+    fallbackNickname: 'Player',
+    nicknameLabel: 'Public nickname',
+    nicknamePlaceholder: 'Your ranking nickname',
+    showInRankingLabel: 'Show me in rankings',
+    showInRankingHint:
+      'When enabled, your nickname and score can appear on leaderboards.',
+    save: 'Save profile',
+    saving: 'Saving...',
+    saved: 'Profile saved',
+    saveError: 'Could not save profile',
+  },
   ranking: {
     title: 'Ranking',
-    subtitle: 'Compete with other players and control your public visibility',
-    profile: {
-      title: 'Your ranking profile',
-      showNickname: 'Show my nickname in rankings',
-      nicknamePlaceholder: 'Public nickname',
-      save: 'Save preferences',
-      saving: 'Saving...',
-      saved: 'Preferences saved',
-      saveError: 'Could not save preferences',
-    },
+    subtitle: 'Compete with other players and track your position',
     filters: {
       type: 'Ranking type',
       period: 'Period',
@@ -305,6 +350,21 @@ export const en: Translations = {
       score: 'Score',
       you: 'You',
     },
+    podium: {
+      first: '1st',
+      second: '2nd',
+      third: '3rd',
+    },
+    viewer: {
+      hiddenTitle: 'You are hidden from rankings',
+      hiddenDescription:
+        'Set a nickname and enable public visibility to appear on leaderboards.',
+      hiddenAction: 'Open profile settings',
+      visibleUnrankedTitle: 'You are visible in rankings',
+      visibleUnrankedDescription:
+        'Play a game session to earn a score and appear on the board.',
+      rankedOutsideTitle: 'You are ranked outside the top 10',
+    },
     scoreUnits: {
       most_active: 'games',
       most_accurate: 'accuracy',
@@ -315,12 +375,136 @@ export const en: Translations = {
     loading: 'Loading ranking...',
     error: 'Failed to load ranking. Please try again.',
     empty: 'No players in this ranking yet.',
-    emptyOptInHint: 'Enable "Show my nickname" and save your preferences.',
     emptyMostActiveHint: 'Only completed Game-mode sessions count (not Study).',
     outsideTopHint:
       'You are ranked but outside the top 10. Your position is shown below.',
     yourPosition: 'Your position',
     periodIgnoredHint:
       'This ranking ignores the period filter — showing all-time data.',
+  },
+  profile: {
+    title: 'Your profile',
+    subtitle: 'Manage your account, ranking visibility, and preferences.',
+    sections: {
+      ranking: 'Public identity',
+      preferences: 'Settings',
+    },
+    hero: {
+      visibleInRanking: 'Visible on leaderboards',
+      hiddenInRanking: 'Hidden from leaderboards',
+    },
+    account: {
+      title: 'Account',
+      roleUser: 'Player',
+      roleTeacher: 'Teacher',
+      roleAdmin: 'Administrator',
+      roleGuest: 'Guest',
+      userIdLabel: 'User ID',
+    },
+    preferences: {
+      title: 'Preferences',
+      themeLabel: 'Theme',
+      themeDescription: 'Light or dark, matching your system or preference.',
+      localeLabel: 'Language',
+      localeDescription: 'Interface in English or Spanish.',
+    },
+    ranking: {
+      title: 'Ranking',
+      description:
+        'Choose your public nickname and whether you appear on leaderboards.',
+      previewTitle: 'How you will appear on leaderboards',
+      previewHidden: 'You are hidden and will not appear on public tables.',
+      previewRankPlaceholder: '—',
+      nicknameHint: 'Between 3 and 30 characters.',
+      nicknameTooShort: 'Nickname must be at least 3 characters.',
+      viewRanking: 'View leaderboards',
+      discard: 'Discard',
+      unsavedHint: 'You have unsaved changes',
+    },
+  },
+  home: {
+    title: 'Welcome',
+    subtitle: 'Start here and choose what you want to do today.',
+    quickStartTitle: 'Getting started',
+    quickStartSteps: [
+      'Listen to a native expression in the game and train your ear.',
+      'Review your progress in stats.',
+      'Set up your profile and ranking nickname.',
+    ],
+    actionsTitle: 'Quick access',
+    navApp: 'Go to app →',
+    roles: {
+      user: 'Player',
+      teacher: 'Teacher',
+      admin: 'Administrator',
+    },
+    actions: {
+      play: {
+        title: 'Play',
+        description: 'Arcade mode with flashcards and scoring.',
+      },
+      study: {
+        title: 'Study',
+        description: 'Review cards without competitive pressure.',
+      },
+      stats: {
+        title: 'My progress',
+        description: 'Modules, achievements, and weak cards.',
+      },
+      ranking: {
+        title: 'Ranking',
+        description: 'Your position against other players.',
+      },
+      profile: {
+        title: 'Profile',
+        description: 'Nickname, visibility, and preferences.',
+      },
+      backofficeGames: {
+        title: 'Backoffice',
+        description: 'Game and user metrics.',
+      },
+      flashcards: {
+        title: 'Flashcards',
+        description: 'Manage catalog content.',
+      },
+      observability: {
+        title: 'Observability',
+        description: 'System metrics and health.',
+      },
+    },
+  },
+  common: {
+    theme: {
+      lightMode: 'Light mode',
+      darkMode: 'Dark mode',
+      activateLight: 'Switch to light mode',
+      activateDark: 'Switch to dark mode',
+    },
+    locale: {
+      switchLanguage: 'Switch language',
+      english: 'EN',
+      spanish: 'ES',
+    },
+  },
+  sidebar: {
+    sections: {
+      game: 'Game',
+      study: 'Learn',
+      progress: 'My progress',
+      backoffice: 'Backoffice',
+      system: 'System',
+    },
+    nav: {
+      home: 'Home',
+      play: 'Play',
+      study: 'Study',
+      stats: 'Stats',
+      ranking: 'Ranking',
+      gameMetrics: 'Game metrics',
+      userMetrics: 'User metrics',
+      flashcards: 'Flashcards',
+      observability: 'Observability',
+    },
+    logout: 'Log out',
   },
 };

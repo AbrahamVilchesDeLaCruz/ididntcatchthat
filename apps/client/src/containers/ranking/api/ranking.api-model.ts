@@ -1,8 +1,9 @@
 import type {
   RankingEntryVM,
+  RankingModule,
   RankingPeriod,
   RankingType,
-  RankingModule,
+  RankingViewerVM,
 } from '../ranking.types';
 
 export type RankingEntryApiModel = {
@@ -10,11 +11,15 @@ export type RankingEntryApiModel = {
   userId: string;
   nickname: string;
   score: number;
+  isMe: boolean;
 };
+
+export type RankingViewerApiModel = RankingViewerVM;
 
 export type RankingsApiModel = {
   entries: RankingEntryApiModel[];
-  currentUser: RankingEntryApiModel | null;
+  currentUser: Omit<RankingEntryVM, 'isMe'> | null;
+  viewer: RankingViewerApiModel;
 };
 
 export type RankingProfileApiModel = {

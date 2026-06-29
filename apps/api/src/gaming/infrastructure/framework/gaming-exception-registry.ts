@@ -12,6 +12,10 @@ import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-excee
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
 import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
+import { StudyRequiresAuth } from '@/gaming/domain/exceptions/study-requires-auth';
+import { ViewRequiresStudyMode } from '@/gaming/domain/exceptions/view-requires-study-mode';
+import { AttemptRequiresGameMode } from '@/gaming/domain/exceptions/attempt-requires-game-mode';
+import { WeakestSourceRequiresGameMode } from '@/gaming/domain/exceptions/weakest-source-requires-game-mode';
 
 @Injectable()
 export class GamingExceptionRegistry implements OnModuleInit {
@@ -32,6 +36,10 @@ export class GamingExceptionRegistry implements OnModuleInit {
         [GameSubcategoryInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [InsufficientWeakFlashcards.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [WeakestSourceRequiresAuth.name, HttpStatus.FORBIDDEN],
+        [StudyRequiresAuth.name, HttpStatus.FORBIDDEN],
+        [ViewRequiresStudyMode.name, HttpStatus.CONFLICT],
+        [AttemptRequiresGameMode.name, HttpStatus.CONFLICT],
+        [WeakestSourceRequiresGameMode.name, HttpStatus.UNPROCESSABLE_ENTITY],
       ]),
     );
   }

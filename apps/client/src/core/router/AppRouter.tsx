@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
+import { usePageView } from '@/core/analytics/usePageView';
 import { AppShell } from '@/common/layout/AppShell';
 import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
@@ -12,9 +13,15 @@ import { RankingView } from '@/views/RankingView';
 import { GameConfigView } from '@/views/GameConfigView';
 import { GameView } from '@/views/GameView';
 import { GameSummaryView } from '@/views/GameSummaryView';
+import { StudyConfigView } from '@/views/StudyConfigView';
+import { StudyView } from '@/views/StudyView';
+import { StudySummaryView } from '@/views/StudySummaryView';
+import { HomeView } from '@/views/HomeView';
+import { ProfileView } from '@/views/ProfileView';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
+  usePageView();
 
   if (!ready) {
     return (
@@ -36,10 +43,18 @@ const AppRoutes = (): ReactElement => {
         <Route path="/game" element={<GameConfigView />} />
         <Route path="/game/:gameId" element={<GameView />} />
         <Route path="/game/:gameId/summary" element={<GameSummaryView />} />
+        <Route path="/study" element={<StudyConfigView />} />
+        <Route path="/study/:sessionId" element={<StudyView />} />
+        <Route
+          path="/study/:sessionId/summary"
+          element={<StudySummaryView />}
+        />
       </Route>
 
       {/* ── App shell (sidebar, protegido — redirige a /auth/login) ────────── */}
       <Route element={<AppShell />}>
+        <Route path="/home" element={<HomeView />} />
+        <Route path="/profile" element={<ProfileView />} />
         <Route path="/stats" element={<StatsView />} />
         <Route path="/ranking" element={<RankingView />} />
         <Route path="/backoffice/*" element={<BackofficeView />} />
