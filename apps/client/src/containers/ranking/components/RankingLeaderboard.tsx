@@ -1,11 +1,10 @@
 import { type ReactElement } from 'react';
 import { useI18n } from '@/core/i18n';
-import {
-  formatRankingScore,
-  getMedalEmoji,
-  isCurrentUser,
-} from '../ranking.mapper';
+import { UserAvatar } from '@/common/components/UserAvatar';
+import { Badge } from '@/common/components/ui/badge';
+import { formatRankingScore } from '../ranking.mapper';
 import type { RankingEntryVM, RankingType } from '../ranking.types';
+import { RankingPodium } from './RankingPodium';
 import {
   Table,
   TableBody,
@@ -18,14 +17,12 @@ import {
 interface RankingLeaderboardProps {
   type: RankingType;
   entries: RankingEntryVM[];
-  currentUser: RankingEntryVM | null;
   isFetching: boolean;
 }
 
 export const RankingLeaderboard = ({
   type,
   entries,
-  currentUser,
   isFetching,
 }: RankingLeaderboardProps): ReactElement => {
   const { t } = useI18n();
@@ -40,10 +37,7 @@ export const RankingLeaderboard = ({
     );
   }
 
-  const podium = entries
-    .filter((e) => e.rank <= 3)
-    .sort((a, b) => a.rank - b.rank);
-  const rest = entries.filter((e) => e.rank > 3);
+  const rest = entries.filter((entry) => entry.rank > 3);
 
   return (
     <div
@@ -52,65 +46,46 @@ export const RankingLeaderboard = ({
         isFetching ? 'opacity-60' : 'opacity-100',
       ].join(' ')}
     >
-      {podium.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 border-b border-[var(--color-border)] bg-white/[0.02] px-4 py-6">
-          {podium.map((entry) => {
-            const highlighted = isCurrentUser(entry, currentUser);
-            return (
-              <div
-                key={entry.userId}
-                className={[
-                  'flex flex-col items-center gap-1 rounded-xl p-3 text-center',
-                  highlighted
-                    ? 'bg-[var(--color-brand)]/15 ring-1 ring-[var(--color-brand)]/40'
-                    : 'bg-[var(--color-bg-base)]/50',
-                ].join(' ')}
-              >
-                <span className="text-2xl">
-                  {getMedalEmoji(entry.rank) ?? `#${entry.rank}`}
-                </span>
-                <span className="text-sm font-semibold text-[var(--color-text-primary)] truncate max-w-full">
-                  {entry.nickname}
-                </span>
-                <span className="text-xs text-[var(--color-text-muted)]">
-                  {formatRankingScore(type, entry.score)} {scoreLabel}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <RankingPodium type={type} entries={entries} />
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16">{r.table.rank}</TableHead>
-            <TableHead>{r.table.player}</TableHead>
-            <TableHead className="text-right">{r.table.score}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rest.map((entry) => {
-            const highlighted = isCurrentUser(entry, currentUser);
-            return (
+      {rest.length > 0 ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16">{r.table.rank}</TableHead>
+              <TableHead>{r.table.player}</TableHead>
+              <TableHead className="text-right">{r.table.score}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rest.map((entry) => (
               <TableRow
                 key={`${entry.userId}-${entry.rank}`}
                 className={
-                  highlighted
+                  entry.isMe
                     ? 'bg-[var(--color-brand)]/10 hover:bg-[var(--color-brand)]/15'
                     : undefined
                 }
               >
                 <TableCell className="font-medium">{entry.rank}</TableCell>
                 <TableCell>
-                  <span className="font-medium text-[var(--color-text-primary)]">
-                    {entry.nickname}
-                  </span>
-                  {highlighted && (
-                    <span className="ml-2 text-xs text-[var(--color-brand-light)]">
-                      {t.ranking.table.you}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <UserAvatar
+                      userId={entry.userId}
+                      nickname={entry.nickname}
+                      className="size-8"
+                    />
+                    <div className="min-w-0">
+                      <span className="font-medium text-[var(--color-text-primary)]">
+                        {entry.nickname}
+                      </span>
+                      {entry.isMe ? (
+                        <Badge className="ml-2 bg-[var(--color-brand)] text-white">
+                          {r.table.you}
+                        </Badge>
+                      ) : null}
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {formatRankingScore(type, entry.score)}
@@ -119,10 +94,10 @@ export const RankingLeaderboard = ({
                   </span>
                 </TableCell>
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      ) : null}
     </div>
   );
 };

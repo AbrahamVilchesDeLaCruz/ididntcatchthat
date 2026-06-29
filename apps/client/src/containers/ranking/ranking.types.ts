@@ -13,11 +13,14 @@ export type RankingModule =
   | 'flow_connectors'
   | 'real_talk';
 
+export type RankingViewerStatus = 'hidden' | 'visible_unranked' | 'ranked';
+
 export type RankingEntryVM = {
   rank: number;
   userId: string;
   nickname: string;
   score: number;
+  isMe: boolean;
 };
 
 export type RankingProfileVM = {
@@ -25,7 +28,16 @@ export type RankingProfileVM = {
   nickname: string;
 };
 
+export type RankingViewerVM = {
+  showInRanking: boolean;
+  nickname: string;
+  rank: number | null;
+  score: number | null;
+  status: RankingViewerStatus;
+};
+
 export type RankingsVM = {
   entries: RankingEntryVM[];
-  currentUser: RankingEntryVM | null;
+  currentUser: Omit<RankingEntryVM, 'isMe'> | null;
+  viewer: RankingViewerVM;
 };
