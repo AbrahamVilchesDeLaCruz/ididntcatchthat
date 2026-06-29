@@ -4,6 +4,10 @@ import {
   type RankingSelector,
   RANKING_SELECTOR,
 } from '@/ranking/domain/ranking-selector';
+import {
+  type RankingUserReader,
+  RANKING_USER_READER,
+} from '@/ranking/domain/ranking-user.reader';
 import { type RankingEntryPrimitives } from '@/ranking/domain/ranking-entry';
 
 export type RequestRankingFinder = {
@@ -14,9 +18,24 @@ export type RequestRankingFinder = {
   limit?: number;
 };
 
+export type RankingEntryResponse = RankingEntryPrimitives & {
+  isMe: boolean;
+};
+
+export type RankingViewerStatus = 'hidden' | 'visible_unranked' | 'ranked';
+
+export type RankingViewerResponse = {
+  showInRanking: boolean;
+  nickname: string;
+  rank: number | null;
+  score: number | null;
+  status: RankingViewerStatus;
+};
+
 export type RankingFinderResult = {
-  entries: RankingEntryPrimitives[];
+  entries: RankingEntryResponse[];
   currentUser: RankingEntryPrimitives | null;
+  viewer: RankingViewerResponse;
 };
 
 @Injectable()
@@ -24,6 +43,8 @@ export class RankingFinder {
   constructor(
     @Inject(RANKING_SELECTOR)
     private readonly selector: RankingSelector,
+    @Inject(RANKING_USER_READER)
+    private readonly userReader: RankingUserReader,
   ) {}
 
   async execute(request: RequestRankingFinder): Promise<RankingFinderResult> {
@@ -44,6 +65,58 @@ export class RankingFinder {
       currentUser = userEntry?.toPrimitives() ?? null;
     }
 
-    return { entries: entryPrimitives, currentUser };
+    const preferences = await this.userReader.findUserRankingPreferences(
+      request.userId,
+    );
+
+    const viewer = this.buildViewer(preferences, currentUser);
+
+    return {
+      entries: entryPrimitives.map((entry) => ({
+        ...entry,
+        isMe: entry.userId === request.userId,
+      })),
+      currentUser,
+      viewer,
+    };
+  }
+
+  private buildViewer(
+    preferences: {
+      nickname: string;
+      showInRanking: boolean;
+    } | null,
+    currentUser: RankingEntryPrimitives | null,
+  ): RankingViewerResponse {
+    const showInRanking = preferences?.showInRanking ?? false;
+    const nickname = preferences?.nickname ?? '';
+
+    if (!showInRanking) {
+      return {
+        showInRanking,
+        nickname,
+        rank: null,
+        score: null,
+        status: 'hidden',
+      };
+    }
+
+    if (currentUser !== null && currentUser.score > 0) {
+      return {
+        showInRanking,
+        nickname,
+        rank: currentUser.rank,
+        score: currentUser.score,
+        status: 'ranked',
+      };
+    }
+
+    return {
+      showInRanking,
+      nickname,
+      rank: null,
+      score: null,
+      status: 'visible_unranked',
+    };
   }
 }
