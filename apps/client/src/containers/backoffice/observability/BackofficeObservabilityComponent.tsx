@@ -60,8 +60,32 @@ export const BackofficeObservabilityComponent = ({
   const runtimeMetrics = parseRuntimeMetrics(metrics);
   const businessMetrics = parseBusinessMetrics(metrics);
 
+  const serverStartedAt = runtimeMetrics.processStartTimestamp;
+  const serverStartLabel = serverStartedAt
+    ? new Date(serverStartedAt).toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : null;
+
   const httpTab = (
     <div className="space-y-6">
+      {serverStartLabel && !isLoading && (
+        <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2.5 text-xs text-[var(--color-text-muted)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-green)] shrink-0" />
+          Datos globales acumulados desde el arranque del servidor:{' '}
+          <span className="font-medium text-[var(--color-text-secondary)]">
+            {serverStartLabel}
+          </span>
+          <span className="ml-auto text-[var(--color-text-muted)]">
+            Todos los usuarios · todas las peticiones
+          </span>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }, (_, i) => (
@@ -77,9 +101,17 @@ export const BackofficeObservabilityComponent = ({
       )}
 
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
-          Requests por endpoint
-        </h2>
+        <div className="flex items-baseline justify-between gap-4 mb-4">
+          <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+            Requests por endpoint
+          </h2>
+          {!isLoading && httpStats && (
+            <span className="text-xs text-[var(--color-text-muted)]">
+              {httpStats.totalRequests.toLocaleString('es-ES')} peticiones
+              totales
+            </span>
+          )}
+        </div>
         {isLoading ? (
           <TableSkeleton />
         ) : httpStats ? (
