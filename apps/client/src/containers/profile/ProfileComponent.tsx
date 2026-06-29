@@ -7,7 +7,7 @@ import { ProfilePreferencesSection } from './components/ProfilePreferencesSectio
 
 export const ProfileComponent = (): ReactElement => {
   const { t } = useI18n();
-  const { isUser } = useCurrentUser();
+  const { canEditRankingProfile } = useCurrentUser();
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -21,7 +21,7 @@ export const ProfileComponent = (): ReactElement => {
       </div>
 
       <ProfileAccountSection />
-      {isUser ? <ProfileRankingSection /> : null}
+      {canEditRankingProfile ? <ProfileRankingSection /> : null}
       <ProfilePreferencesSection />
     </div>
   );

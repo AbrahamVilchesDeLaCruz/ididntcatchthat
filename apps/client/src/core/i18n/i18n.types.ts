@@ -382,6 +382,10 @@ export interface ProfileTranslations {
     themeLabel: string;
     localeLabel: string;
   };
+  ranking: {
+    title: string;
+    description: string;
+  };
 }
 
 export interface HomeTranslations {

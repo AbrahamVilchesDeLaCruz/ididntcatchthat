@@ -397,6 +397,11 @@ export const en: Translations = {
       themeLabel: 'Theme',
       localeLabel: 'Language',
     },
+    ranking: {
+      title: 'Ranking',
+      description:
+        'Choose your public nickname and whether you appear on leaderboards.',
+    },
   },
   home: {
     title: 'Welcome',

@@ -73,10 +73,7 @@ export const RankingComponent = ({
             <CardDescription>{r.viewer.hiddenDescription}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              type="button"
-              onClick={() => void navigate('/profile#ranking')}
-            >
+            <Button type="button" onClick={() => void navigate('/profile')}>
               {r.viewer.hiddenAction}
             </Button>
           </CardContent>

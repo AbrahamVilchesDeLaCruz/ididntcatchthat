@@ -88,7 +88,7 @@ export const HomeContainer = (): ReactElement => {
       id: 'profile',
       title: h.actions.profile.title,
       description: h.actions.profile.description,
-      to: isUser ? '/profile#ranking' : '/profile',
+      to: '/profile',
     });
 
     if (canAccessBackoffice) {
@@ -122,7 +122,6 @@ export const HomeContainer = (): ReactElement => {
   }, [
     h,
     canStudy,
-    isUser,
     canAccessRanking,
     canAccessBackoffice,
     canManageFlashcards,

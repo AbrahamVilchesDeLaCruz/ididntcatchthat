@@ -25,6 +25,7 @@ describe('ProfileComponent', () => {
   it('shows ranking section for player users', () => {
     mockedUseCurrentUser.mockReturnValue({
       isUser: true,
+      canEditRankingProfile: true,
     } as ReturnType<typeof useCurrentUser>);
 
     render(<ProfileComponent />);
@@ -35,6 +36,7 @@ describe('ProfileComponent', () => {
   it('hides ranking section for admin users', () => {
     mockedUseCurrentUser.mockReturnValue({
       isUser: false,
+      canEditRankingProfile: false,
     } as ReturnType<typeof useCurrentUser>);
 
     render(<ProfileComponent />);

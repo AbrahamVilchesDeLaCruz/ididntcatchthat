@@ -56,7 +56,7 @@ describe('SidebarFooter', () => {
 
     expect(screen.getByRole('link', { name: /ace/i })).toHaveAttribute(
       'href',
-      '/profile#ranking',
+      '/profile',
     );
   });
 

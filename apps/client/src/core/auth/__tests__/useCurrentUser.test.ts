@@ -12,8 +12,15 @@ describe('useCurrentUser', () => {
     });
   });
 
-  it('allows ranking access for registered players', () => {
+  it('allows ranking profile editing for player userType', () => {
+    useAuthStore.setState({
+      userType: 'user',
+      userId: 'user-1',
+      roles: [],
+    });
+
     const { result } = renderHook(() => useCurrentUser());
+    expect(result.current.canEditRankingProfile).toBe(true);
     expect(result.current.canAccessRanking).toBe(true);
   });
 

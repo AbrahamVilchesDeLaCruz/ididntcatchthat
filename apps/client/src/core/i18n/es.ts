@@ -401,6 +401,11 @@ export const es: Translations = {
       themeLabel: 'Tema',
       localeLabel: 'Idioma',
     },
+    ranking: {
+      title: 'Ranking',
+      description:
+        'Elige tu nickname público y si quieres aparecer en las tablas de clasificación.',
+    },
   },
   home: {
     title: 'Bienvenido',

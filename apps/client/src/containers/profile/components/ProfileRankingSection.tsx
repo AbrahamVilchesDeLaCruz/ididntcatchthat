@@ -16,6 +16,7 @@ const defaultProfile = (): RankingProfileVM => ({
 
 export const ProfileRankingSection = (): ReactElement => {
   const { t } = useI18n();
+  const section = t.profile.ranking;
   const labels = t.profileMenu;
   const profileQuery = useRankingProfile();
   const savedProfile = profileQuery.data ?? defaultProfile();
@@ -43,10 +44,10 @@ export const ProfileRankingSection = (): ReactElement => {
       className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-6"
     >
       <h2 className="mb-1 text-lg font-semibold text-[var(--color-text-primary)]">
-        {labels.title}
+        {section.title}
       </h2>
       <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
-        {labels.description}
+        {section.description}
       </p>
 
       <div className="flex flex-col items-center gap-3 py-2">

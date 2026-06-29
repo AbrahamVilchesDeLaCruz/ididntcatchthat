@@ -16,8 +16,9 @@ export const SidebarUserBlock = ({
   variant = 'default',
 }: SidebarUserBlockProps): ReactElement => {
   const { t } = useI18n();
-  const { isUser, isTeacher, isAdmin } = useCurrentUser();
-  const profileQuery = useRankingProfile({ enabled: isUser });
+  const { isUser, isTeacher, isAdmin, canEditRankingProfile } =
+    useCurrentUser();
+  const profileQuery = useRankingProfile({ enabled: canEditRankingProfile });
   const isCompact = variant === 'compact';
 
   const nickname =
@@ -34,7 +35,7 @@ export const SidebarUserBlock = ({
         : t.profileMenu.fallbackNickname);
 
   const avatarNickname = nickname ?? displayName;
-  const profilePath = isUser ? '/profile#ranking' : '/profile';
+  const profilePath = '/profile';
 
   const profileLinkClass = ({ isActive }: { isActive: boolean }): string => {
     const active = isActive
