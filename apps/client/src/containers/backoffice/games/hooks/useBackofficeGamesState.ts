@@ -8,5 +8,7 @@ export function useBackofficeGamesState() {
     gamesStats,
     isLoading: gamesStats.isLoading,
     isError: gamesStats.isError,
+    dataUpdatedAt: gamesStats.dataUpdatedAt,
+    refetch: gamesStats.refetch,
   };
 }

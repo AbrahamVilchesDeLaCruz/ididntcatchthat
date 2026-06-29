@@ -1,36 +1,64 @@
 import { type ReactElement } from 'react';
-import { GamesStatsCards } from './components/GamesStatsCards';
+import {
+  GamesStatsCards,
+  StatCardSkeleton,
+} from './components/GamesStatsCards';
 import { GamesByModuleChart } from './components/GamesByModuleChart';
+import { BackofficePageShell } from '@/common/components/BackofficePageShell';
 import type { GamesStatsVM } from './backoffice-games.types';
 
 interface BackofficeGamesComponentProps {
-  stats: GamesStatsVM;
+  stats: GamesStatsVM | null;
+  isLoading: boolean;
+  isError: boolean;
+  lastUpdatedAt?: number;
+  onRetry: () => void;
 }
+
+const ChartSkeleton = (): ReactElement => (
+  <div className="w-full h-80 bg-[var(--color-bg-elevated)] rounded-lg animate-pulse" />
+);
 
 export const BackofficeGamesComponent = ({
   stats,
+  isLoading,
+  isError,
+  lastUpdatedAt,
+  onRetry,
 }: BackofficeGamesComponentProps): ReactElement => {
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
-          Métricas de partidas
-        </h1>
-        <p className="text-[var(--color-text-secondary)] text-sm mt-1">
-          Estadísticas globales de actividad
-        </p>
-      </div>
-
+    <BackofficePageShell
+      title="Métricas de partidas"
+      subtitle="Estadísticas globales de actividad"
+      isError={isError}
+      onRetry={onRetry}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       {/* KPI Cards */}
-      <GamesStatsCards stats={stats} />
+      {isLoading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <StatCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        stats && <GamesStatsCards stats={stats} />
+      )}
 
       {/* Chart */}
       <div className="bg-[var(--color-bg-card)] rounded-xl p-6 border border-[var(--color-border)]">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">
-          Partidas por módulo
-        </h2>
-        {stats.byModule.length === 0 ? (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+            Partidas por módulo
+          </h2>
+          <span className="text-xs text-[var(--color-text-muted)]">
+            barras = cantidad · línea = precisión %
+          </span>
+        </div>
+
+        {isLoading ? (
+          <ChartSkeleton />
+        ) : !stats?.byModule.length ? (
           <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
             Sin datos por módulo
           </p>
@@ -38,6 +66,6 @@ export const BackofficeGamesComponent = ({
           <GamesByModuleChart data={stats.byModule} />
         )}
       </div>
-    </div>
+    </BackofficePageShell>
   );
 };
