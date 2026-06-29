@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
-import { useProfileDialogStore } from '@/core/profile/useProfileDialogStore';
 import { Button } from '@/common/components/ui/button';
 import {
   Card,
@@ -48,8 +48,8 @@ export const RankingComponent = ({
   onModuleChange,
 }: RankingComponentProps): ReactElement => {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const r = t.ranking;
-  const openProfileDialog = useProfileDialogStore((s) => s.openProfileDialog);
 
   const isRankedInList = entries.some((entry) => entry.isMe);
   const showOutsideTopBanner =
@@ -73,7 +73,10 @@ export const RankingComponent = ({
             <CardDescription>{r.viewer.hiddenDescription}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" onClick={openProfileDialog}>
+            <Button
+              type="button"
+              onClick={() => void navigate('/profile#ranking')}
+            >
               {r.viewer.hiddenAction}
             </Button>
           </CardContent>

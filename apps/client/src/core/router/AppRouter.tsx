@@ -16,6 +16,8 @@ import { GameSummaryView } from '@/views/GameSummaryView';
 import { StudyConfigView } from '@/views/StudyConfigView';
 import { StudyView } from '@/views/StudyView';
 import { StudySummaryView } from '@/views/StudySummaryView';
+import { HomeView } from '@/views/HomeView';
+import { ProfileView } from '@/views/ProfileView';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
@@ -51,6 +53,8 @@ const AppRoutes = (): ReactElement => {
 
       {/* ── App shell (sidebar, protegido — redirige a /auth/login) ────────── */}
       <Route element={<AppShell />}>
+        <Route path="/home" element={<HomeView />} />
+        <Route path="/profile" element={<ProfileView />} />
         <Route path="/stats" element={<StatsView />} />
         <Route path="/ranking" element={<RankingView />} />
         <Route path="/backoffice/*" element={<BackofficeView />} />
