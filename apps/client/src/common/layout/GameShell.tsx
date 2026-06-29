@@ -5,7 +5,8 @@ import { BrandWordmark } from '@/common/components/BrandWordmark';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
-import { getAuthenticatedHomePathFromRoles } from '@/core/auth/postLoginRedirect';
+import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
+import { useSessionRouteTracking } from '@/core/navigation/useSessionRouteTracking';
 import '@/containers/game/game-ui.css';
 
 export const GameShell = (): ReactElement => {
@@ -13,17 +14,15 @@ export const GameShell = (): ReactElement => {
   const location = useLocation();
   const { t } = useI18n();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const roles = useAuthStore((s) => s.roles);
   const { canStudy } = useCurrentUser();
+  useSessionRouteTracking();
 
   const isStudyRoute = location.pathname.startsWith('/study');
   const isGameRoute = location.pathname.startsWith('/game');
 
   const handleBack = (): void => {
     if (isStudyRoute) {
-      void navigate(
-        isAuthenticated ? getAuthenticatedHomePathFromRoles(roles) : '/',
-      );
+      void navigate(isAuthenticated ? DEFAULT_AUTHENTICATED_HOME : '/');
       return;
     }
     if (window.history.length > 1) {
@@ -35,11 +34,8 @@ export const GameShell = (): ReactElement => {
 
   const appLink = isAuthenticated
     ? {
-        to: getAuthenticatedHomePathFromRoles(roles),
-        label:
-          roles.includes('admin') || roles.includes('teacher')
-            ? 'Dashboard'
-            : 'Mis estadísticas',
+        to: DEFAULT_AUTHENTICATED_HOME,
+        label: t.home.navApp,
       }
     : null;
 
