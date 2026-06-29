@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/common/components/ui/sheet';
 import { BrandWordmark } from '@/common/components/BrandWordmark';
+import { UserProfileMenu } from '@/common/components/UserProfileMenu';
 import { Button } from '@/common/components/ui/button';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
 import {
@@ -160,7 +161,8 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
         <ThemeToggle variant="pill" />
       </div>
 
-      {/* Logout */}
+      {/* Profile + logout */}
+      <UserProfileMenu />
       <button
         type="button"
         onClick={handleLogout}

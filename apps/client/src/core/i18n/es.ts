@@ -311,18 +311,24 @@ export const es: Translations = {
   achievements: {
     title: 'Logros',
   },
+  profileMenu: {
+    title: 'Tu perfil de jugador',
+    description:
+      'Elige el nickname que verán en los rankings y si quieres aparecer públicamente.',
+    fallbackNickname: 'Jugador',
+    nicknameLabel: 'Nickname público',
+    nicknamePlaceholder: 'Tu nickname en el ranking',
+    showInRankingLabel: 'Mostrarme en los rankings',
+    showInRankingHint:
+      'Si está activo, tu nickname y puntuación pueden aparecer en las tablas.',
+    save: 'Guardar perfil',
+    saving: 'Guardando...',
+    saved: 'Perfil guardado',
+    saveError: 'No se pudo guardar el perfil',
+  },
   ranking: {
     title: 'Ranking',
-    subtitle: 'Compite con otros jugadores y controla tu visibilidad pública',
-    profile: {
-      title: 'Tu perfil en el ranking',
-      showNickname: 'Mostrar mi nickname en los rankings',
-      nicknamePlaceholder: 'Nickname público',
-      save: 'Guardar preferencias',
-      saving: 'Guardando...',
-      saved: 'Preferencias guardadas',
-      saveError: 'No se pudieron guardar las preferencias',
-    },
+    subtitle: 'Compite con otros jugadores y sigue tu posición',
     filters: {
       type: 'Tipo de ranking',
       period: 'Período',
@@ -346,6 +352,21 @@ export const es: Translations = {
       score: 'Puntuación',
       you: 'Tú',
     },
+    podium: {
+      first: '1.º',
+      second: '2.º',
+      third: '3.º',
+    },
+    viewer: {
+      hiddenTitle: 'Estás oculto en los rankings',
+      hiddenDescription:
+        'Configura un nickname y activa la visibilidad pública para aparecer en las tablas.',
+      hiddenAction: 'Abrir ajustes de perfil',
+      visibleUnrankedTitle: 'Estás visible en los rankings',
+      visibleUnrankedDescription:
+        'Juega una partida para sumar puntuación y aparecer en la tabla.',
+      rankedOutsideTitle: 'Estás rankeado fuera del top 10',
+    },
     scoreUnits: {
       most_active: 'partidas',
       most_accurate: 'precisión',
@@ -356,8 +377,6 @@ export const es: Translations = {
     loading: 'Cargando ranking...',
     error: 'Error al cargar el ranking. Intentalo de nuevo.',
     empty: 'Todavía no hay jugadores en este ranking.',
-    emptyOptInHint:
-      'Activa "Mostrar mi nickname" y pulsa Guardar preferencias.',
     emptyMostActiveHint:
       'Cuentan partidas en modo Juego completadas (no Estudio).',
     outsideTopHint:
