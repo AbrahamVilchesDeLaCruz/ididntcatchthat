@@ -34,7 +34,7 @@ La unidad básica es la **flashcard**. Cada flashcard contiene una expresión, f
 4. **Audio en 3 acentos** — puede escuchar la expresión y sus ejemplos pronunciados por voces nativas sintéticas (americano, británico, australiano).
 5. **Bonus de pronunciación** — opcionalmente puede pronunciar él mismo la expresión. Si el análisis de audio valida que suena como un nativo, obtiene puntos extra.
 
-Este diseño permite dos modos de uso sobre el mismo contenido sin cambiar nada: **modo juego** (me evalúo, compito, subo en el ranking) y **modo estudio** (repaso sin presión, escucho, aprendo).
+Este diseño permite dos modos de uso sobre el mismo contenido sin cambiar nada: **modo juego** (me evalúo, compito, subo en el ranking) y **modo estudio** (repaso sin presión, escucho, aprendo). Ver [spec de study mode](spec/study.md) y [spec cliente](spec/study-client.md).
 
 ---
 

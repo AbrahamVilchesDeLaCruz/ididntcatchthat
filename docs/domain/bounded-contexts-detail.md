@@ -95,17 +95,21 @@ graph LR
     subgraph Gaming ["🎮 Gaming"]
         Game["Game\n(Aggregate Root)"]
         Attempt["Attempt\n(Entity)"]
+        View["View\n(Entity — study)"]
         Game --- Attempt
+        Game --- View
     end
 
     subgraph Emits ["Eventos que emite"]
         E1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
+        E1b["FlashcardViewed\nidct.gaming.views.flashcard.viewed"]
         E2["GameCompleted\nidct.gaming.games.game.completed"]
         E3["GamePaused\n(interno — sin cola)"]
         E4["GameAbandoned\n(interno — sin cola)"]
     end
 
     Gaming -->|emite| E1
+    Gaming -->|emite| E1b
     Gaming -->|emite| E2
     Gaming -->|emite| E3
     Gaming -->|emite| E4
@@ -113,7 +117,8 @@ graph LR
 
 | Evento emitido | Exchange | Trigger |
 |----------------|----------|---------|
-| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Usuario responde una flashcard (✓ o ✗) — inmediato |
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Usuario responde una flashcard (✓ o ✗) en modo juego — inmediato |
+| `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Usuario marca flashcard como vista en modo estudio — inmediato |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Usuario termina todas las flashcards del game |
 | `GamePaused` | — interno | Usuario sale de la pantalla / inactividad > 15 min / acción explícita |
 | `GameAbandoned` | — interno | Usuario elige abandonar explícitamente / FIFO al superar 5 pausados |
@@ -130,6 +135,7 @@ graph LR
 graph LR
     subgraph Consumes ["Eventos que consume"]
         C1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
+        C1b["FlashcardViewed\nidct.gaming.views.flashcard.viewed"]
         C2["GameCompleted\nidct.gaming.games.game.completed"]
         C3["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
         C4["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated\n⚠️ planned"]
@@ -154,7 +160,8 @@ graph LR
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Busca o crea `UserFlashcardStats` → `recordPlay()` o `recordStudy()` según `mode` |
+| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Busca o crea `UserFlashcardStats` → `recordPlay()` (modo juego) |
+| `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Busca o crea `UserFlashcardStats` → `recordStudy()` |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Agrega stats del módulo → recalcula `ModuleProgress` (mastery 0–3) |
 | `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest (idempotente via inbox) |
 | `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | ⚠️ Planned — actualiza pronunciation stats en `user_flashcard_stats` |
