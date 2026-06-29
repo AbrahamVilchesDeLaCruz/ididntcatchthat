@@ -9,6 +9,7 @@ export interface LandingTranslations {
     ctaPrimary: string;
     ctaSecondary: string;
     ctaPlay: string;
+    ctaStudy: string;
     ctaHowItWorks: string;
     navBackoffice: string;
     navStats: string;
@@ -168,6 +169,7 @@ export interface StatsTranslations {
   moduleChartTitle: string;
   moduleChartHint: string;
   attemptsLabel: string;
+  studyCoverageLabel: string;
   subcategoryHint: string;
   practiceSubcategory: string;
   weakTableTitle: string;
@@ -218,6 +220,12 @@ export interface StatsTranslations {
     progressing: string;
     solid: string;
     mastered: string;
+  };
+  studyLevel: {
+    novice: string;
+    progressing: string;
+    solid: string;
+    explored: string;
   };
 }
 
@@ -274,9 +282,42 @@ export interface RankingTranslations {
   periodIgnoredHint: string;
 }
 
+export interface StudyTranslations {
+  config: {
+    title: string;
+    subtitle: string;
+    moduleLabel: string;
+    subcategoryLabel: string;
+    wholeCategory: string;
+    countLabel: string;
+    ctaStart: string;
+    ctaStarting: string;
+    pausedSaved: string;
+  };
+  play: {
+    next: string;
+    sessionLabel: string;
+    progressLabel: string;
+    shortcutNext: string;
+    tapNext: string;
+    markAndContinue: string;
+    pause: string;
+  };
+  summary: {
+    title: string;
+    subtitle: string;
+    cardsViewed: string;
+    duration: string;
+    streak: string;
+    studyAgain: string;
+    playGame: string;
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
+  study: StudyTranslations;
   stats: StatsTranslations;
   achievements: AchievementsTranslations;
   ranking: RankingTranslations;

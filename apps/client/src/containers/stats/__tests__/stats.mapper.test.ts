@@ -16,12 +16,16 @@ describe('stats/mapModuleProgress', () => {
       correctCount: 15,
       accuracy: 0.75,
       masteryLevel: 2,
+      studyLevel: 1,
+      studyCoverage: 0.4,
     };
 
     const vm = mapModuleProgress(raw);
 
     expect(vm.accuracy).toBe(75);
     expect(vm.masteryLevel).toBe(2);
+    expect(vm.studyLevel).toBe(1);
+    expect(vm.studyCoverage).toBe(0.4);
   });
 });
 

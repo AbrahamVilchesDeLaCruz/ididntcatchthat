@@ -2,6 +2,7 @@ import { type ReactElement, useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useI18n } from '@/core/i18n';
 import { MasteryBadge } from './MasteryBadge';
+import { StudyLevelBadge } from './StudyLevelBadge';
 import { AccuracyProgressBar } from './AccuracyProgressBar';
 import type { ModuleProgressVM } from '../stats.types';
 import type { GameModule } from '@/containers/game/api/game.api-model';
@@ -48,11 +49,17 @@ export const ModuleProgressChart = ({
                     {row.moduleLabel}
                   </span>
                   <MasteryBadge level={row.masteryLevel} />
+                  <StudyLevelBadge level={row.studyLevel} />
                 </div>
                 <p className="mt-1 text-xs text-[var(--color-text-muted)]">
                   {st.attemptsLabel.replace(
                     '{count}',
                     String(row.totalAttempts),
+                  )}{' '}
+                  ·{' '}
+                  {st.studyCoverageLabel.replace(
+                    '{percent}',
+                    String(Math.round(row.studyCoverage * 100)),
                   )}
                 </p>
               </div>
