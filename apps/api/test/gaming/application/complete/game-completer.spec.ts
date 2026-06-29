@@ -106,4 +106,26 @@ describe('gaming/application/complete GameCompleter', () => {
 
     expect(publisher.publish).toHaveBeenCalledTimes(1);
   });
+
+  it('should return study summary without accuracy when mode is study', async () => {
+    const flashcardIds = ['fc-1', 'fc-2'];
+    const game = GameMother.inStudyProgress({ flashcardIds });
+    game.recordView('fc-1');
+    game.recordView('fc-2');
+    game.pullDomainEvents();
+    const primitives = game.toPrimitives();
+    repository.search.mockResolvedValue(game);
+    repository.save.mockResolvedValue(undefined);
+
+    const result = await completer.execute(
+      RequestGameCompleterMother.random(primitives.id, {
+        userId: primitives.userId,
+      }),
+    );
+
+    expect(result.totalCount).toBe(2);
+    expect(result.cardsViewed).toBe(2);
+    expect(result.correctCount).toBe(0);
+    expect(result.accuracy).toBe(0);
+  });
 });

@@ -3,4 +3,5 @@ export type ResponseGameCompleter = {
   totalCount: number;
   accuracy: number;
   duration: number;
+  cardsViewed: number;
 };

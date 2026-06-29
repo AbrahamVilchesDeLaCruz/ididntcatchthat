@@ -23,6 +23,8 @@ export function mapModuleProgress(
     // API stores 0–1; chart displays 0–100%.
     accuracy: raw.accuracy * 100,
     masteryLevel: raw.masteryLevel,
+    studyLevel: raw.studyLevel,
+    studyCoverage: raw.studyCoverage,
   };
 }
 

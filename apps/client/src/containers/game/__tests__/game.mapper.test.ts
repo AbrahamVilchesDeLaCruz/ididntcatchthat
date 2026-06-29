@@ -133,6 +133,7 @@ describe('game/mapPausedGame', () => {
 
     expect(result).toEqual({
       gameId: 'game-1',
+      mode: 'game',
       module: 'native_sounds',
       subcategory: 't_soft',
       cardCount: 10,

@@ -10,7 +10,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
-import { type ModuleProgressPrimitives } from '@/progress/domain/module-progress';
+import { type ModuleProgressWithStudyPrimitives } from '@/progress/domain/module-progress';
 
 @ApiTags('progress')
 @Controller('progress')
@@ -22,7 +22,7 @@ export class SearchModulesProgressGetController {
   @HttpCode(HttpStatus.OK)
   async handler(
     @CurrentUser() user: UserContext,
-  ): Promise<{ data: ModuleProgressPrimitives[] }> {
+  ): Promise<{ data: ModuleProgressWithStudyPrimitives[] }> {
     const data = await this.finder.execute({ userId: user.userId! });
 
     return { data };

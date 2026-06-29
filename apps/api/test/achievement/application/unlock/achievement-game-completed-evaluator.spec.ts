@@ -30,6 +30,18 @@ describe('achievement/application/unlock AchievementGameCompletedEvaluator', () 
     expect(unlocker.unlock).not.toHaveBeenCalled();
   });
 
+  it('should skip study mode completions', async () => {
+    const userId = UserIdMother.random().value;
+    const event = GameCompletedEventMother.random({
+      userId,
+      mode: 'study',
+    });
+
+    await evaluator.evaluate(event.attributes as never);
+
+    expect(unlocker.unlock).not.toHaveBeenCalled();
+  });
+
   it('should unlock first_game for authenticated users', async () => {
     const userId = UserIdMother.random().value;
     const event = GameCompletedEventMother.random({ userId });

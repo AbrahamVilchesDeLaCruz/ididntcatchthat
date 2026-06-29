@@ -36,7 +36,7 @@ describe('gaming/game GuestLimitsController (e2e)', () => {
         const res = await request(app.getHttpServer())
           .post('/v1/games')
           .set('Authorization', `Bearer ${guestToken}`)
-          .send({ mode: 'study', cardCount: 10 })
+          .send({ mode: 'game', cardCount: 10 })
           .expect(201);
 
         const body = res.body as { gameId: string; flashcardIds: string[] };
@@ -51,14 +51,14 @@ describe('gaming/game GuestLimitsController (e2e)', () => {
         await request(app.getHttpServer())
           .post('/v1/games')
           .set('Authorization', `Bearer ${guestToken}`)
-          .send({ mode: 'study', cardCount: 10 })
+          .send({ mode: 'game', cardCount: 10 })
           .expect(201);
       }
 
       await request(app.getHttpServer())
         .post('/v1/games')
         .set('Authorization', `Bearer ${guestToken}`)
-        .send({ mode: 'study', cardCount: 10 })
+        .send({ mode: 'game', cardCount: 10 })
         .expect(429);
     });
   });

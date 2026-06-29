@@ -14,6 +14,9 @@ import {
 } from '@/gaming/domain/flashcard-selector';
 import { GuestGamePolicy } from '@/gaming/domain/guest-game-policy';
 import { PausedGamePolicy } from '@/gaming/domain/paused-game-policy';
+import { GameMode } from '@/gaming/domain/game-mode';
+import { StudyRequiresAuth } from '@/gaming/domain/exceptions/study-requires-auth';
+import { WeakestSourceRequiresGameMode } from '@/gaming/domain/exceptions/weakest-source-requires-game-mode';
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
 import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
@@ -47,6 +50,15 @@ export class GameStarter {
   async execute(request: RequestGameStarter): Promise<ResponseGameStarter> {
     const { userId, mode, module, subcategory, cardCount, source } = request;
     const gameSource = GameSource.create(source ?? GameSourceValue.Catalog);
+
+    if (GameMode.create(mode).isStudy()) {
+      if (userId === null) {
+        throw new StudyRequiresAuth();
+      }
+      if (gameSource.isWeakest()) {
+        throw new WeakestSourceRequiresGameMode();
+      }
+    }
 
     this.assertValidScope(module, subcategory);
 

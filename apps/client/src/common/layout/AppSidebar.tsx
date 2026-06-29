@@ -9,6 +9,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/common/components/ui/sheet';
+import { BrandWordmark } from '@/common/components/BrandWordmark';
 import { Button } from '@/common/components/ui/button';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
 import {
@@ -42,6 +43,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
     canManageFlashcards,
     isUser,
     isAdmin,
+    canStudy,
   } = useCurrentUser();
 
   const handleLogout = (): void => {
@@ -57,14 +59,8 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
   return (
     <>
       {/* Wordmark */}
-      <Link
-        to="/"
-        onClick={onNavigate}
-        className="mb-8 block px-3 text-lg font-bold leading-none tracking-tight text-[var(--color-text-primary)]"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
-        i didn&apos;t <span className="text-[var(--color-brand)]">catch</span>{' '}
-        that
+      <Link to="/" onClick={onNavigate} className="mb-8 block px-3">
+        <BrandWordmark className="text-lg" />
       </Link>
 
       {/* Navigation */}
@@ -78,6 +74,18 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
             <HeadphonesIcon /> Jugar
           </NavLink>
         </div>
+
+        {/* Aprender — usuarios registrados (no invitados) */}
+        {canStudy && (
+          <div className="mb-2">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              Aprender
+            </p>
+            <NavLink to="/study" className={navLinkClass} onClick={onNavigate}>
+              <FlashcardIcon /> Estudiar
+            </NavLink>
+          </div>
+        )}
 
         {/* Mi progreso — user, teacher, admin */}
         {(isUser || isAdmin || canAccessBackoffice) && (

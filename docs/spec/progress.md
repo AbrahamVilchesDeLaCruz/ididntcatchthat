@@ -111,7 +111,7 @@ Basada en attempts totales del módulo (suma de todos los games de ese módulo) 
 | 2     | `total_attempts >= 10` y `accuracy >= 0.70` |
 | 3     | `total_attempts >= 20` y `accuracy >= 0.85` |
 
-> `studyLevel = 0` fijo en MVP. `combinedLevel = masteryLevel`.
+> `studyLevel` y `studyCoverage` se calculan por módulo desde `times_studied` (ver [study.md](./study.md)). `combinedLevel` fuera de scope MVP.
 
 Cuando `masteryLevel` sube (comparar valor anterior con nuevo), publicar `ModuleLevelUpEvent`.
 

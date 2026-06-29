@@ -30,6 +30,7 @@ export interface GameSummaryVM {
   totalCount: number;
   accuracy: number;
   duration: number;
+  cardsViewed: number;
   failedCards?: { id: string; expression: string }[];
 }
 
@@ -43,6 +44,7 @@ export interface ResumeGameVM {
 // ─── Paused games ─────────────────────────────────────────────────────────────
 export interface PausedGameVM {
   gameId: string;
+  mode: string;
   module: string | null;
   subcategory: string | null;
   cardCount: number;

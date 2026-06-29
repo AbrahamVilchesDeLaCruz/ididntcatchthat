@@ -29,7 +29,7 @@ async function startGame(
   const res = await request(app.getHttpServer())
     .post('/v1/games')
     .set('Authorization', `Bearer ${token}`)
-    .send({ mode: 'study', cardCount: 10 })
+    .send({ mode: 'game', cardCount: 10 })
     .expect(201);
   return res.body as { gameId: string; flashcardIds: string[] };
 }

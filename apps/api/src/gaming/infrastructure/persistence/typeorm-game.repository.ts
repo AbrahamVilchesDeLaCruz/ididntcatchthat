@@ -8,6 +8,10 @@ import {
   type AttemptRepository,
   ATTEMPT_REPOSITORY,
 } from '@/gaming/domain/attempt.repository';
+import {
+  type ViewRepository,
+  VIEW_REPOSITORY,
+} from '@/gaming/domain/view.repository';
 import { type Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { GameEntity } from './game.entity';
 import { GameFlashcardEntity } from './game-flashcard.entity';
@@ -21,6 +25,8 @@ export class TypeOrmGameRepository implements GameRepository {
     private readonly flashcardRepo: Repository<GameFlashcardEntity>,
     @Inject(ATTEMPT_REPOSITORY)
     private readonly attemptRepository: AttemptRepository,
+    @Inject(VIEW_REPOSITORY)
+    private readonly viewRepository: ViewRepository,
   ) {}
 
   async search(id: GameId): Promise<Game | null> {
@@ -28,6 +34,7 @@ export class TypeOrmGameRepository implements GameRepository {
     if (!entity) return null;
 
     const attempts = await this.attemptRepository.findByGameId(id.value);
+    const views = await this.viewRepository.findByGameId(id.value);
     const gameFlashcards = await this.flashcardRepo.find({
       where: { gameId: id.value },
       order: { position: 'ASC' },
@@ -47,6 +54,7 @@ export class TypeOrmGameRepository implements GameRepository {
       startedAt: entity.startedAt,
       finishedAt: entity.finishedAt,
       attempts: attempts.map((a) => a.toPrimitives()),
+      views: views.map((v) => v.toPrimitives()),
     });
   }
 
@@ -111,6 +119,7 @@ export class TypeOrmGameRepository implements GameRepository {
         startedAt: e.startedAt,
         finishedAt: e.finishedAt,
         attempts: [],
+        views: [],
       }),
     );
   }

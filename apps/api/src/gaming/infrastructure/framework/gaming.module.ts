@@ -44,6 +44,10 @@ import { PausedGamesLister } from '@/gaming/application/list-paused/paused-games
 import { GameResumer } from '@/gaming/application/resume/game-resumer';
 import { GameAbandoner } from '@/gaming/application/abandon/game-abandoner';
 import { GameFlashcardsFetcher } from '@/gaming/application/fetch-flashcards/game-flashcards-fetcher';
+import { VIEW_REPOSITORY } from '@/gaming/domain/view.repository';
+import { RecordViewPostController } from '@/gaming/infrastructure/controllers/record-view-post.controller';
+import { TypeOrmViewRepository } from '@/gaming/infrastructure/persistence/typeorm-view.repository';
+import { ViewRecorder } from '@/gaming/application/view/view-recorder';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -62,6 +66,7 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
   controllers: [
     StartGamePostController,
     RecordAttemptPostController,
+    RecordViewPostController,
     CompleteGamePostController,
     GetGameSummaryGetController,
     PatchGameController,
@@ -73,6 +78,7 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
   providers: [
     // Repositories
     { provide: ATTEMPT_REPOSITORY, useClass: TypeOrmAttemptRepository },
+    { provide: VIEW_REPOSITORY, useClass: TypeOrmViewRepository },
     { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
@@ -88,6 +94,7 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     GameStatsRetriever,
     GameStarter,
     AttemptRecorder,
+    ViewRecorder,
     GameCompleter,
     GameSummaryFinder,
     GamePauser,

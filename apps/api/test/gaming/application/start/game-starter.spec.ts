@@ -9,8 +9,11 @@ import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-gam
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
 import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
 import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
+import { StudyRequiresAuth } from '@/gaming/domain/exceptions/study-requires-auth';
+import { WeakestSourceRequiresGameMode } from '@/gaming/domain/exceptions/weakest-source-requires-game-mode';
 import { GameSourceValue } from '@/gaming/domain/game-source';
 import { GameMother } from '@test/gaming/domain/game-mother';
+import { GameModeMother } from '@test/gaming/domain/game-mode-mother';
 import { type WeakestFlashcardIdsProvider } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { RequestGameStarterMother } from './request-game-starter-mother';
 import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
@@ -207,5 +210,44 @@ describe('gaming/application/start GameStarter', () => {
       InsufficientWeakFlashcards,
     );
     expect(gameRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should throw StudyRequiresAuth when guest starts study session', async () => {
+    const request = RequestGameStarterMother.guest({
+      mode: GameModeMother.study().value,
+    });
+    gameRepository.match.mockResolvedValue([]);
+
+    await expect(starter.execute(request)).rejects.toThrow(StudyRequiresAuth);
+    expect(gameRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should throw WeakestSourceRequiresGameMode when study uses weakest source', async () => {
+    const request = RequestGameStarterMother.random({
+      mode: GameModeMother.study().value,
+      source: GameSourceValue.Weakest,
+    });
+    gameRepository.match.mockResolvedValue([]);
+
+    await expect(starter.execute(request)).rejects.toThrow(
+      WeakestSourceRequiresGameMode,
+    );
+    expect(weakestProvider.findWeakestIds).not.toHaveBeenCalled();
+  });
+
+  it('should start a study session for authenticated users', async () => {
+    const request = RequestGameStarterMother.random({
+      mode: GameModeMother.study().value,
+    });
+    const flashcardIds = ['fc-1', 'fc-2'];
+    gameRepository.match.mockResolvedValue([]);
+    flashcardSelector.select.mockResolvedValue(flashcardIds);
+    gameRepository.save.mockResolvedValue(undefined);
+
+    const result = await starter.execute(request);
+
+    expect(result.gameId).toBeDefined();
+    expect(result.flashcardIds).toEqual(flashcardIds);
+    expect(gameRepository.save).toHaveBeenCalledTimes(1);
   });
 });

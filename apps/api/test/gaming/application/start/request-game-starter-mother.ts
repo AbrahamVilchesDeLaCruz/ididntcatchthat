@@ -10,7 +10,7 @@ export class RequestGameStarterMother {
   static random(overrides?: Partial<RequestGameStarter>): RequestGameStarter {
     return {
       userId: UserIdMother.random().value,
-      mode: GameModeMother.study().value,
+      mode: GameModeMother.game().value,
       module: GameModuleMother.nativeSounds().value,
       subcategory: null,
       cardCount: CardCountMother.ten().toNumber(),
@@ -21,7 +21,7 @@ export class RequestGameStarterMother {
   static guest(overrides?: Partial<RequestGameStarter>): RequestGameStarter {
     return {
       userId: null,
-      mode: GameModeMother.study().value,
+      mode: GameModeMother.game().value,
       module: GameModuleMother.nativeSounds().value,
       subcategory: null,
       cardCount: CardCountMother.ten().toNumber(),

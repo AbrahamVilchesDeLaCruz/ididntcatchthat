@@ -8,6 +8,7 @@ import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
 import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-game';
+import { AttemptRequiresGameMode } from '@/gaming/domain/exceptions/attempt-requires-game-mode';
 import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
 import { Attempt } from '@/gaming/domain/attempt';
 import { GameMother } from '@test/gaming/domain/game-mother';
@@ -106,6 +107,22 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     });
 
     await expect(recorder.execute(request)).rejects.toThrow(FlashcardNotInGame);
+    expect(attemptRepository.save).not.toHaveBeenCalled();
+    expect(gameRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should throw AttemptRequiresGameMode when game is in study mode', async () => {
+    const game = GameMother.inStudyProgress({ flashcardIds: ['fc-1'] });
+    const primitives = game.toPrimitives();
+    gameRepository.search.mockResolvedValue(game);
+    const request = RequestAttemptRecorderMother.random(primitives.id, {
+      userId: primitives.userId,
+      flashcardId: 'fc-1',
+    });
+
+    await expect(recorder.execute(request)).rejects.toThrow(
+      AttemptRequiresGameMode,
+    );
     expect(attemptRepository.save).not.toHaveBeenCalled();
     expect(gameRepository.save).not.toHaveBeenCalled();
   });

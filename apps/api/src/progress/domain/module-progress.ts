@@ -22,6 +22,11 @@ export type ModuleProgressPrimitives = {
   updatedAt: string;
 };
 
+export type ModuleProgressWithStudyPrimitives = ModuleProgressPrimitives & {
+  studyLevel: number;
+  studyCoverage: number;
+};
+
 export type ModuleProgressComputation = {
   progress: ModuleProgress;
   levelIncreased: boolean;

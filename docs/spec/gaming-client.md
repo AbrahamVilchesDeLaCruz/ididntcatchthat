@@ -143,7 +143,7 @@ Ubicadas en `apps/client/src/pods/gaming/api/`:
 
 ## Decisiones de diseño
 
-1. **`mode` fijo a `game`**: El campo `mode` siempre se envía como `game` al backend. El modo `study` (marcar flashcards como estudiadas) requiere un BC de progreso/spaced-repetition que no existe todavía. Se activará cuando ese BC esté implementado.
+1. **Modo juego vs estudio**: En `/game` el campo `mode` se envía como `'game'`. El modo estudio vive en rutas `/study` con spec propia: [study-client.md](./study-client.md).
 2. **Lazy Fetching de Flashcards**:
    - El endpoint de creación devuelve un array de `flashcardIds`.
    - El cliente **NO** hace un fetch masivo (Promise.all) de todas. Como la UI muestra una a la vez, se utilizará TanStack Query para hacer fetch de la tarjeta actual (`useFlashcard(currentId)`) y, opcionalmente, pre-fetch de la `currentId + 1` en background para evitar demoras.
