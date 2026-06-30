@@ -3,6 +3,7 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { type AchievementKey } from '@/achievement/shared/domain/achievement-key';
 import { AchievementCatalog } from '@/achievement/catalog/domain/achievement-catalog';
@@ -19,6 +20,8 @@ export class UserAchievementUnlocker {
     private readonly repository: UserAchievementRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
     private readonly catalog: AchievementCatalog,
   ) {}
 
@@ -33,5 +36,11 @@ export class UserAchievementUnlocker {
     const achievement = UserAchievement.unlock(id, key, definition.category);
     await this.repository.save(achievement);
     await this.publisher.publish(achievement.pullDomainEvents());
+
+    this.logger.info('Achievement unlocked', {
+      userId,
+      achievementKey: key.value,
+      category: definition.category.value,
+    });
   }
 }
