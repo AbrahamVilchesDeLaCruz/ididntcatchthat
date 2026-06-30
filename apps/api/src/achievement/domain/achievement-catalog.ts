@@ -1,50 +1,37 @@
+export type AchievementCategory = 'game' | 'streak' | 'module' | 'study';
+
 export interface AchievementCatalogEntry {
   key: string;
-  title: string;
-  description: string;
+  category: AchievementCategory;
+  sortOrder: number;
 }
 
 export const ACHIEVEMENT_CATALOG: AchievementCatalogEntry[] = [
-  {
-    key: 'first_game',
-    title: 'First steps',
-    description: 'Complete your first game',
-  },
-  {
-    key: 'streak_7',
-    title: 'Week warrior',
-    description: 'Reach a 7-day streak',
-  },
-  {
-    key: 'streak_30',
-    title: 'Monthly master',
-    description: 'Reach a 30-day streak',
-  },
-  {
-    key: 'module_mastery_2',
-    title: 'Solid foundation',
-    description: 'Reach mastery level 2 in any module',
-  },
-  {
-    key: 'module_mastery_3',
-    title: 'Module master',
-    description: 'Reach mastery level 3 in any module',
-  },
-  {
-    key: 'perfect_session_10',
-    title: 'Flawless run',
-    description: 'Complete a 10+ card game with 100% accuracy',
-  },
-  {
-    key: 'cards_100',
-    title: 'Century club',
-    description: 'Play 100 flashcards total',
-  },
-  {
-    key: 'weak_warrior',
-    title: 'Weak warrior',
-    description: 'Complete a weakest-flashcards practice game',
-  },
+  { key: 'first_game', category: 'game', sortOrder: 1 },
+  { key: 'perfect_session_10', category: 'game', sortOrder: 2 },
+  { key: 'cards_100', category: 'game', sortOrder: 3 },
+  { key: 'weak_warrior', category: 'game', sortOrder: 4 },
+  { key: 'games_10', category: 'game', sortOrder: 5 },
+  { key: 'streak_7', category: 'streak', sortOrder: 10 },
+  { key: 'streak_30', category: 'streak', sortOrder: 11 },
+  { key: 'streak_100', category: 'streak', sortOrder: 12 },
+  { key: 'module_mastery_2', category: 'module', sortOrder: 20 },
+  { key: 'module_mastery_3', category: 'module', sortOrder: 21 },
+  { key: 'module_all_touched', category: 'module', sortOrder: 22 },
+  { key: 'study_first', category: 'study', sortOrder: 30 },
+  { key: 'study_sessions_10', category: 'study', sortOrder: 31 },
 ];
 
 export const ACHIEVEMENT_KEYS = ACHIEVEMENT_CATALOG.map((entry) => entry.key);
+
+export const ACHIEVEMENT_BY_KEY = new Map(
+  ACHIEVEMENT_CATALOG.map((entry) => [entry.key, entry]),
+);
+
+export function getAchievementCategory(key: string): AchievementCategory {
+  const entry = ACHIEVEMENT_BY_KEY.get(key);
+  if (!entry) {
+    throw new Error(`Unknown achievement key: ${key}`);
+  }
+  return entry.category;
+}

@@ -39,6 +39,8 @@ describe('achievement/application/find AchievementsFinder', () => {
     const firstGame = result.find((item) => item.key === 'first_game');
 
     expect(firstGame?.unlockedAt).toBe(unlockedAt.toISOString());
+    expect(firstGame?.category).toBe('game');
+    expect(firstGame?.sortOrder).toBe(1);
   });
 
   it('should filter catalog by since when provided', async () => {

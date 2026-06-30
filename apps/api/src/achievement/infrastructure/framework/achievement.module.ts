@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { USER_ACHIEVEMENT_REPOSITORY } from '@/achievement/domain/user-achievement.repository';
 import { TOTAL_ATTEMPTS_QUERY } from '@/achievement/domain/total-attempts.query';
+import { COMPLETED_GAMES_COUNT_QUERY } from '@/achievement/domain/completed-games-count.query';
+import { MODULE_COVERAGE_QUERY } from '@/achievement/domain/module-coverage.query';
 import { UserAchievementEntity } from '@/achievement/infrastructure/persistence/typeorm/user-achievement.entity';
 import { TypeOrmUserAchievementRepository } from '@/achievement/infrastructure/persistence/typeorm/typeorm-user-achievement.repository';
 import { TypeOrmTotalAttemptsQuery } from '@/achievement/infrastructure/persistence/typeorm/typeorm-total-attempts.query';
+import { TypeOrmCompletedGamesCountQuery } from '@/achievement/infrastructure/persistence/typeorm/typeorm-completed-games-count.query';
+import { TypeOrmModuleCoverageQuery } from '@/achievement/infrastructure/persistence/typeorm/typeorm-module-coverage.query';
 import { AchievementUnlocker } from '@/achievement/application/unlock/achievement-unlocker';
 import { AchievementGameCompletedEvaluator } from '@/achievement/application/unlock/achievement-game-completed-evaluator';
 import { AchievementsFinder } from '@/achievement/application/find/achievements-finder';
@@ -35,6 +39,14 @@ import { type Subscriber } from '@/shared/application/subscriber';
     {
       provide: TOTAL_ATTEMPTS_QUERY,
       useClass: TypeOrmTotalAttemptsQuery,
+    },
+    {
+      provide: COMPLETED_GAMES_COUNT_QUERY,
+      useClass: TypeOrmCompletedGamesCountQuery,
+    },
+    {
+      provide: MODULE_COVERAGE_QUERY,
+      useClass: TypeOrmModuleCoverageQuery,
     },
     AchievementUnlocker,
     AchievementGameCompletedEvaluator,

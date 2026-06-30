@@ -35,11 +35,13 @@ export class AchievementsFinder {
       const unlockedAt = unlockedMap.get(entry.key);
       if (!unlockedAt) return false;
       return new Date(unlockedAt) >= sinceDate;
-    }).map((entry) => ({
-      key: entry.key,
-      title: entry.title,
-      description: entry.description,
-      unlockedAt: unlockedMap.get(entry.key) ?? null,
-    }));
+    })
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((entry) => ({
+        key: entry.key,
+        category: entry.category,
+        sortOrder: entry.sortOrder,
+        unlockedAt: unlockedMap.get(entry.key) ?? null,
+      }));
   }
 }

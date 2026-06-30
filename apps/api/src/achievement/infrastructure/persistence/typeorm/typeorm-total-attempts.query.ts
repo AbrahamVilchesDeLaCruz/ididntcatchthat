@@ -13,7 +13,7 @@ export class TypeOrmTotalAttemptsQuery implements TotalAttemptsQuery {
 
   async getTotalAttempts(userId: UserId): Promise<number> {
     const rows = await this.dataSource.query<{ total: string }[]>(
-      `SELECT COALESCE(SUM(times_played + times_studied), 0)::int AS total
+      `SELECT COALESCE(SUM(times_played), 0)::int AS total
        FROM user_flashcard_stats
        WHERE user_id = $1`,
       [userId.value],

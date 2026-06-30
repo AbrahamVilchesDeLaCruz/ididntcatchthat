@@ -33,5 +33,8 @@ export class UnlockAchievementOnStreakUpdated extends Subscriber {
     if (attrs.newStreak >= 30) {
       await this.unlocker.unlock(attrs.userId, 'streak_30');
     }
+    if (attrs.newStreak >= 100) {
+      await this.unlocker.unlock(attrs.userId, 'streak_100');
+    }
   }
 }
