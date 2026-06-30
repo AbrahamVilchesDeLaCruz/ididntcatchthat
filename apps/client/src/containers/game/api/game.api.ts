@@ -8,6 +8,8 @@ import {
 import { apiClient } from '@/core/api/apiClient';
 import { statsKeys } from '@/containers/stats/api/stats.api';
 import { achievementKeys } from '@/core/achievements/achievementKeys';
+import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
+import { reconcileProgressWithBackoff } from '@/core/progress/reconcileProgress';
 import {
   mapFlashcardForGame,
   mapGameSummary,
@@ -75,9 +77,16 @@ export const useStartGame = (): UseMutationResult<
 export const useRecordAttempt = (
   gameId: string,
 ): UseMutationResult<void, Error, RecordAttemptPayload> => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: RecordAttemptPayload): Promise<void> => {
       await apiClient.post(`/games/${gameId}/attempts`, payload);
+    },
+    onSuccess: () => {
+      useProgressOptimisticStore.getState().recordGameAttempt();
+      void queryClient.invalidateQueries({ queryKey: statsKeys.modules });
+      void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
     },
   });
 };
@@ -98,7 +107,9 @@ export const useCompleteGame = (): UseMutationResult<
       return mapGameSummary(res.data);
     },
     onSuccess: () => {
+      useProgressOptimisticStore.getState().recordGameComplete();
       invalidateGameAndStats(queryClient);
+      void reconcileProgressWithBackoff(queryClient);
     },
   });
 };

@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
 import {
+  mergeModuleProgressWithOptimistic,
+  mergeProgressSummaryWithOptimistic,
+  selectProgressOptimistic,
+  useProgressOptimisticStore,
+} from '@/core/progress/progressOptimistic.store';
+import {
   mapModuleProgress,
   mapSubcategoryProgress,
   mapWeakFlashcard,
@@ -29,7 +35,8 @@ export const statsKeys = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useModuleProgress = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(selectProgressOptimistic);
+  const query = useQuery({
     queryKey: statsKeys.modules,
     enabled,
     queryFn: async (): Promise<ModuleProgressVM[]> => {
@@ -39,6 +46,13 @@ export const useModuleProgress = (enabled = true) => {
       return res.data.data.map(mapModuleProgress);
     },
   });
+
+  return {
+    ...query,
+    data: query.data
+      ? mergeModuleProgressWithOptimistic(query.data, optimistic)
+      : undefined,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -71,7 +85,8 @@ export const useSubcategoryProgress = (enabled = true) => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useProgressSummary = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(selectProgressOptimistic);
+  const query = useQuery({
     queryKey: statsKeys.summary,
     enabled,
     queryFn: async (): Promise<ProgressSummaryVM> => {
@@ -81,4 +96,11 @@ export const useProgressSummary = (enabled = true) => {
       return mapProgressSummary(res.data.data);
     },
   });
+
+  return {
+    ...query,
+    data: query.data
+      ? mergeProgressSummaryWithOptimistic(query.data, optimistic)
+      : undefined,
+  };
 };

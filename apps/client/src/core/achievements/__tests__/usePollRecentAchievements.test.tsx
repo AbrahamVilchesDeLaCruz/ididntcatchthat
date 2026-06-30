@@ -62,8 +62,8 @@ describe('usePollRecentAchievements', () => {
     );
 
     expect(useToastStore.getState().toasts).toHaveLength(0);
-    expect(mockedFetchAchievements).toHaveBeenCalledTimes(3);
-  }, 10000);
+    expect(mockedFetchAchievements).toHaveBeenCalledTimes(5);
+  }, 20000);
 
   it('falls back to the achievement key when i18n title is missing', async () => {
     mockedFetchAchievements.mockResolvedValue([

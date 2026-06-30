@@ -15,6 +15,8 @@ import {
   useGameFlashcards,
 } from '@/containers/game/api/game.api';
 import { mapGameSummary } from '@/containers/game/game.mapper';
+import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
+import { reconcileProgressWithBackoff } from '@/core/progress/reconcileProgress';
 import type {
   GameSummaryApiModel,
   StartGameApiResponse,
@@ -31,7 +33,7 @@ export const studyKeys = {
   all: ['study'] as const,
 };
 
-const invalidateStudyAndStats = (
+const invalidateStudyQueries = (
   queryClient: ReturnType<typeof useQueryClient>,
 ): void => {
   void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
@@ -54,8 +56,12 @@ export const useCreateStudySession = (): UseMutationResult<
       const res = await apiClient.post<StartGameApiResponse>('/games', payload);
       return res.data;
     },
-    onSuccess: () => {
-      invalidateStudyAndStats(queryClient);
+    onSuccess: (_data, variables) => {
+      useProgressOptimisticStore.getState().beginStudySession({
+        module: variables.module ?? null,
+        cardCount: variables.cardCount,
+      });
+      invalidateStudyQueries(queryClient);
     },
   });
 };
@@ -63,9 +69,18 @@ export const useCreateStudySession = (): UseMutationResult<
 export const useRecordView = (
   sessionId: string,
 ): UseMutationResult<void, Error, RecordViewPayload> => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: RecordViewPayload): Promise<void> => {
       await apiClient.post(`/games/${sessionId}/views`, payload);
+    },
+    onSuccess: (_data, variables) => {
+      useProgressOptimisticStore
+        .getState()
+        .recordStudyView(variables.flashcardId);
+      void queryClient.invalidateQueries({ queryKey: statsKeys.modules });
+      void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
     },
   });
 };
@@ -90,7 +105,9 @@ export const useCompleteStudy = (): UseMutationResult<
       };
     },
     onSuccess: () => {
-      invalidateStudyAndStats(queryClient);
+      useProgressOptimisticStore.getState().recordStudyComplete();
+      invalidateStudyQueries(queryClient);
+      void reconcileProgressWithBackoff(queryClient);
     },
   });
 };

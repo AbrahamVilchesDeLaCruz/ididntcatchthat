@@ -49,6 +49,8 @@ export const mapGameSummary = (raw: GameSummaryApiModel): GameSummaryVM => ({
 
 export const mapResumeGame = (raw: ResumeGameApiResponse): ResumeGameVM => ({
   gameId: raw.game.id,
+  module: raw.game.module,
+  cardCount: Number(raw.game.cardCount),
   pendingFlashcardIds: raw.pendingFlashcardIds,
   lastFlashcardId: raw.game.lastFlashcardId,
 });

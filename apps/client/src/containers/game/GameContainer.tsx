@@ -20,7 +20,7 @@ import { GameComponent } from './GameComponent';
 import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
 import { useGameSession } from './hooks/useGameSession';
 import { useGameKeyboardShortcuts } from './hooks/useGameKeyboardShortcuts';
-import { usePollRecentAchievements } from '@/core/achievements/usePollRecentAchievements';
+import { useProgressSideEffects } from '@/core/progress/useProgressSideEffects';
 import { saveGameSummary } from './game-summary.storage';
 import type { FlashcardGameVM, GameSummaryVM } from './game.types';
 
@@ -55,7 +55,8 @@ export const GameContainer = (): ReactElement => {
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
-  const { pollRecentUnlocks } = usePollRecentAchievements();
+  const { pollRecentUnlocks, showOptimisticGameUnlocks, reconcileProgress } =
+    useProgressSideEffects();
 
   useEffect(() => {
     if (isResumeMode && isResumeError) {
@@ -113,7 +114,9 @@ export const GameContainer = (): ReactElement => {
     completeGame(gameId, {
       onSuccess: (summary) => {
         if (userType !== 'guest') {
+          showOptimisticGameUnlocks();
           void pollRecentUnlocks(completeStartedAt);
+          void reconcileProgress();
         }
         navigateToSummary(summary);
       },
@@ -128,8 +131,10 @@ export const GameContainer = (): ReactElement => {
     gameId,
     navigateToSummary,
     pollRecentUnlocks,
+    reconcileProgress,
     session.wrongFlashcardIds,
     sessionFlashcards,
+    showOptimisticGameUnlocks,
     userType,
   ]);
 

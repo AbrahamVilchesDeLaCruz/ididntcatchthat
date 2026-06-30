@@ -55,7 +55,13 @@ export const StudyConfigContainer = (): ReactElement => {
       onSuccess: ({ gameId, flashcardIds }) => {
         setShowMaxPausedModal(false);
         setPendingStartPayload(null);
-        void navigate(`/study/${gameId}`, { state: { flashcardIds } });
+        void navigate(`/study/${gameId}`, {
+          state: {
+            flashcardIds,
+            module: payload.module ?? null,
+            cardCount: payload.cardCount,
+          },
+        });
       },
       onError: (error: unknown) => {
         if (isMaxPausedGamesError(error)) {
