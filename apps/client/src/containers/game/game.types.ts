@@ -37,6 +37,8 @@ export interface GameSummaryVM {
 // ─── Resume ───────────────────────────────────────────────────────────────────
 export interface ResumeGameVM {
   gameId: string;
+  module: string | null;
+  cardCount: number;
   pendingFlashcardIds: string[];
   lastFlashcardId: string | null;
 }

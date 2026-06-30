@@ -1,4 +1,5 @@
 import { type INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
@@ -15,6 +16,8 @@ describe('progress/update-module-progress (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    const ds = app.get(DataSource);
+    await ds.query(`DELETE FROM flashcards`);
     await seedNativeSoundsFlashcards(app);
   });
 
@@ -27,6 +30,48 @@ describe('progress/update-module-progress (e2e)', () => {
     const { gameId, flashcardIds } = await startGame(app, token, {
       mode: 'game',
       module: 'native_sounds',
+      cardCount: 10,
+    });
+
+    for (let i = 0; i < flashcardIds.length; i++) {
+      await request(app.getHttpServer())
+        .post(`/v1/games/${gameId}/attempts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ flashcardId: flashcardIds[i], correct: i < 5 })
+        .expect(204);
+    }
+
+    await waitForUserFlashcardStatsCount(app, token, flashcardIds.length);
+
+    await request(app.getHttpServer())
+      .post(`/v1/games/${gameId}/complete`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({})
+      .expect(200);
+
+    await waitForModuleMasteryLevel(app, token, 'native_sounds', 1);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/progress/modules')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const entry = (
+      res.body as {
+        data: { module: string; masteryLevel: number; totalAttempts: number }[];
+      }
+    ).data.find((item) => item.module === 'native_sounds');
+
+    expect(entry).toBeDefined();
+    expect(entry!.masteryLevel).toBe(1);
+    expect(entry!.totalAttempts).toBe(10);
+  });
+
+  it('should reach mastery level 1 after a completed random game', async () => {
+    const token = await registerAndLogin(app);
+    const { gameId, flashcardIds } = await startGame(app, token, {
+      mode: 'game',
+      module: null,
       cardCount: 10,
     });
 

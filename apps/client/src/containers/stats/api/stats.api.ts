@@ -1,5 +1,13 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useShallow } from 'zustand/react/shallow';
 import { apiClient } from '@/core/api/apiClient';
+import {
+  mergeModuleProgressWithOptimistic,
+  mergeProgressSummaryWithOptimistic,
+  selectProgressOptimistic,
+  useProgressOptimisticStore,
+} from '@/core/progress/progressOptimistic.store';
 import {
   mapModuleProgress,
   mapSubcategoryProgress,
@@ -29,7 +37,10 @@ export const statsKeys = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useModuleProgress = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
+  const query = useQuery({
     queryKey: statsKeys.modules,
     enabled,
     queryFn: async (): Promise<ModuleProgressVM[]> => {
@@ -39,6 +50,19 @@ export const useModuleProgress = (enabled = true) => {
       return res.data.data.map(mapModuleProgress);
     },
   });
+
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeModuleProgressWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
+  return {
+    ...query,
+    data,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -71,7 +95,10 @@ export const useSubcategoryProgress = (enabled = true) => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useProgressSummary = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
+  const query = useQuery({
     queryKey: statsKeys.summary,
     enabled,
     queryFn: async (): Promise<ProgressSummaryVM> => {
@@ -81,4 +108,17 @@ export const useProgressSummary = (enabled = true) => {
       return mapProgressSummary(res.data.data);
     },
   });
+
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeProgressSummaryWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
+  return {
+    ...query,
+    data,
+  };
 };

@@ -109,6 +109,8 @@ describe('game/mapResumeGame', () => {
     const vm = mapResumeGame(raw);
 
     expect(vm.gameId).toBe('game-1');
+    expect(vm.module).toBeNull();
+    expect(vm.cardCount).toBe(10);
     expect(vm.lastFlashcardId).toBe('fc-3');
     expect(vm.pendingFlashcardIds).toEqual(['fc-3', 'fc-4']);
   });

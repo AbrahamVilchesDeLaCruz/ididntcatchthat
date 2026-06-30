@@ -18,12 +18,15 @@ import { StudyComponent } from './StudyComponent';
 import { useStudySession } from './hooks/useStudySession';
 import type { StudySummaryVM } from './study.types';
 import type { FlashcardGameVM } from '@/containers/game/game.types';
-import { usePollRecentAchievements } from '@/core/achievements/usePollRecentAchievements';
+import { useProgressSideEffects } from '@/core/progress/useProgressSideEffects';
+import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
 import { useStudyAuthGuard } from './hooks/useStudyAuthGuard';
 
 interface LocationState {
   flashcardIds?: string[];
   mode?: 'resume';
+  module?: string | null;
+  cardCount?: number;
 }
 
 export const StudyContainer = (): ReactElement => {
@@ -51,7 +54,25 @@ export const StudyContainer = (): ReactElement => {
   const { mutateAsync: recordView } = useRecordView(sessionId ?? '');
   const { mutate: completeStudy, isPending: isCompleting } = useCompleteStudy();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
-  const { pollRecentUnlocks } = usePollRecentAchievements();
+  const { pollRecentUnlocks, showOptimisticStudyUnlocks, reconcileProgress } =
+    useProgressSideEffects();
+
+  useEffect(() => {
+    if (state.module !== undefined && state.cardCount !== undefined) {
+      useProgressOptimisticStore.getState().beginStudySession({
+        module: state.module,
+        cardCount: state.cardCount,
+      });
+      return;
+    }
+
+    if (isResumeMode && resumeData) {
+      useProgressOptimisticStore.getState().beginStudySession({
+        module: resumeData.module,
+        cardCount: resumeData.cardCount,
+      });
+    }
+  }, [isResumeMode, resumeData, state.cardCount, state.module]);
 
   useEffect(() => {
     if (isResumeMode && isResumeError) {
@@ -88,14 +109,23 @@ export const StudyContainer = (): ReactElement => {
     const completeStartedAt = new Date();
     completeStudy(sessionId, {
       onSuccess: (summary) => {
+        showOptimisticStudyUnlocks();
         void pollRecentUnlocks(completeStartedAt);
+        void reconcileProgress();
         navigateToSummary(summary);
       },
       onError: () => {
         setCompleteError('No se pudo finalizar la sesión. Reintenta.');
       },
     });
-  }, [completeStudy, navigateToSummary, pollRecentUnlocks, sessionId]);
+  }, [
+    completeStudy,
+    navigateToSummary,
+    pollRecentUnlocks,
+    reconcileProgress,
+    sessionId,
+    showOptimisticStudyUnlocks,
+  ]);
 
   useEffect(() => {
     completeRef.current = runCompleteStudy;

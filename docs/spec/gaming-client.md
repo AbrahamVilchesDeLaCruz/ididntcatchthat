@@ -130,7 +130,7 @@ Ubicadas en `apps/client/src/pods/gaming/api/`:
 ## Restricciones y reglas de negocio
 
 1. **Invitados**:
-   - Saltan la configuración. Payload forzado: `{ mode: 'random', cardCount: 10 }`.
+   - Saltan la configuración. Payload forzado: `{ mode: 'game', module: null, cardCount: 10 }`.
    - No pueden pausar la partida (no se muestra botón "Pausar").
    - No guardan historial a largo plazo (el backend no los asocia a un user).
 2. **Logged Users**:
