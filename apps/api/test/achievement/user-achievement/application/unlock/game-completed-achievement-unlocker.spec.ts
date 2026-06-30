@@ -5,7 +5,8 @@ import { type UserAchievementUnlocker } from '@/achievement/user-achievement/dom
 import { AchievementCatalog } from '@/achievement/catalog/domain/achievement-catalog';
 import { allGameCompletedConditionStrategies } from '@/achievement/catalog/domain/unlock/game-completed-condition-strategies';
 import { GameCompletedAchievementUnlockPolicy } from '@/achievement/catalog/domain/unlock/game-completed-achievement-unlock-policy';
-import { UserAchievementProgress } from '@/achievement/progress/domain/user-achievement-progress';
+import { type UserAchievementProgress } from '@/achievement/progress/domain/user-achievement-progress';
+import { UserAchievementProgressMother } from '@test/achievement/progress/domain/user-achievement-progress-mother';
 import { ACTIVE_MODULES } from '@/achievement/shared/domain/active-modules';
 import { AchievementKey } from '@/achievement/shared/domain/achievement-key';
 import { AchievementKeyValue } from '@/achievement/shared/domain/achievement-key-values';
@@ -21,10 +22,9 @@ function progressFor(
     touchedModules?: string[];
   },
 ): UserAchievementProgress {
-  return UserAchievementProgress.fromPrimitives({
+  return UserAchievementProgressMother.random({
     userId,
     completedGamesCount: overrides?.completedGamesCount ?? 1,
-    completedStudySessionsCount: 0,
     totalPlayedAttempts: overrides?.totalPlayedAttempts ?? 0,
     touchedModules: overrides?.touchedModules ?? [],
   });
