@@ -18,6 +18,7 @@ import { StudyComponent } from './StudyComponent';
 import { useStudySession } from './hooks/useStudySession';
 import type { StudySummaryVM } from './study.types';
 import type { FlashcardGameVM } from '@/containers/game/game.types';
+import { usePollRecentAchievements } from '@/core/achievements/usePollRecentAchievements';
 import { useStudyAuthGuard } from './hooks/useStudyAuthGuard';
 
 interface LocationState {
@@ -50,6 +51,7 @@ export const StudyContainer = (): ReactElement => {
   const { mutateAsync: recordView } = useRecordView(sessionId ?? '');
   const { mutate: completeStudy, isPending: isCompleting } = useCompleteStudy();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
+  const { pollRecentUnlocks } = usePollRecentAchievements();
 
   useEffect(() => {
     if (isResumeMode && isResumeError) {
@@ -83,13 +85,17 @@ export const StudyContainer = (): ReactElement => {
   const runCompleteStudy = useCallback((): void => {
     if (!sessionId) return;
     setCompleteError(null);
+    const completeStartedAt = new Date();
     completeStudy(sessionId, {
-      onSuccess: navigateToSummary,
+      onSuccess: (summary) => {
+        void pollRecentUnlocks(completeStartedAt);
+        navigateToSummary(summary);
+      },
       onError: () => {
         setCompleteError('No se pudo finalizar la sesión. Reintenta.');
       },
     });
-  }, [completeStudy, navigateToSummary, sessionId]);
+  }, [completeStudy, navigateToSummary, pollRecentUnlocks, sessionId]);
 
   useEffect(() => {
     completeRef.current = runCompleteStudy;

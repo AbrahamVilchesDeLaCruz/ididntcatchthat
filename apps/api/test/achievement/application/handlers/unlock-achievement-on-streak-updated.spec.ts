@@ -31,6 +31,20 @@ describe('achievement/application/handlers UnlockAchievementOnStreakUpdated', ()
     expect(unlocker.unlock).toHaveBeenCalledWith(userId, 'streak_30');
   });
 
+  it('should unlock streak_100 when threshold is met', async () => {
+    const userId = UuidMother.random();
+    const event = new StreakUpdatedEvent(userId, {
+      userId,
+      previousStreak: 99,
+      newStreak: 100,
+      occurredAt: new Date().toISOString(),
+    });
+
+    await handler.on(event);
+
+    expect(unlocker.unlock).toHaveBeenCalledWith(userId, 'streak_100');
+  });
+
   it('should not unlock streak achievements below thresholds', async () => {
     const userId = UuidMother.random();
     const event = new StreakUpdatedEvent(userId, {

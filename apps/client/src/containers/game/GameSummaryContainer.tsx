@@ -67,6 +67,10 @@ export const GameSummaryContainer = (): ReactElement => {
     void navigate('/stats');
   };
 
+  const handleViewAchievements = (): void => {
+    void navigate('/profile#achievements');
+  };
+
   const handleRegister = (): void => {
     void navigate('/auth/register');
   };
@@ -115,6 +119,7 @@ export const GameSummaryContainer = (): ReactElement => {
       onPlayAgain={handlePlayAgain}
       onViewPaused={handleViewPaused}
       onViewStats={handleViewStats}
+      onViewAchievements={isGuest ? undefined : handleViewAchievements}
       onRegister={handleRegister}
       onPracticeWeakest={isGuest ? undefined : handlePracticeWeakest}
     />

@@ -3,14 +3,12 @@ import type {
   SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
   ProgressSummaryApiModel,
-  AchievementApiModel,
 } from './api/stats.api-model';
 import type {
   ModuleProgressVM,
   SubcategoryProgressVM,
   WeakFlashcardVM,
   ProgressSummaryVM,
-  AchievementVM,
 } from './stats.types';
 
 export function mapModuleProgress(
@@ -64,14 +62,5 @@ export function mapProgressSummary(
     masteredCount: raw.masteredCount,
     gamesCompleted: raw.gamesCompleted,
     lastPlayedAt: raw.lastPlayedAt ? new Date(raw.lastPlayedAt) : null,
-  };
-}
-
-export function mapAchievement(raw: AchievementApiModel): AchievementVM {
-  return {
-    key: raw.key,
-    title: raw.title,
-    description: raw.description,
-    unlockedAt: raw.unlockedAt ? new Date(raw.unlockedAt) : null,
   };
 }

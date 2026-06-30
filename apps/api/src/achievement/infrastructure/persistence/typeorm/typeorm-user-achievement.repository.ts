@@ -24,6 +24,14 @@ export class TypeOrmUserAchievementRepository implements UserAchievementReposito
     );
   }
 
+  async exists(userId: UserId, achievementKey: string): Promise<boolean> {
+    const count = await this.repo.countBy({
+      userId: userId.value,
+      achievementKey,
+    });
+    return count > 0;
+  }
+
   async save(achievement: UserAchievement): Promise<void> {
     const p = achievement.toPrimitives();
     const entity = new UserAchievementEntity();

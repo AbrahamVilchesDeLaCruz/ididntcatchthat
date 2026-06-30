@@ -39,10 +39,3 @@ export interface ProgressSummaryApiModel {
   gamesCompleted: number;
   lastPlayedAt: string | null;
 }
-
-export interface AchievementApiModel {
-  key: string;
-  title: string;
-  description: string;
-  unlockedAt: string | null;
-}

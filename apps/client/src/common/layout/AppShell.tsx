@@ -4,6 +4,7 @@ import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useSessionRouteTracking } from '@/core/navigation/useSessionRouteTracking';
 import { AppSidebar } from '@/common/layout/AppSidebar';
+import { ToastHost } from '@/core/notifications/ToastHost';
 
 /**
  * Layout route for authenticated app pages (stats, backoffice).
@@ -32,9 +33,10 @@ export const AppShell = (): ReactElement => {
   return (
     <div className="flex h-svh overflow-hidden bg-[var(--color-bg-base)]">
       <AppSidebar />
-      <main className="flex-1 overflow-y-auto p-4 pt-16 md:p-8 md:pt-8">
+      <main className="app-scroll flex-1 overflow-y-auto p-4 pt-16 md:p-8 md:pt-8">
         <Outlet />
       </main>
+      <ToastHost />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 export interface AchievementListItemDto {
   key: string;
-  title: string;
-  description: string;
+  category: 'game' | 'streak' | 'module' | 'study';
+  sortOrder: number;
   unlockedAt: string | null;
 }
 

@@ -43,6 +43,10 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | `idct.identity.users.guest_progress.migrated`   | Identity      | Progress      | `import_guest_progress_on_guest_progress_migrated`      |
 | `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Notification  | `notify_level_up_on_module_mastery_level_increased`     |
 | `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Ranking       | `update_ranking_on_module_mastery_level_increased`      |
+| `ididntcatchthat.gaming.games.game.completed`                  | Gaming        | Achievement   | `unlock_achievement_on_game_completed`                  |
+| `idct.identity.streaks.streak.updated`                         | Identity      | Achievement   | `unlock_achievement_on_streak_updated`                  |
+| `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Achievement   | `unlock_achievement_on_module_mastery_level_increased`  |
+| `ididntcatchthat.achievement.user_achievement.unlocked`        | Achievement   | Notification (futuro) | Reservado para toast/push vía Notification BC   |
 | `ididntcatchthat.gaming.games.game.completed`                  | Gaming        | Ranking       | `update_ranking_on_game_completed`                      |
 | `ididntcatchthat.gaming.attempts.attempt.recorded`             | Gaming        | Ranking       | `update_ranking_on_attempt_recorded`                    |
 | `idct.identity.streaks.streak.updated`                         | Identity      | Ranking       | `update_ranking_on_streak_updated`                      |

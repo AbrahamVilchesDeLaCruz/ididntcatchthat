@@ -19,8 +19,11 @@
 | Sección | user | teacher | admin |
 | ------- | :--: | :-----: | :---: |
 | Cuenta (avatar, rol, userId) | ✓ | ✓ | ✓ |
+| Logros (`#achievements`) | ✓ | ✓ | ✓ |
 | Ranking (nickname, opt-in) | ✓ | ✓ | ✓ |
 | Preferencias (tema, idioma) | ✓ | ✓ | ✓ |
+
+Logros: `GET /achievements` vía `useAchievements`. Galería categorizada con iconos Lucide. Ver [achievements.md](achievements.md).
 
 Ranking usa `PATCH /users/me/ranking-profile` vía `useRankingProfile`.
 

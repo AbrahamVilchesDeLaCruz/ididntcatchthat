@@ -4,6 +4,7 @@ import {
   type UseMutationResult,
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import { achievementKeys } from '@/core/achievements/achievementKeys';
 import { statsKeys } from '@/containers/stats/api/stats.api';
 import {
   gameKeys,
@@ -36,6 +37,7 @@ const invalidateStudyAndStats = (
   void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
   void queryClient.invalidateQueries({ queryKey: statsKeys.all });
   void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
+  void queryClient.invalidateQueries({ queryKey: achievementKeys.all });
 };
 
 export const useCreateStudySession = (): UseMutationResult<

@@ -5,34 +5,28 @@ import {
   mapSubcategoryProgress,
   mapWeakFlashcard,
   mapProgressSummary,
-  mapAchievement,
 } from '../stats.mapper';
 import type {
   ModuleProgressApiModel,
   SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
   ProgressSummaryApiModel,
-  AchievementApiModel,
 } from './stats.api-model';
 import type {
   ModuleProgressVM,
   SubcategoryProgressVM,
   WeakFlashcardVM,
   ProgressSummaryVM,
-  AchievementVM,
 } from '../stats.types';
 
-// ─── Query Keys ───────────────────────────────────────────────────────────────
 export const statsKeys = {
   all: ['stats'] as const,
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
   subcategories: ['stats', 'subcategories'] as const,
   summary: ['stats', 'summary'] as const,
-  achievements: ['stats', 'achievements'] as const,
 };
 
-// ─── Queries ──────────────────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useModuleProgress = (enabled = true) => {
   return useQuery({
@@ -85,21 +79,6 @@ export const useProgressSummary = (enabled = true) => {
         '/progress/summary',
       );
       return mapProgressSummary(res.data.data);
-    },
-  });
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useAchievements = (since?: string, enabled = true) => {
-  return useQuery({
-    queryKey: [...statsKeys.achievements, since ?? 'all'] as const,
-    enabled,
-    queryFn: async (): Promise<AchievementVM[]> => {
-      const res = await apiClient.get<{ data: AchievementApiModel[] }>(
-        '/achievements',
-        { params: since ? { since } : undefined },
-      );
-      return res.data.data.map(mapAchievement);
     },
   });
 };

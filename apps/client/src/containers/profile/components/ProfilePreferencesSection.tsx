@@ -24,7 +24,7 @@ export const ProfilePreferencesSection = (): ReactElement => {
             </p>
           </div>
         </div>
-        <div className="shrink-0 sm:pl-2">
+        <div className="profile-pill-toggle shrink-0 sm:pl-2">
           <ThemeToggle variant="pill" />
         </div>
       </div>
@@ -43,7 +43,7 @@ export const ProfilePreferencesSection = (): ReactElement => {
             </p>
           </div>
         </div>
-        <div className="shrink-0 sm:pl-2">
+        <div className="profile-pill-toggle shrink-0 sm:pl-2">
           <LocaleToggle variant="pill" />
         </div>
       </div>

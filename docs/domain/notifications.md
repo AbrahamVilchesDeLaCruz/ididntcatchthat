@@ -18,11 +18,11 @@ Notificaciones visuales dentro de la SPA mientras el usuario está activo.
 | ---------------------------------- | ------------------------------------------------ |
 | Racha conseguida (7, 30, 100 días) | "🔥 ¡7 días de racha! Seguí así"                 |
 | Módulo completado                  | "✅ Completaste Native Sounds nivel 1"           |
-| Logro desbloqueado                 | "🏆 Nuevo logro: First Blood"                    |
+| Logro desbloqueado                 | "🏆 Nuevo logro: {title}" (i18n cliente)         |
 | Límite guest alcanzado             | "Registrate para seguir jugando"                 |
 | Game pausado automáticamente       | "Partida pausada — podés retomar cuando quieras" |
 
-Implementación: Zustand store de notificaciones + componente Toast global.
+Implementación: Zustand store de notificaciones + componente `ToastHost` global. **Logro desbloqueado: implementado** (poll `GET /achievements?since` tras complete). Push y email siguen pendientes.
 
 ### 2. Push Notifications (Service Worker)
 

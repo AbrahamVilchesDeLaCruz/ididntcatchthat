@@ -12,6 +12,7 @@ graph TB
     Content["📦 Content\n─────────────\nFlashcard\nExample"]
     Gaming["🎮 Gaming\n─────────────\nGame\nAttempt"]
     Progress["📈 Progress\n─────────────\nUserFlashcardStats\nModuleProgress"]
+    Achievement["🏅 Achievement\n─────────────\nUserAchievement\nCatalog"]
     Pronunciation["🎤 Pronunciation\n─────────────\nPronunciationAttempt"]
     Ranking["🏆 Ranking\n─────────────\nRanking\nRankingEntry"]
     Notification["🔔 Notification\n─────────────\nEmailJob\nPushJob"]
@@ -19,17 +20,22 @@ graph TB
     Gaming -->|AttemptRecorded| Progress
     Gaming -->|GameCompleted| Progress
     Gaming -->|GameCompleted| Identity
+    Gaming -->|GameCompleted| Achievement
 
     Content -->|FlashcardCreated| Content
     Content -->|FlashcardUpdated| Content
 
     Identity -->|UserRegistered| Notification
     Identity -->|StreakUpdated| Notification
+    Identity -->|StreakUpdated| Achievement
     Identity -->|StreakBroken| Notification
     Identity -->|GuestProgressMigrated| Progress
 
     Progress -->|ModuleMasteryLevelIncreased| Notification
     Progress -->|ModuleMasteryLevelIncreased| Ranking
+    Progress -->|ModuleMasteryLevelIncreased| Achievement
+
+    Achievement -->|AchievementUnlocked| Notification
 
     Pronunciation -->|PronunciationEvaluated| Progress
 ```
@@ -46,13 +52,17 @@ graph TB
 | `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Ranking | Actualiza `most_accurate` y `top_scorer` vía aggregate `Ranking` |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (study/mastery/combined level) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Achievement | Evalúa y desbloquea logros (game/study) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Ranking | Actualiza `most_active` vía aggregate `Ranking` |
+| `AchievementUnlocked` | `ididntcatchthat.achievement.user_achievement.unlocked` | Achievement | Notification (futuro) | Toast in-app vía cliente poll; push/email pendiente |
 | `UserRegistered` | `idct.identity.users.user.registered` | Identity | Notification | Envía email de bienvenida (Resend) |
 | `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
+| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Achievement | Desbloquea logros streak_7/30/100 |
 | `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Ranking | Actualiza `best_streak` vía aggregate `Ranking` |
 | `StreakBroken` | `idct.identity.streaks.streak.broken` | Identity | Notification | Email + push notification |
 | `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Identity | Progress | Importa games + attempts del guest → `user_flashcard_stats` |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Notification | Toast de logro en app |
+| `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Achievement | Desbloquea module_mastery_2/3 |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Actualiza `module_master` vía aggregate `Ranking` |
 | `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | Pronunciation | Progress | Actualiza pronunciation stats en `user_flashcard_stats` |
 

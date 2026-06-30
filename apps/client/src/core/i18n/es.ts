@@ -202,6 +202,7 @@ export const es: Translations = {
       ctaPlayAgain: 'Jugar de nuevo',
       ctaChooseModule: 'Elegir otro módulo',
       ctaViewStats: 'Ver mis estadísticas →',
+      ctaViewAchievements: 'Ver mis logros →',
       ctaRegister: 'Guardar mi progreso',
       registerTitle: '¿Quieres guardar tu progreso?',
       registerHint:
@@ -275,7 +276,7 @@ export const es: Translations = {
       emptyBody: 'Juega como invitado para ver estadísticas locales aquí.',
       registerTitle: 'Guarda tu progreso',
       registerHint:
-        'Regístrate para sincronizar estadísticas, rachas y logros.',
+        'Regístrate para sincronizar estadísticas, rachas y logros en tu perfil.',
       registerCta: 'Crear cuenta gratis',
     },
     noModuleData: 'Sin datos de módulos aún',
@@ -311,6 +312,107 @@ export const es: Translations = {
   },
   achievements: {
     title: 'Logros',
+    progress: '{unlocked}/{total} desbloqueados',
+    motivation: {
+      remaining:
+        'Solo faltan {remaining} — sigue así para completar tu vitrina de trofeos.',
+      complete: '¡Vitrina completa — desbloqueaste todos los logros!',
+    },
+    tooltip: {
+      show: 'Ver cómo desbloquear',
+      howToUnlock: 'Cómo desbloquearlo',
+      unlocked: 'Desbloqueado',
+      incentive: 'Por qué merece la pena',
+    },
+    categories: {
+      game: 'Juego',
+      streak: 'Rachas',
+      module: 'Módulos',
+      study: 'Estudio',
+    },
+    items: {
+      first_game: {
+        title: 'Primeros pasos',
+        description: 'Tu camino empieza con una partida.',
+        unlockHint: 'Completa cualquier sesión en modo Jugar.',
+        incentive: 'Toda leyenda empieza con una sola ronda.',
+      },
+      perfect_session_10: {
+        title: 'Ronda perfecta',
+        description: 'Diez cartas, cero errores.',
+        unlockHint: 'Termina una partida de 10+ cartas con 100% de aciertos.',
+        incentive: 'La precisión gana a la velocidad — apunta a la perfección.',
+      },
+      cards_100: {
+        title: 'Club del centenario',
+        description: 'Cien cartas jugadas.',
+        unlockHint: 'Alcanza 100 jugadas totales en modo juego.',
+        incentive: 'El volumen entrena el oído de verdad.',
+      },
+      weak_warrior: {
+        title: 'Guerrero de débiles',
+        description: 'Enfrenta tus cartas más difíciles.',
+        unlockHint: 'Completa una partida de cartas más débiles.',
+        incentive: 'Los puntos débiles esconden el mayor progreso.',
+      },
+      games_10: {
+        title: 'Jugador dedicado',
+        description: 'Diez partidas terminadas.',
+        unlockHint: 'Completa 10 sesiones de juego.',
+        incentive: 'La constancia siempre gana al atracón.',
+      },
+      streak_7: {
+        title: 'Guerrero semanal',
+        description: 'Siete días seguidos.',
+        unlockHint: 'Juega o estudia 7 días consecutivos.',
+        incentive: 'Una semana de ritmo cuesta mucho de romper.',
+      },
+      streak_30: {
+        title: 'Maestro mensual',
+        description: 'Treinta días de disciplina.',
+        unlockHint: 'Mantén una racha de 30 días.',
+        incentive: 'Un mes de hábito reprograma tu oído.',
+      },
+      streak_100: {
+        title: 'Centurión',
+        description: 'Cien días apareciendo.',
+        unlockHint: 'Alcanza una racha de 100 días.',
+        incentive: 'Los mejores juegan a largo plazo.',
+      },
+      module_mastery_2: {
+        title: 'Base sólida',
+        description: 'Maestría nivel 2 conseguida.',
+        unlockHint: 'Alcanza nivel de maestría 2 en cualquier módulo.',
+        incentive: 'Profundizar en un módulo vale más que rozar muchos.',
+      },
+      module_mastery_3: {
+        title: 'Maestro del módulo',
+        description: 'Nivel 3 — tope en un módulo.',
+        unlockHint: 'Alcanza nivel de maestría 3 en cualquier módulo.',
+        incentive: 'Domina un módulo y el resto fluye mejor.',
+      },
+      module_all_touched: {
+        title: 'Explorador',
+        description: 'Cada módulo probado.',
+        unlockHint: 'Prueba al menos una carta en cada módulo.',
+        incentive: 'Explorar amplio revela tus fortalezas naturales.',
+      },
+      study_first: {
+        title: 'Primer estudio',
+        description: 'Tu primera sesión sin presión.',
+        unlockHint: 'Completa tu primera sesión en modo Estudio.',
+        incentive: 'En estudio es donde los patrones se asientan.',
+      },
+      study_sessions_10: {
+        title: 'Hábito de estudio',
+        description: 'Diez repasos tranquilos.',
+        unlockHint: 'Completa 10 sesiones en modo Estudio.',
+        incentive: 'Repeticiones relajadas hacen el juego más fácil.',
+      },
+    },
+    toast: {
+      unlocked: '🏆 Nuevo logro: {title}',
+    },
   },
   profileMenu: {
     title: 'Tu perfil de jugador',
@@ -389,7 +491,9 @@ export const es: Translations = {
   profile: {
     title: 'Tu perfil',
     subtitle: 'Gestiona tu cuenta, visibilidad en rankings y preferencias.',
+    tabsAriaLabel: 'Secciones del perfil',
     sections: {
+      achievements: 'Logros',
       ranking: 'Identidad pública',
       preferences: 'Ajustes',
     },
@@ -453,7 +557,7 @@ export const es: Translations = {
       },
       stats: {
         title: 'Mi progreso',
-        description: 'Módulos, logros y cartas débiles.',
+        description: 'Módulos, KPIs y cartas débiles.',
       },
       ranking: {
         title: 'Ranking',
@@ -461,7 +565,7 @@ export const es: Translations = {
       },
       profile: {
         title: 'Perfil',
-        description: 'Nickname, visibilidad y preferencias.',
+        description: 'Logros, nickname, visibilidad y preferencias.',
       },
       backofficeGames: {
         title: 'Backoffice',

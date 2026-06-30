@@ -3,7 +3,6 @@ export {
   useSubcategoryProgress,
   useWeakestFlashcards,
   useProgressSummary,
-  useAchievements,
   statsKeys,
 } from './stats.api';
 export type {
@@ -11,5 +10,4 @@ export type {
   SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
   ProgressSummaryApiModel,
-  AchievementApiModel,
 } from './stats.api-model';
