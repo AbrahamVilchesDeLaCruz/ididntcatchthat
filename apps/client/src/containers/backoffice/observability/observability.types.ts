@@ -14,10 +14,10 @@ export interface MetricsSummaryVM {
   metrics: MetricVM[];
 }
 
-export type StatPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
+export type SummaryPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
 
-export interface DbStatsVM {
-  period: StatPeriod;
+export interface AnalyticsSummaryVM {
+  period: SummaryPeriod;
   pageViews: {
     total: number;
     uniqueVisitors: number;
@@ -33,6 +33,12 @@ export interface DbStatsVM {
     byPeriod: { date: string; started: number; completed: number }[];
     byMode: { mode: string; count: number }[];
     topModules: { module: string; count: number }[];
+  };
+  users: {
+    newRegistrations: number;
+    activeUsers: number;
+    byPeriod: { date: string; count: number }[];
+    byProvider: { provider: string; count: number }[];
   };
   flashcards: {
     total: number;

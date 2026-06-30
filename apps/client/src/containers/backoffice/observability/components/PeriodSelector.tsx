@@ -1,8 +1,8 @@
 import { type ReactElement } from 'react';
 
-export type StatPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
+export type SummaryPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
 
-const PERIODS: { key: StatPeriod; label: string }[] = [
+const PERIODS: { key: SummaryPeriod; label: string }[] = [
   { key: '24h', label: '24 h' },
   { key: '7d', label: '7 días' },
   { key: '15d', label: '15 días' },
@@ -12,8 +12,8 @@ const PERIODS: { key: StatPeriod; label: string }[] = [
 ];
 
 interface PeriodSelectorProps {
-  value: StatPeriod;
-  onChange: (period: StatPeriod) => void;
+  value: SummaryPeriod;
+  onChange: (period: SummaryPeriod) => void;
 }
 
 export const PeriodSelector = ({

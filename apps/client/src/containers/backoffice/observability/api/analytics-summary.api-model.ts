@@ -1,9 +1,4 @@
-export interface DbStatsDailyPoint {
-  date: string;
-  [key: string]: string | number;
-}
-
-export interface DbStatsApiModel {
+export interface AnalyticsSummaryApiModel {
   period: string;
   pageViews: {
     total: number;
