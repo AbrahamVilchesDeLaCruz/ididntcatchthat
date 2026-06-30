@@ -1,5 +1,8 @@
 import { AchievementKey } from '@/achievement/shared/domain/achievement-key';
-import { AchievementCategory } from '@/achievement/shared/domain/achievement-category';
+import {
+  AchievementCategory,
+  type AchievementCategoryValue,
+} from '@/achievement/shared/domain/achievement-category';
 import { type AchievementKeyLiteral } from '@/achievement/shared/domain/achievement-key-values';
 import { type AchievementUnlockRule } from '@/achievement/catalog/domain/achievement-unlock-rule';
 
@@ -32,8 +35,7 @@ export class AchievementDefinition {
   toPrimitives(): AchievementDefinitionPrimitives {
     return {
       key: this.key.value as AchievementKeyLiteral,
-      category: this.category
-        .value as AchievementDefinitionPrimitives['category'],
+      category: this.category.value as AchievementCategoryValue,
       sortOrder: this.sortOrder,
       unlockRule: this.unlockRule,
     };

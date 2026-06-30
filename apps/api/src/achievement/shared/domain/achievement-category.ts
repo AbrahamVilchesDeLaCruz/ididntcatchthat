@@ -13,7 +13,7 @@ export class AchievementCategory extends StringValueObject {
     }
   }
 
-  static create(value: string): AchievementCategory {
+  static create(value: AchievementCategoryValue): AchievementCategory {
     return new AchievementCategory(value);
   }
 }

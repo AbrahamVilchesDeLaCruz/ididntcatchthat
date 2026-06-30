@@ -1,7 +1,10 @@
 import { AggregateRoot } from '@/shared/domain/aggregate-root';
 import { UserId, type UserId as UserIdType } from '@/shared/domain/user-id';
 import { AchievementKey } from '@/achievement/shared/domain/achievement-key';
-import { type AchievementCategory } from '@/achievement/shared/domain/achievement-category';
+import {
+  type AchievementCategory,
+  type AchievementCategoryValue,
+} from '@/achievement/shared/domain/achievement-category';
 import { AchievementUnlockedEvent } from '@/achievement/user-achievement/domain/events/achievement-unlocked.event';
 
 export type UserAchievementPrimitives = {
@@ -30,7 +33,7 @@ export class UserAchievement extends AggregateRoot<UserAchievementPrimitives> {
       new AchievementUnlockedEvent(`${userId.value}:${achievementKey.value}`, {
         userId: userId.value,
         achievementKey: achievementKey.value,
-        category: category.value,
+        category: category.value as AchievementCategoryValue,
         unlockedAt: unlockedAt.toISOString(),
       }),
     );
