@@ -9,6 +9,7 @@ import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied'
 import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
 import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-game';
 import { AttemptRequiresGameMode } from '@/gaming/domain/exceptions/attempt-requires-game-mode';
+import { type FlashcardCategoryQuery } from '@/gaming/domain/flashcard-category.query';
 import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
 import { Attempt } from '@/gaming/domain/attempt';
 import { GameMother } from '@test/gaming/domain/game-mother';
@@ -18,6 +19,7 @@ describe('gaming/application/attempt AttemptRecorder', () => {
   const gameRepository = mock<GameRepository>();
   const attemptRepository = mock<AttemptRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const flashcardCategoryQuery = mock<FlashcardCategoryQuery>();
   const logger = mock<Logger>();
   let recorder: AttemptRecorder;
 
@@ -29,12 +31,16 @@ describe('gaming/application/attempt AttemptRecorder', () => {
     logger.info.mockReset();
     logger.warn.mockReset();
     publisher.publish.mockResolvedValue(undefined);
+    flashcardCategoryQuery.findCategoryByFlashcardId.mockResolvedValue(
+      'native_sounds',
+    );
     gameRepository.save.mockResolvedValue(undefined);
     attemptRepository.save.mockResolvedValue(undefined);
     recorder = new AttemptRecorder(
       gameRepository,
       attemptRepository,
       publisher,
+      flashcardCategoryQuery,
       logger,
     );
   });

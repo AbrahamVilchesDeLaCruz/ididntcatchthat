@@ -6,6 +6,7 @@ import { GAME_REPOSITORY } from '@/gaming/domain/game.repository';
 import { ATTEMPT_REPOSITORY } from '@/gaming/domain/attempt.repository';
 import { FLASHCARD_SELECTOR } from '@/gaming/domain/flashcard-selector';
 import { GAME_FLASHCARD_QUERY } from '@/gaming/domain/game-flashcard-query';
+import { FLASHCARD_CATEGORY_QUERY } from '@/gaming/domain/flashcard-category.query';
 
 // Infrastructure — persistence
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
@@ -13,6 +14,7 @@ import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-fl
 import { TypeOrmGameRepository } from '@/gaming/infrastructure/persistence/typeorm-game.repository';
 import { TypeOrmAttemptRepository } from '@/gaming/infrastructure/persistence/typeorm-attempt.repository';
 import { TypeOrmGameFlashcardQuery } from '@/gaming/infrastructure/persistence/typeorm-game-flashcard-query';
+import { TypeOrmFlashcardCategoryQuery } from '@/gaming/infrastructure/persistence/typeorm-flashcard-category.query';
 
 // Infrastructure — selectors
 import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/typeorm-flashcard-selector';
@@ -82,6 +84,10 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
+    {
+      provide: FLASHCARD_CATEGORY_QUERY,
+      useClass: TypeOrmFlashcardCategoryQuery,
+    },
     {
       provide: WEAKEST_FLASHCARD_IDS_PROVIDER,
       useClass: ProgressWeakestFlashcardIdsProvider,

@@ -7,12 +7,16 @@ export interface AttemptRecordedAttributes extends DomainEventAttributes {
   gameId: string;
   userId: string | null;
   flashcardId: string;
+  flashcardModule: string | null;
   correct: boolean;
   mode: string;
   answeredAt: string;
 }
 
 export class AttemptRecordedEvent extends DomainEvent {
+  static readonly EVENT_NAME =
+    'ididntcatchthat.gaming.attempts.attempt.recorded';
+
   constructor(
     aggregateId: string,
     readonly attrs: AttemptRecordedAttributes,
@@ -23,6 +27,6 @@ export class AttemptRecordedEvent extends DomainEvent {
   }
 
   eventName(): string {
-    return 'ididntcatchthat.gaming.attempts.attempt.recorded';
+    return AttemptRecordedEvent.EVENT_NAME;
   }
 }

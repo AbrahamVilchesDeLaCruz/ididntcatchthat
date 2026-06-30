@@ -104,7 +104,11 @@ export class Game extends AggregateRoot<GamePrimitives> {
     );
   }
 
-  recordAttempt(flashcardId: string, correct: boolean): Attempt {
+  recordAttempt(
+    flashcardId: string,
+    correct: boolean,
+    flashcardModule: string | null,
+  ): Attempt {
     if (this.mode.isStudy()) {
       throw new AttemptRequiresGameMode(this.id.value);
     }
@@ -121,6 +125,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
         gameId: this.id.value,
         userId: this.userId,
         flashcardId,
+        flashcardModule,
         correct,
         mode: this.mode.value,
         answeredAt: attempt.answeredAt.toISOString(),
@@ -129,7 +134,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
     return attempt;
   }
 
-  recordView(flashcardId: string): View {
+  recordView(flashcardId: string, flashcardModule: string | null): View {
     if (!this.mode.isStudy()) {
       throw new ViewRequiresStudyMode(this.id.value);
     }
@@ -146,6 +151,7 @@ export class Game extends AggregateRoot<GamePrimitives> {
         gameId: this.id.value,
         userId: this.userId,
         flashcardId,
+        flashcardModule,
         viewedAt: view.viewedAt.toISOString(),
       }),
     );

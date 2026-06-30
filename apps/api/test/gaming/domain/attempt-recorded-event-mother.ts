@@ -18,6 +18,7 @@ export class AttemptRecordedEventMother {
       gameId,
       userId: UserIdMother.random().value,
       flashcardId: UuidMother.random(),
+      flashcardModule: 'native_sounds',
       correct: BooleanMother.random(),
       mode: GameModeMother.game().value,
       answeredAt: DateMother.recent().toISOString(),
