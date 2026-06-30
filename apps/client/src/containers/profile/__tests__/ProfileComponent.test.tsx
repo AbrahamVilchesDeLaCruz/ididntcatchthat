@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { ProfileComponent } from '../ProfileComponent';
@@ -86,5 +87,35 @@ describe('ProfileComponent', () => {
     expect(
       screen.getByRole('tab', { name: 'Public identity' }),
     ).toBeInTheDocument();
+  });
+
+  it('opens the ranking panel when the url hash is #ranking', () => {
+    mockedUseCurrentUser.mockReturnValue({
+      isUser: true,
+      canEditRankingProfile: true,
+    } as ReturnType<typeof useCurrentUser>);
+
+    renderProfile({}, '/profile#ranking');
+
+    expect(screen.getByText('Ranking section')).toBeInTheDocument();
+    expect(screen.queryByText('Achievements section')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: 'Public identity' }),
+    ).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('switches panels when a tab is clicked', async () => {
+    const user = userEvent.setup();
+    mockedUseCurrentUser.mockReturnValue({
+      isUser: true,
+      canEditRankingProfile: true,
+    } as ReturnType<typeof useCurrentUser>);
+
+    renderProfile();
+
+    await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+    expect(screen.getByText('Preferences section')).toBeInTheDocument();
+    expect(screen.queryByText('Achievements section')).not.toBeInTheDocument();
   });
 });
