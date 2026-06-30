@@ -61,11 +61,11 @@ describe('ProfileRankingSection', () => {
     });
   });
 
-  it('updates show in ranking from switch', () => {
+  it('updates show in ranking from visibility toggle', () => {
     renderSection();
 
     fireEvent.click(
-      screen.getByRole('switch', { name: /show me in rankings/i }),
+      screen.getByRole('button', { name: /hidden from leaderboards/i }),
     );
     fireEvent.click(screen.getByRole('button', { name: /save profile/i }));
 

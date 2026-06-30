@@ -1,15 +1,18 @@
-import { useEffect, type ReactElement } from 'react';
-import { useLocation } from 'react-router-dom';
+import { type ReactElement } from 'react';
+import { useAuthStore } from '@/core/store/auth.store';
+import { useAchievements } from '@/core/achievements/useAchievements';
 import { ProfileComponent } from './ProfileComponent';
 
 export const ProfileContainer = (): ReactElement => {
-  const { hash } = useLocation();
+  const userType = useAuthStore((s) => s.userType);
+  const isGuest = userType === 'guest';
+  const achievementsQuery = useAchievements(undefined, !isGuest);
 
-  useEffect(() => {
-    if (!hash) return;
-    const target = document.querySelector(hash);
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [hash]);
-
-  return <ProfileComponent />;
+  return (
+    <ProfileComponent
+      achievements={achievementsQuery.data ?? []}
+      achievementsLoading={achievementsQuery.isLoading}
+      showAchievements={!isGuest}
+    />
+  );
 };

@@ -200,6 +200,7 @@ export const en: Translations = {
       ctaPlayAgain: 'Play again',
       ctaChooseModule: 'Choose another module',
       ctaViewStats: 'View my stats →',
+      ctaViewAchievements: 'View my achievements →',
       ctaRegister: 'Save my progress',
       registerTitle: 'Want to save your progress?',
       registerHint:
@@ -272,7 +273,8 @@ export const en: Translations = {
       emptyTitle: 'No guest stats yet',
       emptyBody: 'Play as a guest to see local session stats here.',
       registerTitle: 'Save your progress',
-      registerHint: 'Register to sync stats, streaks and achievements.',
+      registerHint:
+        'Register to sync stats, streaks and achievements on your profile.',
       registerCta: 'Create free account',
     },
     noModuleData: 'No module data yet',
@@ -308,6 +310,107 @@ export const en: Translations = {
   },
   achievements: {
     title: 'Achievements',
+    progress: '{unlocked}/{total} unlocked',
+    motivation: {
+      remaining:
+        'Only {remaining} left — keep going to complete your trophy case!',
+      complete: 'Trophy case complete — you unlocked every badge!',
+    },
+    tooltip: {
+      show: 'Show unlock details',
+      howToUnlock: 'How to unlock',
+      unlocked: 'Unlocked',
+      incentive: 'Why chase it',
+    },
+    categories: {
+      game: 'Game',
+      streak: 'Streaks',
+      module: 'Modules',
+      study: 'Study',
+    },
+    items: {
+      first_game: {
+        title: 'First steps',
+        description: 'Your journey starts with one game.',
+        unlockHint: 'Complete any game session in Play mode.',
+        incentive: 'Every legend starts with a single round.',
+      },
+      perfect_session_10: {
+        title: 'Flawless run',
+        description: 'Ten cards, zero mistakes.',
+        unlockHint: 'Finish a 10+ card game with 100% accuracy.',
+        incentive: 'Precision beats speed — nail a clean run.',
+      },
+      cards_100: {
+        title: 'Century club',
+        description: 'One hundred cards played.',
+        unlockHint: 'Reach 100 total flashcard plays in game mode.',
+        incentive: 'Volume builds real listening reflexes.',
+      },
+      weak_warrior: {
+        title: 'Weak warrior',
+        description: 'Face your hardest cards head-on.',
+        unlockHint: 'Complete a practice game from your weakest cards.',
+        incentive: 'Weak spots are where the biggest gains hide.',
+      },
+      games_10: {
+        title: 'Dedicated player',
+        description: 'Ten finished games.',
+        unlockHint: 'Complete 10 full game sessions.',
+        incentive: 'Consistency beats cramming every time.',
+      },
+      streak_7: {
+        title: 'Week warrior',
+        description: 'Seven days in a row.',
+        unlockHint: 'Play or study on 7 consecutive days.',
+        incentive: 'A week of momentum is hard to break.',
+      },
+      streak_30: {
+        title: 'Monthly master',
+        description: 'Thirty days of discipline.',
+        unlockHint: 'Maintain a 30-day activity streak.',
+        incentive: 'A month of habit rewires your ear.',
+      },
+      streak_100: {
+        title: 'Centurion',
+        description: 'One hundred days of showing up.',
+        unlockHint: 'Reach a 100-day activity streak.',
+        incentive: 'Elite learners play the long game.',
+      },
+      module_mastery_2: {
+        title: 'Solid foundation',
+        description: 'Level 2 mastery unlocked.',
+        unlockHint: 'Reach mastery level 2 in any module.',
+        incentive: 'Depth in one module beats skimming many.',
+      },
+      module_mastery_3: {
+        title: 'Module master',
+        description: 'Level 3 — top tier in a module.',
+        unlockHint: 'Reach mastery level 3 in any module.',
+        incentive: 'Own a module and the rest gets easier.',
+      },
+      module_all_touched: {
+        title: 'Explorer',
+        description: 'Every module sampled.',
+        unlockHint: 'Try at least one card in each content module.',
+        incentive: 'Broad exposure reveals your natural strengths.',
+      },
+      study_first: {
+        title: 'First study',
+        description: 'Your first low-pressure session.',
+        unlockHint: 'Complete your first Study mode session.',
+        incentive: 'Study mode is where patterns really sink in.',
+      },
+      study_sessions_10: {
+        title: 'Study habit',
+        description: 'Ten calm review sessions.',
+        unlockHint: 'Complete 10 Study mode sessions.',
+        incentive: 'Relaxed reps make game mode feel easier.',
+      },
+    },
+    toast: {
+      unlocked: '🏆 New achievement: {title}',
+    },
   },
   profileMenu: {
     title: 'Your player profile',
@@ -385,7 +488,9 @@ export const en: Translations = {
   profile: {
     title: 'Your profile',
     subtitle: 'Manage your account, ranking visibility, and preferences.',
+    tabsAriaLabel: 'Profile sections',
     sections: {
+      achievements: 'Achievements',
       ranking: 'Public identity',
       preferences: 'Settings',
     },
@@ -449,7 +554,7 @@ export const en: Translations = {
       },
       stats: {
         title: 'My progress',
-        description: 'Modules, achievements, and weak cards.',
+        description: 'Modules, KPIs, and weak cards.',
       },
       ranking: {
         title: 'Ranking',
@@ -457,7 +562,7 @@ export const en: Translations = {
       },
       profile: {
         title: 'Profile',
-        description: 'Nickname, visibility, and preferences.',
+        description: 'Achievements, nickname, visibility, and preferences.',
       },
       backofficeGames: {
         title: 'Backoffice',

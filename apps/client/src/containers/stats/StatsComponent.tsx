@@ -1,13 +1,11 @@
 import { type ReactElement, useMemo } from 'react';
 import { useI18n } from '@/core/i18n';
 import { StatsHero } from './components/StatsHero';
-import { StatsAchievements } from './components/StatsAchievements';
 import { ModuleProgressChart } from './components/ModuleProgressChart';
 import { SubcategoryProgressPanel } from './components/SubcategoryProgressPanel';
 import { WeakFlashcardsTable } from './components/WeakFlashcardsTable';
 import { StatsSectionSkeleton } from './components/StatsSectionSkeleton';
 import type {
-  AchievementVM,
   ModuleProgressVM,
   ProgressSummaryVM,
   SubcategoryProgressVM,
@@ -18,8 +16,6 @@ interface StatsComponentProps {
   summary: ProgressSummaryVM | null;
   summaryLoading: boolean;
   summaryError: boolean;
-  achievements: AchievementVM[];
-  achievementsLoading: boolean;
   modules: ModuleProgressVM[];
   subcategories: SubcategoryProgressVM[];
   weakFlashcards: WeakFlashcardVM[];
@@ -70,8 +66,6 @@ export const StatsComponent = ({
   summary,
   summaryLoading,
   summaryError,
-  achievements,
-  achievementsLoading,
   modules,
   subcategories,
   weakFlashcards,
@@ -233,11 +227,6 @@ export const StatsComponent = ({
           )}
         </div>
       </div>
-
-      <StatsAchievements
-        achievements={achievements}
-        isLoading={achievementsLoading}
-      />
     </div>
   );
 };
