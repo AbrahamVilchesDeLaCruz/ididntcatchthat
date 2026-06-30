@@ -70,6 +70,23 @@ describe('progress/application/update ModuleProgressUpdater', () => {
     );
   });
 
+  it('should publish ModuleMasteryLevelIncreasedEvent on first module progress save', async () => {
+    const userId = ProgressUserIdMother.random().value;
+    statsRepository.findByModule.mockResolvedValue(
+      Array.from({ length: 6 }, () =>
+        UserFlashcardStatsMother.withAccuracy(0.9),
+      ),
+    );
+    moduleRepository.findByModule.mockResolvedValue(null);
+
+    await updater.execute(makeRequest({ userId }));
+
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
+    expect(publisher.publish.mock.calls[0][0][0]).toBeInstanceOf(
+      ModuleMasteryLevelIncreasedEvent,
+    );
+  });
+
   it('should not publish event when mastery level does not change', async () => {
     const userId = ProgressUserIdMother.random().value;
     statsRepository.findByModule.mockResolvedValue([

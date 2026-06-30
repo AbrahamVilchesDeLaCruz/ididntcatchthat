@@ -59,7 +59,7 @@ export class ModuleProgress {
       totalAttempts,
       accuracy,
     );
-    const previousLevel = existing?.masteryLevel ?? -1;
+    const previousLevel = existing?.masteryLevel ?? 0;
     const now = new Date();
 
     const progress = new ModuleProgress(
@@ -75,7 +75,7 @@ export class ModuleProgress {
 
     return {
       progress,
-      levelIncreased: newLevel > previousLevel && previousLevel >= 0,
+      levelIncreased: newLevel > previousLevel,
       newLevel,
       previousLevel,
     };
