@@ -9,7 +9,7 @@ import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/
 import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
 import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typeorm/ranking-user-score.entity';
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
-import { UserAchievementEntity } from '@/achievement/infrastructure/persistence/typeorm/user-achievement.entity';
+import { UserAchievementEntity } from '@/achievement/user-achievement/infrastructure/persistence/user-achievement.entity';
 import { PageViewEntity } from '@/analytics/infrastructure/persistence/page-view.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
