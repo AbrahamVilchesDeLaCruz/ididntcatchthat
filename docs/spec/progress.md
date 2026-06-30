@@ -42,7 +42,9 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 - `AttemptRecorded` con `userId = null` → **ignorar** (guest — sin progreso persistido).
 - `AttemptRecorded` con `mode = study` → incrementa `times_studied`. Con `mode = game` → incrementa `times_played`.
-- `GameCompleted` con `module = null` (random) → **no** recalcula `ModuleProgress`. Sí habrán actualizado `user_flashcard_stats` individualmente por cada `AttemptRecorded`.
+- `AttemptRecorded` con `mode = game` y partida random (`games.module IS NULL`) → tras actualizar stats, recalcula `ModuleProgress` del módulo de la flashcard (`flashcards.category`).
+- `GameCompleted` con `module` definido → recalcula `ModuleProgress` de ese módulo (comportamiento existente).
+- `GameCompleted` con `module = null` (random) → recalcula `ModuleProgress` de **cada módulo** tocado en la partida (distinct categories de los attempts).
 - `GuestProgressMigrated` → bulk UPSERT de `user_flashcard_stats` para el `userId` recién registrado, a partir de los attempts del `guestDeviceId`.
 
 ---
