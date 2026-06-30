@@ -79,7 +79,7 @@ describe('progress/update-module-progress (e2e)', () => {
       await request(app.getHttpServer())
         .post(`/v1/games/${gameId}/attempts`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ flashcardId: flashcardIds[i], correct: true })
+        .send({ flashcardId: flashcardIds[i], correct: i < 5 })
         .expect(204);
     }
 
