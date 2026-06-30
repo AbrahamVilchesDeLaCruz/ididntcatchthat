@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { mapMetricsSummary, mapDbStats } from '../observability.mapper';
 import type { MetricsSummaryApiModel } from './observability.api-model';
@@ -17,8 +18,8 @@ export const useMetricsSummary = () => {
     queryKey: observabilityKeys.metrics,
     queryFn: () =>
       apiClient
-        .get<MetricsSummaryApiModel>('/admin/metrics/summary')
-        .then((res) => res.data),
+        .get<ApiEnvelope<MetricsSummaryApiModel>>('/admin/metrics/summary')
+        .then((res) => res.data.data),
     select: mapMetricsSummary,
     refetchInterval: 30000,
   });
@@ -30,8 +31,10 @@ export const useDbStats = (period: StatPeriod) => {
     queryKey: observabilityKeys.dbStats(period),
     queryFn: () =>
       apiClient
-        .get<DbStatsApiModel>(`/admin/analytics/db-stats?period=${period}`)
-        .then((res) => res.data),
+        .get<
+          ApiEnvelope<DbStatsApiModel>
+        >(`/admin/analytics/db-stats?period=${period}`)
+        .then((res) => res.data.data),
     select: mapDbStats,
     staleTime: 60_000,
   });

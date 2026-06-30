@@ -5,6 +5,7 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { statsKeys } from '@/containers/stats/api/stats.api';
 import { achievementKeys } from '@/core/achievements/achievementKeys';
@@ -122,10 +123,10 @@ export const useGameSummary = (
   return useQuery({
     queryKey: gameKeys.summary(gameId),
     queryFn: async (): Promise<GameSummaryVM> => {
-      const res = await apiClient.get<GameSummaryApiModel>(
+      const res = await apiClient.get<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${gameId}/summary`,
       );
-      return mapGameSummary(res.data);
+      return mapGameSummary(res.data.data);
     },
     enabled: !!gameId && enabled,
     retry: 1,
@@ -177,8 +178,9 @@ export const usePausedGames = (
   return useQuery({
     queryKey: gameKeys.paused,
     queryFn: async (): Promise<PausedGameVM[]> => {
-      const res = await apiClient.get<PausedGameApiModel[]>('/games');
-      return res.data.map(mapPausedGame);
+      const res =
+        await apiClient.get<ApiEnvelope<PausedGameApiModel[]>>('/games');
+      return res.data.data.map(mapPausedGame);
     },
     enabled,
   });
@@ -191,10 +193,10 @@ export const useGameFlashcards = (
   return useQuery({
     queryKey: gameKeys.flashcards(gameId),
     queryFn: async (): Promise<FlashcardGameVM[]> => {
-      const res = await apiClient.get<FlashcardGameApiModel[]>(
+      const res = await apiClient.get<ApiEnvelope<FlashcardGameApiModel[]>>(
         `/games/${gameId}/flashcards`,
       );
-      return res.data.map(mapFlashcardForGame);
+      return res.data.data.map(mapFlashcardForGame);
     },
     enabled: !!gameId,
     staleTime: Infinity,
@@ -209,10 +211,10 @@ export const useResumeGame = (
   return useQuery({
     queryKey: gameKeys.resume(gameId),
     queryFn: async (): Promise<ResumeGameApiResponse> => {
-      const res = await apiClient.get<ResumeGameApiResponse>(
+      const res = await apiClient.get<ApiEnvelope<ResumeGameApiResponse>>(
         `/games/${gameId}/resume`,
       );
-      return res.data;
+      return res.data.data;
     },
     select: mapResumeGame,
     enabled: !!gameId && enabled,

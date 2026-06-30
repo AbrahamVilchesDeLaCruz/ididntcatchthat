@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { useFlashcardCatalog as useFlashcardCatalogCore } from '@/core/api/flashcard-catalog.api';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
@@ -61,8 +62,8 @@ export const useFlashcard = (
     queryKey: flashcardKeys.detail(id),
     queryFn: () =>
       apiClient
-        .get<FlashcardApiModel>(`/flashcards/${id}`)
-        .then((res) => res.data),
+        .get<ApiEnvelope<FlashcardApiModel>>(`/flashcards/${id}`)
+        .then((res) => res.data.data),
     select: mapFlashcard,
     enabled: !!id,
   });
