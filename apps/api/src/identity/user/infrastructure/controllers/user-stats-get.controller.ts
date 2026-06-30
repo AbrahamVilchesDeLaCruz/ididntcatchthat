@@ -4,13 +4,17 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
+import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { UserStatsRetriever } from '@/identity/user/application/stats/user-stats-retriever';
 import { type ResponseUserStatsRetriever } from '@/identity/user/application/stats/response-user-stats-retriever';
 import { type UserStatPeriod } from '@/identity/user/application/stats/user-stats.query';
@@ -32,7 +36,9 @@ export class UserStatsGetController {
   @HttpCode(HttpStatus.OK)
   async handler(
     @Query() query: UserStatsQueryParams,
-  ): Promise<ResponseUserStatsRetriever> {
-    return this.retriever.execute(query.period ?? '7d');
+    @Req() req: Request,
+  ): Promise<ApiResponse<ResponseUserStatsRetriever>> {
+    const data = await this.retriever.execute(query.period ?? '7d');
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

@@ -4,13 +4,17 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
+import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { DbStatsRetriever } from '@/analytics/application/db-stats/db-stats-retriever';
 import {
   type ResponseDbStats,
@@ -32,7 +36,11 @@ export class AdminDbStatsGetController {
 
   @Get('db-stats')
   @HttpCode(HttpStatus.OK)
-  async handler(@Query() query: DbStatsQuery): Promise<ResponseDbStats> {
-    return this.retriever.execute(query.period ?? '7d');
+  async handler(
+    @Query() query: DbStatsQuery,
+    @Req() req: Request,
+  ): Promise<ApiResponse<ResponseDbStats>> {
+    const data = await this.retriever.execute(query.period ?? '7d');
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

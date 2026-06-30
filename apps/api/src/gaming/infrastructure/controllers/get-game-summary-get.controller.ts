@@ -4,12 +4,16 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { type Request } from 'express';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import {
   GameSummaryFinder,
   type ResponseGameSummaryFinder,
@@ -26,10 +30,12 @@ export class GetGameSummaryGetController {
   async handler(
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
-  ): Promise<ResponseGameSummaryFinder> {
-    return this.finder.execute({
+    @Req() req: Request,
+  ): Promise<ApiResponse<ResponseGameSummaryFinder>> {
+    const data = await this.finder.execute({
       gameId: id,
       userId: user.userId ?? null,
     });
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

@@ -104,6 +104,7 @@ export class SearchFlashcardsGetQuery {
 - Un controller = un caso de uso = una responsabilidad
 - Sin lógica — recibe HTTP, delega al use case, devuelve respuesta
 - Payload/Query nunca salen del controller — el use case recibe primitivos
+- Queries GET devuelven `ApiResponse.of(data, resolveRequestId(req))` — ver `api-response`
 
 ### TypeORM Entities
 
