@@ -1,4 +1,5 @@
 import { type INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 import { createTestApp } from '../../shared/infrastructure/create-test-app';
@@ -15,6 +16,8 @@ describe('progress/update-module-progress (e2e)', () => {
 
   beforeEach(async () => {
     app = await createTestApp();
+    const ds = app.get(DataSource);
+    await ds.query(`DELETE FROM flashcards`);
     await seedNativeSoundsFlashcards(app);
   });
 
