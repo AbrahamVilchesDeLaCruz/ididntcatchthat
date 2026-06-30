@@ -51,7 +51,8 @@ apps/api/src/{bc}/
 Ver `apps/api/AGENTS.md` → *Módulos DDD dentro de un Bounded Context*.
 
 Ejemplo `achievement`:
-- `catalog/` — definiciones de logros (catálogo, reglas futuras)
+- `catalog/` — definiciones de logros (catálogo, reglas de unlock)
+- `progress/` — agregado `UserAchievementProgress` (contadores, módulos tocados)
 - `user-achievement/` — desbloqueos por usuario
 - `shared/` — `AchievementKey`, `AchievementCategory`, `AchievementModule`
 
