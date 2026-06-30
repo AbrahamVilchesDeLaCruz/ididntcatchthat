@@ -45,6 +45,15 @@ export const useProgressOptimisticStore = create<ProgressOptimisticState>(
   (set, get) => ({
     ...initialState,
     beginStudySession: ({ module, cardCount }) => {
+      const current = get();
+      if (
+        current.sessionModule === module &&
+        current.sessionCardCount === cardCount &&
+        current.pendingStudyViewIds.length === 0
+      ) {
+        return;
+      }
+
       set({
         ...sessionDefaults,
         sessionModule: module,

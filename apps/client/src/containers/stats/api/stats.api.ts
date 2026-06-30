@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useShallow } from 'zustand/react/shallow';
 import { apiClient } from '@/core/api/apiClient';
 import {
   mergeModuleProgressWithOptimistic,
@@ -35,7 +37,9 @@ export const statsKeys = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useModuleProgress = (enabled = true) => {
-  const optimistic = useProgressOptimisticStore(selectProgressOptimistic);
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
   const query = useQuery({
     queryKey: statsKeys.modules,
     enabled,
@@ -47,11 +51,17 @@ export const useModuleProgress = (enabled = true) => {
     },
   });
 
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeModuleProgressWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
   return {
     ...query,
-    data: query.data
-      ? mergeModuleProgressWithOptimistic(query.data, optimistic)
-      : undefined,
+    data,
   };
 };
 
@@ -85,7 +95,9 @@ export const useSubcategoryProgress = (enabled = true) => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useProgressSummary = (enabled = true) => {
-  const optimistic = useProgressOptimisticStore(selectProgressOptimistic);
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
   const query = useQuery({
     queryKey: statsKeys.summary,
     enabled,
@@ -97,10 +109,16 @@ export const useProgressSummary = (enabled = true) => {
     },
   });
 
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeProgressSummaryWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
   return {
     ...query,
-    data: query.data
-      ? mergeProgressSummaryWithOptimistic(query.data, optimistic)
-      : undefined,
+    data,
   };
 };
