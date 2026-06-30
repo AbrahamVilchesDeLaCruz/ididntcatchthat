@@ -24,15 +24,15 @@ El usuario administrador necesita:
 
 Se crea `apps/api/src/analytics/` como nuevo bounded context, con:
 
-- **Puerto de escritura**: `PageViewRepository` → `TypeOrmPageViewRepository`
-- **Puerto de lectura**: `DbStatsQuery` → `TypeOrmDbStatsQuery`
+- **Puerto de escritura**: `PageViewRepository` → `TypeOrmPageViewRepository` (`page-view/`)
+- **Puerto de lectura**: `AnalyticsSummaryQuery` → `TypeOrmAnalyticsSummaryQuery` (`summary/`)
 - **Tabla propia**: `page_views` (UUID, path, visitor_id, user_id nullable, referrer, created_at)
 
 La separación de responsabilidades sigue Clean Architecture: la capa Application define interfaces; Infrastructure las implementa con TypeORM.
 
 ### 2. Tracking de visitas via `usePageView()` en el cliente
 
-El frontend registra cada cambio de ruta con un `POST /api/analytics/pageview` (sin autenticación) que incluye:
+El frontend registra cada cambio de ruta con un `POST /v1/analytics/pageview` (sin autenticación) que incluye:
 
 - `path`: ruta visitada (sin query params)
 - `visitorId`: UUID generado en `localStorage` (persiste entre sesiones del mismo navegador)
@@ -43,7 +43,7 @@ La conversión se calcula como `registeredVisitors / uniqueVisitors × 100`, don
 
 ### 3. Endpoint admin con soporte de múltiples períodos
 
-`GET /admin/analytics/db-stats?period=7d` acepta: `24h | 7d | 15d | 30d | 6m | all`.
+`GET /v1/admin/analytics/summary?period=7d` acepta: `24h | 7d | 15d | 30d | 6m | all`.
 
 Cada período usa una granularidad diferente para las series temporales:
 
@@ -79,4 +79,4 @@ Para analytics de negocio se usan raw SQL queries sobre las tablas existentes (`
 
 **No decidido:**
 - Retención de datos de `page_views` (candidato para una tarea futura de archivado mensual)
-- Rate limiting específico para `POST /api/analytics/pageview` (actualmente usa el límite global de 100 req/min)
+- Rate limiting específico para `POST /v1/analytics/pageview` (actualmente usa el límite global de 100 req/min)

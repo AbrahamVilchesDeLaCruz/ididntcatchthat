@@ -234,21 +234,17 @@ Nuevo bounded context en `apps/api/src/analytics/` con Clean Architecture:
 
 ```
 analytics/
-  application/
-    record-page-view/    ← comando + puerto PageViewRepository
-    db-stats/            ← query + puerto DbStatsQuery + DTO ResponseDbStats
-  infrastructure/
-    persistence/         ← TypeOrmPageViewRepository, TypeOrmDbStatsQuery
-    controllers/         ← POST /api/analytics/pageview, GET /admin/analytics/db-stats
-    framework/           ← AnalyticsModule + tokens DI
+├── page-view/   ← PageViewRecorder + TypeOrmPageViewRepository
+├── summary/     ← AnalyticsSummaryRetriever + TypeOrmAnalyticsSummaryQuery
+└── shared/      ← AnalyticsModule + AnalyticsExceptionRegistry
 ```
 
 ### Endpoints
 
 | Endpoint | Auth | Descripción |
 |---|---|---|
-| `POST /api/analytics/pageview` | Ninguna | Registra una visita web (SPA route change) |
-| `GET /admin/analytics/db-stats?period=` | Admin | Estadísticas completas de DB con período |
+| `POST /v1/analytics/pageview` | Ninguna | Registra una visita web (SPA route change) |
+| `GET /v1/admin/analytics/summary?period=` | Admin | Resumen histórico de métricas de negocio |
 
 ### Tabla `page_views`
 
@@ -263,7 +259,7 @@ CREATE TABLE page_views (
 );
 ```
 
-### Períodos soportados en `db-stats`
+### Períodos soportados en `summary`
 
 | Período | Granularidad serie |
 |---|---|
@@ -305,10 +301,9 @@ export function usePageView(): void {
 }
 ```
 
-### Tab "Analytics DB" en el backoffice
+### Tab Analytics en el backoffice
 
-El tab `Analytics DB` en el backoffice reemplaza las métricas de negocio de Prometheus
-(que se pierden con reinicios). Incluye:
+El backoffice consume `useAnalyticsSummary(period)` contra `GET /admin/analytics/summary`.
 
 - Selector de período (24h / 7d / 15d / 30d / 6m / Total)
 - Sub-tabs: **Visitas web** · **Partidas** · **Usuarios** · **Contenido**

@@ -16,6 +16,8 @@ graph TB
     Pronunciation["🎤 Pronunciation\n─────────────\nPronunciationAttempt"]
     Ranking["🏆 Ranking\n─────────────\nRanking\nRankingEntry"]
     Notification["🔔 Notification\n─────────────\nEmailJob\nPushJob"]
+    Analytics["📊 Analytics\n─────────────\nPageView\nSummary"]
+    Observability["📡 Observability\n─────────────\nPrometheus Metrics"]
 
     Gaming -->|AttemptRecorded| Progress
     Gaming -->|FlashcardViewed| Progress
@@ -76,7 +78,8 @@ graph TB
 
 ## Dirección de dependencias
 
-- **Ranking** es un **pure consumer** con **proyección incremental** — consume eventos de Gaming, Identity y Progress; persiste scores vía aggregate `Ranking` en `ranking_user_scores`; la lectura usa `RankingSelector`; nunca emite eventos.
+- **Analytics** es un BC **sin eventos** — escribe `page_views` y lee tablas de otros BCs vía SQL para el read model `summary`. No emite ni consume domain events.
+- **Observability** expone métricas Prometheus de runtime (`GET /admin/metrics/summary`) — separado de Analytics (histórico persistente).
 - **Content** se autogestiona el audio — sus eventos son internos al propio BC.
 - **Notification** es un **pure consumer** — nunca emite eventos de dominio, solo ejecuta side effects (email, push, toast).
 - **Progress** es el **hub central** — recibe de Gaming, Pronunciation e Identity, y alimenta a Ranking y Notification.
