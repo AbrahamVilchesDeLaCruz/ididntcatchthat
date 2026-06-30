@@ -18,6 +18,7 @@ graph TB
     Notification["🔔 Notification\n─────────────\nEmailJob\nPushJob"]
 
     Gaming -->|AttemptRecorded| Progress
+    Gaming -->|FlashcardViewed| Progress
     Gaming -->|GameCompleted| Progress
     Gaming -->|GameCompleted| Identity
     Gaming -->|GameCompleted| Achievement
@@ -49,6 +50,7 @@ graph TB
 | `FlashcardCreated` | `idct.content.flashcard.created` | Content | Content (interno) | Trigger audio pipeline async (×4 archivos) |
 | `FlashcardUpdated` | `idct.content.flashcard.updated` | Content | Content (interno) | Regenera audio si cambió `expression` o `examples` |
 | `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Gaming | Progress | Actualiza `user_flashcard_stats`; en partidas random recalcula `ModuleProgress` por módulo de flashcard |
+| `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Gaming | Progress | Incrementa `times_studied` en modo study (event-driven async) |
 | `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Ranking | Actualiza `most_accurate` y `top_scorer` vía aggregate `Ranking` |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (módulo fijo o batch en random) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |

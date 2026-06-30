@@ -18,9 +18,16 @@ export class TypeOrmGameAttemptModulesQuery implements GameAttemptModulesQuery {
   async findModulesByGameId(gameId: string): Promise<string[]> {
     const rows = await this.dataSource.query<GameAttemptModuleRow[]>(
       `SELECT DISTINCT f.category
-       FROM attempts a
-       INNER JOIN flashcards f ON f.id = a.flashcard_id
-       WHERE a.game_id = $1
+       FROM (
+         SELECT a.flashcard_id
+         FROM attempts a
+         WHERE a.game_id = $1
+         UNION
+         SELECT v.flashcard_id
+         FROM game_views v
+         WHERE v.game_id = $1
+       ) activity
+       INNER JOIN flashcards f ON f.id = activity.flashcard_id
        ORDER BY f.category ASC`,
       [gameId],
     );
