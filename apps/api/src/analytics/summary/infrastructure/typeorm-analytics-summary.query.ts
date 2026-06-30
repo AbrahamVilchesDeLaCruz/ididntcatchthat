@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { type DbStatsQuery } from '@/analytics/application/db-stats/db-stats.query';
+import { type AnalyticsSummaryQuery } from '@/analytics/summary/application/analytics-summary.query';
 import {
-  type ResponseDbStats,
-  type StatPeriod,
-} from '@/analytics/application/db-stats/db-stats.response';
+  type ResponseAnalyticsSummaryRetriever,
+  type SummaryPeriod,
+} from '@/analytics/summary/application/response-analytics-summary-retriever';
 
 interface PeriodConfig {
   interval: string | null;
@@ -14,7 +14,7 @@ interface PeriodConfig {
   dateFormat: string;
 }
 
-function periodConfig(period: StatPeriod): PeriodConfig {
+function periodConfig(period: SummaryPeriod): PeriodConfig {
   switch (period) {
     case '24h':
       return {
@@ -72,13 +72,15 @@ function seriesStart(interval: string | null): string {
 }
 
 @Injectable()
-export class TypeOrmDbStatsQuery implements DbStatsQuery {
+export class TypeOrmAnalyticsSummaryQuery implements AnalyticsSummaryQuery {
   constructor(
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
 
-  async execute(period: StatPeriod): Promise<ResponseDbStats> {
+  async execute(
+    period: SummaryPeriod,
+  ): Promise<ResponseAnalyticsSummaryRetriever> {
     const cfg = periodConfig(period);
 
     const [pageViews, games, users, flashcards] = await Promise.all([
@@ -92,9 +94,9 @@ export class TypeOrmDbStatsQuery implements DbStatsQuery {
   }
 
   private async queryPageViews(
-    _period: StatPeriod,
+    _period: SummaryPeriod,
     cfg: PeriodConfig,
-  ): Promise<ResponseDbStats['pageViews']> {
+  ): Promise<ResponseAnalyticsSummaryRetriever['pageViews']> {
     const where = whereClause(cfg.interval, 'created_at');
     const start = seriesStart(cfg.interval);
 
@@ -169,9 +171,9 @@ export class TypeOrmDbStatsQuery implements DbStatsQuery {
   }
 
   private async queryGames(
-    _period: StatPeriod,
+    _period: SummaryPeriod,
     cfg: PeriodConfig,
-  ): Promise<ResponseDbStats['games']> {
+  ): Promise<ResponseAnalyticsSummaryRetriever['games']> {
     const where = whereClause(cfg.interval, 'started_at');
     const start = seriesStart(cfg.interval);
 
@@ -244,9 +246,9 @@ export class TypeOrmDbStatsQuery implements DbStatsQuery {
   }
 
   private async queryUsers(
-    _period: StatPeriod,
+    _period: SummaryPeriod,
     cfg: PeriodConfig,
-  ): Promise<ResponseDbStats['users']> {
+  ): Promise<ResponseAnalyticsSummaryRetriever['users']> {
     const start = seriesStart(cfg.interval);
     const activeInterval = cfg.interval ?? '30 days';
 
@@ -304,9 +306,9 @@ export class TypeOrmDbStatsQuery implements DbStatsQuery {
   }
 
   private async queryFlashcards(
-    _period: StatPeriod,
+    _period: SummaryPeriod,
     cfg: PeriodConfig,
-  ): Promise<ResponseDbStats['flashcards']> {
+  ): Promise<ResponseAnalyticsSummaryRetriever['flashcards']> {
     const start = seriesStart(cfg.interval);
 
     const [[summary], audioStatus, byCategory, byPeriod] = await Promise.all([

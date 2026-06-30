@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { type PageViewRepository } from '@/analytics/domain/page-view.repository';
-import { type PageView } from '@/analytics/domain/page-view';
+import { type PageViewRepository } from '@/analytics/page-view/domain/page-view.repository';
+import { type PageView } from '@/analytics/page-view/domain/page-view';
 import { PageViewEntity } from './page-view.entity';
 
 @Injectable()

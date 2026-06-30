@@ -1,12 +1,7 @@
-export type StatPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
+export type SummaryPeriod = '24h' | '7d' | '15d' | '30d' | '6m' | 'all';
 
-export interface DailyPoint {
-  date: string;
-  [key: string]: string | number;
-}
-
-export interface ResponseDbStats {
-  period: StatPeriod;
+export interface ResponseAnalyticsSummaryRetriever {
+  period: SummaryPeriod;
   pageViews: {
     total: number;
     uniqueVisitors: number;

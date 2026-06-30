@@ -12,7 +12,7 @@ import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { ProgressModule } from './progress/infrastructure/framework/progress.module';
 import { RankingModule } from './ranking/infrastructure/framework/ranking.module';
 import { AchievementModule } from './achievement/shared/infrastructure/framework/achievement.module';
-import { AnalyticsModule } from './analytics/infrastructure/framework/analytics.module';
+import { AnalyticsModule } from './analytics/shared/infrastructure/framework/analytics.module';
 import { buildTypeOrmDataSourceOptions } from './shared/infrastructure/persistence/typeorm/typeorm-data-source-options';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 

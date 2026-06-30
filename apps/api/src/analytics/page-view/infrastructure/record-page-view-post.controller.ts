@@ -1,0 +1,33 @@
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  ApiNoContentResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
+import { PageViewRecorder } from '@/analytics/page-view/application/page-view-recorder';
+import { RecordPageViewPostPayload } from './record-page-view-post.payload';
+
+@ApiTags('analytics')
+@Controller('analytics')
+export class RecordPageViewPostController {
+  constructor(private readonly recorder: PageViewRecorder) {}
+
+  @Post('pageview')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Record a page view',
+    description:
+      'Public endpoint called by the SPA on each route change. Persists path, visitor id, optional user id and referrer.',
+  })
+  @ApiNoContentResponse({ description: 'Page view recorded' })
+  @ApiUnprocessableEntityResponse({ description: 'Invalid path or visitor id' })
+  async handler(@Body() body: RecordPageViewPostPayload): Promise<void> {
+    await this.recorder.execute({
+      path: body.path,
+      visitorId: body.visitorId,
+      userId: body.userId ?? null,
+      referrer: body.referrer ?? null,
+    });
+  }
+}

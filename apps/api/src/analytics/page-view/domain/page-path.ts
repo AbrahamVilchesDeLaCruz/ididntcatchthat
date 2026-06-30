@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { PagePathInvalid } from './errors/page-path-invalid';
+import { PagePathInvalid } from './exceptions/page-path-invalid';
 
 export class PagePath extends StringValueObject {
   private static readonly MAX_LENGTH = 500;
