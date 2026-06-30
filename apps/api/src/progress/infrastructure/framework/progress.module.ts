@@ -9,6 +9,9 @@ import { GUEST_ATTEMPT_REPOSITORY } from '@/progress/domain/guest-attempt.reposi
 import { WEAKEST_FLASHCARD_QUERY } from '@/progress/domain/weakest-flashcard.query';
 import { SUBCATEGORY_PROGRESS_QUERY } from '@/progress/domain/subcategory-progress.query';
 import { PROGRESS_SUMMARY_QUERY } from '@/progress/domain/progress-summary.query';
+import { GAME_MODULE_QUERY } from '@/progress/domain/game-module.query';
+import { FLASHCARD_MODULE_QUERY } from '@/progress/domain/flashcard-module.query';
+import { GAME_ATTEMPT_MODULES_QUERY } from '@/progress/domain/game-attempt-modules.query';
 
 // Infrastructure — entities
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
@@ -23,6 +26,9 @@ import { TypeOrmGuestAttemptRepository } from '@/progress/infrastructure/persist
 import { TypeOrmWeakestFlashcardQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-weakest-flashcard.query';
 import { TypeOrmSubcategoryProgressQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-subcategory-progress.query';
 import { TypeOrmProgressSummaryQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-progress-summary.query';
+import { TypeOrmGameModuleQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-game-module.query';
+import { TypeOrmFlashcardModuleQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-flashcard-module.query';
+import { TypeOrmGameAttemptModulesQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-game-attempt-modules.query';
 // Infrastructure — controllers
 import { SearchModulesProgressGetController } from '@/progress/infrastructure/controllers/search-modules-progress-get.controller';
 import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
@@ -43,6 +49,7 @@ import { ProgressSummaryFinder } from '@/progress/application/find/progress-summ
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
 import { FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
 import { ModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
+import { RandomModuleProgressUpdater } from '@/progress/application/update/random-module-progress-updater';
 import { GuestProgressImporter } from '@/progress/application/import/guest-progress-importer';
 
 // Application — event subscribers
@@ -108,6 +115,18 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
       provide: STUDY_LEVEL_QUERY,
       useClass: TypeOrmStudyLevelQuery,
     },
+    {
+      provide: GAME_MODULE_QUERY,
+      useClass: TypeOrmGameModuleQuery,
+    },
+    {
+      provide: FLASHCARD_MODULE_QUERY,
+      useClass: TypeOrmFlashcardModuleQuery,
+    },
+    {
+      provide: GAME_ATTEMPT_MODULES_QUERY,
+      useClass: TypeOrmGameAttemptModulesQuery,
+    },
 
     // Use cases
     ModuleProgressFinder,
@@ -116,6 +135,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     WeakestFlashcardSearcher,
     FlashcardStatsUpdater,
     ModuleProgressUpdater,
+    RandomModuleProgressUpdater,
     GuestProgressImporter,
 
     // Event subscribers

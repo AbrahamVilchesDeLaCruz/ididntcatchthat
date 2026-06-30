@@ -9,6 +9,10 @@ import {
   GameCompletedEvent,
   type GameCompletedAttributes,
 } from '@/gaming/domain/events/game-completed.event';
+import {
+  type GameAttemptModulesQuery,
+  GAME_ATTEMPT_MODULES_QUERY,
+} from '@/progress/domain/game-attempt-modules.query';
 import { ModuleProgressUpdater } from './module-progress-updater';
 
 @Injectable()
@@ -22,17 +26,33 @@ export class ModuleProgressUpdaterOnGameCompleted extends Subscriber {
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
     @Inject(ModuleProgressUpdater)
     private readonly updater: ModuleProgressUpdater,
+    @Inject(GAME_ATTEMPT_MODULES_QUERY)
+    private readonly gameAttemptModulesQuery: GameAttemptModulesQuery,
   ) {
     super(consumer);
   }
 
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as GameCompletedAttributes;
-    if (attrs.module === null) return;
     if (attrs.userId === null) return;
-    await this.updater.execute({
-      userId: attrs.userId,
-      module: attrs.module,
-    });
+
+    if (attrs.module !== null) {
+      await this.updater.execute({
+        userId: attrs.userId,
+        module: attrs.module,
+      });
+      return;
+    }
+
+    const modules = await this.gameAttemptModulesQuery.findModulesByGameId(
+      attrs.gameId,
+    );
+
+    for (const module of modules) {
+      await this.updater.execute({
+        userId: attrs.userId,
+        module,
+      });
+    }
   }
 }

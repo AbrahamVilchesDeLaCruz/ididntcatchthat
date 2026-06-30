@@ -1,6 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
 import { type FlashcardStatsUpdater } from '@/progress/application/update/flashcard-stats-updater';
+import { type RandomModuleProgressUpdater } from '@/progress/application/update/random-module-progress-updater';
 import { FlashcardStatsUpdaterOnAttemptRecorded } from '@/progress/application/update/update-flashcard-stats-on-attempt-recorded';
 import { AttemptRecordedEvent } from '@/gaming/domain/events/attempt-recorded.event';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
@@ -8,7 +9,8 @@ import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashc
 
 describe('progress/application/update FlashcardStatsUpdaterOnAttemptRecorded', () => {
   const consumer = mock<DomainEventConsumer>();
-  const updater = mock<FlashcardStatsUpdater>();
+  const flashcardStatsUpdater = mock<FlashcardStatsUpdater>();
+  const randomModuleProgressUpdater = mock<RandomModuleProgressUpdater>();
   let subscriber: FlashcardStatsUpdaterOnAttemptRecorded;
 
   const makeEvent = (overrides?: {
@@ -30,15 +32,26 @@ describe('progress/application/update FlashcardStatsUpdaterOnAttemptRecorded', (
   };
 
   beforeEach(() => {
-    updater.execute.mockReset();
-    updater.execute.mockResolvedValue(undefined);
-    subscriber = new FlashcardStatsUpdaterOnAttemptRecorded(consumer, updater);
+    flashcardStatsUpdater.execute.mockReset();
+    randomModuleProgressUpdater.executeForRandomAttempt.mockReset();
+    flashcardStatsUpdater.execute.mockResolvedValue(undefined);
+    randomModuleProgressUpdater.executeForRandomAttempt.mockResolvedValue(
+      undefined,
+    );
+    subscriber = new FlashcardStatsUpdaterOnAttemptRecorded(
+      consumer,
+      flashcardStatsUpdater,
+      randomModuleProgressUpdater,
+    );
   });
 
   it('should skip when userId is null (guest)', async () => {
     await subscriber.on(makeEvent({ userId: null }));
 
-    expect(updater.execute).not.toHaveBeenCalled();
+    expect(flashcardStatsUpdater.execute).not.toHaveBeenCalled();
+    expect(
+      randomModuleProgressUpdater.executeForRandomAttempt,
+    ).not.toHaveBeenCalled();
   });
 
   it('should delegate to use case with event attributes', async () => {
@@ -55,12 +68,30 @@ describe('progress/application/update FlashcardStatsUpdaterOnAttemptRecorded', (
 
     await subscriber.on(event);
 
-    expect(updater.execute).toHaveBeenCalledWith({
+    expect(flashcardStatsUpdater.execute).toHaveBeenCalledWith({
       userId,
       flashcardId,
       correct: true,
       mode: 'game',
     });
+    expect(
+      randomModuleProgressUpdater.executeForRandomAttempt,
+    ).toHaveBeenCalledWith({
+      userId,
+      gameId: 'game-id',
+      flashcardId,
+    });
+  });
+
+  it('should not update random module progress for study attempts', async () => {
+    const userId = ProgressUserIdMother.random().value;
+
+    await subscriber.on(makeEvent({ userId, mode: 'study' }));
+
+    expect(flashcardStatsUpdater.execute).toHaveBeenCalled();
+    expect(
+      randomModuleProgressUpdater.executeForRandomAttempt,
+    ).not.toHaveBeenCalled();
   });
 
   it('should subscribe to AttemptRecordedEvent', () => {
