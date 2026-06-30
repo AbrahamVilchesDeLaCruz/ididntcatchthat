@@ -7,7 +7,7 @@ description: >
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## When to Use
@@ -102,9 +102,11 @@ Usar como tabla de auditoría. Cargar la skill indicada antes de corregir cada f
 1. **Límites y submódulos** — estructura de carpetas + `shared/infrastructure/framework/{bc}.module.ts`
 2. **Dominio** — aggregates, VOs, eventos desde aggregate
 3. **Application** — use cases, extraer lógica de subscribers
-4. **Infrastructure** — repos, controllers con envelope
-5. **Tests** — migrar paths, añadir domain unit tests faltantes
-6. **Cliente** — `res.data.data` + tipos `ApiEnvelope<T>`
+4. **Infrastructure** — repos, controllers con envelope, **entity + migration en `typeorm-data-source-options.ts`**
+5. **Tests unitarios** — migrar paths, Object Mothers, policies/strategies de dominio
+6. **Operabilidad y contrato** — logger, Swagger, docs (ver Fase 7)
+7. **E2E API** — al menos un `*.e2e-spec.ts` por endpoint HTTP del BC
+8. **Cliente** — `ApiEnvelope<T>` + i18n si el copy vive en frontend
 
 ---
 
@@ -117,6 +119,48 @@ Señales de alerta (ej. `achievement` pre-refactor):
 
 Decidir **una** fuente y documentar en ADR si es decisión de producto.
 
+**Paridad código ↔ migraciones:** si el catálogo vive en dominio, añadir test de paridad (`{bc}-catalog-parity.spec.ts`) que compare keys del catálogo con seed de migraciones y `ALL_*_KEY_VALUES`.
+
+---
+
+## Fase 7 — Operabilidad, contrato y documentación
+
+Auditar **después** de límites y capas DDD. Cargar la skill indicada antes de corregir cada fila.
+
+| Área | Skill | Qué verificar |
+|------|-------|---------------|
+| **Logger** | `api-observability` | `LOGGER_SERVICE` inyectado en domain services / use cases que mutan estado relevante (`unlock`, `create`, `import`). Log `info` con contexto (`userId`, aggregate id). **No** loguear en controllers — lo hace el filter/interceptor |
+| **Swagger** | `api-rest` | Por endpoint GET: `@ApiOperation`, `@ApiBearerAuth('access-token')`, `@ApiProperty`/`@ApiPropertyOptional` en Query/Payload, `@ApiResponse` con schema del envelope `{ data, meta }`, códigos 401/422. Solo `@ApiTags` = incompleto |
+| **Docs BC** | — | `docs/apps/api/{bc}/README.md`: submódulos, endpoints, eventos consumidos/publicados, tablas, handlers **v2** (nombres reales de subscribers) |
+| **Docs transversales** | — | Sincronizar si el BC emite/consume eventos: `docs/spec/{feature}.md`, `docs/domain/bounded-contexts.md` (diagrama + tabla), `docs/domain/rabbitmq-design.md` (exchanges, colas, handlers) |
+| **TypeORM** | `api-migrations` | Toda entidad nueva en `typeOrmEntities` **y** su migración en `typeOrmMigrations`. Omitirlo rompe E2E/CI silenciosamente vía subscribers async |
+| **E2E API** | `api-testing` | `test/{bc}/**/infrastructure/*.e2e-spec.ts`: JWT, envelope, happy path de negocio, validación 422. Reutilizar helpers de otros BCs (`registerAndLogin`, `waitUntil`) |
+| **Object Mothers** | `api-testing` | `test/{bc}/{module}/domain/*-mother.ts` para aggregates/VOs usados en ≥2 specs. Evitar `fromPrimitives` inline repetido |
+| **Tests de dominio crítico** | `api-testing` | Policies, strategies y reglas de elegibilidad con tests propios (no solo vía unlocker integration) |
+| **Cliente** | `client-api` | `ApiEnvelope<T>` en fetches, mapper + types, i18n si API devuelve solo keys estructurales |
+| **Métricas custom** | `api-observability` | Opcional TFM — contadores Prometheus en mutaciones clave (`*_total`). Infra HTTP/AMQP ya cubierta globalmente |
+
+### Señales de lag documental (ej. `achievement` pre-fix)
+
+- Handler names v1 en spec (`UnlockAchievementOnGameCompleted` vs `UnlockUserAchievementOnGameCompleted`)
+- Eventos consumidos incompletos (`AttemptRecorded`/`FlashcardViewed` faltaban en bounded-contexts)
+- Colas RabbitMQ sin documentar (`update_progress_on_attempt_recorded`)
+- README sin tablas nuevas (`user_achievement_progress`)
+
+### Commits sugeridos por responsabilidad
+
+Separar en work units reviewables — un commit por área:
+
+```
+feat({bc}): log {evento} in {DomainService}
+feat({bc}): document GET /{recurso} in OpenAPI
+docs({bc}): sync spec, bounded-contexts and rabbitmq design
+test({bc}): add catalog/domain parity tests
+test({bc}): add GET /{recurso} e2e coverage
+test({bc}): add domain object mothers
+feat(client): type {recurso} API response with ApiEnvelope
+```
+
 ---
 
 ## Anti-patterns
@@ -127,6 +171,11 @@ Decidir **una** fuente y documentar en ADR si es decisión de producto.
 // ❌ Evento publicado manualmente en use case sin aggregate.record()
 // ❌ GET devuelve { data } sin meta
 // ❌ achievement-catalog-finder.service.ts  ← sufijo Service prohibido
+// ❌ Controller solo con @ApiTags — sin @ApiOperation ni schema de respuesta
+// ❌ Unlock/mutación de negocio sin logger.info con contexto
+// ❌ Entidad TypeORM sin registrar en typeorm-data-source-options.ts
+// ❌ Nuevo subscriber sin fila en rabbitmq-design.md y bounded-contexts.md
+// ❌ E2E que solo mockea unit — ningún *.e2e-spec.ts para el endpoint HTTP
 ```
 
 ---
@@ -135,4 +184,6 @@ Decidir **una** fuente y documentar en ADR si es decisión de producto.
 
 - [apps/api/AGENTS.md](../../apps/api/AGENTS.md) — submódulos DDD
 - [docs/domain/bounded-contexts.md](../../docs/domain/bounded-contexts.md) — mapa de BCs
+- [docs/domain/rabbitmq-design.md](../../docs/domain/rabbitmq-design.md) — colas y handlers
+- [docs/apps/api/achievement/README.md](../../docs/apps/api/achievement/README.md) — ejemplo docs BC v2
 - [docs/adr/028-achievements-system.md](../../docs/adr/028-achievements-system.md) — decisiones achievement v2
