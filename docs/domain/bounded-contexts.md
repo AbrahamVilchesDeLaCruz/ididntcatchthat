@@ -12,7 +12,7 @@ graph TB
     Content["📦 Content\n─────────────\nFlashcard\nExample"]
     Gaming["🎮 Gaming\n─────────────\nGame\nAttempt"]
     Progress["📈 Progress\n─────────────\nUserFlashcardStats\nModuleProgress"]
-    Achievement["🏅 Achievement\n─────────────\nUserAchievement\nCatalog"]
+    Achievement["🏅 Achievement\n─────────────\nUserAchievement\nUserAchievementProgress\nCatalog"]
     Pronunciation["🎤 Pronunciation\n─────────────\nPronunciationAttempt"]
     Ranking["🏆 Ranking\n─────────────\nRanking\nRankingEntry"]
     Notification["🔔 Notification\n─────────────\nEmailJob\nPushJob"]
@@ -22,6 +22,8 @@ graph TB
     Gaming -->|GameCompleted| Progress
     Gaming -->|GameCompleted| Identity
     Gaming -->|GameCompleted| Achievement
+    Gaming -->|AttemptRecorded| Achievement
+    Gaming -->|FlashcardViewed| Achievement
 
     Content -->|FlashcardCreated| Content
     Content -->|FlashcardUpdated| Content
@@ -52,6 +54,8 @@ graph TB
 | `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Gaming | Progress | Actualiza `user_flashcard_stats`; en partidas random recalcula `ModuleProgress` por módulo de flashcard |
 | `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Gaming | Progress | Incrementa `times_studied` en modo study (event-driven async) |
 | `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Ranking | Actualiza `most_accurate` y `top_scorer` vía aggregate `Ranking` |
+| `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Achievement | Incrementa `total_played_attempts` en `user_achievement_progress` |
+| `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Gaming | Achievement | Registra módulo tocado en `user_achievement_progress` |
 | `GameCompleted` | `idct.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (módulo fijo o batch en random) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Achievement | Evalúa y desbloquea logros (game/study) |
