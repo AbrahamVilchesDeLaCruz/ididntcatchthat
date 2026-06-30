@@ -69,7 +69,7 @@ describe('progress/update-module-progress (e2e)', () => {
     const { gameId, flashcardIds } = await startGame(app, token, {
       mode: 'game',
       module: null,
-      cardCount: 5,
+      cardCount: 10,
     });
 
     for (let i = 0; i < flashcardIds.length; i++) {
@@ -103,6 +103,6 @@ describe('progress/update-module-progress (e2e)', () => {
 
     expect(entry).toBeDefined();
     expect(entry!.masteryLevel).toBe(1);
-    expect(entry!.totalAttempts).toBe(5);
+    expect(entry!.totalAttempts).toBe(10);
   });
 });
