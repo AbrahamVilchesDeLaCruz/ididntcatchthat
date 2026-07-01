@@ -71,6 +71,7 @@ export class RegisterAuthPostController {
     const deviceId = body.guestDeviceId ?? crypto.randomUUID();
 
     const result = await this.registrar.execute({
+      id: crypto.randomUUID(),
       email: body.email,
       password: body.password,
       nickname: body.nickname,
