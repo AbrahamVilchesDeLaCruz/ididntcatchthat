@@ -46,7 +46,9 @@ export class GuestProgressImporter {
     if (alreadyProcessed) return;
 
     const uid = new UserId(userId);
-    const attempts = await this.guestAttemptRepository.findByGameIds(gameIds);
+    const attempts = await this.guestAttemptRepository.findByGameIds(
+      gameIds ?? [],
+    );
 
     for (const attempt of attempts) {
       const fid = new FlashcardId(attempt.flashcardId);

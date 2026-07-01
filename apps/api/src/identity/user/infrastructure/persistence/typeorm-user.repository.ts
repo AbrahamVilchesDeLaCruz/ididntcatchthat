@@ -72,9 +72,11 @@ export class TypeOrmUserRepository implements UserRepository {
       showInRanking: entity.showInRanking,
       currentStreak: entity.currentStreak,
       longestStreak: entity.longestStreak,
-      lastActivityDate: entity.lastActivityDate,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      lastActivityDate: entity.lastActivityDate
+        ? new Date(entity.lastActivityDate)
+        : null,
+      createdAt: new Date(entity.createdAt),
+      updatedAt: new Date(entity.updatedAt),
     });
   }
 
