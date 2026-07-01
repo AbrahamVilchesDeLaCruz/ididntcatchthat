@@ -32,10 +32,9 @@ async function startAndPauseGame(
     .send({ mode: 'game', cardCount: 10 })
     .expect(201);
 
-  const { gameId, flashcardIds } = res.body as {
-    gameId: string;
-    flashcardIds: string[];
-  };
+  const { gameId, flashcardIds } = (
+    res.body as { data: { gameId: string; flashcardIds: string[] } }
+  ).data;
 
   await request(app.getHttpServer())
     .patch(`/v1/games/${gameId}`)
@@ -86,10 +85,9 @@ describe('gaming/game MaxPausedGamesController (e2e)', () => {
           .send({ mode: 'game', cardCount: 10 })
           .expect(201);
 
-        const { gameId, flashcardIds } = res.body as {
-          gameId: string;
-          flashcardIds: string[];
-        };
+        const { gameId, flashcardIds } = (
+          res.body as { data: { gameId: string; flashcardIds: string[] } }
+        ).data;
 
         await request(app.getHttpServer())
           .patch(`/v1/games/${gameId}`)

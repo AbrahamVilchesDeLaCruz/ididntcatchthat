@@ -4,6 +4,7 @@ import { UserSessionEntity } from '@/identity/session/infrastructure/persistence
 import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
 import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entity';
+import { ViewEntity } from '@/gaming/infrastructure/persistence/view.entity';
 import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
 import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
@@ -36,6 +37,7 @@ export const typeOrmEntities = [
   FlashcardEntity,
   GameEntity,
   AttemptEntity,
+  ViewEntity,
   GameFlashcardEntity,
   UserFlashcardStatsEntity,
   ModuleProgressEntity,

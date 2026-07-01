@@ -1,4 +1,4 @@
-// ─── Flashcard (GET /v1/games/:gameId/flashcards) ────────────────────────────
+// ─── Flashcard (GET /v1/games/:id/flashcards) ────────────────────────────────
 export interface FlashcardGameApiModel {
   id: string;
   position: number;

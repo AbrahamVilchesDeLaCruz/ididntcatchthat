@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,6 +19,9 @@ import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { type Request } from 'express';
 import {
   GameCompleter,
   type ResponseGameCompleter,
@@ -44,12 +48,14 @@ export class CompleteGamePostController {
     type: ValidationErrorResponse,
   })
   async handler(
+    @Req() req: Request,
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
-  ): Promise<ResponseGameCompleter> {
-    return this.completer.execute({
+  ): Promise<ApiResponse<ResponseGameCompleter>> {
+    const data = await this.completer.execute({
       gameId: id,
       userId: user.userId ?? null,
     });
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

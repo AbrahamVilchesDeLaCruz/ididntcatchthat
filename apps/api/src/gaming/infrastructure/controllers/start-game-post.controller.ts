@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,7 +19,11 @@ import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { type Request } from 'express';
 import { GameStarter } from '@/gaming/application/start/game-starter';
+import { type ResponseGameStarter } from '@/gaming/application/start/response-game-starter';
 import { StartGamePostPayload } from './start-game-post.payload';
 
 @ApiTags('gaming')
@@ -44,10 +49,11 @@ export class StartGamePostController {
     type: ValidationErrorResponse,
   })
   async handler(
+    @Req() req: Request,
     @Body() body: StartGamePostPayload,
     @CurrentUser() user: UserContext,
-  ): Promise<{ gameId: string; flashcardIds: string[] }> {
-    return this.starter.execute({
+  ): Promise<ApiResponse<ResponseGameStarter>> {
+    const data = await this.starter.execute({
       userId: user.userId ?? null,
       mode: body.mode,
       module: body.module ?? null,
@@ -55,5 +61,6 @@ export class StartGamePostController {
       cardCount: body.cardCount,
       source: body.source,
     });
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

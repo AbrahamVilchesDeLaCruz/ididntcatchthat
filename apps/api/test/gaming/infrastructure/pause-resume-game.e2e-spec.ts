@@ -31,7 +31,8 @@ async function startGame(
     .set('Authorization', `Bearer ${token}`)
     .send({ mode: 'game', cardCount: 10 })
     .expect(201);
-  return res.body as { gameId: string; flashcardIds: string[] };
+  return (res.body as { data: { gameId: string; flashcardIds: string[] } })
+    .data;
 }
 
 describe('gaming/game PauseResumeGameController (e2e)', () => {
@@ -89,15 +90,17 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200);
 
-      const body = res.body as {
-        data: {
-          game: { id: string };
-          pendingFlashcardIds: string[];
-        };
-      };
+      const body = (
+        res.body as {
+          data: {
+            game: { id: string };
+            pendingFlashcardIds: string[];
+          };
+        }
+      ).data;
 
-      expect(body.data.game.id).toBe(gameId);
-      expect(Array.isArray(body.data.pendingFlashcardIds)).toBe(true);
+      expect(body.game.id).toBe(gameId);
+      expect(Array.isArray(body.pendingFlashcardIds)).toBe(true);
     });
 
     it('should return 409 when game is not paused', async () => {

@@ -5,6 +5,9 @@ export type { RequestPausedGamesLister };
 
 export class RequestPausedGamesListerMother {
   static random(userId?: string): RequestPausedGamesLister {
-    return { userId: userId ?? UserIdMother.random().value };
+    return {
+      userId: userId ?? UserIdMother.random().value,
+      status: 'paused' as const,
+    };
   }
 }

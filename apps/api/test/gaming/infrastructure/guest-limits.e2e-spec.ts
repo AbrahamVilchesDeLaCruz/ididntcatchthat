@@ -39,7 +39,9 @@ describe('gaming/game GuestLimitsController (e2e)', () => {
           .send({ mode: 'game', cardCount: 10 })
           .expect(201);
 
-        const body = res.body as { gameId: string; flashcardIds: string[] };
+        const body = (
+          res.body as { data: { gameId: string; flashcardIds: string[] } }
+        ).data;
         expect(typeof body.gameId).toBe('string');
       }
     });

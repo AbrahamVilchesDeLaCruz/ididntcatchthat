@@ -4,6 +4,7 @@ import {
   type UseMutationResult,
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { achievementKeys } from '@/core/achievements/achievementKeys';
 import { statsKeys } from '@/containers/stats/api/stats.api';
 import {
@@ -53,8 +54,11 @@ export const useCreateStudySession = (): UseMutationResult<
     mutationFn: async (
       payload: StartStudyPayload,
     ): Promise<StartGameApiResponse> => {
-      const res = await apiClient.post<StartGameApiResponse>('/games', payload);
-      return res.data;
+      const res = await apiClient.post<ApiEnvelope<StartGameApiResponse>>(
+        '/games',
+        payload,
+      );
+      return res.data.data;
     },
     onSuccess: (_data, variables) => {
       useProgressOptimisticStore.getState().beginStudySession({
@@ -94,10 +98,10 @@ export const useCompleteStudy = (): UseMutationResult<
 
   return useMutation({
     mutationFn: async (sessionId: string): Promise<StudySummaryVM> => {
-      const res = await apiClient.post<GameSummaryApiModel>(
+      const res = await apiClient.post<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${sessionId}/complete`,
       );
-      const mapped = mapGameSummary(res.data);
+      const mapped = mapGameSummary(res.data.data);
       return {
         cardsViewed: mapped.cardsViewed,
         totalCount: mapped.totalCount,

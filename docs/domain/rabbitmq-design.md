@@ -34,9 +34,10 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | ----------------------------------------------- | ------------- | ------------- | ------------------------------------------------------- |
 | `idct.content.flashcard.created`                | Content       | Content       | `create_flashcard_audio_on_flashcard_created`           |
 | `idct.content.flashcard.updated`                | Content       | Content       | `regenerate_flashcard_audio_on_flashcard_updated`       |
-| `idct.gaming.attempts.attempt.recorded`         | Gaming        | Progress      | `update_flashcard_stats_on_attempt_recorded`            |
-| `idct.gaming.games.game.completed`              | Gaming        | Progress      | `update_module_progress_on_game_completed`              |
-| `idct.gaming.games.game.completed`              | Gaming        | Identity      | `update_streak_on_game_completed`                       |
+| `ididntcatchthat.gaming.attempts.attempt.recorded`         | Gaming        | Progress      | `update_flashcard_stats_on_attempt_recorded`            |
+| `ididntcatchthat.gaming.views.flashcard.viewed`            | Gaming        | Progress      | `update_flashcard_stats_on_flashcard_viewed`            |
+| `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Progress      | `update_module_progress_on_game_completed`              |
+| `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Identity      | `update_streak_on_game_completed`                       |
 | `idct.identity.users.user.registered`           | Identity      | Notification  | `send_welcome_email_on_user_registered`                 |
 | `idct.identity.streaks.streak.updated`          | Identity      | Notification  | `notify_streak_milestone_on_streak_updated`             |
 | `idct.identity.streaks.streak.broken`           | Identity      | Notification  | `notify_streak_broken_on_streak_broken`                 |

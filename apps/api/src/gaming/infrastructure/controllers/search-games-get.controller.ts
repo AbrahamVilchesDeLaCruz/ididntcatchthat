@@ -51,8 +51,10 @@ export class SearchGamesGetController {
     @CurrentUser() user: UserContext,
     @Req() req: Request,
   ): Promise<ApiResponse<GamePrimitives[]>> {
-    void query;
-    const data = await this.lister.execute({ userId: user.userId! });
+    const data = await this.lister.execute({
+      userId: user.userId!,
+      status: query.status,
+    });
     return ApiResponse.of(data, resolveRequestId(req));
   }
 }

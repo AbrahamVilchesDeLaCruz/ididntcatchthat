@@ -10,6 +10,11 @@ import { FlashcardNotInGame } from '@/gaming/domain/exceptions/flashcard-not-in-
 import { MaxPausedGamesReached } from '@/gaming/domain/exceptions/max-paused-games-reached';
 import { GuestLimitExceeded } from '@/gaming/domain/exceptions/guest-limit-exceeded';
 import { GameSubcategoryInvalid } from '@/gaming/domain/exceptions/game-subcategory-invalid';
+import { GameModeInvalid } from '@/gaming/domain/exceptions/game-mode-invalid';
+import { GameModuleInvalid } from '@/gaming/domain/exceptions/game-module-invalid';
+import { GameStatusInvalid } from '@/gaming/domain/exceptions/game-status-invalid';
+import { GameIdInvalid } from '@/gaming/domain/exceptions/game-id-invalid';
+import { CardCountInvalid } from '@/gaming/domain/exceptions/card-count-invalid';
 import { InsufficientWeakFlashcards } from '@/gaming/domain/exceptions/insufficient-weak-flashcards';
 import { WeakestSourceRequiresAuth } from '@/gaming/domain/exceptions/weakest-source-requires-auth';
 import { StudyRequiresAuth } from '@/gaming/domain/exceptions/study-requires-auth';
@@ -40,6 +45,11 @@ export class GamingExceptionRegistry implements OnModuleInit {
         [ViewRequiresStudyMode.name, HttpStatus.CONFLICT],
         [AttemptRequiresGameMode.name, HttpStatus.CONFLICT],
         [WeakestSourceRequiresGameMode.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [GameModeInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [GameModuleInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [GameStatusInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [GameIdInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [CardCountInvalid.name, HttpStatus.UNPROCESSABLE_ENTITY],
       ]),
     );
   }

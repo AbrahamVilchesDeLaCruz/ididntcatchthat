@@ -65,8 +65,11 @@ export const useStartGame = (): UseMutationResult<
     mutationFn: async (
       payload: StartGamePayload,
     ): Promise<StartGameApiResponse> => {
-      const res = await apiClient.post<StartGameApiResponse>('/games', payload);
-      return res.data;
+      const res = await apiClient.post<ApiEnvelope<StartGameApiResponse>>(
+        '/games',
+        payload,
+      );
+      return res.data.data;
     },
     onSuccess: () => {
       invalidateGameAndStats(queryClient);
@@ -102,10 +105,10 @@ export const useCompleteGame = (): UseMutationResult<
 
   return useMutation({
     mutationFn: async (gameId: string): Promise<GameSummaryVM> => {
-      const res = await apiClient.post<GameSummaryApiModel>(
+      const res = await apiClient.post<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${gameId}/complete`,
       );
-      return mapGameSummary(res.data);
+      return mapGameSummary(res.data.data);
     },
     onSuccess: () => {
       useProgressOptimisticStore.getState().recordGameComplete();

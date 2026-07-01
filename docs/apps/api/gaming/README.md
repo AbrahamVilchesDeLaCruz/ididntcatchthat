@@ -1,91 +1,93 @@
-# Gaming BC — Documentación
+# Gaming BC
 
-> Bounded Context responsable del ciclo de vida de los juegos y registro de intentos en ididntcatchthat.
+## Estructura
 
-## Flujos de negocio
-
-Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
-
-| Flujo | Descripción | Diagramas |
-|---|---|---|
-| [Start](./start/) | Iniciar una partida (modo estudio o juego) | [Secuencia](./start/sequence.md) · [Clases](./start/classes.md) · [Casos de uso](./start/usecases.md) |
-| [Attempt](./attempt/) | Registrar un intento (respuesta a flashcard) | [Secuencia](./attempt/sequence.md) · [Clases](./attempt/classes.md) · [Casos de uso](./attempt/usecases.md) |
-| [Complete](./complete/) | Completar una partida y obtener resumen | [Secuencia](./complete/sequence.md) · [Clases](./complete/classes.md) · [Casos de uso](./complete/usecases.md) |
-| [Pause](./pause/) | Pausar y retomar una partida | [Secuencia](./pause/sequence.md) · [Clases](./pause/classes.md) · [Casos de uso](./pause/usecases.md) |
-| [Resume](./resume/) | Retomar una partida pausada | [Secuencia](./resume/sequence.md) · [Clases](./resume/classes.md) · [Casos de uso](./resume/usecases.md) |
-| [Abandon](./abandon/) | Abandonar una partida explícitamente | [Secuencia](./abandon/sequence.md) · [Clases](./abandon/classes.md) · [Casos de uso](./abandon/usecases.md) |
-
----
-
-## Mapa de endpoints
-
-| Método | Ruta | Flujo | Auth |
-|---|---|---|---|
-| `POST` | `/games` | [Start](./start/) | Bearer (any) |
-| `POST` | `/games/:id/attempts` | [Attempt](./attempt/) | Bearer (any) |
-| `POST` | `/games/:id/complete` | [Complete](./complete/) | Bearer (any) |
-| `GET` | `/games/:id/summary` | [Complete](./complete/) | Bearer (any) |
-| `PATCH` | `/games/:id` (`status: paused`) | [Pause](./pause/) | Bearer (user) |
-| `GET` | `/games?status=paused` | [Pause](./pause/) | Bearer (user) |
-| `GET` | `/games/:id/resume` | [Resume](./resume/) | Bearer (user) |
-| `PATCH` | `/games/:id` (`status: abandoned`) | [Abandon](./abandon/) | Bearer (user) |
-
----
-
-## Arquitectura general
-
-```mermaid
-graph LR
-    subgraph Infrastructure
-        C[Controllers]
-        E[TypeORM Entities]
-        R[TypeOrmGameRepository]
-        FS[TypeOrmFlashcardSelector]
-    end
-
-    subgraph Application
-        UC[Use Cases]
-    end
-
-    subgraph Domain
-        A[Game Aggregate]
-        AT[Attempt Entity]
-        RI[GameRepository interface]
-        FI[FlashcardSelector interface]
-        EV[Domain Events]
-        EX[Domain Exceptions]
-    end
-
-    C --> UC
-    UC --> A
-    UC --> AT
-    UC --> RI
-    UC --> FI
-    A --> EV
-    A --> EX
-    R -.implements.-> RI
-    FS -.implements.-> FI
-    R --> E
+```
+gaming/
+├── domain/           ← Game (aggregate), Attempt, View, policies, events
+├── application/      ← use cases por acción (start, attempt, complete, …)
+└── infrastructure/
+    ├── controllers/
+    ├── persistence/
+    ├── selectors/    ← lectura cross-BC de flashcards (SQL)
+    ├── providers/    ← weakest flashcards vía ProgressModule
+    └── framework/    ← GamingModule + exception registry
 ```
 
-> **Regla de dependencias**: `Infrastructure` → `Application` → `Domain`. Nunca al revés.
+BC **publisher-only**: no consume domain events de otros BCs.
 
----
+Taxonomía de scope (módulo/subcategoría): `@/shared/domain/subcategory-taxonomy.ts`.
 
-## Domain Events publicados al bus
+## Endpoints
 
-| Evento | Exchange | Consumers |
-|---|---|---|
-| `AttemptRecordedEvent` | `idct.gaming.attempts.attempt.recorded` | BC Progress |
-| `GameCompletedEvent` | `idct.gaming.games.game.completed` | BC Progress, BC Identity (streak) |
+| Método | Ruta | Auth | Respuesta |
+|--------|------|------|-----------|
+| `POST` | `/games` | JWT o guest | envelope `{ gameId, flashcardIds }` |
+| `POST` | `/games/:id/attempts` | JWT o guest | 204 void |
+| `POST` | `/games/:id/views` | JWT o guest | 204 void (modo study) |
+| `POST` | `/games/:id/complete` | JWT o guest | envelope (summary stats) |
+| `GET` | `/games/:id/summary` | JWT o guest | envelope |
+| `PATCH` | `/games/:id` | JWT | 204 void (`status: paused \| abandoned`) |
+| `GET` | `/games?status=paused` | JWT | envelope |
+| `POST` | `/games/:id/resume` | JWT | envelope |
+| `GET` | `/games/:id/flashcards` | JWT o guest | envelope |
+| `GET` | `/games/stats?period=` | JWT admin/teacher | envelope |
 
-> `GamePausedEvent` y `GameAbandonedEvent` son internos — no se publican al AMQP.
+## Eventos publicados
 
----
+| Evento | Exchange | Cuándo |
+|--------|----------|--------|
+| `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Respuesta registrada (modo game) |
+| `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Flashcard vista (modo study) |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Partida completada |
+| `GamePaused` | `ididntcatchthat.gaming.games.game.paused` | Partida pausada |
+| `GameAbandoned` | `ididntcatchthat.gaming.games.game.abandoned` | Partida abandonada |
+
+## Eventos consumidos
+
+Ninguno (Progress, Identity, Achievement y Ranking consumen los eventos anteriores).
+
+### Downstream principal
+
+| Evento | Consumer BC | Efecto |
+|--------|-------------|--------|
+| `AttemptRecorded` | Progress | UPSERT `user_flashcard_stats` |
+| `AttemptRecorded` | Achievement | Incrementa contadores de progreso |
+| `AttemptRecorded` | Ranking | Actualiza rankings de precisión |
+| `FlashcardViewed` | Progress | Incrementa `times_studied` |
+| `FlashcardViewed` | Achievement | Registra módulo estudiado |
+| `GameCompleted` | Progress | Recalcula `ModuleProgress` |
+| `GameCompleted` | Identity | Actualiza streak |
+| `GameCompleted` | Achievement | Evalúa unlocks |
+| `GameCompleted` | Ranking | Actualiza `most_active` |
+
+`GamePaused` y `GameAbandoned` se publican pero **no tienen consumers** hoy (reservados para analytics/notifications).
+
+## Tablas
+
+| Tabla | Propósito |
+|-------|-----------|
+| `games` | Agregado Game |
+| `game_flashcards` | Flashcards de la sesión (orden) |
+| `attempts` | Intentos por flashcard |
+| `game_views` | Vistas en modo study |
+
+## Políticas de dominio
+
+| Policy | Regla |
+|--------|-------|
+| `GuestGamePolicy` | Máx. 3 partidas/día guest, cardCount ≤ 10 |
+| `PausedGamePolicy` | Máx. 5 partidas pausadas por usuario |
+
+## Cross-BC
+
+| Dependencia | Mecanismo |
+|-------------|-----------|
+| Content flashcards | SQL read (`FlashcardSelector`, queries) |
+| Progress weakest | `ProgressModule` → `WEAKEST_FLASHCARD_QUERY` |
+| Taxonomía | `@/shared/domain/subcategory-taxonomy` |
 
 ## Referencias
 
 - [Spec de Gaming](../../../spec/gaming.md)
-- [Tasks](../../../tasks/gaming.md)
-- [Domain Model](../../../domain/domain-model.md)
 - [Game Mechanics](../../../domain/game-mechanics.md)

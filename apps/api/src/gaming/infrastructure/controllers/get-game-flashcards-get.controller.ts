@@ -30,7 +30,7 @@ import { type GameFlashcardDto } from '@/gaming/domain/game-flashcard-query';
 export class GetGameFlashcardsGetController {
   constructor(private readonly fetcher: GameFlashcardsFetcher) {}
 
-  @Get(':gameId/flashcards')
+  @Get(':id/flashcards')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get all flashcards for a game session',
@@ -46,7 +46,7 @@ export class GetGameFlashcardsGetController {
     type: ValidationErrorResponse,
   })
   async handler(
-    @Param('gameId') gameId: string,
+    @Param('id') gameId: string,
     @Req() req: Request,
   ): Promise<ApiResponse<GameFlashcardDto[]>> {
     const data = await this.fetcher.execute({ gameId });

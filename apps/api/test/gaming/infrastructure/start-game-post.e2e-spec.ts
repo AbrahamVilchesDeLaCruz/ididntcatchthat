@@ -42,7 +42,9 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         .send({ mode: 'study', cardCount: 10 })
         .expect(201);
 
-      const body = res.body as { gameId: string; flashcardIds: string[] };
+      const body = (
+        res.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
       expect(typeof body.gameId).toBe('string');
       expect(Array.isArray(body.flashcardIds)).toBe(true);
       expect(body.flashcardIds.length).toBeGreaterThan(0);
@@ -61,7 +63,9 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         .send({ mode: 'game', cardCount: 10 })
         .expect(201);
 
-      const body = res.body as { gameId: string; flashcardIds: string[] };
+      const body = (
+        res.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
       expect(typeof body.gameId).toBe('string');
     });
 
