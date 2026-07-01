@@ -64,3 +64,10 @@ Ver [docs/spec/achievements.md](../../../../docs/spec/achievements.md).
 ## Referencias
 
 - [ADR-028: Sistema de logros v2](../../../../docs/adr/028-achievements-system.md)
+
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Find Achievements](./find-achievements/) | `GET /achievements?since=` | [Clases](./find-achievements/classes.md) · [Secuencia](./find-achievements/sequence.md) · [Casos de uso](./find-achievements/usecases.md) |
+| [Unlock Subscribers](./unlock-subscribers/) | AMQP: GameCompleted, AttemptRecorded, … | [Clases](./unlock-subscribers/classes.md) · [Secuencia](./unlock-subscribers/sequence.md) · [Casos de uso](./unlock-subscribers/usecases.md) |
