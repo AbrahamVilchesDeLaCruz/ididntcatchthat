@@ -23,6 +23,7 @@ describe('progress/application/import GuestProgressImporter', () => {
     eventId,
     userId: ProgressUserIdMother.random().value,
     guestDeviceId: UuidMother.random(),
+    gameIds: [UuidMother.random()],
   });
 
   beforeEach(() => {
@@ -30,7 +31,7 @@ describe('progress/application/import GuestProgressImporter', () => {
     statsRepository.save.mockReset();
     processedRepository.exists.mockReset();
     processedRepository.save.mockReset();
-    guestAttemptRepository.findByDeviceId.mockReset();
+    guestAttemptRepository.findByGameIds.mockReset();
     statsRepository.save.mockResolvedValue(undefined);
     processedRepository.save.mockResolvedValue(undefined);
     importer = new GuestProgressImporter(
@@ -46,14 +47,14 @@ describe('progress/application/import GuestProgressImporter', () => {
 
     await importer.execute(makeRequest());
 
-    expect(guestAttemptRepository.findByDeviceId).not.toHaveBeenCalled();
+    expect(guestAttemptRepository.findByGameIds).not.toHaveBeenCalled();
     expect(statsRepository.save).not.toHaveBeenCalled();
   });
 
   it('should import attempts and mark event as processed on first run', async () => {
     const flashcardId = ProgressFlashcardIdMother.random().value;
     processedRepository.exists.mockResolvedValue(false);
-    guestAttemptRepository.findByDeviceId.mockResolvedValue([
+    guestAttemptRepository.findByGameIds.mockResolvedValue([
       {
         flashcardId,
         correct: true,
@@ -78,7 +79,7 @@ describe('progress/application/import GuestProgressImporter', () => {
   it('should update existing stats if found for the same flashcard', async () => {
     const flashcardId = ProgressFlashcardIdMother.random().value;
     processedRepository.exists.mockResolvedValue(false);
-    guestAttemptRepository.findByDeviceId.mockResolvedValue([
+    guestAttemptRepository.findByGameIds.mockResolvedValue([
       {
         flashcardId,
         correct: true,

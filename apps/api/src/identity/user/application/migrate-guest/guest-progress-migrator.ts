@@ -1,10 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { GuestProgressMigratedEvent } from '@/identity/user/domain/events/guest-progress-migrated.event';
 import {
-  type GuestGameMigrationRepository,
-  GUEST_GAME_MIGRATION_REPOSITORY,
-} from '@/identity/user/domain/guest-game-migration.repository';
-import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
@@ -16,8 +12,6 @@ export type { RequestGuestProgressMigrator };
 @Injectable()
 export class GuestProgressMigrator {
   constructor(
-    @Inject(GUEST_GAME_MIGRATION_REPOSITORY)
-    private readonly repository: GuestGameMigrationRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -29,17 +23,18 @@ export class GuestProgressMigrator {
 
     if (guestGames.length === 0) return;
 
-    await this.repository.migrateGames(userId, guestGames);
+    const gameIds = guestGames.map((g) => g.gameId);
 
     await this.publisher.publish([
       new GuestProgressMigratedEvent(userId, {
         userId,
         deviceId,
         guestDeviceId,
+        gameIds,
       }),
     ]);
 
-    this.logger.info('Guest progress migrated', {
+    this.logger.info('Guest progress migration requested', {
       userId,
       gamesCount: guestGames.length,
       guestDeviceId,

@@ -20,13 +20,14 @@ describe('progress/application/import GuestProgressImporterOnGuestProgressMigrat
     );
   });
 
-  it('should delegate to use case with eventId, userId and guestDeviceId', async () => {
+  it('should delegate to use case with eventId, userId, guestDeviceId and gameIds', async () => {
     const eventId = UuidMother.random();
     const userId = ProgressUserIdMother.random().value;
     const guestDeviceId = UuidMother.random();
+    const gameIds = [UuidMother.random()];
     const event = new GuestProgressMigratedEvent(
       userId,
-      { userId, deviceId: UuidMother.random(), guestDeviceId },
+      { userId, deviceId: UuidMother.random(), guestDeviceId, gameIds },
       eventId,
     );
 
@@ -36,6 +37,7 @@ describe('progress/application/import GuestProgressImporterOnGuestProgressMigrat
       eventId,
       userId,
       guestDeviceId,
+      gameIds,
     });
   });
 

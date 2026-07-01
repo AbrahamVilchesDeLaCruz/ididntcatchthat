@@ -57,6 +57,13 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 import { ProgressModule } from '@/progress/infrastructure/framework/progress.module';
 import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/providers/progress-weakest-flashcard-ids.provider';
+import { GuestGamesMigrator } from '@/gaming/application/migrate-guest/guest-games-migrator';
+import { MigrateGuestGamesOnGuestProgressMigrated } from '@/gaming/application/migrate-guest/migrate-guest-games-on-guest-progress-migrated';
+import {
+  SUBSCRIBERS,
+  SubscribersBootstrapper,
+} from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
+import { type Subscriber } from '@/shared/application/subscriber';
 
 @Module({
   imports: [
@@ -108,6 +115,16 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     GameResumer,
     GameAbandoner,
     GameFlashcardsFetcher,
+    GuestGamesMigrator,
+    MigrateGuestGamesOnGuestProgressMigrated,
+    {
+      provide: SUBSCRIBERS,
+      useFactory: (
+        onGuestMigrated: MigrateGuestGamesOnGuestProgressMigrated,
+      ): Subscriber[] => [onGuestMigrated],
+      inject: [MigrateGuestGamesOnGuestProgressMigrated],
+    },
+    SubscribersBootstrapper,
 
     // Exception registry
     GamingExceptionRegistry,

@@ -67,7 +67,8 @@ export async function startGame(
     .send(payload)
     .expect(201);
 
-  return res.body as { gameId: string; flashcardIds: string[] };
+  return (res.body as { data: { gameId: string; flashcardIds: string[] } })
+    .data;
 }
 
 export async function recordAttempts(

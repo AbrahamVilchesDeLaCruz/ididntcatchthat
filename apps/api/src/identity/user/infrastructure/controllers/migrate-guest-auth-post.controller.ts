@@ -50,18 +50,7 @@ export class MigrateGuestAuthPostController {
       userId: user.userId!,
       deviceId: user.deviceId,
       guestDeviceId: body.guestDeviceId,
-      guestGames: body.guestGames.map((g) => ({
-        gameId: g.gameId,
-        phraseId: g.phraseId,
-        completedAt: new Date(g.completedAt),
-        score: g.score,
-        attempts: g.attempts.map((a) => ({
-          attemptId: a.attemptId,
-          answer: a.answer,
-          isCorrect: a.isCorrect,
-          answeredAt: new Date(a.answeredAt),
-        })),
-      })),
+      guestGames: body.guestGames.map((g) => ({ gameId: g.gameId })),
     });
   }
 }

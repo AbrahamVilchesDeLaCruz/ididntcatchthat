@@ -1,82 +1,48 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsBoolean,
   IsDateString,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-
-class GuestGameAttemptPayload {
-  @ApiProperty({
-    example: 'a1b2c3d4-e5f6-4890-abcd-ef1234567890',
-    description: 'Unique attempt identifier',
-  })
-  @IsUUID()
-  attemptId!: string;
-
-  @ApiProperty({
-    example: 'I want to catch up on my reading',
-    description: 'User answer submitted for the attempt',
-  })
-  @IsString()
-  answer!: string;
-
-  @ApiProperty({
-    example: true,
-    description: 'Whether the answer was marked correct',
-  })
-  @IsBoolean()
-  isCorrect!: boolean;
-
-  @ApiProperty({
-    example: '2026-07-01T12:00:00.000Z',
-    description: 'ISO 8601 timestamp when the attempt was submitted',
-  })
-  @IsDateString()
-  answeredAt!: string;
-}
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class GuestGamePayload {
   @ApiProperty({
     example: 'b2c3d4e5-f6a7-4890-bcde-f12345678901',
-    description: 'Completed game identifier',
+    description: 'Guest game identifier to reassign to the authenticated user',
   })
   @IsUUID()
   gameId!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'c3d4e5f6-a7b8-4901-cdef-123456789012',
-    description: 'Phrase identifier within the game',
+    description: 'Flashcard id from client-side guest stats (informational)',
   })
+  @IsOptional()
   @IsUUID()
-  phraseId!: string;
+  flashcardId?: string;
 
-  @ApiProperty({
-    example: '2026-07-01T12:05:00.000Z',
-    description: 'ISO 8601 timestamp when the game was completed',
-  })
-  @IsDateString()
-  completedAt!: string;
-
-  @ApiProperty({
-    example: 850,
-    description: 'Final score for the completed game',
-  })
+  @ApiPropertyOptional({ example: 850, description: 'Final score' })
+  @IsOptional()
   @IsNumber()
-  score!: number;
+  score?: number;
 
-  @ApiProperty({
-    type: [GuestGameAttemptPayload],
-    description: 'All attempts recorded during the guest game session',
+  @ApiPropertyOptional({ example: 120000, description: 'Duration in ms' })
+  @IsOptional()
+  @IsNumber()
+  durationMs?: number;
+
+  @ApiPropertyOptional({
+    example: '2026-07-01T12:05:00.000Z',
+    description: 'When the game was played (ISO 8601)',
   })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => GuestGameAttemptPayload)
-  attempts!: GuestGameAttemptPayload[];
+  @IsOptional()
+  @IsDateString()
+  playedAt?: string;
 }
 
 export class MigrateGuestAuthPostPayload {
@@ -89,7 +55,8 @@ export class MigrateGuestAuthPostPayload {
 
   @ApiProperty({
     type: [GuestGamePayload],
-    description: 'Guest game sessions to persist under the authenticated user',
+    description:
+      'Guest game sessions to persist under the authenticated user (only gameId is required server-side)',
   })
   @IsArray()
   @ValidateNested({ each: true })

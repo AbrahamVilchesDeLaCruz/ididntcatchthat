@@ -37,7 +37,7 @@ export class GuestProgressImporter {
   async execute({
     eventId,
     userId,
-    guestDeviceId,
+    gameIds,
   }: RequestGuestProgressImporter): Promise<void> {
     const alreadyProcessed = await this.processedRepository.exists(
       eventId,
@@ -46,8 +46,7 @@ export class GuestProgressImporter {
     if (alreadyProcessed) return;
 
     const uid = new UserId(userId);
-    const attempts =
-      await this.guestAttemptRepository.findByDeviceId(guestDeviceId);
+    const attempts = await this.guestAttemptRepository.findByGameIds(gameIds);
 
     for (const attempt of attempts) {
       const fid = new FlashcardId(attempt.flashcardId);
@@ -67,7 +66,7 @@ export class GuestProgressImporter {
 
     this.logger.info('Guest progress imported', {
       userId,
-      guestDeviceId,
+      gameIds,
       attemptsCount: attempts.length,
     });
   }
