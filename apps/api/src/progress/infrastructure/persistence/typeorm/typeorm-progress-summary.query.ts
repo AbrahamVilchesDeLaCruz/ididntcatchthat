@@ -1,10 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
-  type ProgressSummaryDto,
+  type ProgressSummary,
   type ProgressSummaryQuery,
 } from '@/progress/domain/progress-summary.query';
+import {
+  type UserStreakQuery,
+  USER_STREAK_QUERY,
+} from '@/identity/user/domain/user-streak.query';
+import {
+  type UserGamesCompletedQuery,
+  USER_GAMES_COMPLETED_QUERY,
+} from '@/gaming/domain/user-games-completed.query';
 import { type UserId } from '@/shared/domain/user-id';
 
 interface StatsRow {
@@ -15,24 +23,19 @@ interface StatsRow {
   last_played_at: Date | null;
 }
 
-interface StreakRow {
-  current_streak: number;
-  longest_streak: number;
-}
-
-interface GamesRow {
-  games_completed: string;
-}
-
 @Injectable()
 export class TypeOrmProgressSummaryQuery implements ProgressSummaryQuery {
   constructor(
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    @Inject(USER_STREAK_QUERY)
+    private readonly userStreakQuery: UserStreakQuery,
+    @Inject(USER_GAMES_COMPLETED_QUERY)
+    private readonly userGamesCompletedQuery: UserGamesCompletedQuery,
   ) {}
 
-  async findByUserId(userId: UserId): Promise<ProgressSummaryDto> {
-    const [statsRows, streakRows, gamesRows] = await Promise.all([
+  async findByUserId(userId: UserId): Promise<ProgressSummary> {
+    const [statsRows, streak, gamesCompleted] = await Promise.all([
       this.dataSource.query<StatsRow[]>(
         `SELECT
            COALESCE(SUM(ufs.times_played + ufs.times_studied), 0)::int AS total_attempts,
@@ -68,32 +71,20 @@ export class TypeOrmProgressSummaryQuery implements ProgressSummaryQuery {
          WHERE ufs.user_id = $1`,
         [userId.value],
       ),
-      this.dataSource.query<StreakRow[]>(
-        `SELECT current_streak, longest_streak
-         FROM users
-         WHERE id = $1`,
-        [userId.value],
-      ),
-      this.dataSource.query<GamesRow[]>(
-        `SELECT COUNT(*)::int AS games_completed
-         FROM games
-         WHERE user_id = $1 AND status = 'completed' AND mode = 'game'`,
-        [userId.value],
-      ),
+      this.userStreakQuery.findByUserId(userId),
+      this.userGamesCompletedQuery.countCompletedGameMode(userId),
     ]);
 
     const stats = statsRows[0];
-    const streak = streakRows[0];
-    const games = gamesRows[0];
 
     return {
-      currentStreak: streak?.current_streak ?? 0,
-      longestStreak: streak?.longest_streak ?? 0,
+      currentStreak: streak?.currentStreak ?? 0,
+      longestStreak: streak?.longestStreak ?? 0,
       accuracy7d: Number(stats?.accuracy_7d ?? 0),
       totalAttempts: Number(stats?.total_attempts ?? 0),
       weakCount: Number(stats?.weak_count ?? 0),
       masteredCount: Number(stats?.mastered_count ?? 0),
-      gamesCompleted: Number(games?.games_completed ?? 0),
+      gamesCompleted,
       lastPlayedAt: stats?.last_played_at
         ? stats.last_played_at.toISOString()
         : null,

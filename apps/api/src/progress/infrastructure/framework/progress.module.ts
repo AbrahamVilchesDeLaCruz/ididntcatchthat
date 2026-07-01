@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Domain tokens
@@ -31,9 +31,9 @@ import { TypeOrmFlashcardModuleQuery } from '@/progress/infrastructure/persisten
 import { TypeOrmGameAttemptModulesQuery } from '@/progress/infrastructure/persistence/typeorm/typeorm-game-attempt-modules.query';
 // Infrastructure — controllers
 import { SearchModulesProgressGetController } from '@/progress/infrastructure/controllers/search-modules-progress-get.controller';
-import { GetWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/get-weakest-flashcards-get.controller';
-import { GetSubcategoriesProgressGetController } from '@/progress/infrastructure/controllers/get-subcategories-progress-get.controller';
-import { GetProgressSummaryGetController } from '@/progress/infrastructure/controllers/get-progress-summary-get.controller';
+import { SearchWeakestFlashcardsGetController } from '@/progress/infrastructure/controllers/search-weakest-flashcards-get.controller';
+import { SearchSubcategoriesProgressGetController } from '@/progress/infrastructure/controllers/search-subcategories-progress-get.controller';
+import { FindProgressSummaryGetController } from '@/progress/infrastructure/controllers/find-progress-summary-get.controller';
 
 // Infrastructure — event bus
 import {
@@ -59,6 +59,11 @@ import { FlashcardStatsUpdaterOnAttemptRecorded } from '@/progress/application/u
 import { FlashcardStatsUpdaterOnFlashcardViewed } from '@/progress/application/update/update-flashcard-stats-on-flashcard-viewed';
 import { ModuleProgressUpdaterOnGameCompleted } from '@/progress/application/update/update-module-progress-on-game-completed';
 import { GuestProgressImporterOnGuestProgressMigrated } from '@/progress/application/import/import-guest-progress-on-guest-progress-migrated';
+import { ProgressExceptionRegistry } from '@/progress/infrastructure/framework/progress-exception-registry';
+
+// Cross-BC read ports
+import { IdentityModule } from '@/identity/shared/infrastructure/framework/identity.module';
+import { GamingModule } from '@/gaming/infrastructure/framework/gaming.module';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -68,6 +73,8 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   imports: [
     SharedModule,
     AuthModule,
+    IdentityModule,
+    forwardRef(() => GamingModule),
     TypeOrmModule.forFeature([
       UserFlashcardStatsEntity,
       ModuleProgressEntity,
@@ -76,9 +83,9 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   ],
   controllers: [
     SearchModulesProgressGetController,
-    GetWeakestFlashcardsGetController,
-    GetSubcategoriesProgressGetController,
-    GetProgressSummaryGetController,
+    SearchWeakestFlashcardsGetController,
+    SearchSubcategoriesProgressGetController,
+    FindProgressSummaryGetController,
   ],
   exports: [WEAKEST_FLASHCARD_QUERY],
   providers: [
@@ -159,6 +166,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
       ],
     },
     SubscribersBootstrapper,
+    ProgressExceptionRegistry,
   ],
 })
 export class ProgressModule {}
