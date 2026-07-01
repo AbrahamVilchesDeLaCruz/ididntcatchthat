@@ -60,7 +60,15 @@ progress/
 
 ## Flujos detallados
 
-Diagramas por flujo en subcarpetas: [find-modules](./find-modules/), [weakest-flashcards](./weakest-flashcards/), etc.
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Find Modules](./find-modules/) | `GET /progress/modules` | [Clases](./find-modules/classes.md) · [Secuencia](./find-modules/sequence.md) · [Casos de uso](./find-modules/usecases.md) |
+| [Find Subcategories](./find-subcategories/) | `GET /progress/subcategories` | [Clases](./find-subcategories/classes.md) · [Secuencia](./find-subcategories/sequence.md) · [Casos de uso](./find-subcategories/usecases.md) |
+| [Find Progress Summary](./find-progress-summary/) | `GET /progress/summary` | [Clases](./find-progress-summary/classes.md) · [Secuencia](./find-progress-summary/sequence.md) · [Casos de uso](./find-progress-summary/usecases.md) |
+| [Weakest Flashcards](./weakest-flashcards/) | `GET /progress/flashcards/weakest` | [Clases](./weakest-flashcards/classes.md) · [Secuencia](./weakest-flashcards/sequence.md) · [Casos de uso](./weakest-flashcards/usecases.md) |
+| [Update Flashcard Stats](./update-flashcard-stats/) | AMQP: AttemptRecorded, FlashcardViewed | [Clases](./update-flashcard-stats/classes.md) · [Secuencia](./update-flashcard-stats/sequence.md) · [Casos de uso](./update-flashcard-stats/usecases.md) |
+| [Update Module Progress](./update-module-progress/) | AMQP: GameCompleted | [Clases](./update-module-progress/classes.md) · [Secuencia](./update-module-progress/sequence.md) · [Casos de uso](./update-module-progress/usecases.md) |
+| [Import Guest Progress](./import-guest-progress/) | AMQP: GuestProgressMigrated | [Clases](./import-guest-progress/classes.md) · [Secuencia](./import-guest-progress/sequence.md) · [Casos de uso](./import-guest-progress/usecases.md) |
 
 ## Referencias
 
