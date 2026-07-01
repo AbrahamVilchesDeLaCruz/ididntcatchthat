@@ -68,6 +68,19 @@ FlashcardExpressionUpdated | FlashcardExamplesUpdated → FlashcardAudioGenerato
 - Taxonomía ↔ metadatos: `subcategory-taxonomy-parity.spec.ts`
 - Taxonomía publicada en `@/shared/domain/subcategory-taxonomy.ts` — Gaming valida scope sin importar Content
 
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Create](./create/) | `POST /flashcards` | [Clases](./create/classes.md) · [Secuencia](./create/sequence.md) · [Casos de uso](./create/usecases.md) |
+| [Bulk Create](./bulk-create/) | `POST /flashcards/bulk` | [Clases](./bulk-create/classes.md) · [Secuencia](./bulk-create/sequence.md) · [Casos de uso](./bulk-create/usecases.md) |
+| [Update](./update/) | `PATCH /flashcards/:id` | [Clases](./update/classes.md) · [Secuencia](./update/sequence.md) · [Casos de uso](./update/usecases.md) |
+| [Search](./search/) | `GET /flashcards`, `GET /flashcards/:id` | [Clases](./search/classes.md) · [Secuencia](./search/sequence.md) · [Casos de uso](./search/usecases.md) |
+| [Catalogs](./catalogs/) | `GET /flashcards/catalog` | [Clases](./catalogs/classes.md) · [Secuencia](./catalogs/sequence.md) · [Casos de uso](./catalogs/usecases.md) |
+| [Generate Flashcards](./generate-flashcards/) | `POST /flashcards/drafts` | [Clases](./generate-flashcards/classes.md) · [Secuencia](./generate-flashcards/sequence.md) · [Casos de uso](./generate-flashcards/usecases.md) |
+| [Suggest Examples](./suggest-examples/) | `POST /flashcards/example-suggestions` | [Clases](./suggest-examples/classes.md) · [Secuencia](./suggest-examples/sequence.md) · [Casos de uso](./suggest-examples/usecases.md) |
+| [Audio Pipeline](./audio-pipeline/) | Subscribers AMQP (enrich + audio) | [Clases](./audio-pipeline/classes.md) · [Secuencia](./audio-pipeline/sequence.md) · [Casos de uso](./audio-pipeline/usecases.md) |
+
 ## Referencias
 
 - [Taxonomía de contenido](../../../domain/content-taxonomy.md)
