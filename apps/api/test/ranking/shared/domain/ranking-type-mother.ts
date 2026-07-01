@@ -1,16 +1,8 @@
 import {
   RankingType,
-  type RankingTypeValue,
-} from '@/ranking/domain/ranking-type';
+  RANKING_TYPE_VALUES,
+} from '@/ranking/shared/domain/ranking-type';
 import { MotherCreator } from '@test/shared/domain/mother-creator';
-
-const RANKING_TYPE_VALUES: RankingTypeValue[] = [
-  'most_active',
-  'most_accurate',
-  'top_scorer',
-  'best_streak',
-  'module_master',
-];
 
 export class RankingTypeMother {
   static random(): RankingType {

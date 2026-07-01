@@ -1,6 +1,6 @@
-import { RankingKey } from '@/ranking/domain/ranking-key';
-import { RankingTypeMother } from '@test/ranking/domain/ranking-type-mother';
-import { RankingPeriodMother } from '@test/ranking/domain/ranking-period-mother';
+import { RankingKey } from '@/ranking/shared/domain/ranking-key';
+import { RankingTypeMother } from '@test/ranking/shared/domain/ranking-type-mother';
+import { RankingPeriodMother } from '@test/ranking/shared/domain/ranking-period-mother';
 import { ModuleNameMother } from '@test/progress/domain/module-name-mother';
 
 export class RankingKeyMother {

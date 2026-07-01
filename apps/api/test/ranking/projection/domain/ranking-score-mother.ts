@@ -1,9 +1,9 @@
-import { Ranking } from '@/ranking/domain/ranking';
-import { RankingIdMother } from '@test/ranking/domain/ranking-id-mother';
+import { RankingScore } from '@/ranking/projection/domain/ranking-score';
+import { RankingIdMother } from '@test/ranking/projection/domain/ranking-id-mother';
 import { NicknameMother } from '@test/identity/user/domain/nickname-mother';
 import { MotherCreator } from '@test/shared/domain/mother-creator';
 
-export class RankingMother {
+export class RankingScoreMother {
   static random(
     overrides?: Partial<{
       userId: string;
@@ -13,10 +13,10 @@ export class RankingMother {
       nickname: string;
       score: number;
     }>,
-  ): Ranking {
+  ): RankingScore {
     const id = RankingIdMother.random(overrides);
 
-    return Ranking.create(
+    return RankingScore.create(
       id,
       overrides?.nickname ?? NicknameMother.random().value,
       overrides?.score ??

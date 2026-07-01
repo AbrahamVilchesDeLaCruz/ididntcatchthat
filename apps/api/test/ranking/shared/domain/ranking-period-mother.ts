@@ -1,7 +1,7 @@
 import {
   RankingPeriod,
   type RankingPeriodValue,
-} from '@/ranking/domain/ranking-period';
+} from '@/ranking/shared/domain/ranking-period';
 import { MotherCreator } from '@test/shared/domain/mother-creator';
 
 const RANKING_PERIOD_VALUES: RankingPeriodValue[] = [

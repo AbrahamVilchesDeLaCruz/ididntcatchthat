@@ -1,6 +1,6 @@
-import { type RankingKey } from '@/ranking/domain/ranking-key';
-import { RankingId } from '@/ranking/domain/ranking-id';
-import { RankingKeyMother } from '@test/ranking/domain/ranking-key-mother';
+import { type RankingKey } from '@/ranking/shared/domain/ranking-key';
+import { RankingId } from '@/ranking/projection/domain/ranking-id';
+import { RankingKeyMother } from '@test/ranking/shared/domain/ranking-key-mother';
 import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 
 export class RankingIdMother {

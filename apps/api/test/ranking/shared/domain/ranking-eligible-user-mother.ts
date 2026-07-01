@@ -1,4 +1,4 @@
-import { type RankingEligibleUser } from '@/ranking/domain/ranking-user.reader';
+import { type RankingEligibleUser } from '@/ranking/shared/domain/ranking-profile.query';
 import { NicknameMother } from '@test/identity/user/domain/nickname-mother';
 import { MotherCreator } from '@test/shared/domain/mother-creator';
 

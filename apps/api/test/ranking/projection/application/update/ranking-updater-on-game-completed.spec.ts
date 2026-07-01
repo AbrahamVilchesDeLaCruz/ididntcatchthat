@@ -1,39 +1,39 @@
 import { mock } from 'jest-mock-extended';
 import { type DomainEventConsumer } from '@/shared/application/domain-event-consumer';
-import { type RankingUpdater } from '@/ranking/application/update/ranking-updater';
-import { UpdateRankingOnGameCompleted } from '@/ranking/application/handlers/update-ranking-on-game-completed';
+import { type RecordRankingGameCompleted } from '@/ranking/projection/application/update/record-ranking-game-completed';
+import { RankingUpdaterOnGameCompleted } from '@/ranking/projection/application/update/ranking-updater-on-game-completed';
 import { GameCompletedEventMother } from '@test/gaming/domain/game-completed-event-mother';
 import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 import { DateMother } from '@test/shared/domain/date-mother';
 
-describe('ranking/application/handlers UpdateRankingOnGameCompleted', () => {
+describe('ranking/projection/application/update RankingUpdaterOnGameCompleted', () => {
   const consumer = mock<DomainEventConsumer>();
-  const updater = mock<RankingUpdater>();
-  let handler: UpdateRankingOnGameCompleted;
+  const recorder = mock<RecordRankingGameCompleted>();
+  let handler: RankingUpdaterOnGameCompleted;
 
   beforeEach(() => {
-    updater.recordGameCompleted.mockReset();
-    updater.recordGameCompleted.mockResolvedValue(undefined);
-    handler = new UpdateRankingOnGameCompleted(consumer, updater);
+    recorder.execute.mockReset();
+    recorder.execute.mockResolvedValue(undefined);
+    handler = new RankingUpdaterOnGameCompleted(consumer, recorder);
   });
 
   it('should skip when userId is null', async () => {
     await handler.on(GameCompletedEventMother.guest());
 
-    expect(updater.recordGameCompleted).not.toHaveBeenCalled();
+    expect(recorder.execute).not.toHaveBeenCalled();
   });
 
-  it('should delegate to RankingUpdater', async () => {
+  it('should delegate to RecordRankingGameCompleted', async () => {
     const userId = UserIdMother.random().value;
     const finishedAt = DateMother.recent().toISOString();
     const event = GameCompletedEventMother.random({ userId, finishedAt });
 
     await handler.on(event);
 
-    expect(updater.recordGameCompleted).toHaveBeenCalledWith(
+    expect(recorder.execute).toHaveBeenCalledWith({
       userId,
-      event.attrs.mode,
+      mode: event.attrs.mode,
       finishedAt,
-    );
+    });
   });
 });

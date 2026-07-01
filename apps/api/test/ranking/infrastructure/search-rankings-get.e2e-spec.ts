@@ -133,4 +133,80 @@ describe('ranking/search-rankings (e2e)', () => {
       true,
     );
   });
+
+  it('should return viewer hidden when user opted out', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: false, nickname: 'hidden-user' })
+      .expect(200);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({ type: 'most_active', period: 'all_time', limit: 10 })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const body = res.body as {
+      meta: { requestId: string };
+      data: {
+        viewer: {
+          showInRanking: boolean;
+          status: string;
+          rank: null;
+          score: null;
+        };
+      };
+    };
+
+    expect(body.meta.requestId).toBeDefined();
+    expect(body.data.viewer.status).toBe('hidden');
+    expect(body.data.viewer.showInRanking).toBe(false);
+    expect(body.data.viewer.rank).toBeNull();
+    expect(body.data.viewer.score).toBeNull();
+  });
+
+  it('should return 422 when module_master is requested without module', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({ type: 'module_master', period: 'all_time', limit: 10 })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(422);
+  });
+
+  it('should accept module_master when module is provided', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: true, nickname: 'module-player' })
+      .expect(200);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({
+        type: 'module_master',
+        period: 'all_time',
+        module: 'native_sounds',
+        limit: 10,
+      })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const body = res.body as {
+      data: {
+        viewer: { status: string; showInRanking: boolean };
+        entries: unknown[];
+      };
+    };
+
+    expect(body.data.viewer.showInRanking).toBe(true);
+    expect(body.data.viewer.status).toBe('visible_unranked');
+    expect(Array.isArray(body.data.entries)).toBe(true);
+  });
 });
