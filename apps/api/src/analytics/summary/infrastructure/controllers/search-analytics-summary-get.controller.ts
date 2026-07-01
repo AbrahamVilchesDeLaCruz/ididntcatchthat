@@ -10,10 +10,11 @@ import {
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse as SwaggerApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
@@ -21,63 +22,40 @@ import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { AnalyticsSummaryRetriever } from '@/analytics/summary/application/analytics-summary-retriever';
 import { type ResponseAnalyticsSummaryRetriever } from '@/analytics/summary/application/response-analytics-summary-retriever';
-import { GetAnalyticsSummaryGetQuery } from './get-analytics-summary-get.query';
+import { SearchAnalyticsSummaryGetQuery } from './search-analytics-summary-get.query';
+import { SearchAnalyticsSummaryEnvelopeSwagger } from './search-analytics-summary-get.swagger';
 
-@ApiTags('admin')
+@ApiTags('analytics')
 @ApiBearerAuth('access-token')
 @Controller('admin/analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
-export class GetAnalyticsSummaryGetController {
+export class SearchAnalyticsSummaryGetController {
   constructor(private readonly retriever: AnalyticsSummaryRetriever) {}
 
   @Get('summary')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Get historical business analytics summary',
+    summary: 'Search historical business analytics summary',
     description:
       'Returns aggregated page views, games, users and flashcards metrics for the selected period. ' +
-      'Data is persisted in PostgreSQL (survives server restarts).',
+      'Data is persisted in PostgreSQL (survives server restarts). Requires admin JWT.',
   })
-  @SwaggerApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Analytics summary for the requested period',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: {
-          type: 'object',
-          required: ['period', 'pageViews', 'games', 'users', 'flashcards'],
-          properties: {
-            period: {
-              type: 'string',
-              enum: ['24h', '7d', '15d', '30d', '6m', 'all'],
-              example: '7d',
-            },
-            pageViews: { type: 'object' },
-            games: { type: 'object' },
-            users: { type: 'object' },
-            flashcards: { type: 'object' },
-          },
-        },
-        meta: {
-          type: 'object',
-          required: ['timestamp', 'request_id'],
-          properties: {
-            timestamp: { type: 'string', format: 'date-time' },
-            request_id: { type: 'string' },
-          },
-        },
-      },
-    },
+    type: SearchAnalyticsSummaryEnvelopeSwagger,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Invalid period query parameter',
+    type: ValidationErrorSwagger,
+  })
   async handler(
-    @Query() query: GetAnalyticsSummaryGetQuery,
+    @Query() query: SearchAnalyticsSummaryGetQuery,
     @Req() req: Request,
   ): Promise<ApiResponse<ResponseAnalyticsSummaryRetriever>> {
     const data = await this.retriever.execute(query.period ?? '7d');

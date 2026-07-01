@@ -8,9 +8,19 @@ Separado de **Observability** (Prometheus runtime desde arranque).
 
 ```
 analytics/
-├── page-view/   ← agregado PageView (write model)
-├── summary/     ← read model histórico cross-BC
-└── shared/      ← AnalyticsModule + exception registry
+├── page-view/
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+│       ├── controllers/   ← record-page-view-post.*
+│       └── persistence/     ← page-view.entity, typeorm-page-view.repository
+├── summary/
+│   ├── application/
+│   └── infrastructure/
+│       ├── controllers/   ← search-analytics-summary-get.*
+│       └── persistence/     ← typeorm-analytics-summary.query
+└── shared/
+    └── infrastructure/framework/  ← AnalyticsModule, exception registry
 ```
 
 ## Endpoints

@@ -11,7 +11,7 @@ import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typ
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
 import { UserAchievementEntity } from '@/achievement/user-achievement/infrastructure/persistence/user-achievement.entity';
 import { UserAchievementProgressEntity } from '@/achievement/progress/infrastructure/persistence/user-achievement-progress.entity';
-import { PageViewEntity } from '@/analytics/page-view/infrastructure/page-view.entity';
+import { PageViewEntity } from '@/analytics/page-view/infrastructure/persistence/page-view.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
