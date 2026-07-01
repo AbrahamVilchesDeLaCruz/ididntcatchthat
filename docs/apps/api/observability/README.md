@@ -61,6 +61,12 @@ No emite ni consume domain events.
 - `useMetricsSummary()` — tab HTTP/Runtime/Negocio en `/backoffice/observability`
 - `useAnalyticsSummary(period)` — tabs Visitas/Contenido (Analytics BC, no este módulo)
 
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Metrics Summary](./metrics-summary/) | `GET /v1/metrics/summary` (+ scrape `GET /metrics`) | [Clases](./metrics-summary/classes.md) · [Secuencia](./metrics-summary/sequence.md) · [Casos de uso](./metrics-summary/usecases.md) |
+
 ## Referencias
 
 - [Observabilidad operacional](../../../../docs/observability.md)
