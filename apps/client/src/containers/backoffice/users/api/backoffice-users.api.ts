@@ -16,9 +16,7 @@ export const useUserPageStats = (period: UserStatsPeriod = '7d') => {
     queryKey: backofficeUsersKeys.stats(period),
     queryFn: () =>
       apiClient
-        .get<
-          ApiEnvelope<UserStatsApiModel>
-        >(`/admin/users/stats?period=${period}`)
+        .get<ApiEnvelope<UserStatsApiModel>>(`/users/stats?period=${period}`)
         .then((res) => res.data.data),
     select: mapUserStats,
   });

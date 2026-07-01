@@ -17,13 +17,13 @@ import {
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import {
   GameCompleter,
   type ResponseGameCompleter,
 } from '@/gaming/application/complete/game-completer';
 
-@ApiTags('games')
+@ApiTags('gaming')
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
@@ -41,7 +41,7 @@ export class CompleteGamePostController {
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Param('id') id: string,

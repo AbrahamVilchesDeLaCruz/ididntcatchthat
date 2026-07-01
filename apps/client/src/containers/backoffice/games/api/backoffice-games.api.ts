@@ -16,9 +16,7 @@ export const useGamesStats = (period: GameStatsPeriod = '7d') => {
     queryKey: backofficeGamesKeys.stats(period),
     queryFn: () =>
       apiClient
-        .get<
-          ApiEnvelope<GamesStatsApiModel>
-        >(`/admin/games/stats?period=${period}`)
+        .get<ApiEnvelope<GamesStatsApiModel>>(`/games/stats?period=${period}`)
         .then((res) => res.data.data),
     select: mapGamesStats,
   });

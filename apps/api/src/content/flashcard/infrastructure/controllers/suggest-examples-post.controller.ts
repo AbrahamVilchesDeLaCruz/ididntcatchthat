@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -19,41 +18,27 @@ import {
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import {
   AiExampleSuggester,
   type ResponseAiExampleSuggester,
 } from '@/content/flashcard/application/suggest-examples/ai-example-suggester';
 import { SuggestExamplesPostPayload } from './suggest-examples-post.payload';
 
-const SUGGEST_EXAMPLES_BODY_EXAMPLE: SuggestExamplesPostPayload = {
-  expression: 'catch up',
-  category: 'phrasal_verbs',
-};
-
-@ApiTags('ai')
+@ApiTags('content')
 @ApiBearerAuth('access-token')
-@Controller('ai')
+@Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SuggestExamplesPostController {
   constructor(private readonly suggester: AiExampleSuggester) {}
 
-  @Post('suggest-examples')
+  @Post('example-suggestions')
   @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Suggest example sentences for a flashcard expression using AI',
     description:
       'Generates bilingual example sentences for backoffice flashcard editing. Requires admin JWT.',
-  })
-  @ApiBody({
-    type: SuggestExamplesPostPayload,
-    examples: {
-      default: {
-        summary: 'Phrasal verb examples',
-        value: SUGGEST_EXAMPLES_BODY_EXAMPLE,
-      },
-    },
   })
   @ApiOkResponse({
     description: 'Examples generated successfully',
@@ -68,7 +53,7 @@ export class SuggestExamplesPostController {
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Body() body: SuggestExamplesPostPayload,

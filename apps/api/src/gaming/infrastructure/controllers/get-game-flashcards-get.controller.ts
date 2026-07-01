@@ -19,11 +19,11 @@ import { type Request } from 'express';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { GameFlashcardsFetcher } from '@/gaming/application/fetch-flashcards/game-flashcards-fetcher';
 import { type GameFlashcardDto } from '@/gaming/domain/game-flashcard-query';
 
-@ApiTags('games')
+@ApiTags('gaming')
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
@@ -43,7 +43,7 @@ export class GetGameFlashcardsGetController {
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Param('gameId') gameId: string,

@@ -10,7 +10,7 @@ import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder'
 import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import crypto from 'crypto';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class GoogleCallbackAuthGetController {
   constructor(

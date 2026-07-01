@@ -8,7 +8,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GoogleAuthGuard } from '@/shared/infrastructure/auth/google.guard';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class GoogleAuthGetController {
   @Get('google')

@@ -73,7 +73,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
     });
   });
 
-  describe('GET /v1/games/:id/resume', () => {
+  describe('POST /v1/games/:id/resume', () => {
     it('should return 200 with game and pendingFlashcardIds after pausing', async () => {
       const userToken = await registerAndLogin(app);
       const { gameId, flashcardIds } = await startGame(app, userToken);
@@ -85,17 +85,19 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
         .expect(204);
 
       const res = await request(app.getHttpServer())
-        .get(`/v1/games/${gameId}/resume`)
+        .post(`/v1/games/${gameId}/resume`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200);
 
       const body = res.body as {
-        game: { id: string };
-        pendingFlashcardIds: string[];
+        data: {
+          game: { id: string };
+          pendingFlashcardIds: string[];
+        };
       };
 
-      expect(body.game.id).toBe(gameId);
-      expect(Array.isArray(body.pendingFlashcardIds)).toBe(true);
+      expect(body.data.game.id).toBe(gameId);
+      expect(Array.isArray(body.data.pendingFlashcardIds)).toBe(true);
     });
 
     it('should return 409 when game is not paused', async () => {
@@ -104,7 +106,7 @@ describe('gaming/game PauseResumeGameController (e2e)', () => {
 
       // Game is in_progress, not paused
       await request(app.getHttpServer())
-        .get(`/v1/games/${gameId}/resume`)
+        .post(`/v1/games/${gameId}/resume`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(409);
     });

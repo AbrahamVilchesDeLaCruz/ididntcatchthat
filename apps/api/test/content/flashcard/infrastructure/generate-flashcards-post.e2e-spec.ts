@@ -19,10 +19,10 @@ describe('content/flashcard GenerateFlashcardsPostController (e2e)', () => {
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /v1/ai/generate-flashcards', () => {
+  describe('POST /v1/flashcards/drafts', () => {
     it('should return 200 with drafts when admin sends valid payload', async () => {
       const res = await request(app.getHttpServer())
-        .post('/v1/ai/generate-flashcards')
+        .post('/v1/flashcards/drafts')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           category: CategoryValue.ConnectedSpeech,
@@ -40,7 +40,7 @@ describe('content/flashcard GenerateFlashcardsPostController (e2e)', () => {
 
     it('should return 422 when subcategory is invalid for category', async () => {
       await request(app.getHttpServer())
-        .post('/v1/ai/generate-flashcards')
+        .post('/v1/flashcards/drafts')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           category: CategoryValue.NativeSounds,
@@ -52,7 +52,7 @@ describe('content/flashcard GenerateFlashcardsPostController (e2e)', () => {
 
     it('should return 401 without token', async () => {
       await request(app.getHttpServer())
-        .post('/v1/ai/generate-flashcards')
+        .post('/v1/flashcards/drafts')
         .send({
           category: CategoryValue.ConnectedSpeech,
           subcategory: ConnectedSpeechSubcategory.InformalGoingTo,

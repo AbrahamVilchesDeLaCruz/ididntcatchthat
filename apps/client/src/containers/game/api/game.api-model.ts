@@ -60,7 +60,7 @@ export interface PatchGamePayload {
   lastFlashcardId?: string;
 }
 
-// ─── Resume game (GET /v1/games/:id/resume) ───────────────────────────────────
+// ─── Resume game (POST /v1/games/:id/resume) ───────────────────────────────────
 export interface ResumeGameApiResponse {
   game: {
     id: string;
@@ -79,5 +79,5 @@ export interface ResumeGameApiResponse {
   pendingFlashcardIds: string[];
 }
 
-// ─── Paused games (GET /v1/games) ─────────────────────────────────────────────
+// ─── Paused games (GET /v1/games?status=paused) ─────────────────────────────
 export type PausedGameApiModel = ResumeGameApiResponse['game'];

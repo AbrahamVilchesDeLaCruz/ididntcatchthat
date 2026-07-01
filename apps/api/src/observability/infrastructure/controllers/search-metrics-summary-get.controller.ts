@@ -22,11 +22,10 @@ import { ApiResponse } from '@/shared/infrastructure/http/response/api-response'
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { MetricsSummaryRetriever } from '@/observability/application/summary/metrics-summary-retriever';
 import { type ResponseMetricsSummaryRetriever } from '@/observability/application/summary/response-metrics-summary-retriever';
-import { SearchMetricsSummaryEnvelopeSwagger } from './search-metrics-summary-get.swagger';
 
 @ApiTags('observability')
 @ApiBearerAuth('access-token')
-@Controller('admin/metrics')
+@Controller('metrics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 export class SearchMetricsSummaryGetController {
@@ -41,7 +40,6 @@ export class SearchMetricsSummaryGetController {
   })
   @ApiOkResponse({
     description: 'Prometheus metrics summary',
-    type: SearchMetricsSummaryEnvelopeSwagger,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })

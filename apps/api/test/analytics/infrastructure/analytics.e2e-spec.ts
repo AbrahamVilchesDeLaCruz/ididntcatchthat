@@ -4,7 +4,7 @@ import { type App } from 'supertest/types';
 import { createTestApp } from '@test/shared/infrastructure/create-test-app';
 import { createAdminToken } from '@test/shared/infrastructure/create-admin-token';
 
-describe('POST /analytics/pageview (e2e)', () => {
+describe('POST /analytics/page-views (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -17,7 +17,7 @@ describe('POST /analytics/pageview (e2e)', () => {
 
   it('should record a page view and return 204', async () => {
     await request(app.getHttpServer())
-      .post('/v1/analytics/pageview')
+      .post('/v1/analytics/page-views')
       .send({
         path: '/games',
         visitorId: 'e2e-visitor-001',
@@ -29,7 +29,7 @@ describe('POST /analytics/pageview (e2e)', () => {
 
   it('should return 422 for an empty path', async () => {
     await request(app.getHttpServer())
-      .post('/v1/analytics/pageview')
+      .post('/v1/analytics/page-views')
       .send({
         path: '',
         visitorId: 'e2e-visitor-002',
@@ -38,7 +38,7 @@ describe('POST /analytics/pageview (e2e)', () => {
   });
 });
 
-describe('GET /admin/analytics/summary (e2e)', () => {
+describe('GET /analytics/summary (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -50,16 +50,14 @@ describe('GET /admin/analytics/summary (e2e)', () => {
   });
 
   it('should reject unauthenticated requests', async () => {
-    await request(app.getHttpServer())
-      .get('/v1/admin/analytics/summary')
-      .expect(401);
+    await request(app.getHttpServer()).get('/v1/analytics/summary').expect(401);
   });
 
   it('should return analytics summary envelope for admin', async () => {
     const token = await createAdminToken(app);
 
     const res = await request(app.getHttpServer())
-      .get('/v1/admin/analytics/summary?period=7d')
+      .get('/v1/analytics/summary?period=7d')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 

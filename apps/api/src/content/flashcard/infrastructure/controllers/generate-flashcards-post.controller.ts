@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -19,41 +18,25 @@ import {
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { AiFlashcardDraftGenerator } from '@/content/flashcard/application/generate-drafts/ai-flashcard-draft-generator';
 import { type ResponseAiFlashcardDraftGenerator } from '@/content/flashcard/application/generate-drafts/request-ai-flashcard-draft-generator';
 import { GenerateFlashcardsPostPayload } from './generate-flashcards-post.payload';
 
-const GENERATE_FLASHCARDS_BODY_EXAMPLE: GenerateFlashcardsPostPayload = {
-  category: 'phrasal_verbs',
-  subcategory: 'daily_life',
-  count: 5,
-  prompt: 'Common phrasal verbs about work and daily routines',
-};
-
-@ApiTags('ai')
+@ApiTags('content')
 @ApiBearerAuth('access-token')
-@Controller('ai')
+@Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class GenerateFlashcardsPostController {
   constructor(private readonly generator: AiFlashcardDraftGenerator) {}
 
-  @Post('generate-flashcards')
+  @Post('drafts')
   @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Generate flashcard drafts with AI for a category and subcategory',
     description:
       'Uses AI to propose flashcard drafts for backoffice review before bulk import. Requires admin JWT.',
-  })
-  @ApiBody({
-    type: GenerateFlashcardsPostPayload,
-    examples: {
-      default: {
-        summary: 'Generate 5 phrasal verb drafts',
-        value: GENERATE_FLASHCARDS_BODY_EXAMPLE,
-      },
-    },
   })
   @ApiOkResponse({
     description: 'Drafts generated successfully',
@@ -68,7 +51,7 @@ export class GenerateFlashcardsPostController {
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Body() body: GenerateFlashcardsPostPayload,

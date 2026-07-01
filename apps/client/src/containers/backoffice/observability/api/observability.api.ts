@@ -21,7 +21,7 @@ export const useMetricsSummary = () => {
     queryKey: observabilityKeys.metrics,
     queryFn: () =>
       apiClient
-        .get<ApiEnvelope<MetricsSummaryApiModel>>('/admin/metrics/summary')
+        .get<ApiEnvelope<MetricsSummaryApiModel>>('/metrics/summary')
         .then((res) => res.data.data),
     select: mapMetricsSummary,
     refetchInterval: 30000,
@@ -36,7 +36,7 @@ export const useAnalyticsSummary = (period: SummaryPeriod) => {
       apiClient
         .get<
           ApiEnvelope<AnalyticsSummaryApiModel>
-        >(`/admin/analytics/summary?period=${period}`)
+        >(`/analytics/summary?period=${period}`)
         .then((res) => res.data.data),
     select: mapAnalyticsSummary,
     staleTime: 60_000,

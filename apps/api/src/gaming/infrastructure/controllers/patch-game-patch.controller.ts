@@ -9,8 +9,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiNoContentResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -19,12 +17,12 @@ import {
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { GamePauser } from '@/gaming/application/pause/game-pauser';
 import { GameAbandoner } from '@/gaming/application/abandon/game-abandoner';
 import { PatchGamePayload } from './patch-game.payload';
 
-@ApiTags('games')
+@ApiTags('gaming')
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(JwtAuthGuard)
@@ -41,12 +39,10 @@ export class PatchGamePatchController {
     description:
       'Updates game status to paused (requires lastFlashcardId) or abandoned. Requires authenticated user JWT.',
   })
-  @ApiBody({ type: PatchGamePayload })
-  @ApiNoContentResponse({ description: 'Game status updated' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid status or lastFlashcardId',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Param('id') id: string,

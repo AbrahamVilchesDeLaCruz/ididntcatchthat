@@ -19,7 +19,7 @@ import { Throttle } from '@nestjs/throttler';
 import { TokenRefresher } from '@/identity/session/application/refresh/token-refresher';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class RefreshAuthPostController {
   constructor(

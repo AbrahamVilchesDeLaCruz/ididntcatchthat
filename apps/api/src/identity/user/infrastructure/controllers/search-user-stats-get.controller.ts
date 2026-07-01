@@ -22,15 +22,14 @@ import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { UserStatsRetriever } from '@/identity/user/application/stats/user-stats-retriever';
 import { type ResponseUserStatsRetriever } from '@/identity/user/application/stats/response-user-stats-retriever';
 import { SearchUserStatsGetQuery } from './search-user-stats-get.query';
-import { SearchUserStatsEnvelopeSwagger } from './search-user-stats-get.swagger';
 
-@ApiTags('users')
+@ApiTags('identity')
 @ApiBearerAuth('access-token')
-@Controller('admin/users')
+@Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 export class SearchUserStatsGetController {
@@ -45,13 +44,12 @@ export class SearchUserStatsGetController {
   })
   @ApiOkResponse({
     description: 'User statistics for the requested period',
-    type: SearchUserStatsEnvelopeSwagger,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid period query parameter',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Query() query: SearchUserStatsGetQuery,

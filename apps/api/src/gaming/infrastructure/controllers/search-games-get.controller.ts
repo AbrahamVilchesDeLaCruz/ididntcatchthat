@@ -3,7 +3,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,41 +21,38 @@ import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
-import {
-  GameResumer,
-  type ResponseGameResumer,
-} from '@/gaming/application/resume/game-resumer';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
+import { PausedGamesLister } from '@/gaming/application/list-paused/paused-games-lister';
+import { type GamePrimitives } from '@/gaming/domain/game';
+import { SearchGamesGetQuery } from './search-games-get.query';
 
-@ApiTags('games')
+@ApiTags('gaming')
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(JwtAuthGuard)
-export class ResumeGameGetController {
-  constructor(private readonly resumer: GameResumer) {}
+export class SearchGamesGetController {
+  constructor(private readonly lister: PausedGamesLister) {}
 
-  @Get(':id/resume')
+  @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Resume a paused game session',
+    summary: 'Search games for the current user',
     description:
-      'Returns game state and flashcard ids to continue a paused session. Requires authenticated user JWT.',
+      'Returns game sessions for the authenticated user filtered by status. Use `status=paused` to list resumable sessions.',
   })
-  @ApiOkResponse({ description: 'Paused game state for resumption' })
+  @ApiOkResponse({ description: 'List of games matching the status filter' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
-    @Param('id') id: string,
+    @Query() query: SearchGamesGetQuery,
     @CurrentUser() user: UserContext,
     @Req() req: Request,
-  ): Promise<ApiResponse<ResponseGameResumer>> {
-    const data = await this.resumer.execute({
-      gameId: id,
-      userId: user.userId!,
-    });
+  ): Promise<ApiResponse<GamePrimitives[]>> {
+    void query;
+    const data = await this.lister.execute({ userId: user.userId! });
     return ApiResponse.of(data, resolveRequestId(req));
   }
 }

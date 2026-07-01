@@ -178,8 +178,12 @@ export const usePausedGames = (
   return useQuery({
     queryKey: gameKeys.paused,
     queryFn: async (): Promise<PausedGameVM[]> => {
-      const res =
-        await apiClient.get<ApiEnvelope<PausedGameApiModel[]>>('/games');
+      const res = await apiClient.get<ApiEnvelope<PausedGameApiModel[]>>(
+        '/games',
+        {
+          params: { status: 'paused' },
+        },
+      );
       return res.data.data.map(mapPausedGame);
     },
     enabled,
@@ -211,7 +215,7 @@ export const useResumeGame = (
   return useQuery({
     queryKey: gameKeys.resume(gameId),
     queryFn: async (): Promise<ResumeGameApiResponse> => {
-      const res = await apiClient.get<ApiEnvelope<ResumeGameApiResponse>>(
+      const res = await apiClient.post<ApiEnvelope<ResumeGameApiResponse>>(
         `/games/${gameId}/resume`,
       );
       return res.data.data;
