@@ -3,21 +3,28 @@ import { type Translations } from '@/core/i18n/i18n.types';
 export const es: Translations = {
   landing: {
     hero: {
-      badge: 'Próximamente',
+      badge: 'Inglés real, acentos reales',
       headline: 'Ese momento en el que un nativo habla…',
       headlineAccent: 'y no entiendes nada.',
       subheadline:
-        'La app que te enseña cómo hablan realmente los nativos — fonética real, connected speech y 3 acentos por expresión.',
-      ctaPrimary: 'Avísame cuando esté lista',
-      ctaSecondary: 'Cómo funciona',
+        'La aplicación que te enseña cómo hablan realmente los nativos: fonética real, connected speech y 3 acentos por expresión.',
       ctaPlay: 'Jugar ahora',
+      ctaSignUp: 'Crear cuenta gratis',
       ctaStudy: 'Estudiar',
       ctaHowItWorks: 'Ver cómo funciona',
+      ctaGetStarted: 'Empezar',
       navBackoffice: 'Ir al backoffice →',
       navStats: 'Mis estadísticas →',
       navDashboard: 'Panel →',
       navLogin: 'Iniciar sesión',
-      navRegister: 'Registrarse',
+      navRegister: 'Crear cuenta',
+    },
+    trustBar: {
+      items: [
+        '3 acentos nativos por expresión',
+        'Fonética real y connected speech',
+        'Contenido curado — sin IA generativa',
+      ],
     },
     authGate: {
       title: '¿Cómo quieres jugar?',
@@ -32,20 +39,39 @@ export const es: Translations = {
     gameDemo: {
       title: 'Así funciona',
       subtitle: 'Aprende pronunciación real con flashcards interactivas',
-      hoverHint: 'Pasa el cursor para ver →',
+      hoverHint: 'Pasa el cursor para voltear →',
+      tapHint: 'Toca para voltear →',
+      cards: [
+        {
+          expression: 'think',
+          ipa: '/θɪŋk/',
+          meaning: 'Pensar — TH sorda',
+          exampleEn: 'I think so.',
+          exampleEs: 'Creo que sí.',
+        },
+        {
+          expression: 'gonna',
+          ipa: '/ˈɡɒnə/',
+          meaning: 'Forma corta de “going to”',
+          exampleEn: "I'm gonna be late.",
+          exampleEs: 'Voy a llegar tarde.',
+        },
+      ],
     },
     problem: {
       sectionLabel: 'El problema',
       headline: 'Tienes un B2. Y sigues sin entender a los nativos.',
       subheadline:
-        'No es tu culpa — es lo que te enseñaron. Las escuelas se centran en gramática. Los nativos hablan en fonética.',
+        'No es culpa tuya: es lo que te enseñaron. La escuela se centra en la gramática. Los nativos hablan en fonética.',
       duolingoLabel: 'Lo que enseña Duolingo',
       duolingoDescription:
         'Vocabulario. Gramática. Frases de libro que nunca escucharás en la vida real.',
       weTeachLabel: 'Lo que enseñamos nosotros',
       weTeachDescription:
-        'Cómo cambian los sonidos al conectar palabras. Los 23 fonemas reales del inglés. Expresiones que usan los nativos de verdad.',
+        'Cómo cambian los sonidos al conectar palabras. 45 temas de sonidos nativos en el catálogo. Expresiones que usan los nativos de verdad.',
       exampleLabel: 'Connected speech — ejemplo',
+      exampleWrittenLabel: 'Escrito',
+      exampleNativeLabel: 'Cómo lo dicen los nativos',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
       exampleTag: 'T suave',
@@ -58,15 +84,15 @@ export const es: Translations = {
       steps: [
         {
           number: '01',
-          title: 'Ve la expresión',
+          title: 'Mira la expresión',
           description:
-            'Una flashcard muestra una palabra, fonema o expresión nativa. Tú piensas: ¿la conozco?',
+            'Una flashcard muestra una palabra, un fonema o una expresión nativa. Piensas: ¿la conozco?',
         },
         {
           number: '02',
-          title: 'Júzgate tú mismo',
+          title: 'Evalúate tú mismo',
           description:
-            'Sin trampas. Decides tú: ✓ la sabía, o ✗ no la sabía. Autoevaluación honesta como Anki.',
+            'Sin trampas. Tú decides: ✓ la sabía o ✗ no la sabía. Autoevaluación honesta, al estilo Anki.',
         },
         {
           number: '03',
@@ -92,39 +118,51 @@ export const es: Translations = {
           title: 'Sonidos nativos',
           tag: 'Fonética',
           description:
-            'Domina los 23 fonemas del inglés. Foco en los que más cuestan a los hispanohablantes.',
+            'Domina 45 temas de sonidos nativos: consonantes, vocales y patrones que más cuestan a los hispanohablantes.',
+          examples: ['/θ/ vs /ð/', 'T suave', 'schwa /ə/'],
         },
         {
           title: 'Habla conectada',
           tag: 'Enlace y reducción',
           description:
             'Escucha cómo cambian y fusionan los sonidos a velocidad real — gonna, enlace, elisión.',
+          examples: ['gonna', 'wanna', 'word linking'],
         },
         {
           title: 'Fluidez y conectores',
           tag: 'Fluidez',
           description:
             'Conectores y estructuras para sonar fluido, no robótico.',
+          examples: ['however', 'furthermore', 'in short'],
         },
         {
-          title: 'Inglés de calle',
+          title: 'Inglés coloquial',
           tag: 'Inglés cotidiano',
           description:
-            'El vocabulario informal que usan los nativos cada día — y que nunca te enseñaron en clase.',
+            'El vocabulario informal que usan los nativos a diario y que rara vez enseñan en clase.',
+          examples: ['stuff', 'you guys', "I'm good"],
         },
       ],
     },
-    notify: {
-      sectionLabel: 'Próximamente',
-      headline: 'Deja de perderte lo que dicen los nativos.',
+    finalCta: {
+      sectionLabel: 'Empieza ya',
+      headline: 'Empieza a oír lo que dicen los nativos de verdad.',
       subheadline:
-        'Sé el primero en saber cuándo lanzamos. Sin spam — un email, cuando esté lista.',
-      inputPlaceholder: 'tu@email.com',
-      ctaButton: 'Avísame',
-      disclaimer: 'Sin spam. Cancela cuando quieras.',
+        'Juega gratis como invitado o crea una cuenta para guardar progreso y ver tus estadísticas.',
+      ctaSignUp: 'Crear cuenta gratis',
+      ctaPlay: 'Jugar ahora',
     },
     footer: {
-      tagline: 'En desarrollo',
+      tagline: 'Fonética · Connected speech · Inglés real',
+      navHowItWorks: 'Cómo funciona',
+      navGetStarted: 'Empezar',
+      navLogin: 'Iniciar sesión',
+      navRegister: 'Crear cuenta',
+      accents: '🇺🇸 Americano · 🇬🇧 Británico · 🇦🇺 Australiano',
+    },
+    header: {
+      explore: 'El método',
+      start: 'Pruébalo',
     },
   },
   game: {
@@ -145,7 +183,7 @@ export const es: Translations = {
         native_sounds: 'Sonidos nativos',
         connected_speech: 'Habla conectada',
         flow_connectors: 'Fluidez y conectores',
-        real_talk: 'Inglés de calle',
+        real_talk: 'Inglés coloquial',
       },
     },
     paused: {

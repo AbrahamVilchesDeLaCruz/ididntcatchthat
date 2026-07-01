@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
 import { usePageView } from '@/core/analytics/usePageView';
 import { AppShell } from '@/common/layout/AppShell';
@@ -18,6 +18,7 @@ import { StudyView } from '@/views/StudyView';
 import { StudySummaryView } from '@/views/StudySummaryView';
 import { HomeView } from '@/views/HomeView';
 import { ProfileView } from '@/views/ProfileView';
+import { FallbackRedirect } from '@/core/router/FallbackRedirect';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
@@ -61,7 +62,7 @@ const AppRoutes = (): ReactElement => {
       </Route>
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<FallbackRedirect />} />
     </Routes>
   );
 };

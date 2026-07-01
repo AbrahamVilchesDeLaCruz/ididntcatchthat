@@ -46,7 +46,7 @@ export const BulkCreateModal = ({
     try {
       parsed = JSON.parse(jsonText) as unknown;
     } catch {
-      setParseError('JSON inválido. Revisá la sintaxis.');
+      setParseError('JSON inválido. Revisa la sintaxis.');
       return;
     }
 
@@ -68,7 +68,7 @@ export const BulkCreateModal = ({
               Crear flashcards en bloque
             </h2>
             <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
-              Pegá un array JSON con las flashcards a crear
+              Pega un array JSON con las flashcards a crear
             </p>
           </div>
           <button

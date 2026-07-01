@@ -15,6 +15,6 @@ export const BrandWordmark = ({
     )}
     style={{ fontFamily: 'var(--font-display)' }}
   >
-    i didn&apos;t <span className="text-[var(--color-brand)]">catch</span> that
+    I didn&apos;t <span className="text-[var(--color-brand)]">catch</span> that
   </span>
 );

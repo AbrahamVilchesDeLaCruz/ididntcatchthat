@@ -6,16 +6,19 @@ export interface LandingTranslations {
     headline: string;
     headlineAccent: string;
     subheadline: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
     ctaPlay: string;
+    ctaSignUp: string;
     ctaStudy: string;
     ctaHowItWorks: string;
+    ctaGetStarted: string;
     navBackoffice: string;
     navStats: string;
     navDashboard: string;
     navLogin: string;
     navRegister: string;
+  };
+  trustBar: {
+    items: [string, string, string];
   };
   authGate: {
     title: string;
@@ -30,6 +33,23 @@ export interface LandingTranslations {
     title: string;
     subtitle: string;
     hoverHint: string;
+    tapHint: string;
+    cards: [
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        exampleEn: string;
+        exampleEs: string;
+      },
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        exampleEn: string;
+        exampleEs: string;
+      },
+    ];
   };
   problem: {
     sectionLabel: string;
@@ -40,6 +60,8 @@ export interface LandingTranslations {
     weTeachLabel: string;
     weTeachDescription: string;
     exampleLabel: string;
+    exampleWrittenLabel: string;
+    exampleNativeLabel: string;
     exampleWritten: string;
     exampleNative: string;
     exampleTag: string;
@@ -60,22 +82,50 @@ export interface LandingTranslations {
     headline: string;
     subheadline: string;
     items: [
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
     ];
   };
-  notify: {
+  finalCta: {
     sectionLabel: string;
     headline: string;
     subheadline: string;
-    inputPlaceholder: string;
-    ctaButton: string;
-    disclaimer: string;
+    ctaSignUp: string;
+    ctaPlay: string;
   };
   footer: {
     tagline: string;
+    navHowItWorks: string;
+    navGetStarted: string;
+    navLogin: string;
+    navRegister: string;
+    accents: string;
+  };
+  header: {
+    explore: string;
+    start: string;
   };
 }
 

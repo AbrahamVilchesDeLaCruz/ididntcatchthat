@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { useAuthForm } from './hooks';
 import { AuthLoginForm } from './components/AuthLoginForm';
 import { AuthRegisterForm } from './components/AuthRegisterForm';
+import { BrandWordmark } from '@/common/components/BrandWordmark';
 import type {
   AuthMode,
   LoginFormValues,
@@ -48,13 +49,13 @@ export const AuthComponent = ({
       <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
-            ididntcatchthat
+          <h1 className="mb-2">
+            <BrandWordmark className="text-3xl" />
           </h1>
           <p className="text-[var(--color-text-secondary)] text-sm">
             {mode === 'login'
-              ? 'Accedé a tu cuenta'
-              : 'Creá tu cuenta y empezá a aprender'}
+              ? 'Accede a tu cuenta'
+              : 'Crea tu cuenta y empieza a aprender'}
           </p>
         </div>
 
@@ -130,7 +131,7 @@ export const AuthComponent = ({
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--color-border)]" />
             <span className="text-xs text-[var(--color-text-muted)]">
-              o continuá con
+              o continúa con
             </span>
             <div className="flex-1 h-px bg-[var(--color-border)]" />
           </div>

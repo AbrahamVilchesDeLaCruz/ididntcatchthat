@@ -9,7 +9,7 @@ import type {
 } from '../auth.types';
 
 const loginSchema = z.object({
-  email: z.string().email('Ingresá un email válido'),
+  email: z.string().email('Introduce un email válido'),
   password: z.string().min(1, 'La contraseña es obligatoria'),
 });
 
@@ -19,7 +19,7 @@ const registerSchema = z.object({
     .min(3, 'El nickname debe tener al menos 3 caracteres')
     .max(30, 'El nickname no puede superar los 30 caracteres')
     .regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guiones bajos'),
-  email: z.string().email('Ingresá un email válido'),
+  email: z.string().email('Introduce un email válido'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 });
 

@@ -3,21 +3,28 @@ import { type Translations } from '@/core/i18n/i18n.types';
 export const en: Translations = {
   landing: {
     hero: {
-      badge: 'Coming soon',
+      badge: 'Real English, real accents',
       headline: 'That moment when a native speaks…',
       headlineAccent: 'and you get nothing.',
       subheadline:
         'The app that teaches you how natives actually speak — real phonetics, connected speech, and 3 accents per expression.',
-      ctaPrimary: "Notify me when it's ready",
-      ctaSecondary: 'See how it works',
       ctaPlay: 'Play now',
+      ctaSignUp: 'Sign up free',
       ctaStudy: 'Study',
       ctaHowItWorks: 'See how it works',
+      ctaGetStarted: 'Get started',
       navBackoffice: 'Go to backoffice →',
       navStats: 'My stats →',
       navDashboard: 'Dashboard →',
       navLogin: 'Log in',
       navRegister: 'Sign up',
+    },
+    trustBar: {
+      items: [
+        '3 native accents per expression',
+        'Real phonetics & connected speech',
+        'Curated content — not AI-generated',
+      ],
     },
     authGate: {
       title: 'How do you want to play?',
@@ -31,7 +38,24 @@ export const en: Translations = {
     gameDemo: {
       title: 'See it in action',
       subtitle: 'Learn real pronunciation with interactive flashcards',
-      hoverHint: 'Hover to reveal →',
+      hoverHint: 'Hover to flip →',
+      tapHint: 'Tap to flip →',
+      cards: [
+        {
+          expression: 'think',
+          ipa: '/θɪŋk/',
+          meaning: 'Think — voiceless TH',
+          exampleEn: 'I think so.',
+          exampleEs: 'Creo que sí.',
+        },
+        {
+          expression: 'gonna',
+          ipa: '/ˈɡɒnə/',
+          meaning: 'Short form of “going to”',
+          exampleEn: "I'm gonna be late.",
+          exampleEs: "I'm going to be late.",
+        },
+      ],
     },
     problem: {
       sectionLabel: 'The problem',
@@ -43,8 +67,10 @@ export const en: Translations = {
         "Vocabulary. Grammar. Textbook phrases you'll never hear in real life.",
       weTeachLabel: 'What we teach',
       weTeachDescription:
-        'How sounds change when words connect. The 23 real phonemes. Expressions natives actually use.',
+        'How sounds change when words connect. 45 native sound topics in the catalog. Expressions natives actually use.',
       exampleLabel: 'Connected speech — example',
+      exampleWrittenLabel: 'Written',
+      exampleNativeLabel: 'How natives say it',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
       exampleTag: 'Soft T',
@@ -91,39 +117,51 @@ export const en: Translations = {
           title: 'Native Sounds',
           tag: 'Phonetics',
           description:
-            'Master the 23 phonemes of English. Focus on the ones that trip up Spanish speakers most.',
+            'Master 45 native sound topics — consonants, vowels, and patterns Spanish speakers miss most.',
+          examples: ['/θ/ vs /ð/', 'Soft T', 'schwa /ə/'],
         },
         {
           title: 'Connected Speech',
           tag: 'Linking & reduction',
           description:
             'Hear how sounds morph and merge when natives speak at full speed — gonna, linking, elision.',
+          examples: ['gonna', 'wanna', 'word linking'],
         },
         {
           title: 'Flow & Connectors',
           tag: 'Fluency',
           description:
             'Connectors and structures that make you sound fluent, not robotic.',
+          examples: ['however', 'furthermore', 'in short'],
         },
         {
           title: 'Real Talk',
           tag: 'Everyday English',
           description:
             'The casual vocabulary natives use every day — never taught in class.',
+          examples: ['stuff', 'you guys', "I'm good"],
         },
       ],
     },
-    notify: {
-      sectionLabel: 'Coming soon',
-      headline: 'Stop missing what natives say.',
+    finalCta: {
+      sectionLabel: 'Get started',
+      headline: 'Start hearing what natives actually say.',
       subheadline:
-        "Be the first to know when we launch. No spam — one email, when it's ready.",
-      inputPlaceholder: 'your@email.com',
-      ctaButton: 'Notify me',
-      disclaimer: 'No spam. Unsubscribe any time.',
+        'Play free as a guest or create an account to save progress and track your stats.',
+      ctaSignUp: 'Sign up free',
+      ctaPlay: 'Play now',
     },
     footer: {
-      tagline: 'Still in development',
+      tagline: 'Phonetics · Connected speech · Real talk',
+      navHowItWorks: 'How it works',
+      navGetStarted: 'Get started',
+      navLogin: 'Log in',
+      navRegister: 'Sign up',
+      accents: '🇺🇸 American · 🇬🇧 British · 🇦🇺 Australian',
+    },
+    header: {
+      explore: 'The method',
+      start: 'Try it',
     },
   },
   game: {

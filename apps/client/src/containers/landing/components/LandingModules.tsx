@@ -5,25 +5,21 @@ import { useI18n } from '@/core/i18n';
 const modulesMeta = [
   {
     Icon: Volume2,
-    examples: ['/θ/ vs /ð/', 'T suave', 'schwa /ə/'],
     color: 'var(--color-brand)',
     colorDim: 'var(--color-brand-dim)',
   },
   {
     Icon: Link2,
-    examples: ['gonna', 'wanna', 'word linking'],
     color: 'var(--color-brand-light)',
     colorDim: 'var(--color-brand-dim)',
   },
   {
     Icon: Sparkles,
-    examples: ['however', 'furthermore', 'in short'],
     color: 'var(--color-accent-green)',
     colorDim: 'var(--color-accent-green-dim)',
   },
   {
     Icon: MessageCircle,
-    examples: ['stuff', 'you guys', "I'm good"],
     color: 'var(--color-accent-green)',
     colorDim: 'var(--color-accent-green-dim)',
   },
@@ -34,8 +30,8 @@ export const LandingModules = (): ReactElement => {
   const m = t.landing.modules;
 
   return (
-    <section className="px-5 py-20">
-      <div className="mx-auto max-w-2xl">
+    <section className="border-t border-[var(--color-border)] px-5 py-20">
+      <div className="mx-auto max-w-5xl">
         <p className="mb-3 text-center text-sm font-semibold uppercase tracking-widest text-[var(--color-brand)]">
           {m.sectionLabel}
         </p>
@@ -76,7 +72,7 @@ export const LandingModules = (): ReactElement => {
                   {item.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {meta.examples.map((ex) => (
+                  {item.examples.map((ex) => (
                     <span
                       key={ex}
                       className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-2 py-0.5 font-mono text-xs text-[var(--color-text-muted)]"
