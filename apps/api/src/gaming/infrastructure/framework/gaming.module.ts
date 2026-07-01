@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Domain tokens
@@ -6,6 +6,7 @@ import { GAME_REPOSITORY } from '@/gaming/domain/game.repository';
 import { ATTEMPT_REPOSITORY } from '@/gaming/domain/attempt.repository';
 import { FLASHCARD_SELECTOR } from '@/gaming/domain/flashcard-selector';
 import { GAME_FLASHCARD_QUERY } from '@/gaming/domain/game-flashcard-query';
+import { FLASHCARD_CATEGORY_QUERY } from '@/gaming/domain/flashcard-category.query';
 
 // Infrastructure — persistence
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
@@ -13,6 +14,7 @@ import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-fl
 import { TypeOrmGameRepository } from '@/gaming/infrastructure/persistence/typeorm-game.repository';
 import { TypeOrmAttemptRepository } from '@/gaming/infrastructure/persistence/typeorm-attempt.repository';
 import { TypeOrmGameFlashcardQuery } from '@/gaming/infrastructure/persistence/typeorm-game-flashcard-query';
+import { TypeOrmFlashcardCategoryQuery } from '@/gaming/infrastructure/persistence/typeorm-flashcard-category.query';
 
 // Infrastructure — selectors
 import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/typeorm-flashcard-selector';
@@ -21,15 +23,20 @@ import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/type
 import { StartGamePostController } from '@/gaming/infrastructure/controllers/start-game-post.controller';
 import { RecordAttemptPostController } from '@/gaming/infrastructure/controllers/record-attempt-post.controller';
 import { CompleteGamePostController } from '@/gaming/infrastructure/controllers/complete-game-post.controller';
-import { GetGameSummaryGetController } from '@/gaming/infrastructure/controllers/get-game-summary-get.controller';
-import { PatchGameController } from '@/gaming/infrastructure/controllers/patch-game.controller';
-import { ListPausedGamesGetController } from '@/gaming/infrastructure/controllers/list-paused-games-get.controller';
-import { ResumeGameGetController } from '@/gaming/infrastructure/controllers/resume-game-get.controller';
-import { GetGameFlashcardsController } from '@/gaming/infrastructure/controllers/get-game-flashcards.controller';
-import { GamesStatsGetController } from '@/gaming/infrastructure/controllers/games-stats-get.controller';
+import { FindGameSummaryGetController } from '@/gaming/infrastructure/controllers/find-game-summary-get.controller';
+import { PatchGamePatchController } from '@/gaming/infrastructure/controllers/patch-game-patch.controller';
+import { SearchGamesGetController } from '@/gaming/infrastructure/controllers/search-games-get.controller';
+import { ResumeGamePostController } from '@/gaming/infrastructure/controllers/resume-game-post.controller';
+import { SearchGameFlashcardsGetController } from '@/gaming/infrastructure/controllers/search-game-flashcards-get.controller';
+import { SearchGamesStatsGetController } from '@/gaming/infrastructure/controllers/search-games-stats-get.controller';
 import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
 import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
+import { USER_GAMES_COMPLETED_QUERY } from '@/gaming/domain/user-games-completed.query';
+import { TypeOrmUserGamesCompletedQuery } from '@/gaming/infrastructure/persistence/typeorm-user-games-completed.query';
+import { GAMING_USER_ACTIVITY_QUERY } from '@/gaming/domain/gaming-user-activity.query';
+import { TypeOrmGamingUserActivityQuery } from '@/gaming/infrastructure/persistence/typeorm-gaming-user-activity.query';
 import { GameStatsRetriever } from '@/gaming/application/stats/game-stats-retriever';
+import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
 
 // Infrastructure — exception registry
 import { GamingExceptionRegistry } from './gaming-exception-registry';
@@ -53,27 +60,33 @@ import { ViewRecorder } from '@/gaming/application/view/view-recorder';
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 import { ProgressModule } from '@/progress/infrastructure/framework/progress.module';
-import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/providers/progress-weakest-flashcard-ids.provider';
+import { GuestGamesMigrator } from '@/gaming/application/migrate-guest/guest-games-migrator';
+import { MigrateGuestGamesOnGuestProgressMigrated } from '@/gaming/application/migrate-guest/migrate-guest-games-on-guest-progress-migrated';
+import {
+  SUBSCRIBERS,
+  SubscribersBootstrapper,
+} from '@/shared/infrastructure/event-bus/subscribers-bootstrapper';
+import { type Subscriber } from '@/shared/application/subscriber';
 
 @Module({
   imports: [
     SharedModule,
     AuthModule,
-    ProgressModule,
+    forwardRef(() => ProgressModule),
     TypeOrmModule.forFeature([GameEntity, GameFlashcardEntity]),
   ],
   controllers: [
     StartGamePostController,
+    SearchGamesStatsGetController,
+    SearchGamesGetController,
     RecordAttemptPostController,
     RecordViewPostController,
     CompleteGamePostController,
-    GetGameSummaryGetController,
-    PatchGameController,
-    ListPausedGamesGetController,
-    ResumeGameGetController,
-    GetGameFlashcardsController,
-    GamesStatsGetController,
+    FindGameSummaryGetController,
+    PatchGamePatchController,
+    ResumeGamePostController,
+    SearchGameFlashcardsGetController,
   ],
   providers: [
     // Repositories
@@ -83,12 +96,25 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     { provide: FLASHCARD_SELECTOR, useClass: TypeOrmFlashcardSelector },
     { provide: GAME_FLASHCARD_QUERY, useClass: TypeOrmGameFlashcardQuery },
     {
+      provide: FLASHCARD_CATEGORY_QUERY,
+      useClass: TypeOrmFlashcardCategoryQuery,
+    },
+    {
       provide: WEAKEST_FLASHCARD_IDS_PROVIDER,
       useClass: ProgressWeakestFlashcardIdsProvider,
     },
 
     // Queries
     { provide: GAME_STATS_QUERY, useClass: TypeOrmGameStatsQuery },
+    {
+      provide: GAMING_USER_ACTIVITY_QUERY,
+      useClass: TypeOrmGamingUserActivityQuery,
+    },
+
+    {
+      provide: USER_GAMES_COMPLETED_QUERY,
+      useClass: TypeOrmUserGamesCompletedQuery,
+    },
 
     // Use cases
     GameStatsRetriever,
@@ -102,9 +128,20 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     GameResumer,
     GameAbandoner,
     GameFlashcardsFetcher,
+    GuestGamesMigrator,
+    MigrateGuestGamesOnGuestProgressMigrated,
+    {
+      provide: SUBSCRIBERS,
+      useFactory: (
+        onGuestMigrated: MigrateGuestGamesOnGuestProgressMigrated,
+      ): Subscriber[] => [onGuestMigrated],
+      inject: [MigrateGuestGamesOnGuestProgressMigrated],
+    },
+    SubscribersBootstrapper,
 
     // Exception registry
     GamingExceptionRegistry,
   ],
+  exports: [GAMING_USER_ACTIVITY_QUERY, USER_GAMES_COMPLETED_QUERY],
 })
 export class GamingModule {}

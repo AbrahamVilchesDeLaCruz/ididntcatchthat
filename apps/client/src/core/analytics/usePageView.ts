@@ -21,7 +21,7 @@ export function usePageView(): void {
     const visitorId = getOrCreateVisitorId();
 
     apiClient
-      .post('/analytics/pageview', {
+      .post('/analytics/page-views', {
         path: location.pathname,
         visitorId,
         userId: userId ?? null,

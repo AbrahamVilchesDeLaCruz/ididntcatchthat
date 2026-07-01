@@ -46,22 +46,28 @@ Esta spec cubre la segunda iteración: 4 tabs, métricas de negocio, endpoint de
 
 ## API Contracts
 
-### Existente — `GET /v1/admin/metrics/summary`
+### Existente — `GET /v1/metrics/summary`
 
-Autenticación: JWT Bearer + rol `admin`.
+Autenticación: JWT Bearer + rol `admin`. Respuesta con envelope `{ data, meta }`.
 
 ```typescript
-// Response body
+// Response body (envelope)
 {
-  metrics: Array<{
-    name: string;    // e.g. "http_requests_total", "nodejs_heap_size_used_bytes"
-    help: string;
-    type: string;    // "counter" | "histogram" | "gauge"
-    samples: Array<{
-      labels: Record<string, string>;  // siempre incluye "app"="ididntcatchthat-api"
-      value: number;
+  data: {
+    metrics: Array<{
+      name: string;    // e.g. "http_requests_total", "nodejs_heap_size_used_bytes"
+      help: string;
+      type: string;    // "counter" | "histogram" | "gauge"
+      samples: Array<{
+        labels: Record<string, string>;  // siempre incluye "app"="ididntcatchthat-api"
+        value: number;
+      }>;
     }>;
-  }>;
+  },
+  meta: {
+    timestamp: string;
+    request_id: string;
+  },
 }
 ```
 
@@ -69,7 +75,7 @@ Labels HTTP: `method`, `route`, `status_code`, `app`.
 Labels histogram: añaden `le` para buckets.  
 Nota: `_sum` y `_count` de histogramas se exponen como **nombres de métrica separados** (`http_request_duration_seconds_sum`, `http_request_duration_seconds_count`).
 
-### Nuevo — `GET /v1/admin/users/stats`
+### Nuevo — `GET /v1/users/stats`
 
 Autenticación: JWT Bearer + rol `admin`.
 

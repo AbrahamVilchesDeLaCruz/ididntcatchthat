@@ -63,9 +63,9 @@ export class FlashcardFinder {
 Para lógica reutilizable que necesitan varios casos de uso. Viven en `domain/`.
 
 ```typescript
-// flashcards/domain/flashcard-finder.service.ts
+// flashcards/domain/flashcard-finder.ts
 @Injectable()
-export class FlashcardFinderService {
+export class FlashcardFinder {
   constructor(
     @Inject(FLASHCARD_REPOSITORY)
     private readonly repository: FlashcardRepository,
@@ -81,9 +81,11 @@ export class FlashcardFinderService {
 
 **Reglas:**
 
-- Nombre: `{Feature}{Action}Service` con sufijo `Service`
-- Método con verbo descriptivo: `find()`, `validate()`, `calculate()`
-- Reutilizable desde múltiples casos de uso — si solo lo usa uno, va directo en el use case
+- Nombre: `{Feature}{Action}` — **sin sufijo `Service`** (ver `api-bc-review`)
+- Archivo: `{feature}-{action}.ts` — p.ej. `flashcard-finder.ts`, `achievement-catalog-finder.ts`
+- Método con verbo descriptivo: `find()`, `validate()`, `calculate()`, `list()`
+- Reutilizable desde varios casos de uso — si solo lo usa uno, va directo en el use case
+- Sufijos permitidos en domain: solo `Repository`, `Event`, excepciones (`Exception` / error tipado)
 
 ### UseCase vs Domain Service
 
@@ -92,7 +94,7 @@ export class FlashcardFinderService {
 | **Método**       | `execute()`                 | verbo descriptivo: `find()`, `validate()` |
 | **Reutilizable** | No — un flujo concreto      | Sí — lo llaman varios casos de uso        |
 | **Dónde**        | `application/{verb}/`       | `domain/`                                 |
-| **Ejemplo**      | `FlashcardFinder.execute()` | `FlashcardFinderService.find()`           |
+| **Ejemplo**      | `FlashcardFinder.execute()` | `FlashcardFinder.find()` en domain |
 
 ### Inyección — nombre por ROL
 
@@ -101,8 +103,7 @@ El nombre de la variable inyectada refleja el ROL, no la clase concreta.
 ```typescript
 // ✅
 constructor(private readonly repository: FlashcardRepository) {}
-constructor(private readonly finder: FlashcardFinderService) {}
-constructor(private readonly creator: FlashcardCreatorService) {}
+constructor(private readonly finder: FlashcardFinder) {}
 
 // ❌
 constructor(private readonly flashcardRepository: FlashcardRepository) {}

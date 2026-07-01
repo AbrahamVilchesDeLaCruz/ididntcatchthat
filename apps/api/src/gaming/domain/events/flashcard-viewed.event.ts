@@ -7,10 +7,13 @@ export interface FlashcardViewedAttributes extends DomainEventAttributes {
   gameId: string;
   userId: string | null;
   flashcardId: string;
+  flashcardModule: string | null;
   viewedAt: string;
 }
 
 export class FlashcardViewedEvent extends DomainEvent {
+  static readonly EVENT_NAME = 'ididntcatchthat.gaming.views.flashcard.viewed';
+
   constructor(
     aggregateId: string,
     readonly attrs: FlashcardViewedAttributes,
@@ -21,6 +24,6 @@ export class FlashcardViewedEvent extends DomainEvent {
   }
 
   eventName(): string {
-    return 'ididntcatchthat.gaming.views.flashcard.viewed';
+    return FlashcardViewedEvent.EVENT_NAME;
   }
 }

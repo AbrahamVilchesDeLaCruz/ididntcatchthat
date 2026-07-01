@@ -27,11 +27,11 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
   });
 
   describe('POST /v1/flashcards', () => {
-    it('should return 201 with created flashcard when admin sends valid payload', async () => {
+    it('should return 201 when admin sends valid payload', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
 
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/v1/flashcards')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
@@ -47,10 +47,6 @@ describe('content/flashcard CreateFlashcardPostController (e2e)', () => {
           ],
         })
         .expect(201);
-
-      const body = res.body as { id: string; expression: string };
-      expect(body.id).toBe(id);
-      expect(body.expression).toBe(VALID_PAYLOAD.expression);
     });
 
     it('should return 401 when no token is provided', async () => {

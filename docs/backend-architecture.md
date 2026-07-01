@@ -107,8 +107,9 @@ src/
 │   ├── application/                 ← Subscriber base, interfaces de handlers
 │   └── infrastructure/              ← conexión DB, EventBus impl, Criteria, DI container, PinoLogger
 └── observability/                   ← módulo técnico transversal (no es un BC de dominio)
+    ├── application/summary/         ← read port + MetricsSummaryRetriever (admin JSON)
     └── infrastructure/
-        ├── controllers/             ← metrics-get.controller.ts
+        ├── controllers/             ← metrics-get + search-metrics-summary-get
         ├── metrics.interceptor.ts   ← MetricsInterceptor (prom-client)
         └── framework/
             └── observability.module.ts
@@ -227,8 +228,9 @@ Módulo técnico transversal — no es un Bounded Context de dominio sino infrae
 Responsabilidades:
 - **`MetricsInterceptor`** — intercepta cada request HTTP y registra duración y conteo en prom-client
 - **`MetricsGetController`** — expone `GET /metrics` para que Prometheus haga scraping
-- **`ObservabilityModule`** — registra el Registry de prom-client, el interceptor global y el controller
+- **`SearchMetricsSummaryGetController`** — expone `GET /v1/metrics/summary` (admin, envelope JSON)
+- **`ObservabilityModule`** — registra el Registry de prom-client, el interceptor global y los controllers
 
-No tiene capa `domain/` ni `application/` — es puramente infraestructura técnica.
+No tiene capa `domain/` — es infraestructura técnica con un read slice en `application/summary/`.
 
-`SharedModule` exporta el `Logger`. `ObservabilityModule` gestiona todo lo relacionado con métricas HTTP.
+Tokens `METRICS_REGISTRY` y `APP_METRICS` viven en `shared/domain/`. `PrometheusAppMetrics` implementa `AppMetrics` en `shared/infrastructure/metrics/`.

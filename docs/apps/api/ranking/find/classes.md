@@ -2,12 +2,15 @@
 
 ```mermaid
 classDiagram
-    class RankingFinder {
-        +execute(request) RankingFinderResult
+    class RankingSearcher {
+        +execute(request) ResponseRankingSearcher
     }
-    class RankingSelector {
+    class RankingLeaderboardQuery {
         +selectLeaderboard(key, limit) RankingEntry[]
         +selectUserEntry(key, userId) RankingEntry
+    }
+    class RankingViewerProjector {
+        +project(preferences, currentUser) RankingViewerResponse
     }
     class RankingKey {
         +type RankingType
@@ -23,9 +26,11 @@ classDiagram
         +score number
         +toPrimitives() RankingEntryPrimitives
     }
-    RankingFinder --> RankingSelector
-    RankingFinder --> RankingKey
-    RankingSelector --> RankingEntry
+    RankingSearcher --> RankingLeaderboardQuery
+    RankingSearcher --> RankingProfileQuery
+    RankingSearcher --> RankingViewerProjector
+    RankingSearcher --> RankingKey
+    RankingLeaderboardQuery --> RankingEntry
 ```
 
-`RankingFinder` no usa el repository en el path de lectura — las queries con `RANK()` viven en `RankingSelector` (patrón selector, igual que `FlashcardSelector` en Gaming).
+`RankingSearcher` no usa el repository en el path de lectura — las queries con `RANK()` viven en `RankingLeaderboardQuery`.

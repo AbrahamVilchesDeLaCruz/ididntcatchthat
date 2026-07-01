@@ -25,11 +25,16 @@ export class GuestProgressImporterOnGuestProgressMigrated extends Subscriber {
   }
 
   async on(event: DomainEvent): Promise<void> {
-    const attrs = event.attributes as { userId: string; guestDeviceId: string };
+    const attrs = event.attributes as {
+      userId: string;
+      guestDeviceId: string;
+      gameIds: string[];
+    };
     await this.importer.execute({
       eventId: event.eventId,
       userId: attrs.userId,
       guestDeviceId: attrs.guestDeviceId,
+      gameIds: attrs.gameIds ?? [],
     });
   }
 }

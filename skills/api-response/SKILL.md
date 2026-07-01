@@ -198,7 +198,8 @@ async handler(@Param('id') id: string): Promise<void> {
 ## Rules
 
 - Los endpoints de **comando** (mutación) devuelven **solo status code** — sin body
-- Los endpoints de **query** (lectura) devuelven siempre el **envelope** con `data` y `meta`
+- Los endpoints de **query** (lectura) devuelven siempre el **envelope** con `data` y `meta` — usar `ApiResponse.of()` / `PaginatedApiResponse.of()` desde `shared/infrastructure/http/response/api-response.ts`
+- `resolveRequestId(req)` desde `shared/infrastructure/http/resolve-request-id.ts`
 - `pagination` solo si el endpoint acepta `page` y `limit` en la query
 - Sin `success`, sin `message` en respuestas exitosas
 - El `request_id` se lee del header `X-Request-Id` si viene del cliente, o se genera con `crypto.randomUUID()`

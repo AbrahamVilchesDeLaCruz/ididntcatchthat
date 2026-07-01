@@ -1,10 +1,10 @@
 import { type DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { type AudioUrlsPrimitives } from '@/content/flashcard/domain/audio-urls';
-import { ConnectedSpeechSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
-import { FlowConnectorsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
-import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
-import { RealTalkSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { ConnectedSpeechSubcategory } from '@/shared/domain/subcategory-taxonomy';
+import { FlowConnectorsSubcategory } from '@/shared/domain/subcategory-taxonomy';
+import { NativeSoundsSubcategory } from '@/shared/domain/subcategory-taxonomy';
+import { RealTalkSubcategory } from '@/shared/domain/subcategory-taxonomy';
 import { LearningModule } from '@/shared/domain/learning-module';
 
 export const LOCAL_DEMO_USER_ID = '00000000-0000-4000-a000-000000000001';

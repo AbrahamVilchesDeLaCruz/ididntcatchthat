@@ -12,6 +12,10 @@ import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
+import {
+  type FlashcardCategoryQuery,
+  FLASHCARD_CATEGORY_QUERY,
+} from '@/gaming/domain/flashcard-category.query';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
@@ -28,6 +32,8 @@ export class AttemptRecorder {
     private readonly attemptRepository: AttemptRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(FLASHCARD_CATEGORY_QUERY)
+    private readonly flashcardCategoryQuery: FlashcardCategoryQuery,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -42,7 +48,9 @@ export class AttemptRecorder {
       throw new GameAccessDenied(gameId);
     }
 
-    const attempt = game.recordAttempt(flashcardId, correct);
+    const flashcardModule =
+      await this.flashcardCategoryQuery.findCategoryByFlashcardId(flashcardId);
+    const attempt = game.recordAttempt(flashcardId, correct, flashcardModule);
 
     await this.attemptRepository.save(attempt);
     await this.gameRepository.save(game);

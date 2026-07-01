@@ -43,6 +43,7 @@ describe('GET /progress/summary (e2e)', () => {
     expect(data.totalAttempts).toBeGreaterThan(0);
     expect(data.gamesCompleted).toBeGreaterThanOrEqual(1);
     expect(typeof data.currentStreak).toBe('number');
+    expect(res.body.meta.request_id).toBeDefined();
   });
 });
 
@@ -87,7 +88,9 @@ describe('POST /games source=weakest (e2e)', () => {
       .send({ mode: 'game', cardCount: 10, source: 'weakest' })
       .expect(201);
 
-    const body = res.body as { gameId: string; flashcardIds: string[] };
+    const body = (
+      res.body as { data: { gameId: string; flashcardIds: string[] } }
+    ).data;
     expect(body.flashcardIds.length).toBeGreaterThan(0);
     expect(body.flashcardIds).toContain(wrongId);
   });

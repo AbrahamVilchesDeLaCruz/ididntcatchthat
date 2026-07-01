@@ -7,6 +7,7 @@ type GuestProgressMigratedAttributes = {
   userId: string;
   deviceId: string;
   guestDeviceId: string;
+  gameIds: string[];
 };
 
 export class GuestProgressMigratedEvent extends DomainEvent {

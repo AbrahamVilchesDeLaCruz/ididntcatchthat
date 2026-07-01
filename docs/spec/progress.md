@@ -32,11 +32,12 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Eventos consumidos
 
-| Exchange                                      | BC Emisor | Handler                                            | Idempotencia                                 |
-| --------------------------------------------- | --------- | -------------------------------------------------- | -------------------------------------------- |
-| `idct.gaming.attempts.attempt.recorded`       | Gaming    | `update_flashcard_stats_on_attempt_recorded`       | Natural — UPSERT por `(userId, flashcardId)` |
-| `idct.gaming.games.game.completed`            | Gaming    | `update_module_progress_on_game_completed`         | Natural — recálculo idempotente              |
-| `idct.identity.users.guest_progress.migrated` | Identity  | `import_guest_progress_on_guest_progress_migrated` | Inbox table — `processed_events`             |
+| Exchange | BC Emisor | Handler | Idempotencia |
+| -------- | --------- | ------- | ------------ |
+| `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | `FlashcardStatsUpdaterOnAttemptRecorded` | Natural — UPSERT por `(userId, flashcardId)` |
+| `ididntcatchthat.gaming.views.flashcard.viewed` | Gaming | `FlashcardStatsUpdaterOnFlashcardViewed` | Natural — UPSERT por `(userId, flashcardId)` |
+| `ididntcatchthat.gaming.games.game.completed` | Gaming | `ModuleProgressUpdaterOnGameCompleted` | Natural — recálculo idempotente |
+| `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | `GuestProgressImporterOnGuestProgressMigrated` | Inbox table — `processed_events` |
 
 ### Reglas de procesamiento
 
@@ -51,9 +52,9 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Eventos publicados
 
-| Exchange                                        | Cuándo                                         |
-| ----------------------------------------------- | ---------------------------------------------- |
-| `idct.progress.module_progress.module_level.up` | Cuando `masteryLevel` sube en `ModuleProgress` |
+| Exchange | Cuándo |
+| -------- | ------ |
+| `idct.progress.module_progress.module_mastery_level.increased` | Cuando `masteryLevel` sube — `ModuleProgress.record()` |
 
 ---
 
@@ -171,7 +172,7 @@ ModuleProgress
 
 ```
 ModuleLevelUpEvent
-  eventName: 'idct.progress.module_progress.module_level.up'
+  eventName: 'idct.progress.module_progress.module_mastery_level.increased'
   attrs:
     userId: string
     module: string
@@ -183,8 +184,8 @@ ModuleLevelUpEvent
 ### Domain Exceptions
 
 ```
-UserFlashcardStatsNotFound
-  — cuando se busca stats de un usuario/flashcard que no existe
+ModuleNameInvalid
+  — cuando el slug de módulo no pertenece a LEARNING_MODULES
 ```
 
 ### Repository Interface

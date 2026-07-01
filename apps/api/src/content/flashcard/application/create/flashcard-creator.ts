@@ -12,6 +12,7 @@ import {
   DOMAIN_EVENT_PUBLISHER,
 } from '@/shared/domain/domain-event-publisher';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { type RequestFlashcardCreator } from './request-flashcard-creator';
 
 export type { RequestFlashcardCreator } from './request-flashcard-creator';
@@ -25,6 +26,8 @@ export class FlashcardCreator {
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(
@@ -62,6 +65,8 @@ export class FlashcardCreator {
       expression,
       createdBy,
     });
+
+    this.metrics.increment('app_flashcards_created_total');
 
     return flashcard.toPrimitives();
   }

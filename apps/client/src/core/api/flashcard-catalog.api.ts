@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import type { FlashcardCatalogApiModel } from '@/core/api/flashcard-catalog.api-model';
 
 export const flashcardCatalogKeys = {
@@ -12,10 +13,10 @@ export const useFlashcardCatalog = () => {
   return useQuery({
     queryKey: flashcardCatalogKeys.catalog(),
     queryFn: async (): Promise<FlashcardCatalogApiModel> => {
-      const res = await apiClient.get<FlashcardCatalogApiModel>(
+      const res = await apiClient.get<ApiEnvelope<FlashcardCatalogApiModel>>(
         '/flashcards/catalog',
       );
-      return res.data;
+      return res.data.data;
     },
     staleTime: Infinity,
   });

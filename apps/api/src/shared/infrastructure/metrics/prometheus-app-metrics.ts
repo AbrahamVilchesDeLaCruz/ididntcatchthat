@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Counter, Registry } from 'prom-client';
 import { type AppMetrics } from '@/shared/domain/app-metrics';
-import { METRICS_REGISTRY } from '@/observability/infrastructure/framework/metrics-registry.token';
+import { METRICS_REGISTRY } from '@/shared/domain/metrics-registry';
 
 interface MetricDef {
   name: string;

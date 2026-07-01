@@ -2,27 +2,23 @@
 
 ```mermaid
 sequenceDiagram
-    actor U as Usuario
-    participant API as GET /rankings
-    participant Finder as RankingFinder
-    participant Sel as RankingSelector
-    participant DB as ranking_user_scores
+    participant C as SearchRankingsGetController
+    participant S as RankingSearcher
+    participant Q as RankingLeaderboardQuery
+    participant P as RankingProfileQuery
+    participant V as RankingViewerProjector
 
-    U->>API: type + period + module?
-    API->>Finder: execute(userId, type, period, limit)
-    Finder->>Finder: RankingKey.create(type, period, module)
-    Finder->>Sel: selectLeaderboard(key, limit)
-    Sel->>DB: SELECT top N (RANK OVER score)
-    DB-->>Sel: entries
-    Sel-->>Finder: RankingEntry[]
-    alt currentUser no está en top N
-        Finder->>Sel: selectUserEntry(key, userId)
-        Sel->>DB: SELECT rank por user_id
-        DB-->>Sel: currentUser entry
-        Sel-->>Finder: RankingEntry
+    C->>S: execute(userId, type, period, module?, limit?)
+    S->>S: RankingKey.create(type, period, module)
+    S->>Q: selectLeaderboard(key, limit)
+    Q-->>S: entries[]
+    alt user not in top N
+        S->>Q: selectUserEntry(key, userId)
+        Q-->>S: currentUser | null
     end
-    Finder-->>API: entries + currentUser
-    API-->>U: JSON response
+    S->>P: findUserRankingPreferences(userId)
+    P-->>S: preferences
+    S->>V: project(preferences, currentUser)
+    V-->>S: viewer
+    S-->>C: { entries, currentUser, viewer }
 ```
-
-No hay recomputo ni job programado en el path de lectura.

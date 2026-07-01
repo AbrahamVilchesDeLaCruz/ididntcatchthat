@@ -6,6 +6,7 @@ import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { GameModeMother } from '@test/gaming/domain/game-mode-mother';
+import { GameModuleMother } from '@test/gaming/domain/game-module-mother';
 import { DateMother } from '@test/shared/domain/date-mother';
 import { BooleanMother } from '@test/shared/domain/boolean-mother';
 
@@ -18,6 +19,7 @@ export class AttemptRecordedEventMother {
       gameId,
       userId: UserIdMother.random().value,
       flashcardId: UuidMother.random(),
+      flashcardModule: GameModuleMother.nativeSounds().value,
       correct: BooleanMother.random(),
       mode: GameModeMother.game().value,
       answeredAt: DateMother.recent().toISOString(),

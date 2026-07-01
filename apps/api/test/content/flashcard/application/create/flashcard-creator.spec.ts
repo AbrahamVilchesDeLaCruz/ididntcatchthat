@@ -1,5 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { FlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
@@ -12,12 +13,13 @@ import { JestTimers } from '@test/shared/jest-timers';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { RequestFlashcardCreatorMother } from './request-flashcard-creator-mother';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { ConnectedSpeechSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { ConnectedSpeechSubcategory } from '@/shared/domain/subcategory-taxonomy';
 
 describe('content/flashcard/application/create FlashcardCreator', () => {
   const repository = mock<FlashcardRepository>();
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
+  const metrics = mock<AppMetrics>();
   let creator: FlashcardCreator;
 
   beforeEach(() => {
@@ -28,7 +30,7 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
     publisher.publish.mockResolvedValue(undefined);
     repository.save.mockResolvedValue(undefined);
 
-    creator = new FlashcardCreator(repository, publisher, logger);
+    creator = new FlashcardCreator(repository, publisher, logger, metrics);
   });
 
   afterEach(() => JestTimers.teardown());
@@ -56,6 +58,9 @@ describe('content/flashcard/application/create FlashcardCreator', () => {
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(FlashcardCreatedEvent);
     expect(result).toEqual(expected.toPrimitives());
+    expect(metrics.increment).toHaveBeenCalledWith(
+      'app_flashcards_created_total',
+    );
   });
 
   it('should throw ExpressionEmpty when expression is blank', async () => {

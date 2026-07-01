@@ -13,12 +13,7 @@ import { type RequestModuleProgressFinder } from './request-module-progress-find
 
 export type { RequestModuleProgressFinder };
 
-const ALL_MODULES = [
-  'native_sounds',
-  'connected_speech',
-  'flow_connectors',
-  'real_talk',
-] as const;
+import { LEARNING_MODULES } from '@/shared/domain/learning-module';
 
 @Injectable()
 export class ModuleProgressFinder {
@@ -45,7 +40,7 @@ export class ModuleProgressFinder {
     );
     const studyByModule = new Map(studyLevels.map((s) => [s.module, s]));
 
-    return ALL_MODULES.map((module) => {
+    return LEARNING_MODULES.map((module) => {
       const existing = progressByModule.get(module);
       const study = studyByModule.get(module) ?? {
         studyLevel: 0,

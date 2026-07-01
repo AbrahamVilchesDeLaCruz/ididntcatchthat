@@ -6,6 +6,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import type { RankingProfileVM } from '@/containers/ranking/ranking.types';
 
 type RankingProfileApiModel = {
@@ -24,7 +25,7 @@ export const useRankingProfile = (options?: {
     queryKey: rankingProfileKeys.profile,
     enabled: options?.enabled ?? true,
     queryFn: async (): Promise<RankingProfileVM> => {
-      const res = await apiClient.get<{ data: RankingProfileApiModel }>(
+      const res = await apiClient.get<ApiEnvelope<RankingProfileApiModel>>(
         '/users/me/ranking-profile',
       );
       return res.data.data;
@@ -46,7 +47,7 @@ export const useUpdateRankingProfile = (
     mutationFn: async (
       payload: RankingProfileVM,
     ): Promise<RankingProfileVM> => {
-      const res = await apiClient.patch<{ data: RankingProfileApiModel }>(
+      const res = await apiClient.patch<ApiEnvelope<RankingProfileApiModel>>(
         '/users/me/ranking-profile',
         payload,
       );

@@ -1,16 +1,16 @@
-# Find Rankings — Casos de Uso
+# Find Rankings — Casos de uso
 
-```mermaid
-graph TB
-    User(["Usuario autenticado"])
-    UC1["Consultar ranking por tipo y período"]
-    User --> UC1
-```
+## `RankingSearcher`
 
-| Regla | Descripción |
-| ----- | ----------- |
-| Opt-in | Solo usuarios con filas en `ranking_user_scores` (`show_in_ranking = true` al escribir) |
-| Lectura directa | `RankingSelector` sobre `ranking_user_scores` — sin recomputo |
-| `module_master` | Requiere query param `module` |
-| Posición fuera del top N | `currentUser` resuelto con `RankingSelector.selectUserEntry` |
-| `best_streak` / `module_master` | Período efectivo siempre `all_time` |
+| Input | Output |
+| ----- | ------ |
+| `userId`, `type`, `period`, `module?`, `limit?` | `{ entries, currentUser, viewer }` |
+
+### Reglas
+
+| Regla | Detalle |
+| ----- | ------- |
+| Lectura directa | `RankingLeaderboardQuery` sobre `ranking_user_scores` — sin recomputo |
+| `isMe` | Marcado en cada entry comparando `userId` |
+| Posición fuera del top N | `currentUser` resuelto con `RankingLeaderboardQuery.selectUserEntry` |
+| Viewer | `RankingViewerProjector` según opt-in y score |

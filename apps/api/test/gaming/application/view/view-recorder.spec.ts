@@ -6,6 +6,7 @@ import { type DomainEventPublisher } from '@/shared/domain/domain-event-publishe
 import { ViewRecorder } from '@/gaming/application/view/view-recorder';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
+import { type FlashcardCategoryQuery } from '@/gaming/domain/flashcard-category.query';
 import { FlashcardViewedEvent } from '@/gaming/domain/events/flashcard-viewed.event';
 import { View } from '@/gaming/domain/view';
 import { GameMother } from '@test/gaming/domain/game-mother';
@@ -15,6 +16,7 @@ describe('gaming/application/view ViewRecorder', () => {
   const gameRepository = mock<GameRepository>();
   const viewRepository = mock<ViewRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const flashcardCategoryQuery = mock<FlashcardCategoryQuery>();
   const logger = mock<Logger>();
   let recorder: ViewRecorder;
 
@@ -28,10 +30,14 @@ describe('gaming/application/view ViewRecorder', () => {
     publisher.publish.mockResolvedValue(undefined);
     gameRepository.save.mockResolvedValue(undefined);
     viewRepository.save.mockResolvedValue(undefined);
+    flashcardCategoryQuery.findCategoryByFlashcardId.mockResolvedValue(
+      'native_sounds',
+    );
     recorder = new ViewRecorder(
       gameRepository,
       viewRepository,
       publisher,
+      flashcardCategoryQuery,
       logger,
     );
   });

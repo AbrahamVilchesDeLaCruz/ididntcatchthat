@@ -1,6 +1,6 @@
 import { type UserId } from '@/shared/domain/user-id';
 
-export interface WeakestFlashcardDto {
+export interface WeakestFlashcard {
   flashcardId: string;
   expression: string;
   /** @deprecated use category — kept for backward compatibility */
@@ -21,7 +21,7 @@ export interface WeakestFlashcardQuery {
     userId: UserId,
     limit: number,
     filters?: WeakestFlashcardFilters,
-  ): Promise<WeakestFlashcardDto[]>;
+  ): Promise<WeakestFlashcard[]>;
 }
 
 export const WEAKEST_FLASHCARD_QUERY = Symbol('WeakestFlashcardQuery');

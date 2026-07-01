@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import {
+  GAMING_USER_ACTIVITY_QUERY,
+  type GamingUserActivityQuery,
+} from '@/gaming/domain/gaming-user-activity.query';
 import {
   type UserStatsQuery,
   type UserStatPeriod,
@@ -61,11 +65,31 @@ function periodCfg(period: UserStatPeriod): PeriodCfg {
   }
 }
 
+function sinceDateForInterval(interval: string | null): Date | null {
+  if (!interval) return null;
+  const since = new Date();
+  const match = /^(\d+)\s+(hour|hours|day|days|month|months)$/.exec(interval);
+  if (!match) return since;
+
+  const amount = parseInt(match[1], 10);
+  const unit = match[2];
+  if (unit.startsWith('hour')) {
+    since.setHours(since.getHours() - amount);
+  } else if (unit.startsWith('day')) {
+    since.setDate(since.getDate() - amount);
+  } else {
+    since.setMonth(since.getMonth() - amount);
+  }
+  return since;
+}
+
 @Injectable()
 export class TypeOrmUserStatsQuery implements UserStatsQuery {
   constructor(
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    @Inject(GAMING_USER_ACTIVITY_QUERY)
+    private readonly gamingActivity: GamingUserActivityQuery,
   ) {}
 
   async execute(period: UserStatPeriod): Promise<ResponseUserStatsRetriever> {
@@ -77,8 +101,13 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
       ? `WHERE created_at >= NOW() - INTERVAL '${pc.interval}'`
       : '';
 
+    const usersWithGames =
+      await this.gamingActivity.countUsersWithAtLeastOneGame();
+    const activeUsers = await this.gamingActivity.countDistinctActiveUsersSince(
+      sinceDateForInterval(pc.interval),
+    );
+
     const [snapshot, periodStats, byProvider, byPeriod] = await Promise.all([
-      // All-time snapshot — uses actual column names: oauth_provider, longest_streak
       this.dataSource.query<
         {
           total: string;
@@ -86,7 +115,6 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
           email_users: string;
           users_with_streak: string;
           avg_longest_streak: string;
-          never_played: string;
         }[]
       >(`
         SELECT
@@ -94,32 +122,16 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
           COUNT(*) FILTER (WHERE oauth_provider = 'google')              AS google_users,
           COUNT(*) FILTER (WHERE oauth_provider IS NULL)                  AS email_users,
           COUNT(*) FILTER (WHERE longest_streak > 0)                     AS users_with_streak,
-          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak,
-          COUNT(*) FILTER (
-            WHERE id NOT IN (
-              SELECT DISTINCT user_id FROM games WHERE user_id IS NOT NULL
-            )
-          )                                                               AS never_played
+          COALESCE(ROUND(AVG(longest_streak)::numeric, 1), 0)            AS avg_longest_streak
         FROM users
       `),
 
-      // Period-aware aggregate
-      this.dataSource.query<
-        { new_registrations: string; active_users: string }[]
-      >(`
-        SELECT
-          COUNT(*) AS new_registrations,
-          (
-            SELECT COUNT(DISTINCT user_id)
-            FROM games
-            WHERE user_id IS NOT NULL
-            ${pc.interval ? `AND started_at >= NOW() - INTERVAL '${pc.interval}'` : ''}
-          ) AS active_users
+      this.dataSource.query<{ new_registrations: string }[]>(`
+        SELECT COUNT(*) AS new_registrations
         FROM users
         ${whereClause}
       `),
 
-      // By provider for the period — normalise NULL → 'email'
       this.dataSource.query<{ provider: string; count: string }[]>(`
         SELECT
           COALESCE(oauth_provider, 'email') AS provider,
@@ -130,7 +142,6 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
         ORDER BY count DESC
       `),
 
-      // Time-series of registrations
       this.dataSource.query<{ date: string; count: string }[]>(`
         SELECT
           TO_CHAR(DATE_TRUNC('${pc.dateTrunc}', gs.bucket), '${pc.dateFormat}') AS date,
@@ -150,7 +161,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
     const snap = snapshot[0];
     const ps = periodStats[0];
     const totalUsers = parseInt(snap.total, 10);
-    const activeUsers = parseInt(ps.active_users, 10);
+    const neverPlayed = Math.max(0, totalUsers - usersWithGames);
     const engagementRate =
       totalUsers > 0
         ? parseFloat(((activeUsers / totalUsers) * 100).toFixed(1))
@@ -163,7 +174,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
       emailUsers: parseInt(snap.email_users, 10),
       usersWithStreak: parseInt(snap.users_with_streak, 10),
       avgLongestStreak: parseFloat(snap.avg_longest_streak),
-      neverPlayed: parseInt(snap.never_played, 10),
+      neverPlayed,
       newRegistrations: parseInt(ps.new_registrations, 10),
       activeUsers,
       engagementRate,

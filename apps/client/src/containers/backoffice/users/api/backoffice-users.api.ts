@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { mapUserStats } from '../backoffice-users.mapper';
 import type { UserStatsApiModel } from './backoffice-users.api-model';
@@ -15,8 +16,8 @@ export const useUserPageStats = (period: UserStatsPeriod = '7d') => {
     queryKey: backofficeUsersKeys.stats(period),
     queryFn: () =>
       apiClient
-        .get<UserStatsApiModel>(`/admin/users/stats?period=${period}`)
-        .then((res) => res.data),
+        .get<ApiEnvelope<UserStatsApiModel>>(`/users/stats?period=${period}`)
+        .then((res) => res.data.data),
     select: mapUserStats,
   });
 };

@@ -1,7 +1,7 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
 import { type Category } from './category';
 import { InvalidSubcategory } from './exceptions/invalid-subcategory';
-import { SUBCATEGORY_BY_CATEGORY } from './subcategory-catalog';
+import { SUBCATEGORY_BY_CATEGORY } from '@/shared/domain/subcategory-taxonomy';
 
 export class Subcategory extends StringValueObject {
   constructor(value: string, category: Category) {

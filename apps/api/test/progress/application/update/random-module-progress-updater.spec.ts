@@ -5,6 +5,8 @@ import { type ModuleProgressUpdater } from '@/progress/application/update/module
 import { RandomModuleProgressUpdater } from '@/progress/application/update/random-module-progress-updater';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ProgressFlashcardIdMother } from '@test/progress/domain/progress-flashcard-id-mother';
+import { ModuleNameMother } from '@test/progress/domain/module-name-mother';
+import { GameIdMother } from '@test/gaming/domain/game-id-mother';
 
 describe('progress/application/update RandomModuleProgressUpdater', () => {
   const gameModuleQuery = mock<GameModuleQuery>();
@@ -25,11 +27,13 @@ describe('progress/application/update RandomModuleProgressUpdater', () => {
   });
 
   it('should skip when the game has a fixed module', async () => {
-    gameModuleQuery.getModule.mockResolvedValue('native_sounds');
+    gameModuleQuery.getModule.mockResolvedValue(
+      ModuleNameMother.nativeSounds().value,
+    );
 
     await updater.executeForRandomAttempt({
       userId: ProgressUserIdMother.random().value,
-      gameId: 'game-id',
+      gameId: GameIdMother.random().value,
       flashcardId: ProgressFlashcardIdMother.random().value,
     });
 
@@ -40,18 +44,19 @@ describe('progress/application/update RandomModuleProgressUpdater', () => {
   it('should recalculate module progress for random games', async () => {
     const userId = ProgressUserIdMother.random().value;
     const flashcardId = ProgressFlashcardIdMother.random().value;
+    const module = ModuleNameMother.nativeSounds().value;
     gameModuleQuery.getModule.mockResolvedValue(null);
-    flashcardModuleQuery.getModule.mockResolvedValue('native_sounds');
+    flashcardModuleQuery.getModule.mockResolvedValue(module);
 
     await updater.executeForRandomAttempt({
       userId,
-      gameId: 'game-id',
+      gameId: GameIdMother.random().value,
       flashcardId,
     });
 
     expect(moduleProgressUpdater.execute).toHaveBeenCalledWith({
       userId,
-      module: 'native_sounds',
+      module,
     });
   });
 
@@ -61,7 +66,7 @@ describe('progress/application/update RandomModuleProgressUpdater', () => {
 
     await updater.executeForRandomAttempt({
       userId: ProgressUserIdMother.random().value,
-      gameId: 'game-id',
+      gameId: GameIdMother.random().value,
       flashcardId: ProgressFlashcardIdMother.random().value,
     });
 

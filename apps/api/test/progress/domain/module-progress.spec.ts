@@ -24,5 +24,8 @@ describe('progress/domain ModuleProgress', () => {
     expect(result.newLevel).toBe(1);
     expect(result.previousLevel).toBe(0);
     expect(result.levelIncreased).toBe(true);
+    expect(result.progress.pullDomainEvents()[0]?.eventName()).toBe(
+      'idct.progress.module_progress.module_mastery_level.increased',
+    );
   });
 });

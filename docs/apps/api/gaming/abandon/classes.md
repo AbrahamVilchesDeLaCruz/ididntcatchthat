@@ -2,7 +2,7 @@
 
 ```mermaid
 classDiagram
-    class PatchGameController {
+    class PatchGamePatchController {
         -gamePauser: GamePauser
         -gameAbandoner: GameAbandoner
         +handle(id: string, payload: PatchGamePayload, user: UserContext): Promise~void~
@@ -29,7 +29,7 @@ classDiagram
         +userId: string
     }
 
-    PatchGameController --> GameAbandoner
+    PatchGamePatchController --> GameAbandoner
     GameAbandoner --> GameRepository
     GameAbandoner --> Game
     Game --> GameAbandonedEvent

@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { useFlashcardCatalog as useFlashcardCatalogCore } from '@/core/api/flashcard-catalog.api';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
 import type { FlashcardsPageVM } from '../flashcards.types';
 import type {
   BulkCreateFlashcardApiPayload,
-  BulkCreateFlashcardApiResult,
   CreateFlashcardApiPayload,
   FlashcardApiModel,
   FlashcardDraftApiModel,
@@ -61,8 +61,8 @@ export const useFlashcard = (
     queryKey: flashcardKeys.detail(id),
     queryFn: () =>
       apiClient
-        .get<FlashcardApiModel>(`/flashcards/${id}`)
-        .then((res) => res.data),
+        .get<ApiEnvelope<FlashcardApiModel>>(`/flashcards/${id}`)
+        .then((res) => res.data.data),
     select: mapFlashcard,
     enabled: !!id,
   });
@@ -93,10 +93,8 @@ export const useUpdateFlashcard = () => {
     }: {
       id: string;
       data: UpdateFlashcardApiPayload;
-    }) =>
-      apiClient
-        .patch<FlashcardApiModel>(`/flashcards/${id}`, data)
-        .then((res) => res.data),
+    }): Promise<void> =>
+      apiClient.patch<void>(`/flashcards/${id}`, data).then((res) => res.data),
     onSuccess: (_, { id }) => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
       void queryClient.invalidateQueries({
@@ -125,12 +123,8 @@ export const useBulkCreateFlashcards = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      payload: BulkCreateFlashcardApiPayload,
-    ): Promise<BulkCreateFlashcardApiResult> =>
-      apiClient
-        .post<BulkCreateFlashcardApiResult>('/flashcards/bulk', payload)
-        .then((res) => res.data),
+    mutationFn: (payload: BulkCreateFlashcardApiPayload): Promise<void> =>
+      apiClient.post<void>('/flashcards/bulk', payload).then((res) => res.data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
     },
@@ -144,7 +138,9 @@ export const useGenerateFlashcards = () => {
       payload: GenerateFlashcardsApiPayload,
     ): Promise<FlashcardDraftApiModel[]> =>
       apiClient
-        .post<GenerateFlashcardsApiResult>('/ai/generate-flashcards', payload)
-        .then((res) => res.data.drafts),
+        .post<
+          ApiEnvelope<GenerateFlashcardsApiResult>
+        >('/flashcards/drafts', payload)
+        .then((res) => res.data.data.drafts),
   });
 };

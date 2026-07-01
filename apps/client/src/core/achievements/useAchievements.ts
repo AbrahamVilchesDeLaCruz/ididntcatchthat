@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { achievementKeys } from './achievementKeys';
 import { mapAchievement } from './achievement.mapper';
 import type { AchievementApiModel, AchievementVM } from './achievement.types';
@@ -8,7 +9,7 @@ export const fetchAchievements = async (
   since?: string,
 ): Promise<AchievementVM[]> => {
   const params = since ? { since } : undefined;
-  const res = await apiClient.get<{ data: AchievementApiModel[] }>(
+  const res = await apiClient.get<ApiEnvelope<AchievementApiModel[]>>(
     '/achievements',
     { params },
   );

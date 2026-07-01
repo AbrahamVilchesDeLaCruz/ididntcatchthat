@@ -1,14 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
-import { mapMetricsSummary, mapDbStats } from '../observability.mapper';
+import {
+  mapMetricsSummary,
+  mapAnalyticsSummary,
+} from '../observability.mapper';
 import type { MetricsSummaryApiModel } from './observability.api-model';
-import type { DbStatsApiModel } from './db-stats.api-model';
-import type { StatPeriod } from '../observability.types';
+import type { AnalyticsSummaryApiModel } from './analytics-summary.api-model';
+import type { SummaryPeriod } from '../observability.types';
 
 export const observabilityKeys = {
   metrics: ['backoffice', 'observability', 'metrics'] as const,
-  dbStats: (period: StatPeriod) =>
-    ['backoffice', 'observability', 'db-stats', period] as const,
+  analyticsSummary: (period: SummaryPeriod) =>
+    ['backoffice', 'observability', 'analytics-summary', period] as const,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -17,22 +21,24 @@ export const useMetricsSummary = () => {
     queryKey: observabilityKeys.metrics,
     queryFn: () =>
       apiClient
-        .get<MetricsSummaryApiModel>('/admin/metrics/summary')
-        .then((res) => res.data),
+        .get<ApiEnvelope<MetricsSummaryApiModel>>('/metrics/summary')
+        .then((res) => res.data.data),
     select: mapMetricsSummary,
     refetchInterval: 30000,
   });
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useDbStats = (period: StatPeriod) => {
+export const useAnalyticsSummary = (period: SummaryPeriod) => {
   return useQuery({
-    queryKey: observabilityKeys.dbStats(period),
+    queryKey: observabilityKeys.analyticsSummary(period),
     queryFn: () =>
       apiClient
-        .get<DbStatsApiModel>(`/admin/analytics/db-stats?period=${period}`)
-        .then((res) => res.data),
-    select: mapDbStats,
+        .get<
+          ApiEnvelope<AnalyticsSummaryApiModel>
+        >(`/analytics/summary?period=${period}`)
+        .then((res) => res.data.data),
+    select: mapAnalyticsSummary,
     staleTime: 60_000,
   });
 };

@@ -11,14 +11,21 @@ import {
 import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { UserAuthenticator } from '@/identity/user/application/login/user-authenticator';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { LoginAuthPostPayload } from './login-auth-post.payload';
 import crypto from 'crypto';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class LoginAuthPostController {
   constructor(
@@ -30,9 +37,24 @@ export class LoginAuthPostController {
   @Post('login')
   @Throttle({ auth: {} })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with email and password' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiOperation({
+    summary: 'Login with email and password',
+    description:
+      'Authenticates a registered user and returns a JWT access token. ' +
+      'Sets an httpOnly refresh token cookie for subsequent token refresh.',
+  })
+  @ApiOkResponse({
+    description:
+      'Login successful — access token returned, refresh token set as cookie',
+    schema: {
+      example: { accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Invalid email format or missing fields',
+    type: ValidationErrorResponse,
+  })
   async handler(
     @Body() body: LoginAuthPostPayload,
     @Ip() ip: string,

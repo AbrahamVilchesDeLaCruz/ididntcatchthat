@@ -53,8 +53,7 @@ describe('content/flashcard FindFlashcardGetController (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      const body = res.body as { id: string };
-      expect(body.id).toBe(id);
+      expect(res.body.data.id).toBe(id);
     });
 
     it('should return 404 when flashcard does not exist', async () => {

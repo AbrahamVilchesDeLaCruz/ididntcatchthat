@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
-  type WeakestFlashcardDto,
+  type WeakestFlashcard,
   type WeakestFlashcardFilters,
   type WeakestFlashcardQuery,
 } from '@/progress/domain/weakest-flashcard.query';
@@ -28,7 +28,7 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
     userId: UserId,
     limit: number,
     filters?: WeakestFlashcardFilters,
-  ): Promise<WeakestFlashcardDto[]> {
+  ): Promise<WeakestFlashcard[]> {
     const params: unknown[] = [userId.value];
     const conditions = [
       'ufs.user_id = $1',

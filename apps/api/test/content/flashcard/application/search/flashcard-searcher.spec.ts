@@ -3,7 +3,7 @@ import { FlashcardSearcher } from '@/content/flashcard/application/search/flashc
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { NativeSoundsSubcategory } from '@/shared/domain/subcategory-taxonomy';
 import { AudioStatusValue } from '@/content/flashcard/domain/audio-status';
 
 describe('content/flashcard/application/search FlashcardSearcher', () => {

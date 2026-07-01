@@ -17,11 +17,11 @@ export class PausedGamesLister {
   ) {}
 
   async execute(request: RequestPausedGamesLister): Promise<GamePrimitives[]> {
-    const { userId } = request;
+    const { userId, status } = request;
 
     const criteria = new Criteria([
       { field: 'userId', operator: FilterOperator.EQ, value: userId },
-      { field: 'status', operator: FilterOperator.EQ, value: 'paused' },
+      { field: 'status', operator: FilterOperator.EQ, value: status },
     ]);
     const games = await this.repository.match(criteria);
     return games.map((g) => g.toPrimitives());

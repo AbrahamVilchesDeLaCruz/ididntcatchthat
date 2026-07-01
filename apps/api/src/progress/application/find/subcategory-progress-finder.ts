@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserId } from '@/shared/domain/user-id';
 import {
-  type SubcategoryProgressDto,
+  type SubcategoryProgress,
   type SubcategoryProgressQuery,
   SUBCATEGORY_PROGRESS_QUERY,
 } from '@/progress/domain/subcategory-progress.query';
@@ -19,7 +19,7 @@ export class SubcategoryProgressFinder {
 
   async execute({
     userId,
-  }: RequestSubcategoryProgressFinder): Promise<SubcategoryProgressDto[]> {
+  }: RequestSubcategoryProgressFinder): Promise<SubcategoryProgress[]> {
     return this.query.findByUser(new UserId(userId));
   }
 }

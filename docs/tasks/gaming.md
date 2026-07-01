@@ -169,14 +169,14 @@
 
 - [x] **TASK-GAMING-16** — Entidades TypeORM
   - `GameEntity` — mapea tabla `games`.
-  - `AttemptEntity` — mapea tabla `attempts`.
   - `GameFlashcardEntity` — mapea tabla `game_flashcards` (join table con `position`).
+  - `attempts` y `game_views` se persisten vía SQL raw en `TypeOrmAttemptRepository` y `TypeOrmViewRepository` (sin entidad TypeORM).
   - Solo mapeo DB ↔ objeto plano. Sin lógica. Sufijo `Entity`.
   - En `gaming/infrastructure/persistence/`.
 
 - [x] **TASK-GAMING-17** — `TypeOrmGameRepository`
   - Implementa `GameRepository`.
-  - `save()`: upsert de `GameEntity` + insert/update de `AttemptEntity[]` y `GameFlashcardEntity[]`.
+  - `save()`: upsert de `GameEntity` + insert/update de `GameFlashcardEntity[]`.
   - `search(id)`: join con attempts y game_flashcards.
   - `match(criteria)`: usa `CriteriaConverter` de shared.
   - Mapeo explícito via `Game.fromPrimitives()` y `game.toPrimitives()`.
@@ -197,9 +197,12 @@
   - `StartGamePostController` → `POST /games` — retorna `201` con `{ gameId, flashcards[] }`.
   - `RecordAttemptPostController` → `POST /games/:id/attempts` — retorna `204`.
   - `CompleteGamePostController` → `POST /games/:id/complete` — retorna `200` con resumen.
-  - `PatchGameController` → `PATCH /games/:id` — despacha a `GamePauser` o `GameAbandoner` según `status`. Retorna `204`.
-  - `ListPausedGamesGetController` → `GET /games?status=paused` — retorna `200` con lista.
-  - `ResumeGameGetController` → `GET /games/:id/resume` — retorna `200` con `{ game, pendingFlashcardIds }`.
+  - `PatchGamePatchController` → `PATCH /games/:id` — despacha a `GamePauser` o `GameAbandoner` según `status`. Retorna `204`.
+  - `SearchGamesGetController` → `GET /games?status=paused` — retorna envelope con lista.
+  - `ResumeGamePostController` → `POST /games/:id/resume` — retorna envelope con `{ game, pendingFlashcardIds }`.
+  - `FindGameSummaryGetController` → `GET /games/:id/summary`.
+  - `SearchGameFlashcardsGetController` → `GET /games/:id/flashcards`.
+  - `SearchGamesStatsGetController` → `GET /games/stats?period=`.
 
 - [x] **TASK-GAMING-21** — Registro de excepciones en `GamingModule`
   - Registrar todos los `DomainError` de este BC en `GlobalExceptionRegistry` siguiendo el skill `api-error-handler`.

@@ -5,6 +5,8 @@ export type {
   LocalizedLabelApiModel,
 } from '@/core/api/flashcard-catalog.api-model';
 
+import type { PaginatedApiEnvelope } from '@/core/api/api-envelope';
+
 // Tipos crudos que devuelve/recibe la API de content/flashcard
 export interface FlashcardExampleApiModel {
   id: string;
@@ -33,12 +35,7 @@ export interface FlashcardApiModel {
   updatedAt?: string;
 }
 
-export interface FlashcardsListApiModel {
-  data: FlashcardApiModel[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type FlashcardsListApiModel = PaginatedApiEnvelope<FlashcardApiModel>;
 
 export interface CreateFlashcardApiPayload {
   id: string;

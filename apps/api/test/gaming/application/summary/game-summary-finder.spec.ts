@@ -17,8 +17,8 @@ describe('gaming/application/summary GameSummaryFinder', () => {
 
   it('should return summary when all flashcards have attempts', async () => {
     const game = GameMother.random({ flashcardIds: ['fc-1', 'fc-2'] });
-    game.recordAttempt('fc-1', true);
-    game.recordAttempt('fc-2', false);
+    game.recordAttempt('fc-1', true, null);
+    game.recordAttempt('fc-2', false, null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);
@@ -35,7 +35,7 @@ describe('gaming/application/summary GameSummaryFinder', () => {
 
   it('should return summary for completed game', async () => {
     const game = GameMother.random({ flashcardIds: ['fc-1'] });
-    game.recordAttempt('fc-1', true);
+    game.recordAttempt('fc-1', true, null);
     game.pullDomainEvents();
     game.complete();
     game.pullDomainEvents();
@@ -74,7 +74,7 @@ describe('gaming/application/summary GameSummaryFinder', () => {
 
   it('should throw GameNotFinished when pending flashcards remain', async () => {
     const game = GameMother.random({ flashcardIds: ['fc-1', 'fc-2'] });
-    game.recordAttempt('fc-1', true);
+    game.recordAttempt('fc-1', true, null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);

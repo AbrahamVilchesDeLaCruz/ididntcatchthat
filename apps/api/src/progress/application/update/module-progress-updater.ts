@@ -13,7 +13,6 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { ModuleProgress } from '@/progress/domain/module-progress';
 import { ModuleName } from '@/progress/domain/module-name';
-import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { UserId } from '@/shared/domain/user-id';
 import { type RequestModuleProgressUpdater } from './request-update-module-progress';
@@ -50,6 +49,9 @@ export class ModuleProgressUpdater {
 
     await this.moduleRepository.save(progress);
 
+    const events = progress.pullDomainEvents();
+    if (events.length === 0) return;
+
     if (levelIncreased) {
       this.logger.info('Module mastery level increased', {
         userId,
@@ -57,16 +59,8 @@ export class ModuleProgressUpdater {
         previousLevel,
         newLevel,
       });
-
-      await this.publisher.publish([
-        new ModuleMasteryLevelIncreasedEvent(uid.value, {
-          userId: uid.value,
-          module: mod.value,
-          previousLevel,
-          newLevel,
-          occurredAt: progress.updatedAt.toISOString(),
-        }),
-      ]);
     }
+
+    await this.publisher.publish(events);
   }
 }

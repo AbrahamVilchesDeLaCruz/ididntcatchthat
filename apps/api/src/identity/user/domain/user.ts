@@ -8,6 +8,8 @@ import { OauthProvider } from '@/identity/user/domain/oauth-provider';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
 import { StreakUpdatedEvent } from '@/identity/user/domain/events/streak-updated.event';
 import { StreakBrokenEvent } from '@/identity/user/domain/events/streak-broken.event';
+import { RankingProfileUpdatedEvent } from '@/identity/user/domain/events/ranking-profile-updated.event';
+import { GuestProgressMigratedEvent } from '@/identity/user/domain/events/guest-progress-migrated.event';
 
 export type UserPrimitives = {
   id: string;
@@ -102,12 +104,54 @@ export class User extends AggregateRoot<UserPrimitives> {
   }
 
   updateRankingPreferences(showInRanking: boolean, nickname: string): User {
-    return User.fromPrimitives({
+    const nick = new Nickname(nickname);
+    if (
+      showInRanking === this.showInRanking &&
+      nick.value === this.nickname.value
+    ) {
+      return this;
+    }
+
+    const user = User.fromPrimitives({
       ...this.toPrimitives(),
       showInRanking,
-      nickname: new Nickname(nickname).value,
+      nickname: nick.value,
       updatedAt: new Date(),
     });
+
+    user.record(
+      new RankingProfileUpdatedEvent(user.id.value, {
+        userId: user.id.value,
+        showInRanking,
+        nickname: nick.value,
+      }),
+    );
+
+    return user;
+  }
+
+  requestGuestProgressMigration(
+    deviceId: string,
+    guestDeviceId: string,
+    gameIds: string[],
+  ): User {
+    if (gameIds.length === 0) return this;
+
+    const user = User.fromPrimitives({
+      ...this.toPrimitives(),
+      updatedAt: new Date(),
+    });
+
+    user.record(
+      new GuestProgressMigratedEvent(user.id.value, {
+        userId: user.id.value,
+        deviceId,
+        guestDeviceId,
+        gameIds,
+      }),
+    );
+
+    return user;
   }
 
   recordDailyActivity(activityDate: Date): User {

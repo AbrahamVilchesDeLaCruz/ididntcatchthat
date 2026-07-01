@@ -18,6 +18,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Construir queries con filtros, orden o paginación | `api-criteria` |
 | Crear domain errors o registrar excepciones en un módulo | `api-error-handler` |
 | Diseñar o implementar endpoints REST o acciones DDD | `api-rest` |
+| Auditar o refactorizar un bounded context (límites, submódulos, deuda) | `api-bc-review` |
 | Implementar auth, guards, strategies, @CurrentUser, voters | `api-auth` |
 | Crear o modificar SharedModule, shared interno, validación de env | `api-shared` |
 | Definir o implementar EventBus, DomainEventConsumer, Handler abstract | `api-events` |
@@ -157,6 +158,7 @@ pnpm test:debug       # Jest con inspector de Node
 | `api-criteria`         | api    | Criteria — filtros, orden, paginación, flujo controller→uc→repo  | [SKILL.md](../../skills/api-criteria/SKILL.md)         |
 | `api-error-handler`    | api    | GlobalExceptionRegistry, filtros por módulo, HttpExceptionFilter | [SKILL.md](../../skills/api-error-handler/SKILL.md)    |
 | `api-rest`             | api    | Convenciones RESTful + acciones DDD con POST                     | [SKILL.md](../../skills/api-rest/SKILL.md)             |
+| `api-bc-review`        | api    | Auditoría DDD de bounded contexts: límites, submódulos, checklist | [SKILL.md](../../skills/api-bc-review/SKILL.md)        |
 | `api-auth`             | api    | JWT, OAuth Google, guest token, guards, @CurrentUser, voters     | [SKILL.md](../../skills/api-auth/SKILL.md)             |
 | `api-shared`           | api    | SharedModule global, bounded context shared, env validation Joi  | [SKILL.md](../../skills/api-shared/SKILL.md)           |
 | `api-events`           | api    | EventBus interface, DomainEventConsumer, Handler abstract        | [SKILL.md](../../skills/api-events/SKILL.md)           |

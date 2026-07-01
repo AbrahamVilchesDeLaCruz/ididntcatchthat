@@ -14,6 +14,10 @@ export class GameModuleMother {
     return GameModule.create(GameModuleValue.NativeSounds);
   }
 
+  static connectedSpeech(): GameModule {
+    return GameModule.create(GameModuleValue.ConnectedSpeech);
+  }
+
   static invalid(): string {
     return 'invalid_module';
   }

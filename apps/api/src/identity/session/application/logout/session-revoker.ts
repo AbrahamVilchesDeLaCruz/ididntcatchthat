@@ -4,6 +4,10 @@ import {
   type UserSessionRepository,
   USER_SESSION_REPOSITORY,
 } from '@/identity/session/domain/user-session.repository';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestSessionRevoker } from './request-session-revoker';
 
@@ -14,6 +18,8 @@ export class SessionRevoker {
   constructor(
     @Inject(USER_SESSION_REPOSITORY)
     private readonly repository: UserSessionRepository,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -27,9 +33,11 @@ export class SessionRevoker {
       ]),
     );
 
-    if (!session || session.isRevoked()) return; // idempotent
+    if (!session || session.isRevoked()) return;
 
-    await this.repository.save(session.revoke());
+    const revoked = session.revoke();
+    await this.repository.save(revoked);
+    await this.publisher.publish(revoked.pullDomainEvents());
 
     this.logger.info('User logged out', {
       userId: userId ?? session.ownerId,

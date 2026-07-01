@@ -9,7 +9,7 @@ import { type Request, type Response } from 'express';
 import { Counter, Histogram, Registry } from 'prom-client';
 import { type Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { METRICS_REGISTRY } from './metrics-registry.token';
+import { METRICS_REGISTRY } from '@/shared/domain/metrics-registry';
 
 @Injectable()
 export class MetricsInterceptor implements NestInterceptor {

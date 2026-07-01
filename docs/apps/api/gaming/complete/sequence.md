@@ -46,7 +46,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor U as Usuario / Guest
-    participant C as GetGameSummaryGetController
+    participant C as FindGameSummaryGetController
     participant UC as GameSummaryFinder
     participant GR as GameRepository
 

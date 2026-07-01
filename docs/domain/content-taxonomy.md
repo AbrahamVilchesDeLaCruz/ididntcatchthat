@@ -1,7 +1,7 @@
 # Content Taxonomy
 
 > Fuente de verdad del catálogo de categorías y subcategorías en ididntcatchthat.  
-> Implementación en código: `apps/api/src/shared/domain/learning-module.ts` y `apps/api/src/content/flashcard/domain/subcategory-catalog.ts`.
+> Implementación en código: `apps/api/src/shared/domain/learning-module.ts` y `apps/api/src/shared/domain/subcategory-taxonomy.ts` (slugs + validación). Metadatos i18n del catálogo: `apps/api/src/content/flashcard/domain/subcategory-catalog.ts`.
 
 ---
 

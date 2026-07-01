@@ -10,7 +10,7 @@ import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder'
 import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import crypto from 'crypto';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class GoogleCallbackAuthGetController {
   constructor(
@@ -21,10 +21,15 @@ export class GoogleCallbackAuthGetController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @ApiOperation({ summary: 'Google OAuth callback — redirects to frontend' })
+  @ApiOperation({
+    summary: 'Google OAuth callback handler',
+    description:
+      'Handles the redirect from Google after OAuth consent. ' +
+      'Issues JWT access token and refresh cookie, then redirects to the frontend callback URL.',
+  })
   @ApiResponse({
     status: 302,
-    description: 'Redirects to /auth/callback?token=...',
+    description: 'Redirects to frontend /auth/callback?token=<accessToken>',
   })
   async handler(
     @Ip() ip: string,
@@ -49,7 +54,7 @@ export class GoogleCallbackAuthGetController {
       ip: ip ?? '',
     });
 
-    res.cookie('refreshToken', deviceId, {
+    res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
       secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',

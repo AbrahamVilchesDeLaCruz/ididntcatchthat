@@ -31,7 +31,8 @@ async function startGame(
     .set('Authorization', `Bearer ${token}`)
     .send({ mode: 'game', cardCount: 10 })
     .expect(201);
-  return res.body as { gameId: string; flashcardIds: string[] };
+  return (res.body as { data: { gameId: string; flashcardIds: string[] } })
+    .data;
 }
 
 describe('gaming/game RecordAttemptPostController (e2e)', () => {

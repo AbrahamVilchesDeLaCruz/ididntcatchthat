@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
-  type SubcategoryProgressDto,
+  type SubcategoryProgress,
   type SubcategoryProgressQuery,
 } from '@/progress/domain/subcategory-progress.query';
 import { type UserId } from '@/shared/domain/user-id';
@@ -21,7 +21,7 @@ export class TypeOrmSubcategoryProgressQuery implements SubcategoryProgressQuery
     private readonly dataSource: DataSource,
   ) {}
 
-  async findByUser(userId: UserId): Promise<SubcategoryProgressDto[]> {
+  async findByUser(userId: UserId): Promise<SubcategoryProgress[]> {
     const rows = await this.dataSource.query<SubcategoryProgressRow[]>(
       `SELECT
          f.category,

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { mapGamesStats } from '../backoffice-games.mapper';
 import type { GamesStatsApiModel } from './backoffice-games.api-model';
@@ -15,8 +16,8 @@ export const useGamesStats = (period: GameStatsPeriod = '7d') => {
     queryKey: backofficeGamesKeys.stats(period),
     queryFn: () =>
       apiClient
-        .get<GamesStatsApiModel>(`/admin/games/stats?period=${period}`)
-        .then((res) => res.data),
+        .get<ApiEnvelope<GamesStatsApiModel>>(`/games/stats?period=${period}`)
+        .then((res) => res.data.data),
     select: mapGamesStats,
   });
 };

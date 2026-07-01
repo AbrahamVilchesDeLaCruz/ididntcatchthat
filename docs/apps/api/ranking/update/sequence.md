@@ -7,7 +7,7 @@ sequenceDiagram
     participant Src as Gaming / Identity / Progress
     participant Bus as Event Bus
     participant H as Ranking Subscriber
-    participant U as RankingUpdater
+    participant U as RankingScoreUpdater
     participant Agg as Ranking
     participant R as RankingRepository
     participant Stats as RankingUserStatsQuery

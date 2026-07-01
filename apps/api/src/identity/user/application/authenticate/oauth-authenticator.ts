@@ -77,20 +77,6 @@ export class OAuthAuthenticator {
 
     await this.userRepository.save(user);
 
-    const events = user.pullDomainEvents();
-    if (events.length > 0) {
-      await this.publisher.publish(events);
-    }
-
-    this.logUserAuthentication(isNewUser, user, email);
-    if (isNewUser) {
-      this.metrics.increment('app_auth_registrations_total', {
-        provider: 'google',
-      });
-    } else {
-      this.metrics.increment('app_auth_logins_total', { provider: 'google' });
-    }
-
     const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: user.role.value,
       userId: user.id.value,
@@ -109,8 +95,21 @@ export class OAuthAuthenticator {
     );
 
     await this.sessionRepository.save(session);
+    await this.publisher.publish([
+      ...user.pullDomainEvents(),
+      ...session.pullDomainEvents(),
+    ]);
 
-    return { accessToken };
+    this.logUserAuthentication(isNewUser, user, email);
+    if (isNewUser) {
+      this.metrics.increment('app_auth_registrations_total', {
+        provider: 'google',
+      });
+    } else {
+      this.metrics.increment('app_auth_logins_total', { provider: 'google' });
+    }
+
+    return { accessToken, refreshTokenId };
   }
 
   private logUserAuthentication(
