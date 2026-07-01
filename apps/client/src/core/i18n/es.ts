@@ -40,6 +40,7 @@ export const es: Translations = {
       title: 'Así funciona',
       subtitle: 'Aprende pronunciación real con flashcards interactivas',
       hoverHint: 'Pasa el cursor para voltear →',
+      tapHint: 'Toca para voltear →',
       cards: [
         {
           expression: 'think',

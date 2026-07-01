@@ -33,6 +33,7 @@ export interface LandingTranslations {
     title: string;
     subtitle: string;
     hoverHint: string;
+    tapHint: string;
     cards: [
       {
         expression: string;

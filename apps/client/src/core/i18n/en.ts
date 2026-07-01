@@ -39,6 +39,7 @@ export const en: Translations = {
       title: 'See it in action',
       subtitle: 'Learn real pronunciation with interactive flashcards',
       hoverHint: 'Hover to flip →',
+      tapHint: 'Tap to flip →',
       cards: [
         {
           expression: 'think',

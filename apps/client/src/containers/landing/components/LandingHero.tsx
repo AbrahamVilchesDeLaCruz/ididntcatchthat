@@ -48,17 +48,17 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         {h.subheadline}
       </p>
 
-      <div className="relative flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
+      <div className="relative mx-auto flex w-full max-w-[280px] flex-col items-stretch gap-2 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
         <button
           type="button"
           onClick={onPlay}
-          className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand)] px-8 py-3.5 text-base font-semibold text-white shadow-[0_0_40px_-12px_var(--color-brand)] transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_32px_-14px_var(--color-brand)] transition-opacity hover:opacity-90 active:scale-[0.98] sm:px-7 sm:py-3 sm:text-base"
         >
           {h.ctaPlay}
         </button>
         <Link
           to="/auth/register"
-          className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-brand)] px-8 py-3.5 text-base font-semibold text-[var(--color-brand-light)] transition-colors hover:bg-[var(--color-brand-dim)]"
+          className="inline-flex items-center justify-center rounded-full border border-[var(--color-brand)] px-5 py-2.5 text-sm font-semibold text-[var(--color-brand-light)] transition-colors hover:bg-[var(--color-brand-dim)] sm:border-2 sm:px-7 sm:py-3 sm:text-base"
         >
           {h.ctaSignUp}
         </Link>
