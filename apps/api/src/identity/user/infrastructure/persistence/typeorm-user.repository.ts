@@ -48,6 +48,18 @@ export class TypeOrmUserRepository implements UserRepository {
     await this.repo.delete({ id: id.value });
   }
 
+  async findWithStaleStreak(beforeDate: Date): Promise<User[]> {
+    const before = beforeDate.toISOString().slice(0, 10);
+    const entities = await this.repo
+      .createQueryBuilder('u')
+      .where('u.current_streak > 0')
+      .andWhere('u.last_activity_date IS NOT NULL')
+      .andWhere('u.last_activity_date < :before', { before })
+      .getMany();
+
+    return entities.map((e) => this.toDomain(e));
+  }
+
   private toDomain(entity: UserEntity): User {
     return User.fromPrimitives({
       id: entity.id,

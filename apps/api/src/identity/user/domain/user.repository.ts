@@ -7,6 +7,7 @@ export interface UserRepository {
   search(id: UserId): Promise<User | null>;
   save(user: User): Promise<void>;
   remove(id: UserId): Promise<void>;
+  findWithStaleStreak(beforeDate: Date): Promise<User[]>;
 }
 
 export const USER_REPOSITORY = Symbol('UserRepository');

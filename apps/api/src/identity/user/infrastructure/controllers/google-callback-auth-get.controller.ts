@@ -54,7 +54,7 @@ export class GoogleCallbackAuthGetController {
       ip: ip ?? '',
     });
 
-    res.cookie('refreshToken', deviceId, {
+    res.cookie('refreshToken', result.refreshTokenId, {
       httpOnly: true,
       secure: this.config.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',

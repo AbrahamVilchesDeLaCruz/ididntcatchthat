@@ -31,6 +31,8 @@ import { SearchGameFlashcardsGetController } from '@/gaming/infrastructure/contr
 import { SearchGamesStatsGetController } from '@/gaming/infrastructure/controllers/search-games-stats-get.controller';
 import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
 import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
+import { GAMING_USER_ACTIVITY_QUERY } from '@/gaming/domain/gaming-user-activity.query';
+import { TypeOrmGamingUserActivityQuery } from '@/gaming/infrastructure/persistence/typeorm-gaming-user-activity.query';
 import { GameStatsRetriever } from '@/gaming/application/stats/game-stats-retriever';
 
 // Infrastructure — exception registry
@@ -102,6 +104,10 @@ import { type Subscriber } from '@/shared/application/subscriber';
 
     // Queries
     { provide: GAME_STATS_QUERY, useClass: TypeOrmGameStatsQuery },
+    {
+      provide: GAMING_USER_ACTIVITY_QUERY,
+      useClass: TypeOrmGamingUserActivityQuery,
+    },
 
     // Use cases
     GameStatsRetriever,
@@ -129,5 +135,6 @@ import { type Subscriber } from '@/shared/application/subscriber';
     // Exception registry
     GamingExceptionRegistry,
   ],
+  exports: [GAMING_USER_ACTIVITY_QUERY],
 })
 export class GamingModule {}

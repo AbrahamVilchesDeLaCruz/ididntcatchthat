@@ -109,7 +109,7 @@ export class OAuthAuthenticator {
       this.metrics.increment('app_auth_logins_total', { provider: 'google' });
     }
 
-    return { accessToken };
+    return { accessToken, refreshTokenId };
   }
 
   private logUserAuthentication(

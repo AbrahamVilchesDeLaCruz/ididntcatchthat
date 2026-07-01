@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleModule } from '@nestjs/schedule';
 
 // Domain tokens
 import { USER_REPOSITORY } from '@/identity/user/domain/user.repository';
@@ -64,12 +63,13 @@ import { UserSearcher } from '@/identity/user/domain/user-searcher';
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
+import { GamingModule } from '@/gaming/infrastructure/framework/gaming.module';
 
 @Module({
   imports: [
     SharedModule,
     AuthModule,
-    ScheduleModule.forRoot(),
+    GamingModule,
     TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
   ],
   controllers: [

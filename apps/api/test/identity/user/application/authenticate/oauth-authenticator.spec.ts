@@ -66,6 +66,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
     const result = await authenticator.execute(request);
 
     expect(result.accessToken).toBe('access-token');
+    expect(result.refreshTokenId).toBeDefined();
     expect(userRepository.save).toHaveBeenCalledTimes(1);
     expect(sessionRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).toHaveBeenCalledTimes(1);

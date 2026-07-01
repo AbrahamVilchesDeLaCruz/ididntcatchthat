@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'node:path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -30,6 +31,7 @@ import { envValidationSchema } from './shared/infrastructure/config/env.validati
     TypeOrmModule.forRootAsync({
       useFactory: () => buildTypeOrmDataSourceOptions(),
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         name: 'default',
