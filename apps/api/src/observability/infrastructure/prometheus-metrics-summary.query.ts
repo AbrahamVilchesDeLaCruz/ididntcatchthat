@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Registry } from 'prom-client';
-import { METRICS_REGISTRY } from '@/observability/infrastructure/framework/metrics-registry.token';
+import { METRICS_REGISTRY } from '@/shared/domain/metrics-registry';
 import { type MetricsSummaryQuery } from '@/observability/application/summary/metrics-summary.query';
 import { type ResponseMetricsSummaryRetriever } from '@/observability/application/summary/response-metrics-summary-retriever';
 

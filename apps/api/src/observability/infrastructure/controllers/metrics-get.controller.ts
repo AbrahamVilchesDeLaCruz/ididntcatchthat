@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { type Response } from 'express';
 import { Registry } from 'prom-client';
-import { METRICS_REGISTRY } from '@/observability/infrastructure/framework/metrics-registry.token';
+import { METRICS_REGISTRY } from '@/shared/domain/metrics-registry';
 
 @ApiTags('observability')
 @Controller('metrics')
