@@ -315,16 +315,20 @@ apps/api/src/
         record-attempt-post.controller.ts
         record-attempt-post.payload.ts
         complete-game-post.controller.ts
-        pause-game-patch.controller.ts
-        pause-game-patch.payload.ts
-        list-paused-games-get.controller.ts
-        resume-game-get.controller.ts
-        abandon-game-patch.controller.ts   ← mismo endpoint PATCH /games/:id
+        patch-game-patch.controller.ts
+        patch-game.payload.ts
+        search-games-get.controller.ts
+        resume-game-post.controller.ts
+        find-game-summary-get.controller.ts
+        search-game-flashcards-get.controller.ts
+        search-games-stats-get.controller.ts
+        record-view-post.controller.ts
       persistence/
         game.entity.ts
-        attempt.entity.ts
         game-flashcard.entity.ts           ← join table
         typeorm-game.repository.ts
+        typeorm-attempt.repository.ts      ← SQL raw (sin entity)
+        typeorm-view.repository.ts         ← SQL raw (sin entity)
       selectors/
         typeorm-flashcard-selector.ts      ← implementa FlashcardSelector
       framework/

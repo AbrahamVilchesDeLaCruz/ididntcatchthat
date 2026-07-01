@@ -26,7 +26,7 @@ classDiagram
 
     class PausedGamesLister {
         -gameRepository: GameRepository
-        +execute(request: ListPausedGamesRequest): Promise~GamePrimitive[]~
+        +execute(request: RequestPausedGamesLister): Promise~GamePrimitive[]~
     }
 
     class SearchGamesGetController {
