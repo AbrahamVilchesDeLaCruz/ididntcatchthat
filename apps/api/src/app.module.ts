@@ -11,7 +11,7 @@ import { IdentityModule } from './identity/shared/infrastructure/framework/ident
 import { ContentModule } from './content/shared/infrastructure/framework/content.module';
 import { GamingModule } from './gaming/infrastructure/framework/gaming.module';
 import { ProgressModule } from './progress/infrastructure/framework/progress.module';
-import { RankingModule } from './ranking/infrastructure/framework/ranking.module';
+import { RankingModule } from './ranking/shared/infrastructure/framework/ranking.module';
 import { AchievementModule } from './achievement/shared/infrastructure/framework/achievement.module';
 import { AnalyticsModule } from './analytics/shared/infrastructure/framework/analytics.module';
 import { buildTypeOrmDataSourceOptions } from './shared/infrastructure/persistence/typeorm/typeorm-data-source-options';
