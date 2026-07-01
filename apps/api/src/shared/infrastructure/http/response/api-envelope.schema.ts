@@ -1,8 +1,19 @@
-/** OpenAPI schema fragment for `{ data, meta }` query responses. */
-export function apiEnvelopeSchema(dataExample: Record<string, unknown>): {
+type ApiEnvelopeSchema = {
   type: 'object';
-  properties: Record<string, unknown>;
-} {
+  properties: {
+    data: { example: unknown };
+    meta: {
+      type: 'object';
+      properties: {
+        timestamp: { type: 'string'; example: string };
+        request_id: { type: 'string'; example: string };
+      };
+    };
+  };
+};
+
+/** OpenAPI schema fragment for `{ data, meta }` query responses. */
+export function apiEnvelopeSchema(dataExample: unknown): ApiEnvelopeSchema {
   return {
     type: 'object',
     properties: {
