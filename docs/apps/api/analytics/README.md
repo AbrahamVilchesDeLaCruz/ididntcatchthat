@@ -27,8 +27,8 @@ analytics/
 
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
-| POST | `/analytics/pageview` | Ninguna | Registra una visita (cambio de ruta SPA) |
-| GET | `/admin/analytics/summary?period=` | Admin JWT | Resumen histórico de métricas de negocio |
+| POST | `/analytics/page-views` | Ninguna | Registra una visita (cambio de ruta SPA) |
+| GET | `/analytics/summary?period=` | Admin JWT | Resumen histórico de métricas de negocio |
 
 ### Períodos (`summary`)
 
@@ -48,8 +48,15 @@ El read model `summary` consulta también tablas de otros BCs (`games`, `users`,
 
 ## Cliente
 
-- `usePageView()` — hook global en `AppRouter` (`POST /analytics/pageview`, silencioso)
+- `usePageView()` — hook global en `AppRouter` (`POST /analytics/page-views`, silencioso)
 - `useAnalyticsSummary(period)` — backoffice observability tabs
+
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Record Page View](./record-page-view/) | `POST /analytics/page-views` | [Clases](./record-page-view/classes.md) · [Secuencia](./record-page-view/sequence.md) · [Casos de uso](./record-page-view/usecases.md) |
+| [Search Analytics Summary](./search-analytics-summary/) | `GET /analytics/summary?period=` | [Clases](./search-analytics-summary/classes.md) · [Secuencia](./search-analytics-summary/sequence.md) · [Casos de uso](./search-analytics-summary/usecases.md) |
 
 ## Referencias
 
