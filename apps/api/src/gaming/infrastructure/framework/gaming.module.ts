@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Domain tokens
@@ -31,9 +31,12 @@ import { SearchGameFlashcardsGetController } from '@/gaming/infrastructure/contr
 import { SearchGamesStatsGetController } from '@/gaming/infrastructure/controllers/search-games-stats-get.controller';
 import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
 import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
+import { USER_GAMES_COMPLETED_QUERY } from '@/gaming/domain/user-games-completed.query';
+import { TypeOrmUserGamesCompletedQuery } from '@/gaming/infrastructure/persistence/typeorm-user-games-completed.query';
 import { GAMING_USER_ACTIVITY_QUERY } from '@/gaming/domain/gaming-user-activity.query';
 import { TypeOrmGamingUserActivityQuery } from '@/gaming/infrastructure/persistence/typeorm-gaming-user-activity.query';
 import { GameStatsRetriever } from '@/gaming/application/stats/game-stats-retriever';
+import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
 
 // Infrastructure — exception registry
 import { GamingExceptionRegistry } from './gaming-exception-registry';
@@ -57,7 +60,6 @@ import { ViewRecorder } from '@/gaming/application/view/view-recorder';
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 import { ProgressModule } from '@/progress/infrastructure/framework/progress.module';
-import { WEAKEST_FLASHCARD_IDS_PROVIDER } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/providers/progress-weakest-flashcard-ids.provider';
 import { GuestGamesMigrator } from '@/gaming/application/migrate-guest/guest-games-migrator';
 import { MigrateGuestGamesOnGuestProgressMigrated } from '@/gaming/application/migrate-guest/migrate-guest-games-on-guest-progress-migrated';
@@ -71,7 +73,7 @@ import { type Subscriber } from '@/shared/application/subscriber';
   imports: [
     SharedModule,
     AuthModule,
-    ProgressModule,
+    forwardRef(() => ProgressModule),
     TypeOrmModule.forFeature([GameEntity, GameFlashcardEntity]),
   ],
   controllers: [
@@ -109,6 +111,11 @@ import { type Subscriber } from '@/shared/application/subscriber';
       useClass: TypeOrmGamingUserActivityQuery,
     },
 
+    {
+      provide: USER_GAMES_COMPLETED_QUERY,
+      useClass: TypeOrmUserGamesCompletedQuery,
+    },
+
     // Use cases
     GameStatsRetriever,
     GameStarter,
@@ -135,6 +142,6 @@ import { type Subscriber } from '@/shared/application/subscriber';
     // Exception registry
     GamingExceptionRegistry,
   ],
-  exports: [GAMING_USER_ACTIVITY_QUERY],
+  exports: [GAMING_USER_ACTIVITY_QUERY, USER_GAMES_COMPLETED_QUERY],
 })
 export class GamingModule {}
