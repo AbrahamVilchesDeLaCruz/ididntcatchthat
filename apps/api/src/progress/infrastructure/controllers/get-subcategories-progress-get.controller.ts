@@ -17,7 +17,6 @@ import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { API_ENVELOPE_META_SCHEMA } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { SubcategoryProgressFinder } from '@/progress/application/find/subcategory-progress-finder';
@@ -37,20 +36,7 @@ export class GetSubcategoriesProgressGetController {
     description:
       'Returns per-subcategory completion and accuracy for the authenticated user.',
   })
-  @ApiOkResponse({
-    description: 'Subcategory progress list',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: {
-          type: 'array',
-          items: { type: 'object', description: 'Subcategory progress DTO' },
-        },
-        meta: API_ENVELOPE_META_SCHEMA,
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'Subcategory progress list' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(
     @CurrentUser() user: UserContext,

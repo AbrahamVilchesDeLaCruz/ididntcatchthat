@@ -17,7 +17,7 @@ import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-i
 import { FlashcardFinder } from '@/content/flashcard/application/find/flashcard-finder';
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
 
-@ApiTags('flashcards')
+@ApiTags('content')
 @ApiBearerAuth('access-token')
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,28 +30,7 @@ export class FindFlashcardGetController {
     summary: 'Find a flashcard by id',
     description: 'Returns a single flashcard by UUID. Requires admin JWT.',
   })
-  @ApiOkResponse({
-    description: 'Flashcard found',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: { type: 'object', description: 'Flashcard primitives' },
-        meta: {
-          type: 'object',
-          required: ['timestamp', 'request_id'],
-          properties: {
-            timestamp: {
-              type: 'string',
-              format: 'date-time',
-              example: '2026-06-30T12:00:00.000Z',
-            },
-            request_id: { type: 'string', example: 'req_abc123' },
-          },
-        },
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'Flashcard found' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiNotFoundResponse({ description: 'Flashcard not found' })

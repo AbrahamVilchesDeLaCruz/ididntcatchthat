@@ -14,13 +14,12 @@ import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { PaginatedApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { FlashcardSearcher } from '@/content/flashcard/application/search/flashcard-searcher';
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
 import { SearchFlashcardsGetQuery } from './search-flashcards-get.query';
-import { SearchFlashcardsEnvelopeSwagger } from './search-flashcards-get.swagger';
 
-@ApiTags('flashcards')
+@ApiTags('content')
 @ApiBearerAuth('access-token')
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -36,13 +35,12 @@ export class SearchFlashcardsGetController {
   })
   @ApiOkResponse({
     description: 'Paginated list of flashcards',
-    type: SearchFlashcardsEnvelopeSwagger,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid query parameters',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Query() query: SearchFlashcardsGetQuery,

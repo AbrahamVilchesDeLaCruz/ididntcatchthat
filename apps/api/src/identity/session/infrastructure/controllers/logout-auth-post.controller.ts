@@ -11,7 +11,6 @@ import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiBearerAuth,
-  ApiNoContentResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -21,7 +20,7 @@ import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator
 import { type UserContext } from '@/shared/domain/user-context';
 import { SessionRevoker } from '@/identity/session/application/logout/session-revoker';
 
-@ApiTags('auth')
+@ApiTags('identity')
 @ApiBearerAuth('access-token')
 @Controller('auth')
 export class LogoutAuthPostController {
@@ -38,9 +37,6 @@ export class LogoutAuthPostController {
     description:
       'Revokes the current refresh token session and clears the httpOnly cookie. ' +
       'Requires a valid JWT access token in the Authorization header.',
-  })
-  @ApiNoContentResponse({
-    description: 'Logged out — refresh token revoked and cookie cleared',
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(

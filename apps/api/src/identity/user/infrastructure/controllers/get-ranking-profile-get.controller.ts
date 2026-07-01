@@ -19,10 +19,9 @@ import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { API_ENVELOPE_META_SCHEMA } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { RankingProfileFinder } from '@/identity/user/application/update-profile/ranking-profile-finder';
 
-@ApiTags('users')
+@ApiTags('identity')
 @ApiBearerAuth('access-token')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -32,23 +31,7 @@ export class GetRankingProfileGetController {
   @Get('me/ranking-profile')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get the current user ranking profile' })
-  @ApiOkResponse({
-    description: 'Ranking profile for the authenticated user',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: {
-          type: 'object',
-          properties: {
-            showInRanking: { type: 'boolean', example: true },
-            nickname: { type: 'string', example: 'learner42' },
-          },
-        },
-        meta: API_ENVELOPE_META_SCHEMA,
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'Ranking profile for the authenticated user' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(
     @CurrentUser() user: UserContext,

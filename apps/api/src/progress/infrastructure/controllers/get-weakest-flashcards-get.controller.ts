@@ -19,10 +19,9 @@ import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { API_ENVELOPE_META_SCHEMA } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
 import { type WeakestFlashcardDto } from '@/progress/domain/weakest-flashcard.query';
 import { GetWeakestFlashcardsGetQuery } from './get-weakest-flashcards-get.query';
@@ -41,24 +40,11 @@ export class GetWeakestFlashcardsGetController {
     description:
       'Returns flashcards with the lowest accuracy for targeted review. Optional limit query parameter (1–50, default 10).',
   })
-  @ApiOkResponse({
-    description: 'Weakest flashcards list',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: {
-          type: 'array',
-          items: { type: 'object', description: 'Weakest flashcard DTO' },
-        },
-        meta: API_ENVELOPE_META_SCHEMA,
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'Weakest flashcards list' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid limit query parameter',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @CurrentUser() user: UserContext,

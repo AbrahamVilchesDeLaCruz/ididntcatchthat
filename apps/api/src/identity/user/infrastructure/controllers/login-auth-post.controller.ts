@@ -12,7 +12,6 @@ import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import {
-  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -22,17 +21,11 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { UserAuthenticator } from '@/identity/user/application/login/user-authenticator';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { LoginAuthPostPayload } from './login-auth-post.payload';
 import crypto from 'crypto';
 
-const LOGIN_BODY_EXAMPLE: LoginAuthPostPayload = {
-  email: 'user@example.com',
-  password: 'mySecurePassword123',
-  guestDeviceId: '550e8400-e29b-41d4-a716-446655440000',
-};
-
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class LoginAuthPostController {
   constructor(
@@ -50,24 +43,6 @@ export class LoginAuthPostController {
       'Authenticates a registered user and returns a JWT access token. ' +
       'Sets an httpOnly refresh token cookie for subsequent token refresh.',
   })
-  @ApiBody({
-    type: LoginAuthPostPayload,
-    description:
-      'Credentials and optional guest device id to link prior guest progress',
-    examples: {
-      default: {
-        summary: 'Login with guest migration',
-        value: LOGIN_BODY_EXAMPLE,
-      },
-      withoutGuest: {
-        summary: 'Login without guest device',
-        value: {
-          email: LOGIN_BODY_EXAMPLE.email,
-          password: LOGIN_BODY_EXAMPLE.password,
-        },
-      },
-    },
-  })
   @ApiOkResponse({
     description:
       'Login successful — access token returned, refresh token set as cookie',
@@ -78,7 +53,7 @@ export class LoginAuthPostController {
   @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid email format or missing fields',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Body() body: LoginAuthPostPayload,

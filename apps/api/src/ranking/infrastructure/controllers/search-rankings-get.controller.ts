@@ -19,14 +19,13 @@ import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { API_ENVELOPE_META_SCHEMA } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { RankingFinder } from '@/ranking/application/find/ranking-finder';
 import { SearchRankingsGetQuery } from './search-rankings-get.query';
 
-@ApiTags('rankings')
+@ApiTags('ranking')
 @ApiBearerAuth('access-token')
 @Controller('rankings')
 @UseGuards(JwtAuthGuard)
@@ -41,42 +40,11 @@ export class SearchRankingsGetController {
       'Returns leaderboard entries, the current user entry when ranked, and viewer visibility status. ' +
       'Requires type and period query parameters; module is required for module_master rankings.',
   })
-  @ApiOkResponse({
-    description: 'Ranking entries with viewer context',
-    schema: {
-      type: 'object',
-      required: ['data', 'meta'],
-      properties: {
-        data: {
-          type: 'object',
-          required: ['entries', 'currentUser', 'viewer'],
-          properties: {
-            entries: {
-              type: 'array',
-              items: {
-                type: 'object',
-                description: 'Ranking entry with isMe flag',
-              },
-            },
-            currentUser: {
-              type: 'object',
-              nullable: true,
-              description: 'Current user entry when ranked',
-            },
-            viewer: {
-              type: 'object',
-              description: 'Viewer nickname, rank, score and visibility status',
-            },
-          },
-        },
-        meta: API_ENVELOPE_META_SCHEMA,
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'Ranking entries with viewer context' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid ranking query parameters',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @CurrentUser() user: UserContext,

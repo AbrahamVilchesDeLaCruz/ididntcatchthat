@@ -48,14 +48,11 @@ describe('content/flashcard UpdateFlashcardPatchController (e2e)', () => {
         })
         .expect(201);
 
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/v1/flashcards/${id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ meaning: 'Updated meaning for gonna' })
-        .expect(200);
-
-      const body = res.body as { meaning: string };
-      expect(body.meaning).toBe('Updated meaning for gonna');
+        .expect(204);
     });
 
     it('should return 404 when flashcard does not exist', async () => {

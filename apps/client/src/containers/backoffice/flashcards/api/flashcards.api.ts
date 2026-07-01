@@ -6,7 +6,6 @@ import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
 import type { FlashcardsPageVM } from '../flashcards.types';
 import type {
   BulkCreateFlashcardApiPayload,
-  BulkCreateFlashcardApiResult,
   CreateFlashcardApiPayload,
   FlashcardApiModel,
   FlashcardDraftApiModel,
@@ -94,10 +93,8 @@ export const useUpdateFlashcard = () => {
     }: {
       id: string;
       data: UpdateFlashcardApiPayload;
-    }) =>
-      apiClient
-        .patch<FlashcardApiModel>(`/flashcards/${id}`, data)
-        .then((res) => res.data),
+    }): Promise<void> =>
+      apiClient.patch<void>(`/flashcards/${id}`, data).then((res) => res.data),
     onSuccess: (_, { id }) => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
       void queryClient.invalidateQueries({
@@ -126,12 +123,8 @@ export const useBulkCreateFlashcards = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      payload: BulkCreateFlashcardApiPayload,
-    ): Promise<BulkCreateFlashcardApiResult> =>
-      apiClient
-        .post<BulkCreateFlashcardApiResult>('/flashcards/bulk', payload)
-        .then((res) => res.data),
+    mutationFn: (payload: BulkCreateFlashcardApiPayload): Promise<void> =>
+      apiClient.post<void>('/flashcards/bulk', payload).then((res) => res.data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
     },
@@ -145,7 +138,7 @@ export const useGenerateFlashcards = () => {
       payload: GenerateFlashcardsApiPayload,
     ): Promise<FlashcardDraftApiModel[]> =>
       apiClient
-        .post<GenerateFlashcardsApiResult>('/ai/generate-flashcards', payload)
+        .post<GenerateFlashcardsApiResult>('/flashcards/drafts', payload)
         .then((res) => res.data.drafts),
   });
 };

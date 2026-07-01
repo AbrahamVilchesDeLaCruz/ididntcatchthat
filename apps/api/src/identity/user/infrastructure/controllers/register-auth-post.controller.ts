@@ -12,7 +12,6 @@ import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { COOKIE_MAX_AGE_MS } from '@/identity/shared/domain/cookie-constants';
 import {
-  ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOperation,
@@ -22,18 +21,11 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { UserRegistrar } from '@/identity/user/application/register/user-registrar';
 import { FingerprintBuilder } from '@/shared/infrastructure/fingerprint-builder';
-import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
+import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { RegisterAuthPostPayload } from './register-auth-post.payload';
 import crypto from 'crypto';
 
-const REGISTER_BODY_EXAMPLE: RegisterAuthPostPayload = {
-  email: 'user@example.com',
-  password: 'mySecurePassword123',
-  nickname: 'englishLearner',
-  guestDeviceId: '550e8400-e29b-41d4-a716-446655440000',
-};
-
-@ApiTags('auth')
+@ApiTags('identity')
 @Controller('auth')
 export class RegisterAuthPostController {
   constructor(
@@ -51,25 +43,6 @@ export class RegisterAuthPostController {
       'Creates a new user with email, password and nickname. ' +
       'Returns a JWT access token and sets an httpOnly refresh token cookie.',
   })
-  @ApiBody({
-    type: RegisterAuthPostPayload,
-    description:
-      'Registration details and optional guest device id for progress migration',
-    examples: {
-      default: {
-        summary: 'Register with guest migration',
-        value: REGISTER_BODY_EXAMPLE,
-      },
-      withoutGuest: {
-        summary: 'Register without guest device',
-        value: {
-          email: REGISTER_BODY_EXAMPLE.email,
-          password: REGISTER_BODY_EXAMPLE.password,
-          nickname: REGISTER_BODY_EXAMPLE.nickname,
-        },
-      },
-    },
-  })
   @ApiCreatedResponse({
     description:
       'User registered — access token returned, refresh token set as cookie',
@@ -81,7 +54,7 @@ export class RegisterAuthPostController {
   @ApiUnprocessableEntityResponse({
     description:
       'Weak password, invalid email or nickname constraints violated',
-    type: ValidationErrorSwagger,
+    type: ValidationErrorResponse,
   })
   async handler(
     @Body() body: RegisterAuthPostPayload,
@@ -98,7 +71,6 @@ export class RegisterAuthPostController {
     const deviceId = body.guestDeviceId ?? crypto.randomUUID();
 
     const result = await this.registrar.execute({
-      id: crypto.randomUUID(),
       email: body.email,
       password: body.password,
       nickname: body.nickname,
