@@ -43,6 +43,7 @@ describe('GET /progress/summary (e2e)', () => {
     expect(data.totalAttempts).toBeGreaterThan(0);
     expect(data.gamesCompleted).toBeGreaterThanOrEqual(1);
     expect(typeof data.currentStreak).toBe('number');
+    expect(res.body.meta.request_id).toBeDefined();
   });
 });
 
