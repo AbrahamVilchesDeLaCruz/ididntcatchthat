@@ -16,8 +16,11 @@ export const LandingHowItWorks = (): ReactElement => {
   const h = t.landing.howItWorks;
 
   return (
-    <section id="how-it-works" className="px-5 py-20">
-      <div className="mx-auto max-w-2xl">
+    <section
+      id="how-it-works"
+      className="border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)]/30 px-5 py-20"
+    >
+      <div className="mx-auto max-w-3xl">
         <p className="mb-3 text-center text-sm font-semibold uppercase tracking-widest text-[var(--color-brand)]">
           {h.sectionLabel}
         </p>

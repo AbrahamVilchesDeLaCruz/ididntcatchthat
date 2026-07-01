@@ -9,13 +9,22 @@ export const es: Translations = {
       subheadline:
         'La aplicación que te enseña cómo hablan realmente los nativos: fonética real, connected speech y 3 acentos por expresión.',
       ctaPlay: 'Jugar ahora',
+      ctaSignUp: 'Crear cuenta gratis',
       ctaStudy: 'Estudiar',
       ctaHowItWorks: 'Ver cómo funciona',
+      ctaGetStarted: 'Empezar',
       navBackoffice: 'Ir al backoffice →',
       navStats: 'Mis estadísticas →',
       navDashboard: 'Panel →',
       navLogin: 'Iniciar sesión',
       navRegister: 'Crear cuenta',
+    },
+    trustBar: {
+      items: [
+        '3 acentos nativos por expresión',
+        'Fonética real y connected speech',
+        'Contenido curado — sin IA generativa',
+      ],
     },
     authGate: {
       title: '¿Cómo quieres jugar?',
@@ -31,6 +40,20 @@ export const es: Translations = {
       title: 'Así funciona',
       subtitle: 'Aprende pronunciación real con flashcards interactivas',
       hoverHint: 'Pasa el cursor para ver →',
+      cards: [
+        {
+          expression: 'gonna',
+          ipa: '/ˈɡɒnə/',
+          meaning: 'Going to (ir a...)',
+          example: "I'm gonna be late.",
+        },
+        {
+          expression: 'wanna',
+          ipa: '/ˈwɒnə/',
+          meaning: 'Want to (querer...)',
+          example: 'Do you wanna grab coffee?',
+        },
+      ],
     },
     problem: {
       sectionLabel: 'El problema',
@@ -93,24 +116,28 @@ export const es: Translations = {
           tag: 'Fonética',
           description:
             'Domina los 23 fonemas del inglés. Con enfoque en los que más cuestan a los hispanohablantes.',
+          examples: ['/θ/ vs /ð/', 'T suave', 'schwa /ə/'],
         },
         {
           title: 'Habla conectada',
           tag: 'Enlace y reducción',
           description:
             'Escucha cómo cambian y fusionan los sonidos a velocidad real — gonna, enlace, elisión.',
+          examples: ['gonna', 'wanna', 'word linking'],
         },
         {
           title: 'Fluidez y conectores',
           tag: 'Fluidez',
           description:
             'Conectores y estructuras para sonar fluido, no robótico.',
+          examples: ['however', 'furthermore', 'in short'],
         },
         {
           title: 'Inglés coloquial',
           tag: 'Inglés cotidiano',
           description:
             'El vocabulario informal que usan los nativos a diario y que rara vez enseñan en clase.',
+          examples: ['stuff', 'you guys', "I'm good"],
         },
       ],
     },
@@ -124,6 +151,11 @@ export const es: Translations = {
     },
     footer: {
       tagline: 'Fonética · Connected speech · Inglés real',
+      navHowItWorks: 'Cómo funciona',
+      navGetStarted: 'Empezar',
+      navLogin: 'Iniciar sesión',
+      navRegister: 'Crear cuenta',
+      accents: '🇺🇸 Americano · 🇬🇧 Británico · 🇦🇺 Australiano',
     },
   },
   game: {

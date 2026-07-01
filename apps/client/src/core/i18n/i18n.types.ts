@@ -7,13 +7,18 @@ export interface LandingTranslations {
     headlineAccent: string;
     subheadline: string;
     ctaPlay: string;
+    ctaSignUp: string;
     ctaStudy: string;
     ctaHowItWorks: string;
+    ctaGetStarted: string;
     navBackoffice: string;
     navStats: string;
     navDashboard: string;
     navLogin: string;
     navRegister: string;
+  };
+  trustBar: {
+    items: [string, string, string];
   };
   authGate: {
     title: string;
@@ -28,6 +33,20 @@ export interface LandingTranslations {
     title: string;
     subtitle: string;
     hoverHint: string;
+    cards: [
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        example: string;
+      },
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        example: string;
+      },
+    ];
   };
   problem: {
     sectionLabel: string;
@@ -60,10 +79,30 @@ export interface LandingTranslations {
     headline: string;
     subheadline: string;
     items: [
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
     ];
   };
   finalCta: {
@@ -75,6 +114,11 @@ export interface LandingTranslations {
   };
   footer: {
     tagline: string;
+    navHowItWorks: string;
+    navGetStarted: string;
+    navLogin: string;
+    navRegister: string;
+    accents: string;
   };
 }
 

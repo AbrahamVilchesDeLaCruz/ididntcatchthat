@@ -1,13 +1,7 @@
 import { type ReactElement } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
-import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
-import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
-import { ThemeToggle } from '@/common/components/ThemeToggle';
-import { LocaleToggle } from '@/common/components/LocaleToggle';
-import { BrandWordmark } from '@/common/components/BrandWordmark';
 
 interface LandingHeroProps {
   onPlay: () => void;
@@ -16,23 +10,20 @@ interface LandingHeroProps {
 export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   const { t } = useI18n();
   const h = t.landing.hero;
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { canStudy } = useCurrentUser();
 
   const studyLink = canStudy
     ? '/study'
     : { pathname: '/auth/login', state: { returnTo: '/study' } };
 
-  const authNavLink = isAuthenticated
-    ? {
-        to: DEFAULT_AUTHENTICATED_HOME,
-        label: t.home.navApp,
-      }
-    : null;
+  const tertiaryLinkClass =
+    'text-sm font-medium text-[var(--color-text-muted)] underline-offset-4 transition-colors hover:text-[var(--color-text-primary)] hover:underline';
 
   return (
-    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 py-20 text-center">
-      {/* Background glow */}
+    <section
+      id="top"
+      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 pb-16 pt-28 text-center sm:pt-32"
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 flex items-center justify-center"
@@ -40,47 +31,11 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         <div className="h-[500px] w-[500px] rounded-full bg-[var(--color-brand)] opacity-[0.08] blur-[120px]" />
       </div>
 
-      {/* Top bar — language toggle + auth links */}
-      <div className="absolute right-5 top-5 z-10 flex items-center gap-3">
-        {authNavLink ? (
-          <Link
-            to={authNavLink.to}
-            className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-          >
-            {authNavLink.label}
-          </Link>
-        ) : (
-          <>
-            <Link
-              to="/auth/login"
-              className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-            >
-              {h.navLogin}
-            </Link>
-            <Link
-              to="/auth/register"
-              className="rounded-full bg-[var(--color-brand)] px-4 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              {h.navRegister}
-            </Link>
-          </>
-        )}
-
-        <ThemeToggle variant="icon" />
-        <LocaleToggle variant="icon" />
-      </div>
-
-      {/* Badge */}
-      <div className="relative mb-6">
-        <BrandWordmark className="text-2xl sm:text-3xl" />
-      </div>
-
-      <div className="relative mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)]">
+      <p className="relative mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)]">
         <span className="size-2 animate-pulse rounded-full bg-[var(--color-accent-green)]" />
         {h.badge}
-      </div>
+      </p>
 
-      {/* Heading */}
       <h1 className="relative mb-4 max-w-[22ch] text-4xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-5xl md:text-6xl">
         {h.headline}{' '}
         <span className="bg-gradient-to-r from-[var(--color-brand-light)] to-[var(--color-accent-green)] bg-clip-text text-transparent">
@@ -88,35 +43,44 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
         </span>
       </h1>
 
-      {/* Sub */}
-      <p className="relative mb-10 max-w-[40ch] text-lg text-[var(--color-text-secondary)] sm:text-xl">
+      <p className="relative mb-10 max-w-[42ch] text-lg text-[var(--color-text-secondary)] sm:text-xl">
         {h.subheadline}
       </p>
 
-      {/* CTA */}
-      <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+      <div className="relative flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
         <button
+          type="button"
           onClick={onPlay}
-          className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand)] px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand)] px-8 py-3.5 text-base font-semibold text-white shadow-[0_0_40px_-12px_var(--color-brand)] transition-opacity hover:opacity-90 active:scale-[0.98]"
         >
           {h.ctaPlay}
         </button>
         <Link
-          to={studyLink}
-          className="inline-flex items-center justify-center rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          to="/auth/register"
+          className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-brand)] px-8 py-3.5 text-base font-semibold text-[var(--color-brand-light)] transition-colors hover:bg-[var(--color-brand-dim)]"
         >
+          {h.ctaSignUp}
+        </Link>
+      </div>
+
+      <div className="relative mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <Link to={studyLink} className={tertiaryLinkClass}>
           {h.ctaStudy}
         </Link>
-        <a
-          href="#how-it-works"
-          className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-7 py-3.5 text-base font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-        >
+        <span className="text-[var(--color-text-muted)]" aria-hidden>
+          ·
+        </span>
+        <a href="#how-it-works" className={tertiaryLinkClass}>
           {h.ctaHowItWorks}
-          <ChevronDown size={16} strokeWidth={2} />
+        </a>
+        <span className="text-[var(--color-text-muted)]" aria-hidden>
+          ·
+        </span>
+        <a href="#get-started" className={tertiaryLinkClass}>
+          {h.ctaGetStarted}
         </a>
       </div>
 
-      {/* Phonetic decoration */}
       <div
         aria-hidden
         className="relative mt-14 flex flex-wrap justify-center gap-3 opacity-30"

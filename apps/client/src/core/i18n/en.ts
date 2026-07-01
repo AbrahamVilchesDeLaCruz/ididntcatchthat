@@ -9,13 +9,22 @@ export const en: Translations = {
       subheadline:
         'The app that teaches you how natives actually speak — real phonetics, connected speech, and 3 accents per expression.',
       ctaPlay: 'Play now',
+      ctaSignUp: 'Sign up free',
       ctaStudy: 'Study',
       ctaHowItWorks: 'See how it works',
+      ctaGetStarted: 'Get started',
       navBackoffice: 'Go to backoffice →',
       navStats: 'My stats →',
       navDashboard: 'Dashboard →',
       navLogin: 'Log in',
       navRegister: 'Sign up',
+    },
+    trustBar: {
+      items: [
+        '3 native accents per expression',
+        'Real phonetics & connected speech',
+        'Curated content — not AI-generated',
+      ],
     },
     authGate: {
       title: 'How do you want to play?',
@@ -30,6 +39,20 @@ export const en: Translations = {
       title: 'See it in action',
       subtitle: 'Learn real pronunciation with interactive flashcards',
       hoverHint: 'Hover to reveal →',
+      cards: [
+        {
+          expression: 'gonna',
+          ipa: '/ˈɡɒnə/',
+          meaning: 'Going to',
+          example: "I'm gonna be late.",
+        },
+        {
+          expression: 'wanna',
+          ipa: '/ˈwɒnə/',
+          meaning: 'Want to',
+          example: 'Do you wanna grab coffee?',
+        },
+      ],
     },
     problem: {
       sectionLabel: 'The problem',
@@ -92,24 +115,28 @@ export const en: Translations = {
           tag: 'Phonetics',
           description:
             'Master the 23 phonemes of English. Focus on the ones that trip up Spanish speakers most.',
+          examples: ['/θ/ vs /ð/', 'Soft T', 'schwa /ə/'],
         },
         {
           title: 'Connected Speech',
           tag: 'Linking & reduction',
           description:
             'Hear how sounds morph and merge when natives speak at full speed — gonna, linking, elision.',
+          examples: ['gonna', 'wanna', 'word linking'],
         },
         {
           title: 'Flow & Connectors',
           tag: 'Fluency',
           description:
             'Connectors and structures that make you sound fluent, not robotic.',
+          examples: ['however', 'furthermore', 'in short'],
         },
         {
           title: 'Real Talk',
           tag: 'Everyday English',
           description:
             'The casual vocabulary natives use every day — never taught in class.',
+          examples: ['stuff', 'you guys', "I'm good"],
         },
       ],
     },
@@ -123,6 +150,11 @@ export const en: Translations = {
     },
     footer: {
       tagline: 'Phonetics · Connected speech · Real talk',
+      navHowItWorks: 'How it works',
+      navGetStarted: 'Get started',
+      navLogin: 'Log in',
+      navRegister: 'Sign up',
+      accents: '🇺🇸 American · 🇬🇧 British · 🇦🇺 Australian',
     },
   },
   game: {

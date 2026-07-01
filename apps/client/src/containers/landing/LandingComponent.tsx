@@ -1,6 +1,8 @@
 import { type ReactElement, useState } from 'react';
 import { LandingFooter } from '@/containers/landing/components/LandingFooter';
+import { LandingHeader } from '@/containers/landing/components/LandingHeader';
 import { LandingHero } from '@/containers/landing/components/LandingHero';
+import { LandingTrustBar } from '@/containers/landing/components/LandingTrustBar';
 import { LandingHowItWorks } from '@/containers/landing/components/LandingHowItWorks';
 import { LandingModules } from '@/containers/landing/components/LandingModules';
 import { LandingFinalCta } from '@/containers/landing/components/LandingFinalCta';
@@ -13,7 +15,9 @@ export const LandingComponent = (): ReactElement => {
 
   return (
     <main className="min-h-svh bg-[var(--color-bg-base)]">
+      <LandingHeader />
       <LandingHero onPlay={() => setShowAuthGate(true)} />
+      <LandingTrustBar />
       <LandingGameDemo />
       <LandingProblem />
       <LandingHowItWorks />

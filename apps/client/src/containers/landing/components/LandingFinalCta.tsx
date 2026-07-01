@@ -13,7 +13,10 @@ export const LandingFinalCta = ({
   const c = t.landing.finalCta;
 
   return (
-    <section id="get-started" className="px-5 py-20">
+    <section
+      id="get-started"
+      className="border-t border-[var(--color-border)] px-5 py-20"
+    >
       <div className="mx-auto max-w-xl">
         <div className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-8 text-center sm:p-12">
           <div
