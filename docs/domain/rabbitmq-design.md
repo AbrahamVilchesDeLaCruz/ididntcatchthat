@@ -199,6 +199,11 @@ ranking.update_ranking_on_attempt_recorded.dead_letter
 ranking.update_ranking_on_streak_updated
 ranking.update_ranking_on_streak_updated.retry
 ranking.update_ranking_on_streak_updated.dead_letter
+
+# RankingProfileUpdated → opt-out remove / opt-in backfill
+ranking.update_ranking_on_ranking_profile_updated
+ranking.update_ranking_on_ranking_profile_updated.retry
+ranking.update_ranking_on_ranking_profile_updated.dead_letter
 ```
 
 ### 🎤 Pronunciation → 📈 Progress
@@ -243,6 +248,7 @@ El TTL es **por mensaje** (header `expiration`), no por cola — permite backoff
 | `update_ranking_on_game_completed`                      | Opción A — natural | Increment / recount scoped al usuario vía aggregate      |
 | `update_ranking_on_attempt_recorded`                    | Opción A — natural | `applyScore` / `incrementScore` scoped al usuario        |
 | `update_ranking_on_streak_updated`                      | Opción A — natural | `applyScore` idempotente                                 |
+| `update_ranking_on_ranking_profile_updated`             | Opción A — natural | Opt-out remove + opt-in backfill idempotente por usuario |
 | `update_pronunciation_stats_on_pronunciation_evaluated` | Opción A — natural | UPSERT idempotente                                   |
 
 ---
@@ -349,8 +355,11 @@ flowchart TD
 
     subgraph Identity_Ranking ["👤 Identity → 🏆 Ranking"]
         SU_EX["streak.updated"]
+        RP_EX["ranking_profile.updated"]
         SU_Q["update_ranking_on_streak_updated"]
+        RP_Q["update_ranking_on_ranking_profile_updated"]
         SU_EX --> SU_Q
+        RP_EX --> RP_Q
     end
 
     subgraph Pronunciation_Progress ["🎤 Pronunciation → 📈 Progress"]
@@ -383,6 +392,7 @@ flowchart TD
 | 12  | `update_ranking_on_game_completed`                      |  ✅   |     ✅      |
 | 13  | `update_ranking_on_attempt_recorded`                    |  ✅   |     ✅      |
 | 14  | `update_ranking_on_streak_updated`                      |  ✅   |     ✅      |
-| 15  | `update_pronunciation_stats_on_pronunciation_evaluated` |  ✅   |     ✅      |
+| 15  | `update_ranking_on_ranking_profile_updated`           |  ✅   |     ✅      |
+| 16  | `update_pronunciation_stats_on_pronunciation_evaluated` |  ✅   |     ✅      |
 
 **15 handlers × 3 colas = 45 colas en total.**

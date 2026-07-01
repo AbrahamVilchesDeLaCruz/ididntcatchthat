@@ -22,24 +22,24 @@ Evento de dominio
       ↓
 Handler (Subscriber)
       ↓
-RankingUpdater  →  Ranking (aggregate)  →  RankingRepository.save()
+RankingScoreUpdater  →  RankingScore  →  RankingScoreRepository.save()
       ↓
-GET /rankings  →  RankingFinder  →  RankingSelector (RANK() OVER score)
+GET /rankings  →  RankingSearcher  →  RankingLeaderboardQuery (RANK() OVER score)
 ```
 
-La tabla `ranking_user_scores` guarda el **score por usuario**; el **rank** (posición relativa) se calcula en la lectura vía `RankingSelector`.
+La tabla `ranking_user_scores` guarda el **score por usuario**; el **rank** (posición relativa) se calcula en la lectura vía `RankingLeaderboardQuery`.
 
 ## Modelo de dominio
 
 | Elemento | Rol |
 | -------- | --- |
-| `Ranking` | Aggregate root — invariantes de score y nickname |
+| `RankingScore` | Aggregate — fila de proyección; `incrementScore`, `applyScore`, `rename` |
 | `RankingId` | Identidad compuesta `(userId, type, period, period_bucket, module)` |
 | `RankingKey` | Scope de lectura/escritura — periodo efectivo y módulo |
-| `RankingRepository` | `save`, `search`, `match`, `remove` |
-| `RankingSelector` | Leaderboard con `RANK()` — no es repository |
+| `RankingScoreRepository` | `save`, `search`, `match`, `remove` |
+| `RankingLeaderboardQuery` | Leaderboard con `RANK()` — no es repository |
 | `RankingUserStatsQuery` | Stats cross-BC para recalcular ventanas |
-| `RankingUserReader` | Usuario elegible (`show_in_ranking = true`) |
+| `RankingProfileQuery` | Usuario elegible (`show_in_ranking = true`) |
 
 ---
 
