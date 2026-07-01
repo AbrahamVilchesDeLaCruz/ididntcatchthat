@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Domain tokens
@@ -73,7 +73,7 @@ import { GamingModule } from '@/gaming/infrastructure/framework/gaming.module';
   imports: [
     SharedModule,
     AuthModule,
-    GamingModule,
+    forwardRef(() => GamingModule),
     TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
   ],
   controllers: [

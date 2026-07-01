@@ -73,7 +73,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   imports: [
     SharedModule,
     AuthModule,
-    IdentityModule,
+    forwardRef(() => IdentityModule),
     forwardRef(() => GamingModule),
     TypeOrmModule.forFeature([
       UserFlashcardStatsEntity,
