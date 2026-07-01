@@ -17,55 +17,66 @@ export const LandingGameDemo = (): ReactElement => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6">
+        <div className="flex flex-wrap items-stretch justify-center gap-6">
           {gd.cards.map((card) => (
             <div
               key={card.expression}
-              className="demo-card-wrapper"
-              style={{ width: '280px', height: '180px', perspective: '1000px' }}
+              className="demo-card-wrapper w-full max-w-[320px]"
+              style={{ height: '360px', perspective: '1200px' }}
             >
               <div
-                className="demo-card-inner"
+                className="demo-card-inner size-full"
                 style={{
                   position: 'relative',
-                  width: '100%',
-                  height: '100%',
                   transformStyle: 'preserve-3d',
                   transition: 'transform 0.55s cubic-bezier(0.4,0,0.2,1)',
                 }}
               >
+                {/* Front — like game play (expression + IPA + hint) */}
                 <div
                   style={{
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
                   }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-sm"
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center shadow-sm"
                 >
-                  <span className="text-3xl font-bold text-[var(--color-text-primary)]">
+                  <span className="text-4xl font-bold text-[var(--color-text-primary)]">
                     {card.expression}
                   </span>
                   <span className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-1 font-mono text-sm text-[var(--color-brand-light)]">
                     {card.ipa}
                   </span>
-                  <span className="text-xs text-[var(--color-text-muted)]">
+                  <span className="text-sm text-[var(--color-text-muted)]">
                     {gd.hoverHint}
                   </span>
                 </div>
 
+                {/* Back — like game reveal (meaning + bilingual examples) */}
                 <div
                   style={{
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
                   }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)] p-6 shadow-sm"
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-4 overflow-y-auto rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-card)] p-6 text-center shadow-sm"
                 >
-                  <span className="text-xl font-bold text-[var(--color-brand-light)]">
-                    {card.meaning}
-                  </span>
-                  <p className="text-center text-sm italic text-[var(--color-text-secondary)]">
-                    &ldquo;{card.example}&rdquo;
+                  <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                    {card.expression}
                   </p>
+                  <p className="text-lg font-semibold text-[var(--color-brand-light)]">
+                    {card.meaning}
+                  </p>
+                  <span className="rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-1 font-mono text-sm text-[var(--color-brand-light)]">
+                    {card.ipa}
+                  </span>
+                  <div className="w-full max-w-[260px] space-y-2">
+                    <p className="text-[15px] italic text-[var(--color-text-primary)]">
+                      &ldquo;{card.exampleEn}&rdquo;
+                    </p>
+                    <p className="text-[13px] text-[var(--color-text-muted)]">
+                      {card.exampleEs}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

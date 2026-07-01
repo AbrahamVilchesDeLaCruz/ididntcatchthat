@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import { Link } from 'react-router-dom';
+import { scrollToLandingSection } from '@/containers/landing/landingScroll';
 import { useI18n } from '@/core/i18n';
 
 export const LandingFooter = (): ReactElement => {
@@ -16,10 +17,24 @@ export const LandingFooter = (): ReactElement => {
           className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
           aria-label="Footer"
         >
-          <a href="#how-it-works" className={linkClass}>
+          <a
+            href="#how-it-works"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToLandingSection('how-it-works');
+            }}
+            className={linkClass}
+          >
             {f.navHowItWorks}
           </a>
-          <a href="#get-started" className={linkClass}>
+          <a
+            href="#get-started"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToLandingSection('get-started');
+            }}
+            className={linkClass}
+          >
             {f.navGetStarted}
           </a>
           <Link to="/auth/login" className={linkClass}>

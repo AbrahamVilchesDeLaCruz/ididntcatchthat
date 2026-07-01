@@ -39,19 +39,21 @@ export const es: Translations = {
     gameDemo: {
       title: 'Así funciona',
       subtitle: 'Aprende pronunciación real con flashcards interactivas',
-      hoverHint: 'Pasa el cursor para ver →',
+      hoverHint: 'Pasa el cursor para voltear →',
       cards: [
+        {
+          expression: 'think',
+          ipa: '/θɪŋk/',
+          meaning: 'Pensar — TH sorda',
+          exampleEn: 'I think so.',
+          exampleEs: 'Creo que sí.',
+        },
         {
           expression: 'gonna',
           ipa: '/ˈɡɒnə/',
-          meaning: 'Going to (ir a...)',
-          example: "I'm gonna be late.",
-        },
-        {
-          expression: 'wanna',
-          ipa: '/ˈwɒnə/',
-          meaning: 'Want to (querer...)',
-          example: 'Do you wanna grab coffee?',
+          meaning: 'Forma corta de “going to”',
+          exampleEn: "I'm gonna be late.",
+          exampleEs: 'Voy a llegar tarde.',
         },
       ],
     },
@@ -65,7 +67,7 @@ export const es: Translations = {
         'Vocabulario. Gramática. Frases de libro que nunca escucharás en la vida real.',
       weTeachLabel: 'Lo que enseñamos nosotros',
       weTeachDescription:
-        'Cómo cambian los sonidos al conectar palabras. Los 23 fonemas reales del inglés. Expresiones que usan los nativos de verdad.',
+        'Cómo cambian los sonidos al conectar palabras. 45 temas de sonidos nativos en el catálogo. Expresiones que usan los nativos de verdad.',
       exampleLabel: 'Connected speech — ejemplo',
       exampleWrittenLabel: 'Escrito',
       exampleNativeLabel: 'Cómo lo dicen los nativos',
@@ -115,7 +117,7 @@ export const es: Translations = {
           title: 'Sonidos nativos',
           tag: 'Fonética',
           description:
-            'Domina los 23 fonemas del inglés. Con enfoque en los que más cuestan a los hispanohablantes.',
+            'Domina 45 temas de sonidos nativos: consonantes, vocales y patrones que más cuestan a los hispanohablantes.',
           examples: ['/θ/ vs /ð/', 'T suave', 'schwa /ə/'],
         },
         {

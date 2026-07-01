@@ -38,13 +38,15 @@ export interface LandingTranslations {
         expression: string;
         ipa: string;
         meaning: string;
-        example: string;
+        exampleEn: string;
+        exampleEs: string;
       },
       {
         expression: string;
         ipa: string;
         meaning: string;
-        example: string;
+        exampleEn: string;
+        exampleEs: string;
       },
     ];
   };

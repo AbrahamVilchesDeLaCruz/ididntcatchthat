@@ -38,19 +38,21 @@ export const en: Translations = {
     gameDemo: {
       title: 'See it in action',
       subtitle: 'Learn real pronunciation with interactive flashcards',
-      hoverHint: 'Hover to reveal →',
+      hoverHint: 'Hover to flip →',
       cards: [
+        {
+          expression: 'think',
+          ipa: '/θɪŋk/',
+          meaning: 'Think — voiceless TH',
+          exampleEn: 'I think so.',
+          exampleEs: 'Creo que sí.',
+        },
         {
           expression: 'gonna',
           ipa: '/ˈɡɒnə/',
-          meaning: 'Going to',
-          example: "I'm gonna be late.",
-        },
-        {
-          expression: 'wanna',
-          ipa: '/ˈwɒnə/',
-          meaning: 'Want to',
-          example: 'Do you wanna grab coffee?',
+          meaning: 'Short form of “going to”',
+          exampleEn: "I'm gonna be late.",
+          exampleEs: "I'm going to be late.",
         },
       ],
     },
@@ -64,7 +66,7 @@ export const en: Translations = {
         "Vocabulary. Grammar. Textbook phrases you'll never hear in real life.",
       weTeachLabel: 'What we teach',
       weTeachDescription:
-        'How sounds change when words connect. The 23 real phonemes. Expressions natives actually use.',
+        'How sounds change when words connect. 45 native sound topics in the catalog. Expressions natives actually use.',
       exampleLabel: 'Connected speech — example',
       exampleWrittenLabel: 'Written',
       exampleNativeLabel: 'How natives say it',
@@ -114,7 +116,7 @@ export const en: Translations = {
           title: 'Native Sounds',
           tag: 'Phonetics',
           description:
-            'Master the 23 phonemes of English. Focus on the ones that trip up Spanish speakers most.',
+            'Master 45 native sound topics — consonants, vowels, and patterns Spanish speakers miss most.',
           examples: ['/θ/ vs /ð/', 'Soft T', 'schwa /ə/'],
         },
         {
