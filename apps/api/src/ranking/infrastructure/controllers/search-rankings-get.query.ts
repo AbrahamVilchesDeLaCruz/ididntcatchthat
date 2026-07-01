@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
 
@@ -19,16 +20,35 @@ const MODULES = [
 ] as const;
 
 export class SearchRankingsGetQuery {
+  @ApiProperty({
+    enum: RANKING_TYPES,
+    example: 'most_active',
+  })
   @IsIn(RANKING_TYPES)
   type!: (typeof RANKING_TYPES)[number];
 
+  @ApiProperty({
+    enum: RANKING_PERIODS,
+    example: 'weekly',
+  })
   @IsIn(RANKING_PERIODS)
   period!: (typeof RANKING_PERIODS)[number];
 
+  @ApiPropertyOptional({
+    enum: MODULES,
+    example: 'native_sounds',
+    description: 'Required when type is module_master',
+  })
   @IsOptional()
   @IsIn(MODULES)
   module?: (typeof MODULES)[number];
 
+  @ApiPropertyOptional({
+    example: 10,
+    minimum: 1,
+    maximum: 50,
+    default: 10,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

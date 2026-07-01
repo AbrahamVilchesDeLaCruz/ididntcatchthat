@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { Registry, collectDefaultMetrics } from 'prom-client';
 import { MetricsGetController } from '../controllers/metrics-get.controller';
-import { MetricsSummaryGetController } from '../controllers/metrics-summary-get.controller';
+import { SearchMetricsSummaryGetController } from '../controllers/search-metrics-summary-get.controller';
 import { MetricsInterceptor } from './metrics.interceptor';
 import { METRICS_REGISTRY } from './metrics-registry.token';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
@@ -15,7 +15,7 @@ import { APP_METRICS } from '@/shared/domain/app-metrics';
 @Global()
 @Module({
   imports: [AuthModule],
-  controllers: [MetricsGetController, MetricsSummaryGetController],
+  controllers: [MetricsGetController, SearchMetricsSummaryGetController],
   providers: [
     {
       provide: METRICS_REGISTRY,

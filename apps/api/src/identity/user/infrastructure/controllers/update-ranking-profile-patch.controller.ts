@@ -6,15 +6,25 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { RankingProfileUpdater } from '@/identity/user/application/update-profile/ranking-profile-updater';
 import { RankingUpdater } from '@/ranking/application/update/ranking-updater';
 import { UpdateRankingProfilePatchPayload } from './update-ranking-profile-patch.payload';
 
 @ApiTags('users')
+@ApiBearerAuth('access-token')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UpdateRankingProfilePatchController {
@@ -25,6 +35,22 @@ export class UpdateRankingProfilePatchController {
 
   @Patch('me/ranking-profile')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update the current user ranking profile' })
+  @ApiBody({
+    type: UpdateRankingProfilePatchPayload,
+    examples: {
+      default: {
+        summary: 'Show in ranking with nickname',
+        value: { showInRanking: true, nickname: 'learner42' },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Updated ranking profile' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Validation error',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @CurrentUser() user: UserContext,
     @Body() body: UpdateRankingProfilePatchPayload,

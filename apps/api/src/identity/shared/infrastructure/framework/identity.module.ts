@@ -33,7 +33,7 @@ import { GoogleCallbackAuthGetController } from '@/identity/user/infrastructure/
 import { MigrateGuestAuthPostController } from '@/identity/user/infrastructure/controllers/migrate-guest-auth-post.controller';
 import { UpdateRankingProfilePatchController } from '@/identity/user/infrastructure/controllers/update-ranking-profile-patch.controller';
 import { GetRankingProfileGetController } from '@/identity/user/infrastructure/controllers/get-ranking-profile-get.controller';
-import { UserStatsGetController } from '@/identity/user/infrastructure/controllers/user-stats-get.controller';
+import { SearchUserStatsGetController } from '@/identity/user/infrastructure/controllers/search-user-stats-get.controller';
 
 // Infrastructure — exception registry
 import { IdentityExceptionRegistry } from './identity-exception-registry';
@@ -88,7 +88,7 @@ import { RankingModule } from '@/ranking/infrastructure/framework/ranking.module
     MigrateGuestAuthPostController,
     GetRankingProfileGetController,
     UpdateRankingProfilePatchController,
-    UserStatsGetController,
+    SearchUserStatsGetController,
   ],
   providers: [
     // Repositories
