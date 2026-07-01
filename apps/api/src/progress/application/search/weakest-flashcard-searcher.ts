@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  type WeakestFlashcardDto,
+  type WeakestFlashcard,
   type WeakestFlashcardQuery,
   WEAKEST_FLASHCARD_QUERY,
 } from '../../domain/weakest-flashcard.query';
@@ -22,7 +22,7 @@ export class WeakestFlashcardSearcher {
   async execute({
     userId,
     limit,
-  }: RequestWeakestFlashcardSearcher): Promise<WeakestFlashcardDto[]> {
+  }: RequestWeakestFlashcardSearcher): Promise<WeakestFlashcard[]> {
     const cappedLimit = Math.min(limit ?? DEFAULT_LIMIT, MAX_LIMIT);
     return this.query.findWeakest(new UserId(userId), cappedLimit);
   }

@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
 import { type ModuleProgressWithStudyPrimitives } from '@/progress/domain/module-progress';
@@ -36,7 +37,23 @@ export class SearchModulesProgressGetController {
     description:
       'Returns module-level progress merged with study session data for the authenticated user.',
   })
-  @ApiOkResponse({ description: 'Module progress list' })
+  @ApiOkResponse({
+    description: 'Module progress list',
+    schema: apiEnvelopeSchema([
+      {
+        userId: 'user-uuid',
+        module: 'native_sounds',
+        totalAttempts: 42,
+        correctCount: 35,
+        accuracy: 0.83,
+        masteryLevel: 2,
+        studyLevel: 1,
+        studyCoverage: 0.25,
+        lastPlayedAt: '2026-06-30T12:00:00.000Z',
+        updatedAt: '2026-06-30T12:00:00.000Z',
+      },
+    ]),
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(
     @CurrentUser() user: UserContext,

@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class GetWeakestFlashcardsGetQuery {
+export class SearchWeakestFlashcardsGetQuery {
   @ApiPropertyOptional({
     example: 10,
     minimum: 1,
