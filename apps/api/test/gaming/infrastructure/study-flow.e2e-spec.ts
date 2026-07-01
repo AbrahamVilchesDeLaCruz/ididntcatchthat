@@ -57,7 +57,9 @@ describe('gaming/study Study flow (e2e)', () => {
       .send({ mode: 'study', cardCount: 10 })
       .expect(201);
 
-    const body = startRes.body as { gameId: string; flashcardIds: string[] };
+    const body = (
+      startRes.body as { data: { gameId: string; flashcardIds: string[] } }
+    ).data;
 
     for (const flashcardId of body.flashcardIds) {
       await request(app.getHttpServer())
@@ -72,10 +74,11 @@ describe('gaming/study Study flow (e2e)', () => {
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200);
 
-    const summary = completeRes.body as {
-      cardsViewed: number;
-      accuracy: number;
-    };
+    const summary = (
+      completeRes.body as {
+        data: { cardsViewed: number; accuracy: number };
+      }
+    ).data;
     expect(summary.cardsViewed).toBe(body.flashcardIds.length);
     expect(summary.accuracy).toBe(0);
 

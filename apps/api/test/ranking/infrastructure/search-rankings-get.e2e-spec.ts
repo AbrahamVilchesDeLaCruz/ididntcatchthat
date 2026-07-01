@@ -25,11 +25,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should return rankings and current user position when opted in', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `rank${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'rankhero' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     const { gameId, flashcardIds } = await startGame(app, token, {
@@ -100,11 +101,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should return viewer visible_unranked when opted in without playing', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `visible${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'visible-only' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     const res = await request(app.getHttpServer())
@@ -127,7 +129,7 @@ describe('ranking/search-rankings (e2e)', () => {
 
     expect(body.data.viewer.status).toBe('visible_unranked');
     expect(body.data.viewer.showInRanking).toBe(true);
-    expect(body.data.viewer.nickname).toBe('visible-only');
+    expect(body.data.viewer.nickname).toBe(nickname);
     expect(body.data.currentUser).toBeNull();
     expect(body.data.entries.every((entry) => entry.userId !== undefined)).toBe(
       true,
@@ -136,11 +138,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should return viewer hidden when user opted out', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `hidden${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: false, nickname: 'hidden-user' })
+      .send({ showInRanking: false, nickname })
       .expect(200);
 
     const res = await request(app.getHttpServer())
@@ -150,7 +153,7 @@ describe('ranking/search-rankings (e2e)', () => {
       .expect(200);
 
     const body = res.body as {
-      meta: { requestId: string };
+      meta: { request_id: string };
       data: {
         viewer: {
           showInRanking: boolean;
@@ -161,7 +164,7 @@ describe('ranking/search-rankings (e2e)', () => {
       };
     };
 
-    expect(body.meta.requestId).toBeDefined();
+    expect(body.meta.request_id).toBeDefined();
     expect(body.data.viewer.status).toBe('hidden');
     expect(body.data.viewer.showInRanking).toBe(false);
     expect(body.data.viewer.rank).toBeNull();
@@ -180,11 +183,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should accept module_master when module is provided', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `module${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'module-player' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     const res = await request(app.getHttpServer())

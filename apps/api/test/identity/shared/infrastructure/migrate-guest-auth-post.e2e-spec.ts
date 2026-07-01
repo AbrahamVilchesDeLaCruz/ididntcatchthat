@@ -35,7 +35,7 @@ describe('identity/auth MigrateGuestAuthPostController (e2e)', () => {
     const gameRes = await request(app.getHttpServer())
       .post('/v1/games')
       .set('Authorization', `Bearer ${guestToken}`)
-      .send({ mode: 'game', cardCount: 5 })
+      .send({ mode: 'game', cardCount: 10 })
       .expect(201);
 
     const { gameId } = (gameRes.body as { data: { gameId: string } }).data;

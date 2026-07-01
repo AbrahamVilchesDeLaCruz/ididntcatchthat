@@ -53,16 +53,17 @@ describe('identity/user UpdateRankingProfilePatchController (e2e)', () => {
 
   it('should update ranking profile and return envelope', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `rank${Date.now()}`.slice(0, 20);
 
     const res = await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'rankhero' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     expect(res.body.data).toEqual({
       showInRanking: true,
-      nickname: 'rankhero',
+      nickname,
     });
     expect(res.body.meta.request_id).toBeDefined();
   });

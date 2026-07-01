@@ -27,7 +27,7 @@ describe('content/flashcard SearchFlashcardCatalogGetController (e2e)', () => {
       });
       expect(res.body.data.categories).toHaveLength(LEARNING_MODULES.length);
       expect(res.body.data.categories[0]).toMatchObject({
-        slug: expect.any(String),
+        value: expect.any(String),
         label: { es: expect.any(String), en: expect.any(String) },
         subcategories: expect.any(Array),
       });

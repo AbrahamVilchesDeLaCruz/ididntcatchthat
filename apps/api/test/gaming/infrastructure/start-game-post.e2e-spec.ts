@@ -165,14 +165,18 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         })
         .expect(201);
 
-      const { gameId } = startRes.body as { gameId: string };
+      const { gameId } = (
+        startRes.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
 
       const flashcardsRes = await request(app.getHttpServer())
         .get(`/v1/games/${gameId}/flashcards`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200);
 
-      const flashcards = flashcardsRes.body as { subcategory: string }[];
+      const flashcards = (
+        flashcardsRes.body as { data: { subcategory: string }[] }
+      ).data;
       expect(flashcards.length).toBeGreaterThan(0);
       expect(
         flashcards.every((f) => f.subcategory === 't_soft_between_vowels'),

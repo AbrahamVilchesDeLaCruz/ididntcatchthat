@@ -44,8 +44,18 @@ describe('progress/idempotency (e2e)', () => {
 
     const importer = app.get(GuestProgressImporter);
 
-    await importer.execute({ eventId, userId, guestDeviceId });
-    await importer.execute({ eventId, userId, guestDeviceId });
+    await importer.execute({
+      eventId,
+      userId,
+      guestDeviceId,
+      gameIds: [gameId],
+    });
+    await importer.execute({
+      eventId,
+      userId,
+      guestDeviceId,
+      gameIds: [gameId],
+    });
 
     const statsRows = await ds.query<{ count: string }[]>(
       `SELECT COUNT(*)::text AS count FROM user_flashcard_stats WHERE user_id = $1`,
