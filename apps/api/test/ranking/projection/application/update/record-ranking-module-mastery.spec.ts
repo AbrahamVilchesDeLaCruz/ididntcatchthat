@@ -1,30 +1,26 @@
 import { mock } from 'jest-mock-extended';
-import { RecordRankingGameCompleted } from '@/ranking/projection/application/update/record-ranking-game-completed';
+import { RecordRankingModuleMastery } from '@/ranking/projection/application/update/record-ranking-module-mastery';
 import { RankingScoreWriter } from '@/ranking/projection/domain/ranking-score-writer';
 import { type RankingScoreRepository } from '@/ranking/projection/domain/ranking-score.repository';
 import { type RankingProfileQuery } from '@/ranking/shared/domain/ranking-profile.query';
-import { type RankingUserStatsQuery } from '@/ranking/projection/domain/ranking-user-stats.query';
 import { type Logger } from '@/shared/domain/logger';
 import { RankingEligibleUserMother } from '@test/ranking/shared/domain/ranking-eligible-user-mother';
 import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
-import { GameModeMother } from '@test/gaming/domain/game-mode-mother';
-import { DateMother } from '@test/shared/domain/date-mother';
+import { ModuleNameMother } from '@test/progress/domain/module-name-mother';
+import { ModuleMasteryLevelMother } from '@test/progress/domain/module-mastery-level-mother';
 
-describe('ranking/projection/application/update RecordRankingGameCompleted', () => {
+describe('ranking/projection/application/update RecordRankingModuleMastery', () => {
   const repository = mock<RankingScoreRepository>();
   const profileQuery = mock<RankingProfileQuery>();
-  const statsQuery = mock<RankingUserStatsQuery>();
   const logger = mock<Logger>();
-  let recorder: RecordRankingGameCompleted;
+  let recorder: RecordRankingModuleMastery;
 
   beforeEach(() => {
     repository.search.mockResolvedValue(null);
     repository.save.mockResolvedValue(undefined);
-    statsQuery.countCompletedGames.mockResolvedValue(1);
-    recorder = new RecordRankingGameCompleted(
+    recorder = new RecordRankingModuleMastery(
       new RankingScoreWriter(repository),
       profileQuery,
-      statsQuery,
       logger,
     );
   });
@@ -34,43 +30,27 @@ describe('ranking/projection/application/update RecordRankingGameCompleted', () 
 
     await recorder.execute({
       userId: UserIdMother.random().value,
-      mode: GameModeMother.game().value,
-      finishedAt: DateMother.recent().toISOString(),
+      module: ModuleNameMother.nativeSounds().value,
+      level: ModuleMasteryLevelMother.intermediate(),
     });
 
     expect(repository.save).not.toHaveBeenCalled();
   });
 
-  it('should skip when mode is study', async () => {
-    profileQuery.findEligibleUser.mockResolvedValue(
-      RankingEligibleUserMother.random(),
-    );
-
-    await recorder.execute({
-      userId: UserIdMother.random().value,
-      mode: GameModeMother.study().value,
-      finishedAt: DateMother.recent().toISOString(),
-    });
-
-    expect(repository.save).not.toHaveBeenCalled();
-  });
-
-  it('should update most_active when user is eligible', async () => {
+  it('should apply module_master score when user is eligible', async () => {
     const userId = UserIdMother.random().value;
+    const module = ModuleNameMother.nativeSounds().value;
+    const level = ModuleMasteryLevelMother.intermediate();
     profileQuery.findEligibleUser.mockResolvedValue(
       RankingEligibleUserMother.random(),
     );
 
-    await recorder.execute({
-      userId,
-      mode: GameModeMother.game().value,
-      finishedAt: '2026-06-19T12:00:00.000Z',
-    });
+    await recorder.execute({ userId, module, level });
 
     expect(repository.save).toHaveBeenCalled();
     expect(logger.info).toHaveBeenCalledWith(
-      'Ranking score updated for game completed',
-      { userId },
+      'Ranking score updated for module mastery',
+      { userId, module, level },
     );
   });
 });

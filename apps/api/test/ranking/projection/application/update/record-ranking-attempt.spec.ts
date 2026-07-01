@@ -17,6 +17,12 @@ describe('ranking/projection/application/update RecordRankingAttempt', () => {
   let recorder: RecordRankingAttempt;
 
   beforeEach(() => {
+    repository.search.mockReset();
+    repository.save.mockReset();
+    profileQuery.findEligibleUser.mockReset();
+    statsQuery.sumCorrectCount.mockReset();
+    statsQuery.avgAccuracy.mockReset();
+    logger.info.mockReset();
     repository.search.mockResolvedValue(null);
     repository.save.mockResolvedValue(undefined);
     statsQuery.sumCorrectCount.mockResolvedValue(5);
@@ -44,5 +50,50 @@ describe('ranking/projection/application/update RecordRankingAttempt', () => {
 
     expect(statsQuery.sumCorrectCount).toHaveBeenCalled();
     expect(repository.save).toHaveBeenCalled();
+  });
+
+  it('should skip when mode is not game', async () => {
+    await recorder.execute({
+      userId: UserIdMother.random().value,
+      mode: GameModeMother.study().value,
+      correct: true,
+      answeredAt: '2026-06-19T12:00:00.000Z',
+    });
+
+    expect(profileQuery.findEligibleUser).not.toHaveBeenCalled();
+  });
+
+  it('should skip when user is not eligible', async () => {
+    profileQuery.findEligibleUser.mockResolvedValue(null);
+
+    await recorder.execute({
+      userId: UserIdMother.random().value,
+      mode: GameModeMother.game().value,
+      correct: true,
+      answeredAt: '2026-06-19T12:00:00.000Z',
+    });
+
+    expect(repository.save).not.toHaveBeenCalled();
+  });
+
+  it('should skip top_scorer when attempt was incorrect', async () => {
+    const userId = UserIdMother.random().value;
+    profileQuery.findEligibleUser.mockResolvedValue(
+      RankingEligibleUserMother.random(),
+    );
+    statsQuery.avgAccuracy.mockResolvedValue(null);
+
+    await recorder.execute({
+      userId,
+      mode: GameModeMother.game().value,
+      correct: false,
+      answeredAt: '2026-06-19T12:00:00.000Z',
+    });
+
+    expect(statsQuery.sumCorrectCount).not.toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith(
+      'Ranking score updated for attempt',
+      { userId },
+    );
   });
 });

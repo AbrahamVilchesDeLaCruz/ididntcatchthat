@@ -3,7 +3,9 @@ import { type DomainEventConsumer } from '@/shared/application/domain-event-cons
 import { UnlockUserAchievementOnModuleMasteryLevelIncreased } from '@/achievement/user-achievement/application/unlock/unlock-user-achievement-on-module-mastery-level-increased';
 import { type ModuleMasteryAchievementUnlocker } from '@/achievement/user-achievement/application/unlock/module-mastery-achievement-unlocker';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
-import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { ModuleMasteryLevelIncreasedEventMother } from '@test/progress/domain/module-mastery-level-increased-event-mother';
+import { ModuleMasteryLevelMother } from '@test/progress/domain/module-mastery-level-mother';
+import { UserIdMother } from '@test/identity/user/domain/user-id-mother';
 
 describe('achievement/user-achievement/application/unlock UnlockUserAchievementOnModuleMasteryLevelIncreased', () => {
   const consumer = mock<DomainEventConsumer>();
@@ -19,20 +21,21 @@ describe('achievement/user-achievement/application/unlock UnlockUserAchievementO
   });
 
   it('should delegate module mastery events to the unlocker', async () => {
-    const userId = UuidMother.random();
-    const event = new ModuleMasteryLevelIncreasedEvent(userId, {
+    const userId = UserIdMother.random().value;
+    const newLevel = ModuleMasteryLevelMother.intermediate();
+    const event = ModuleMasteryLevelIncreasedEventMother.withLevel(newLevel, {
       userId,
-      module: 'native_sounds',
-      previousLevel: 1,
-      newLevel: 2,
-      occurredAt: new Date().toISOString(),
     });
 
     await handler.on(event);
 
     expect(unlocker.execute).toHaveBeenCalledWith({
       userId,
-      newLevel: 2,
+      newLevel,
     });
+  });
+
+  it('should subscribe to ModuleMasteryLevelIncreasedEvent', () => {
+    expect(handler.eventName).toBe(ModuleMasteryLevelIncreasedEvent.EVENT_NAME);
   });
 });

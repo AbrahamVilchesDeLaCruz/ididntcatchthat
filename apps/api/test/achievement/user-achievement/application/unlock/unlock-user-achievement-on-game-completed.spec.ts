@@ -73,4 +73,24 @@ describe('achievement/user-achievement/application/unlock UnlockUserAchievementO
     expect(gameUnlocker.execute).not.toHaveBeenCalled();
     expect(studyUnlocker.execute).not.toHaveBeenCalled();
   });
+
+  it('should update progress but skip unlockers for unsupported modes', async () => {
+    const userId = UserIdMother.random().value;
+    const event = GameCompletedEventMother.random({
+      userId,
+      mode: 'unsupported-mode',
+    });
+    const progress = UserAchievementProgress.create(
+      UserIdMother.withValue(userId),
+    );
+    progressUpdater.applyGameCompleted.mockResolvedValue(progress);
+
+    await handler.on(event);
+
+    expect(progressUpdater.applyGameCompleted).toHaveBeenCalledWith(
+      event.attributes,
+    );
+    expect(gameUnlocker.execute).not.toHaveBeenCalled();
+    expect(studyUnlocker.execute).not.toHaveBeenCalled();
+  });
 });

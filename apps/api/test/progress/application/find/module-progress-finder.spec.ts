@@ -4,6 +4,7 @@ import { type StudyLevelQuery } from '@/progress/domain/study-level.query';
 import { ModuleProgressFinder } from '@/progress/application/find/module-progress-finder';
 import { ModuleProgressMother } from '@test/progress/domain/module-progress-mother';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
+import { ModuleNameMother } from '@test/progress/domain/module-name-mother';
 import { RequestModuleProgressFinderMother } from './request-module-progress-finder-mother';
 
 describe('progress/application/find ModuleProgressFinder', () => {
@@ -22,21 +23,21 @@ describe('progress/application/find ModuleProgressFinder', () => {
     const userId = ProgressUserIdMother.random().value;
     const level0 = ModuleProgressMother.random({
       userId,
-      module: 'flow_connectors',
+      module: ModuleNameMother.create('flow_connectors').value,
       masteryLevel: 0,
       totalAttempts: 0,
       accuracy: 0,
     });
     const level2 = ModuleProgressMother.random({
       userId,
-      module: 'native_sounds',
+      module: ModuleNameMother.nativeSounds().value,
       masteryLevel: 2,
       totalAttempts: 15,
       accuracy: 0.75,
     });
     const level1 = ModuleProgressMother.random({
       userId,
-      module: 'connected_speech',
+      module: ModuleNameMother.connectedSpeech().value,
       masteryLevel: 1,
       totalAttempts: 6,
       accuracy: 0.6,
@@ -70,7 +71,10 @@ describe('progress/application/find ModuleProgressFinder', () => {
   it('should return primitives not domain objects', async () => {
     const userId = ProgressUserIdMother.random().value;
     repository.findAll.mockResolvedValue([
-      ModuleProgressMother.random({ userId, module: 'native_sounds' }),
+      ModuleProgressMother.random({
+        userId,
+        module: ModuleNameMother.nativeSounds().value,
+      }),
     ]);
 
     const result = await finder.execute(

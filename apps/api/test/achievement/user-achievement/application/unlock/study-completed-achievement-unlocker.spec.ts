@@ -28,6 +28,21 @@ describe('achievement/user-achievement/application/unlock StudyCompletedAchievem
     evaluator = new StudyCompletedAchievementUnlocker(ruleUnlocker, policy);
   });
 
+  it('should skip guest events', async () => {
+    const event = GameCompletedEventMother.guest({ mode: 'study' });
+    const progress = UserAchievementProgress.fromPrimitives({
+      userId: UserIdMother.random().value,
+      completedGamesCount: 0,
+      completedStudySessionsCount: 1,
+      totalPlayedAttempts: 0,
+      touchedModules: [],
+    });
+
+    await evaluator.execute(event.attributes as never, progress);
+
+    expect(unlocker.unlock).not.toHaveBeenCalled();
+  });
+
   it('should skip game mode', async () => {
     const userId = UserIdMother.random().value;
     const event = GameCompletedEventMother.random({ userId, mode: 'game' });

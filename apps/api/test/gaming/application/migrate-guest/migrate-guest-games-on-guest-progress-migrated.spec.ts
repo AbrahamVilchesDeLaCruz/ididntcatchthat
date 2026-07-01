@@ -16,6 +16,20 @@ describe('gaming/application/migrate-guest MigrateGuestGamesOnGuestProgressMigra
     handler = new MigrateGuestGamesOnGuestProgressMigrated(consumer, migrator);
   });
 
+  it('should default gameIds to an empty array when missing', async () => {
+    const userId = UuidMother.random();
+    const event = new GuestProgressMigratedEvent(userId, {
+      userId,
+      deviceId: UuidMother.random(),
+      guestDeviceId: UuidMother.random(),
+      gameIds: undefined as unknown as string[],
+    });
+
+    await handler.on(event);
+
+    expect(migrator.execute).toHaveBeenCalledWith(userId, []);
+  });
+
   it('should migrate guest games on GuestProgressMigrated', async () => {
     const userId = UuidMother.random();
     const gameIds = [UuidMother.random()];

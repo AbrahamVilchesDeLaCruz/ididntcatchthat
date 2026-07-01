@@ -5,7 +5,10 @@ import { type AudioGenerator } from '@/content/flashcard/domain/audio-generator'
 import { type AudioStorage } from '@/content/flashcard/domain/audio-storage';
 import { type Logger } from '@/shared/domain/logger';
 import { type AppMetrics } from '@/shared/domain/app-metrics';
-import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
+import {
+  FlashcardAudioGenerator,
+  resolveExpressionAudioText,
+} from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 import { FlashcardAudioReadyEvent } from '@/content/flashcard/domain/events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from '@/content/flashcard/domain/events/flashcard-audio-failed.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
@@ -142,5 +145,42 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
     expect(audioGenerator.generate).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
+  });
+});
+
+describe('content/flashcard/application/generate-audio resolveExpressionAudioText', () => {
+  it('should use expression when nativeSpeech is null', () => {
+    const flashcard = FlashcardMother.random({ nativeSpeech: null });
+
+    expect(resolveExpressionAudioText(flashcard)).toBe(
+      `"${flashcard.expression.value}"`,
+    );
+  });
+
+  it('should prefer nativeSpeech when it is shorter and has no dots', () => {
+    const flashcard = FlashcardMother.random({
+      expression: 'a longer expression for audio',
+      nativeSpeech: 'short',
+    });
+
+    expect(resolveExpressionAudioText(flashcard)).toBe('"short"');
+  });
+
+  it('should use expression when nativeSpeech contains a dot', () => {
+    const flashcard = FlashcardMother.random({
+      expression: 'hello',
+      nativeSpeech: 'hi.there',
+    });
+
+    expect(resolveExpressionAudioText(flashcard)).toBe('"hello"');
+  });
+
+  it('should use expression when nativeSpeech is not shorter', () => {
+    const flashcard = FlashcardMother.random({
+      expression: 'hi',
+      nativeSpeech: 'hello world',
+    });
+
+    expect(resolveExpressionAudioText(flashcard)).toBe('"hi"');
   });
 });
