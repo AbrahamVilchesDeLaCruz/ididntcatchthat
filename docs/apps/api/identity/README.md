@@ -65,5 +65,21 @@ identity/
 ## Referencias
 
 - [Flujos de auth](./guest/) — guest, register, login, refresh, logout, OAuth, migrate-guest
+- [Ranking Profile](./ranking-profile/) — GET/PATCH `/users/me/ranking-profile`
+- [User Stats](./user-stats/) — GET `/users/stats?period=`
 - [Spec de autenticación](../../../spec/auth.md)
 - [Bounded contexts](../../../domain/bounded-contexts.md)
+
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Guest](./guest/) | `POST /auth/guest` | [Clases](./guest/classes.md) · [Secuencia](./guest/sequence.md) · [Casos de uso](./guest/usecases.md) |
+| [Register](./register/) | `POST /auth/register` | [Clases](./register/classes.md) · [Secuencia](./register/sequence.md) · [Casos de uso](./register/usecases.md) |
+| [Login](./login/) | `POST /auth/login` | [Clases](./login/classes.md) · [Secuencia](./login/sequence.md) · [Casos de uso](./login/usecases.md) |
+| [Refresh](./refresh/) | `POST /auth/refresh` | [Clases](./refresh/classes.md) · [Secuencia](./refresh/sequence.md) · [Casos de uso](./refresh/usecases.md) |
+| [Logout](./logout/) | `POST /auth/logout` | [Clases](./logout/classes.md) · [Secuencia](./logout/sequence.md) · [Casos de uso](./logout/usecases.md) |
+| [Google OAuth](./google-oauth/) | `GET /auth/google`, callback | [Clases](./google-oauth/classes.md) · [Secuencia](./google-oauth/sequence.md) · [Casos de uso](./google-oauth/usecases.md) |
+| [Migrate Guest](./migrate-guest/) | `POST /auth/migrate-guest` | [Clases](./migrate-guest/classes.md) · [Secuencia](./migrate-guest/sequence.md) · [Casos de uso](./migrate-guest/usecases.md) |
+| [Ranking Profile](./ranking-profile/) | GET/PATCH ranking profile | [Clases](./ranking-profile/classes.md) · [Secuencia](./ranking-profile/sequence.md) · [Casos de uso](./ranking-profile/usecases.md) |
+| [User Stats](./user-stats/) | `GET /users/stats?period=` | [Clases](./user-stats/classes.md) · [Secuencia](./user-stats/sequence.md) · [Casos de uso](./user-stats/usecases.md) |
