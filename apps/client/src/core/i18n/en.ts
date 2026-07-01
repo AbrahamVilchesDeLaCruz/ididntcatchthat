@@ -3,13 +3,11 @@ import { type Translations } from '@/core/i18n/i18n.types';
 export const en: Translations = {
   landing: {
     hero: {
-      badge: 'Coming soon',
+      badge: 'Real English, real accents',
       headline: 'That moment when a native speaks…',
       headlineAccent: 'and you get nothing.',
       subheadline:
         'The app that teaches you how natives actually speak — real phonetics, connected speech, and 3 accents per expression.',
-      ctaPrimary: "Notify me when it's ready",
-      ctaSecondary: 'See how it works',
       ctaPlay: 'Play now',
       ctaStudy: 'Study',
       ctaHowItWorks: 'See how it works',
@@ -113,17 +111,16 @@ export const en: Translations = {
         },
       ],
     },
-    notify: {
-      sectionLabel: 'Coming soon',
-      headline: 'Stop missing what natives say.',
+    finalCta: {
+      sectionLabel: 'Get started',
+      headline: 'Start hearing what natives actually say.',
       subheadline:
-        "Be the first to know when we launch. No spam — one email, when it's ready.",
-      inputPlaceholder: 'your@email.com',
-      ctaButton: 'Notify me',
-      disclaimer: 'No spam. Unsubscribe any time.',
+        'Play free as a guest or create an account to save progress and track your stats.',
+      ctaSignUp: 'Sign up free',
+      ctaPlay: 'Play now',
     },
     footer: {
-      tagline: 'Still in development',
+      tagline: 'Phonetics · Connected speech · Real talk',
     },
   },
   game: {

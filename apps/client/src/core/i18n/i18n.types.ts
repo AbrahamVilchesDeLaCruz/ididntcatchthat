@@ -6,8 +6,6 @@ export interface LandingTranslations {
     headline: string;
     headlineAccent: string;
     subheadline: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
     ctaPlay: string;
     ctaStudy: string;
     ctaHowItWorks: string;
@@ -66,13 +64,12 @@ export interface LandingTranslations {
       { title: string; tag: string; description: string },
     ];
   };
-  notify: {
+  finalCta: {
     sectionLabel: string;
     headline: string;
     subheadline: string;
-    inputPlaceholder: string;
-    ctaButton: string;
-    disclaimer: string;
+    ctaSignUp: string;
+    ctaPlay: string;
   };
   footer: {
     tagline: string;

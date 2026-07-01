@@ -7,6 +7,7 @@ import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
 import { ThemeToggle } from '@/common/components/ThemeToggle';
 import { LocaleToggle } from '@/common/components/LocaleToggle';
+import { BrandWordmark } from '@/common/components/BrandWordmark';
 
 interface LandingHeroProps {
   onPlay: () => void;
@@ -70,6 +71,10 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
       </div>
 
       {/* Badge */}
+      <div className="relative mb-6">
+        <BrandWordmark className="text-2xl sm:text-3xl" />
+      </div>
+
       <div className="relative mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)]">
         <span className="size-2 animate-pulse rounded-full bg-[var(--color-accent-green)]" />
         {h.badge}
