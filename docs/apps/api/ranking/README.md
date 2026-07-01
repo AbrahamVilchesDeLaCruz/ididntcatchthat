@@ -4,20 +4,20 @@
 
 **Spec**: [docs/spec/ranking.md](../../spec/ranking.md)
 
-## Submódulos DDD
+## Submódulos DDD (código)
 
 | Submódulo | Responsabilidad |
 | --------- | --------------- |
-| [`shared/`](./shared/) | VOs cross-módulo (`RankingType`, `RankingKey`), puerto `RankingProfileQuery`, NestJS module |
-| [`projection/`](./projection/) | Write-time — aggregate `RankingScore`, use cases `RecordRanking*`, subscribers AMQP |
-| [`search/`](./search/) | Read-time — `RankingSearcher`, `RankingLeaderboardQuery`, `GET /rankings` |
+| `ranking/shared/` | VOs cross-módulo (`RankingType`, `RankingKey`), puerto `RankingProfileQuery`, NestJS module |
+| `ranking/projection/` | Write-time — aggregate `RankingScore`, use cases `RecordRanking*`, subscribers AMQP |
+| `ranking/search/` | Read-time — `RankingSearcher`, `RankingLeaderboardQuery`, `GET /rankings` |
 
 ## Flujos
 
 | Flujo | Descripción | Diagramas |
 | ----- | ----------- | --------- |
 | [Find Rankings](./find/) | `GET /rankings` — top N + posición del caller | [Secuencia](./find/sequence.md) · [Clases](./find/classes.md) · [Casos de uso](./find/usecases.md) |
-| [Update Ranking](./update/) | Subscribers que actualizan scores al consumir eventos | [Secuencia](./update/sequence.md) · [Clases](./update/classes.md) |
+| [Update Ranking](./update/) | Subscribers que actualizan scores al consumir eventos | [Secuencia](./update/sequence.md) · [Clases](./update/classes.md) · [Casos de uso](./update/usecases.md) |
 
 ## Endpoint
 
