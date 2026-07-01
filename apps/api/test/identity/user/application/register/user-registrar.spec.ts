@@ -10,6 +10,7 @@ import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { EmailAlreadyTakenException } from '@/identity/user/domain/exceptions/email-already-taken.exception';
 import { NicknameAlreadyTakenException } from '@/identity/user/domain/exceptions/nickname-already-taken.exception';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
+import { SessionStartedEvent } from '@/identity/session/domain/events/session-started.event';
 import { type User } from '@/identity/user/domain/user';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type Criteria } from '@/shared/domain/criteria';
@@ -89,7 +90,8 @@ describe('identity/application/register UserRegistrar', () => {
 
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
-    expect(events[0]).toBeInstanceOf(UserRegisteredEvent);
+    expect(events.some((e) => e instanceof UserRegisteredEvent)).toBe(true);
+    expect(events.some((e) => e instanceof SessionStartedEvent)).toBe(true);
   });
 
   it('should throw EmailAlreadyTakenException when email is in use', async () => {

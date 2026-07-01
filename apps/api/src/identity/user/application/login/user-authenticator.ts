@@ -20,6 +20,7 @@ import {
 } from '@/identity/shared/domain/token-generator';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
+import { SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { type RequestUserAuthenticator } from './request-user-authenticator';
 import { type ResponseUserAuthenticator } from './response-user-authenticator';
 
@@ -40,6 +41,7 @@ export class UserAuthenticator {
     private readonly logger: Logger,
     @Inject(APP_METRICS)
     private readonly metrics: AppMetrics,
+    private readonly sessionEvents: SessionEventPublisher,
   ) {}
 
   async execute(
@@ -82,6 +84,7 @@ export class UserAuthenticator {
     );
 
     await this.sessionRepository.save(session);
+    await this.sessionEvents.publishFromSessions(session);
 
     this.logger.info('User logged in', { userId: user.id.value });
     this.metrics.increment('app_auth_logins_total', { provider: 'email' });

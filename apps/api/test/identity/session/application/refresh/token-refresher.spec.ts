@@ -5,6 +5,7 @@ import { type UserSession } from '@/identity/session/domain/user-session';
 import { type UserRepository } from '@/identity/user/domain/user.repository';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
+import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { InvalidRefreshTokenException } from '@/identity/session/domain/exceptions/invalid-refresh-token.exception';
 import { ExpiredRefreshTokenException } from '@/identity/session/domain/exceptions/expired-refresh-token.exception';
 import { UserSessionCompromisedException } from '@/identity/session/domain/exceptions/user-session-compromised.exception';
@@ -20,6 +21,7 @@ describe('identity/application/refresh TokenRefresher', () => {
   const userRepository = mock<UserRepository>();
   const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
+  const sessionEvents = mock<SessionEventPublisher>();
   let useCase: TokenRefresher;
 
   const params = RequestTokenRefresherMother.random();
@@ -30,17 +32,20 @@ describe('identity/application/refresh TokenRefresher', () => {
     sessionRepository.save.mockReset();
     userRepository.search.mockReset();
     generator.generatePair.mockReset();
+    sessionEvents.publishEvents.mockReset();
 
     generator.generatePair.mockReturnValue({
       accessToken: 'new-access-token',
       refreshTokenId: UuidMother.random(),
     });
+    sessionEvents.publishEvents.mockResolvedValue(undefined);
 
     useCase = new TokenRefresher(
       sessionRepository,
       userRepository,
       generator,
       logger,
+      sessionEvents,
     );
   });
 
@@ -66,6 +71,7 @@ describe('identity/application/refresh TokenRefresher', () => {
     expect(sessionRepository.save).toHaveBeenCalledTimes(2);
     const firstCall = sessionRepository.save.mock.calls[0][0];
     expect(firstCall.isRevoked()).toBe(true);
+    expect(sessionEvents.publishEvents).toHaveBeenCalledTimes(1);
   });
 
   it('should throw InvalidRefreshTokenException when session not found', async () => {
@@ -121,6 +127,7 @@ describe('identity/application/refresh TokenRefresher', () => {
     expect(
       saved.some(([s]) => s.id === activeSession.id && s.isRevoked()),
     ).toBe(true);
+    expect(sessionEvents.publishEvents).toHaveBeenCalledTimes(1);
   });
 
   it('should throw UserNotFoundException when session is valid but user does not exist', async () => {

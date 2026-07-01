@@ -22,7 +22,7 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | --------------- | :-----------------: | ----------------------------------------------- |
 | `content`       |         ❌          | `idct.content.flashcard.created`                |
 | `gaming`        |         ✅          | `idct.gaming.games.game.completed`              |
-| `identity`      |         ✅          | `idct.identity.users.user.registered`           |
+| `identity`      |         ✅          | `ididntcatchthat.identity.user.registered`           |
 | `progress`      |         ✅          | `idct.progress.module_progress.module_level.up` |
 | `pronunciation` |         ❌          | `idct.pronunciation.attempt.evaluated`          |
 
@@ -38,21 +38,23 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | `ididntcatchthat.gaming.views.flashcard.viewed`            | Gaming        | Progress      | `update_flashcard_stats_on_flashcard_viewed`            |
 | `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Progress      | `update_module_progress_on_game_completed`              |
 | `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Identity      | `update_streak_on_game_completed`                       |
-| `idct.identity.users.user.registered`           | Identity      | Notification  | `send_welcome_email_on_user_registered`                 |
-| `idct.identity.streaks.streak.updated`          | Identity      | Notification  | `notify_streak_milestone_on_streak_updated`             |
-| `idct.identity.streaks.streak.broken`           | Identity      | Notification  | `notify_streak_broken_on_streak_broken`                 |
-| `idct.identity.users.guest_progress.migrated`   | Identity      | Progress      | `import_guest_progress_on_guest_progress_migrated`      |
+| `ididntcatchthat.identity.user.registered`           | Identity      | Notification  | `send_welcome_email_on_user_registered`                 |
+| `ididntcatchthat.identity.streak.updated`          | Identity      | Notification  | `notify_streak_milestone_on_streak_updated`             |
+| `ididntcatchthat.identity.streak.broken`           | Identity      | Notification  | `notify_streak_broken_on_streak_broken`                 |
+| `ididntcatchthat.identity.user.guest_progress_migrated`   | Identity      | Progress      | `import_guest_progress_on_guest_progress_migrated`      |
+| `ididntcatchthat.identity.user.guest_progress_migrated`   | Identity      | Gaming        | `migrate_guest_games_on_guest_progress_migrated`        |
+| `ididntcatchthat.identity.user.ranking_profile_updated` | Identity      | Ranking       | `update_ranking_on_ranking_profile_updated`             |
 | `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Notification  | `notify_level_up_on_module_mastery_level_increased`     |
 | `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Ranking       | `update_ranking_on_module_mastery_level_increased`      |
 | `ididntcatchthat.gaming.games.game.completed`                  | Gaming        | Achievement   | `unlock_user_achievement_on_game_completed`             |
 | `ididntcatchthat.gaming.attempts.attempt.recorded`             | Gaming        | Achievement   | `update_progress_on_attempt_recorded`                 |
 | `ididntcatchthat.gaming.views.flashcard.viewed`                | Gaming        | Achievement   | `update_progress_on_flashcard_viewed`                   |
-| `idct.identity.streaks.streak.updated`                         | Identity      | Achievement   | `unlock_user_achievement_on_streak_updated`             |
+| `ididntcatchthat.identity.streak.updated`                         | Identity      | Achievement   | `unlock_user_achievement_on_streak_updated`             |
 | `idct.progress.module_progress.module_mastery_level.increased` | Progress      | Achievement   | `unlock_user_achievement_on_module_mastery_level_increased` |
 | `ididntcatchthat.achievement.user_achievement.unlocked`        | Achievement   | Notification (futuro) | Reservado para toast/push vía Notification BC   |
 | `ididntcatchthat.gaming.games.game.completed`                  | Gaming        | Ranking       | `update_ranking_on_game_completed`                      |
 | `ididntcatchthat.gaming.attempts.attempt.recorded`             | Gaming        | Ranking       | `update_ranking_on_attempt_recorded`                    |
-| `idct.identity.streaks.streak.updated`                         | Identity      | Ranking       | `update_ranking_on_streak_updated`                      |
+| `ididntcatchthat.identity.streak.updated`                         | Identity      | Ranking       | `update_ranking_on_streak_updated`                      |
 | `idct.pronunciation.attempt.evaluated`          | Pronunciation | Progress      | `update_pronunciation_stats_on_pronunciation_evaluated` |
 
 > Nota: `idct.gaming.games.game.completed` tiene **dos handlers** suscritos — uno en Progress y otro en Identity. Cada handler tiene su propia cola con binding al mismo exchange.
@@ -68,10 +70,10 @@ idct.content.flashcard.created
 idct.content.flashcard.updated
 idct.gaming.attempts.attempt.recorded
 idct.gaming.games.game.completed
-idct.identity.users.user.registered
-idct.identity.streaks.streak.updated
-idct.identity.streaks.streak.broken
-idct.identity.users.guest_progress.migrated
+ididntcatchthat.identity.user.registered
+ididntcatchthat.identity.streak.updated
+ididntcatchthat.identity.streak.broken
+ididntcatchthat.identity.user.guest_progress_migrated
 idct.progress.module_progress.module_level.up
 idct.pronunciation.attempt.evaluated
 ```
@@ -288,9 +290,9 @@ flowchart TD
     end
 
     subgraph Identity_Notification ["🔐 Identity → 🔔 Notification"]
-        UR_EX["idct.identity.users.user.registered"]
-        SU_EX["idct.identity.streaks.streak.updated"]
-        SB_EX["idct.identity.streaks.streak.broken"]
+        UR_EX["ididntcatchthat.identity.user.registered"]
+        SU_EX["ididntcatchthat.identity.streak.updated"]
+        SB_EX["ididntcatchthat.identity.streak.broken"]
         WE_Q["send_welcome_email\n_on_user_registered"]
         WE_R["...retry"]
         WE_D["...dead_letter"]
@@ -309,7 +311,7 @@ flowchart TD
     end
 
     subgraph Identity_Progress ["🔐 Identity → 📈 Progress"]
-        GP_EX["idct.identity.users.guest_progress.migrated"]
+        GP_EX["ididntcatchthat.identity.user.guest_progress_migrated"]
         GP_Q["import_guest_progress\n_on_guest_progress_migrated"]
         GP_R["...retry"]
         GP_D["...dead_letter"]

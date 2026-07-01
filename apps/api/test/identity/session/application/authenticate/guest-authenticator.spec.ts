@@ -3,6 +3,7 @@ import { GuestAuthenticator } from '@/identity/session/application/authenticate/
 import { type UserSessionRepository } from '@/identity/session/domain/user-session.repository';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
+import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { RequestGuestAuthenticatorMother } from './request-guest-authenticator-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { JestTimers } from '@test/shared/jest-timers';
@@ -11,14 +12,22 @@ describe('identity/application/guest GuestAuthenticator', () => {
   const repository = mock<UserSessionRepository>();
   const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
+  const sessionEvents = mock<SessionEventPublisher>();
   let useCase: GuestAuthenticator;
 
   beforeEach(() => {
     JestTimers.setup();
     repository.save.mockReset();
     generator.generateGuest.mockReset();
+    sessionEvents.publishFromSessions.mockReset();
+    sessionEvents.publishFromSessions.mockResolvedValue(undefined);
 
-    useCase = new GuestAuthenticator(repository, generator, logger);
+    useCase = new GuestAuthenticator(
+      repository,
+      generator,
+      logger,
+      sessionEvents,
+    );
   });
 
   afterEach(() => JestTimers.teardown());
@@ -57,6 +66,7 @@ describe('identity/application/guest GuestAuthenticator', () => {
     expect(savedSession.isGuest()).toBe(true);
     expect(savedSession.isRevoked()).toBe(false);
     expect(savedSession.isExpired()).toBe(false);
+    expect(sessionEvents.publishFromSessions).toHaveBeenCalledTimes(1);
   });
 
   it('should call tokenService with fingerprint and ip', async () => {

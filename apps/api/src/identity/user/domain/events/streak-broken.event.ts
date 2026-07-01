@@ -10,7 +10,7 @@ export interface StreakBrokenAttributes extends DomainEventAttributes {
 }
 
 export class StreakBrokenEvent extends DomainEvent {
-  static readonly EVENT_NAME = 'idct.identity.streaks.streak.broken';
+  static readonly EVENT_NAME = 'ididntcatchthat.identity.streak.broken';
 
   constructor(
     aggregateId: string,
@@ -23,5 +23,19 @@ export class StreakBrokenEvent extends DomainEvent {
 
   eventName(): string {
     return StreakBrokenEvent.EVENT_NAME;
+  }
+
+  static fromPrimitives(
+    aggregateId: string,
+    eventId: string,
+    occurredOn: Date,
+    attributes: DomainEventAttributes,
+  ): StreakBrokenEvent {
+    return new StreakBrokenEvent(
+      aggregateId,
+      attributes as StreakBrokenAttributes,
+      eventId,
+      occurredOn,
+    );
   }
 }

@@ -69,12 +69,14 @@ graph TB
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Achievement | Evalúa y desbloquea logros (game/study) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Ranking | Actualiza `most_active` vía aggregate `Ranking` |
 | `AchievementUnlocked` | `ididntcatchthat.achievement.user_achievement.unlocked` | Achievement | Notification (futuro) | Toast in-app vía cliente poll; push/email pendiente |
-| `UserRegistered` | `idct.identity.users.user.registered` | Identity | Notification | Envía email de bienvenida (Resend) |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Achievement | Desbloquea logros streak_7/30/100 |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Identity | Ranking | Actualiza `best_streak` vía aggregate `Ranking` |
-| `StreakBroken` | `idct.identity.streaks.streak.broken` | Identity | Notification | Email + push notification |
-| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Identity | Progress | Importa games + attempts del guest → `user_flashcard_stats` |
+| `UserRegistered` | `ididntcatchthat.identity.user.registered` | Identity | Notification | Envía email de bienvenida (Resend) |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | Identity | Notification | Toast + push si hito (7, 30, 100 días) |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | Identity | Achievement | Desbloquea logros streak_7/30/100 |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | Identity | Ranking | Actualiza `best_streak` vía aggregate `Ranking` |
+| `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Identity | Notification | Email + push notification |
+| `RankingProfileUpdated` | `ididntcatchthat.identity.user.ranking_profile_updated` | Identity | Ranking | Sincroniza opt-in/out y nickname en tablas de ranking |
+| `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | Gaming | Reasigna `games.user_id` de guest → usuario registrado |
+| `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | Progress | Importa attempts de games migrados → `user_flashcard_stats` |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Notification | Toast de logro en app |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Achievement | Desbloquea module_mastery_2/3 |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Actualiza `module_master` vía aggregate `Ranking` |

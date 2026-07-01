@@ -15,6 +15,7 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { EmailMother } from '@test/identity/user/domain/email-mother';
 import { JestTimers } from '@test/shared/jest-timers';
 import { type UserSearcher } from '@/identity/user/domain/user-searcher';
+import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { RequestOAuthAuthenticatorMother } from './request-oauth-authenticator-mother';
 
 describe('identity/application/google OAuthAuthenticator', () => {
@@ -26,6 +27,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
   const logger = mock<Logger>();
   const searcher = mock<UserSearcher>();
   const metrics = mock<AppMetrics>();
+  const sessionEvents = mock<SessionEventPublisher>();
   let authenticator: OAuthAuthenticator;
 
   beforeEach((): void => {
@@ -43,6 +45,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
     });
     publisher.publish.mockResolvedValue(undefined);
     nicknameResolver.resolve.mockResolvedValue('test-user');
+    sessionEvents.publishFromSessions.mockResolvedValue(undefined);
 
     authenticator = new OAuthAuthenticator(
       userRepository,
@@ -53,6 +56,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
       logger,
       searcher,
       metrics,
+      sessionEvents,
     );
   });
 
@@ -70,6 +74,7 @@ describe('identity/application/google OAuthAuthenticator', () => {
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(UserRegisteredEvent);
+    expect(sessionEvents.publishFromSessions).toHaveBeenCalledTimes(1);
     const savedSession = sessionRepository.save.mock.calls[0][0];
     expect(savedSession.isGuest()).toBe(false);
   });

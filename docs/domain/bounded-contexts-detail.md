@@ -18,8 +18,8 @@ graph LR
 
     subgraph Emits ["Eventos que emite"]
         E1["UserRegistered\nidct.identity.users.user.registered"]
-        E2["StreakUpdated\nidct.identity.streaks.streak.updated"]
-        E3["StreakBroken\nidct.identity.streaks.streak.broken"]
+        E2["StreakUpdated\nididntcatchthat.identity.streak.updated"]
+        E3["StreakBroken\nididntcatchthat.identity.streak.broken"]
         E4["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
     end
 
@@ -37,8 +37,8 @@ graph LR
 | Evento emitido | Exchange | Trigger |
 |----------------|----------|---------|
 | `UserRegistered` | `idct.identity.users.user.registered` | Usuario completa registro (email o OAuth) |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | `GameCompleted` o sesión de estudio — primera del día |
-| `StreakBroken` | `idct.identity.streaks.streak.broken` | Job nocturno detecta que `last_activity_date < ayer` |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | `GameCompleted` o sesión de estudio — primera del día |
+| `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Job nocturno detecta que `last_activity_date < ayer` |
 | `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Guest completa registro y envía estado Zustand |
 
 | Evento consumido | Exchange | Acción |
@@ -236,7 +236,7 @@ graph LR
 |-----------------|----------|--------|
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | `most_active` +1 / recount ventanas |
 | `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | `top_scorer` +1 si acierto; `most_accurate` recalculado |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | `best_streak` = racha actual |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | `best_streak` = racha actual |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | `module_master` = nivel del módulo |
 
 **No emite eventos.** Es un pure consumer — la lectura es `SELECT` sobre la proyección.
@@ -253,8 +253,8 @@ Write-time usa queries scoped al usuario (o incrementos) — no hay recomputo gl
 graph LR
     subgraph Consumes ["Eventos que consume"]
         C1["UserRegistered\nidct.identity.users.user.registered"]
-        C2["StreakUpdated\nidct.identity.streaks.streak.updated"]
-        C3["StreakBroken\nidct.identity.streaks.streak.broken"]
+        C2["StreakUpdated\nididntcatchthat.identity.streak.updated"]
+        C3["StreakBroken\nididntcatchthat.identity.streak.broken"]
         C4["ModuleMasteryLevelIncreased\nidct.progress.module_progress.module_mastery_level.increased"]
     end
 
@@ -275,8 +275,8 @@ graph LR
 | Evento consumido | Exchange | Canal | Condición |
 |-----------------|----------|-------|-----------|
 | `UserRegistered` | `idct.identity.users.user.registered` | Email (Resend) | Siempre |
-| `StreakUpdated` | `idct.identity.streaks.streak.updated` | Toast + Push | Solo si hito (7, 30, 100 días) |
-| `StreakBroken` | `idct.identity.streaks.streak.broken` | Email + Push | Siempre que streak > 0 |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | Toast + Push | Solo si hito (7, 30, 100 días) |
+| `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Email + Push | Siempre que streak > 0 |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Toast | Siempre |
 
 **No emite eventos.** Es un pure consumer — solo ejecuta side effects.

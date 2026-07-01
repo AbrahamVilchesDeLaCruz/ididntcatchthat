@@ -2,6 +2,7 @@ import { AggregateRoot } from '@/shared/domain/aggregate-root';
 import { SessionStartedEvent } from '@/identity/session/domain/events/session-started.event';
 import { SessionRevokedEvent } from '@/identity/session/domain/events/session-revoked.event';
 import { SessionRotatedEvent } from '@/identity/session/domain/events/session-rotated.event';
+import { SessionCompromisedEvent } from '@/identity/session/domain/events/session-compromised.event';
 
 export enum OwnerType {
   User = 'user',
@@ -174,5 +175,19 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
       new SessionRotatedEvent(this.id, { newSessionId, ownerId: this.ownerId }),
     );
     return rotated;
+  }
+
+  rotationEvent(newSessionId: string): SessionRotatedEvent {
+    return new SessionRotatedEvent(this.id, {
+      newSessionId,
+      ownerId: this.ownerId,
+    });
+  }
+
+  compromisedEvent(): SessionCompromisedEvent {
+    return new SessionCompromisedEvent(this.id, {
+      ownerId: this.ownerId,
+      tokenId: this.tokenId,
+    });
   }
 }

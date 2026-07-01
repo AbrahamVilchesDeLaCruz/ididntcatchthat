@@ -19,6 +19,7 @@ import {
 } from '@/identity/shared/domain/token-generator';
 import { UserId } from '@/shared/domain/user-id';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { type RequestTokenRefresher } from './request-token-refresher';
 import { type ResponseTokenRefresher } from './response-token-refresher';
 
@@ -35,6 +36,7 @@ export class TokenRefresher {
     private readonly generator: TokenGenerator,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    private readonly sessionEvents: SessionEventPublisher,
   ) {}
 
   async execute(
@@ -60,11 +62,16 @@ export class TokenRefresher {
           },
         ]),
       );
-      await Promise.all(
-        ownerSessions
-          .filter((s) => !s.isRevoked())
-          .map((s) => this.sessionRepository.save(s.revoke())),
-      );
+
+      const events = [session.compromisedEvent()];
+      for (const active of ownerSessions.filter((s) => !s.isRevoked())) {
+        const revoked = active.revoke();
+        await this.sessionRepository.save(revoked);
+        events.push(...revoked.pullDomainEvents());
+      }
+
+      await this.sessionEvents.publishEvents(events);
+
       this.logger.warn('Token reuse detected — all sessions revoked', {
         ownerId: session.ownerId,
         ownerType: session.ownerType,
@@ -79,9 +86,7 @@ export class TokenRefresher {
     const user = await this.userRepository.search(new UserId(session.ownerId));
     if (!user) throw new UserNotFoundException(session.ownerId);
 
-    const revokedSession = session.revoke();
-    await this.sessionRepository.save(revokedSession);
-
+    const newSessionId = crypto.randomUUID();
     const { accessToken, refreshTokenId } = this.generator.generatePair({
       type: user.role.value,
       userId: user.id.value,
@@ -91,15 +96,23 @@ export class TokenRefresher {
       roles: [user.role.value],
     });
 
+    const rotationEvent = session.rotationEvent(newSessionId);
+    const revokedSession = session.revoke();
     const newSession = UserSession.create(
-      crypto.randomUUID(),
+      newSessionId,
       refreshTokenId,
       user.id.value,
       deviceId,
       fingerprint,
     );
 
+    await this.sessionRepository.save(revokedSession);
     await this.sessionRepository.save(newSession);
+    await this.sessionEvents.publishEvents([
+      rotationEvent,
+      ...revokedSession.pullDomainEvents(),
+      ...newSession.pullDomainEvents(),
+    ]);
 
     this.logger.info('Token refreshed', { userId: user.id.value });
 
