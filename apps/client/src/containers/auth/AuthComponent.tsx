@@ -131,7 +131,7 @@ export const AuthComponent = ({
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--color-border)]" />
             <span className="text-xs text-[var(--color-text-muted)]">
-              o continuá con
+              o continúa con
             </span>
             <div className="flex-1 h-px bg-[var(--color-border)]" />
           </div>

@@ -46,7 +46,7 @@ export const FlashcardsTable = ({
   if (flashcards.length === 0) {
     return (
       <div className="rounded-xl border border-[var(--color-border)] py-16 text-center text-[var(--color-text-secondary)]">
-        No hay flashcards. ¡Creá la primera!
+        No hay flashcards. ¡Crea la primera!
       </div>
     );
   }

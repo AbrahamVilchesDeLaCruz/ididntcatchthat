@@ -73,7 +73,7 @@ export const AiGenerateModal = ({
             </h2>
             <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
               {step === 'configure'
-                ? 'Elegí categoría, subcategoría y cantidad'
+                ? 'Elige categoría, subcategoría y cantidad'
                 : `${String(drafts?.length ?? 0)} borradores — revisá y confirmá`}
             </p>
           </div>
@@ -102,7 +102,7 @@ export const AiGenerateModal = ({
                   }}
                   className={selectClass}
                 >
-                  <option value="">Seleccioná categoría</option>
+                  <option value="">Selecciona categoría</option>
                   {catalog?.categories.map((c) => (
                     <option key={c.value} value={c.value}>
                       {c.label.es}
@@ -123,8 +123,8 @@ export const AiGenerateModal = ({
                 >
                   <option value="">
                     {category
-                      ? 'Seleccioná subcategoría'
-                      : 'Elegí categoría primero'}
+                      ? 'Selecciona subcategoría'
+                      : 'Elige categoría primero'}
                   </option>
                   {selectedCategory?.subcategories.map((s) => (
                     <option key={s.value} value={s.value}>

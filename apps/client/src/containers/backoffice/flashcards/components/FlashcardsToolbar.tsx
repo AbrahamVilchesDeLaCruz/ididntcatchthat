@@ -91,7 +91,7 @@ export const FlashcardsToolbar = ({
           <option value="">
             {categoryFilter
               ? 'Todas las subcategorías'
-              : 'Elegí categoría primero'}
+              : 'Elige categoría primero'}
           </option>
           {subcategories.map((s) => (
             <option key={s.value} value={s.value}>
