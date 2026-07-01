@@ -2,7 +2,7 @@
 
 ```mermaid
 classDiagram
-    class PatchGameController {
+    class PatchGamePatchController {
         -gamePauser: GamePauser
         -gameAbandoner: GameAbandoner
         +handle(id: string, payload: PatchGamePayload, user: UserContext): Promise~void~
@@ -29,7 +29,7 @@ classDiagram
         +execute(request: ListPausedGamesRequest): Promise~GamePrimitive[]~
     }
 
-    class ListPausedGamesGetController {
+    class SearchGamesGetController {
         -pausedGamesLister: PausedGamesLister
         +handle(user: UserContext): Promise~GamePrimitive[]~
     }
@@ -45,11 +45,11 @@ classDiagram
         +lastFlashcardId: string
     }
 
-    PatchGameController --> GamePauser
-    PatchGameController --> PatchGamePayload
+    PatchGamePatchController --> GamePauser
+    PatchGamePatchController --> PatchGamePayload
     GamePauser --> GameRepository
     GamePauser --> Game
     Game --> GamePausedEvent
-    ListPausedGamesGetController --> PausedGamesLister
+    SearchGamesGetController --> PausedGamesLister
     PausedGamesLister --> GameRepository
 ```

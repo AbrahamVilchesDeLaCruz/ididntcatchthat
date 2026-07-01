@@ -31,7 +31,7 @@ import {
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
-export class GetGameSummaryGetController {
+export class FindGameSummaryGetController {
   constructor(private readonly finder: GameSummaryFinder) {}
 
   @Get(':id/summary')

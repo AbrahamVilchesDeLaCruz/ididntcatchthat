@@ -27,7 +27,7 @@ import { type GameFlashcardDto } from '@/gaming/domain/game-flashcard-query';
 @ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
-export class GetGameFlashcardsGetController {
+export class SearchGameFlashcardsGetController {
   constructor(private readonly fetcher: GameFlashcardsFetcher) {}
 
   @Get(':id/flashcards')

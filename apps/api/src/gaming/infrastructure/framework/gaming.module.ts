@@ -23,11 +23,11 @@ import { TypeOrmFlashcardSelector } from '@/gaming/infrastructure/selectors/type
 import { StartGamePostController } from '@/gaming/infrastructure/controllers/start-game-post.controller';
 import { RecordAttemptPostController } from '@/gaming/infrastructure/controllers/record-attempt-post.controller';
 import { CompleteGamePostController } from '@/gaming/infrastructure/controllers/complete-game-post.controller';
-import { GetGameSummaryGetController } from '@/gaming/infrastructure/controllers/get-game-summary-get.controller';
+import { FindGameSummaryGetController } from '@/gaming/infrastructure/controllers/find-game-summary-get.controller';
 import { PatchGamePatchController } from '@/gaming/infrastructure/controllers/patch-game-patch.controller';
 import { SearchGamesGetController } from '@/gaming/infrastructure/controllers/search-games-get.controller';
 import { ResumeGamePostController } from '@/gaming/infrastructure/controllers/resume-game-post.controller';
-import { GetGameFlashcardsGetController } from '@/gaming/infrastructure/controllers/get-game-flashcards-get.controller';
+import { SearchGameFlashcardsGetController } from '@/gaming/infrastructure/controllers/search-game-flashcards-get.controller';
 import { SearchGamesStatsGetController } from '@/gaming/infrastructure/controllers/search-games-stats-get.controller';
 import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
 import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
@@ -72,10 +72,10 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     RecordAttemptPostController,
     RecordViewPostController,
     CompleteGamePostController,
-    GetGameSummaryGetController,
+    FindGameSummaryGetController,
     PatchGamePatchController,
     ResumeGamePostController,
-    GetGameFlashcardsGetController,
+    SearchGameFlashcardsGetController,
   ],
   providers: [
     // Repositories

@@ -36,7 +36,7 @@ async function startGame(
     .data;
 }
 
-describe('gaming/game GetGameSummaryGetController (e2e)', () => {
+describe('gaming/game FindGameSummaryGetController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
