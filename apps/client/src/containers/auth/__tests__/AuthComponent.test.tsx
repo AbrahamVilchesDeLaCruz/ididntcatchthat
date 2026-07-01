@@ -16,6 +16,14 @@ const defaultProps = {
 };
 
 describe('AuthComponent', () => {
+  it('muestra BrandWordmark con el nombre legible de la app', () => {
+    render(<AuthComponent {...defaultProps} />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /I didn't catch that/i,
+    );
+  });
+
   describe('modo login', () => {
     it('muestra campos de email y contraseña', () => {
       render(<AuthComponent {...defaultProps} />);
