@@ -4,6 +4,7 @@ import { type DomainEventPublisher } from '@/shared/domain/domain-event-publishe
 import { type AudioGenerator } from '@/content/flashcard/domain/audio-generator';
 import { type AudioStorage } from '@/content/flashcard/domain/audio-storage';
 import { type Logger } from '@/shared/domain/logger';
+import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 import { FlashcardAudioReadyEvent } from '@/content/flashcard/domain/events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from '@/content/flashcard/domain/events/flashcard-audio-failed.event';
@@ -18,6 +19,7 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
   const audioGenerator = mock<AudioGenerator>();
   const audioStorage = mock<AudioStorage>();
   const logger = mock<Logger>();
+  const metrics = mock<AppMetrics>();
   let generator: FlashcardAudioGenerator;
 
   const fakeBuffer = Buffer.from('audio');
@@ -44,6 +46,7 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
       audioGenerator,
       audioStorage,
       logger,
+      metrics,
     );
   });
 
@@ -85,6 +88,12 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
 
     const events: DomainEvent[] = publisher.publish.mock.calls[1][0];
     expect(events[0]).toBeInstanceOf(FlashcardAudioReadyEvent);
+    expect(metrics.increment).toHaveBeenCalledWith(
+      'app_audio_generated_total',
+      {
+        provider: 'elevenlabs',
+      },
+    );
   });
 
   it('should mark audio as failed and publish FlashcardAudioFailedEvent when generator throws', async () => {
@@ -103,6 +112,9 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
     const events: DomainEvent[] = publisher.publish.mock.calls[1][0];
     expect(events[0]).toBeInstanceOf(FlashcardAudioFailedEvent);
     expect(logger.error).toHaveBeenCalled();
+    expect(metrics.increment).toHaveBeenCalledWith('app_audio_errors_total', {
+      provider: 'elevenlabs',
+    });
   });
 
   it('should mark audio as failed when generator throws a non-Error value', async () => {
