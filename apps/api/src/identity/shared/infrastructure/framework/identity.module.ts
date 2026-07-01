@@ -52,6 +52,8 @@ import { USER_STATS_QUERY } from '@/identity/user/application/stats/user-stats.q
 import { TypeOrmUserStatsQuery } from '@/identity/user/infrastructure/persistence/typeorm-user-stats.query';
 import { USER_STREAK_QUERY } from '@/identity/user/domain/user-streak.query';
 import { TypeOrmUserStreakQuery } from '@/identity/user/infrastructure/persistence/typeorm-user-streak.query';
+import { RANKING_ELIGIBILITY_QUERY } from '@/identity/user/domain/ranking-eligibility.query';
+import { TypeOrmRankingEligibilityQuery } from '@/identity/user/infrastructure/persistence/typeorm-ranking-eligibility.query';
 import {
   SUBSCRIBERS,
   SubscribersBootstrapper,
@@ -123,6 +125,10 @@ import { GamingModule } from '@/gaming/infrastructure/framework/gaming.module';
     // User stats
     { provide: USER_STATS_QUERY, useClass: TypeOrmUserStatsQuery },
     { provide: USER_STREAK_QUERY, useClass: TypeOrmUserStreakQuery },
+    {
+      provide: RANKING_ELIGIBILITY_QUERY,
+      useClass: TypeOrmRankingEligibilityQuery,
+    },
     UserStatsRetriever,
     {
       provide: SUBSCRIBERS,
@@ -137,6 +143,6 @@ import { GamingModule } from '@/gaming/infrastructure/framework/gaming.module';
     // Exception registry
     IdentityExceptionRegistry,
   ],
-  exports: [USER_STREAK_QUERY],
+  exports: [USER_STREAK_QUERY, RANKING_ELIGIBILITY_QUERY],
 })
 export class IdentityModule {}
