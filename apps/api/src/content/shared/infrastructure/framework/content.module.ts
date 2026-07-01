@@ -69,9 +69,10 @@ import { AiExampleSuggester } from '@/content/flashcard/application/suggest-exam
 import { AiFlashcardDraftGenerator } from '@/content/flashcard/application/generate-drafts/ai-flashcard-draft-generator';
 
 // Application — event subscribers
-import { GenerateFlashcardExamplesOnFlashcardCreated } from '@/content/flashcard/application/complete-examples/generate-flashcard-examples-on-flashcard-created';
-import { GenerateFlashcardPhoneticsOnFlashcardCreated } from '@/content/flashcard/application/complete-phonetics/generate-flashcard-phonetics-on-flashcard-created';
+import { EnrichFlashcardOnFlashcardCreated } from '@/content/flashcard/application/enrich/enrich-flashcard-on-flashcard-created';
 import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-completed';
+import { GenerateFlashcardAudioOnFlashcardExpressionUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-expression-updated';
+import { GenerateFlashcardAudioOnFlashcardExamplesUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-updated';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -135,20 +136,28 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     { provide: AUDIO_STORAGE, useClass: R2AudioStorage },
 
     // Event subscribers
-    GenerateFlashcardExamplesOnFlashcardCreated,
-    GenerateFlashcardPhoneticsOnFlashcardCreated,
+    EnrichFlashcardOnFlashcardCreated,
     GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+    GenerateFlashcardAudioOnFlashcardExpressionUpdated,
+    GenerateFlashcardAudioOnFlashcardExamplesUpdated,
     {
       provide: SUBSCRIBERS,
       useFactory: (
-        s1: GenerateFlashcardExamplesOnFlashcardCreated,
-        s2: GenerateFlashcardPhoneticsOnFlashcardCreated,
-        s3: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
-      ): Subscriber[] => [s1, s2, s3],
+        enrich: EnrichFlashcardOnFlashcardCreated,
+        audioOnExamplesCompleted: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+        audioOnExpressionUpdated: GenerateFlashcardAudioOnFlashcardExpressionUpdated,
+        audioOnExamplesUpdated: GenerateFlashcardAudioOnFlashcardExamplesUpdated,
+      ): Subscriber[] => [
+        enrich,
+        audioOnExamplesCompleted,
+        audioOnExpressionUpdated,
+        audioOnExamplesUpdated,
+      ],
       inject: [
-        GenerateFlashcardExamplesOnFlashcardCreated,
-        GenerateFlashcardPhoneticsOnFlashcardCreated,
+        EnrichFlashcardOnFlashcardCreated,
         GenerateFlashcardAudioOnFlashcardExamplesCompleted,
+        GenerateFlashcardAudioOnFlashcardExpressionUpdated,
+        GenerateFlashcardAudioOnFlashcardExamplesUpdated,
       ],
     },
     SubscribersBootstrapper,

@@ -6,17 +6,20 @@ import {
 } from '@/shared/application/domain-event-consumer';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardCreatedEvent } from '@/content/flashcard/domain/events/flashcard-created.event';
-import { AiPhoneticsCompleter } from './ai-phonetics-completer';
+import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
+import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-phonetics/ai-phonetics-completer';
 
 @Injectable()
-export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Subscriber {
-  readonly queueName = 'generate_flashcard_phonetics_on_flashcard_created';
+export class EnrichFlashcardOnFlashcardCreated extends Subscriber {
+  readonly queueName = 'enrich_flashcard_on_flashcard_created';
   readonly eventName = FlashcardCreatedEvent.EVENT_NAME;
   readonly exchangeName = FlashcardCreatedEvent.EVENT_NAME;
   readonly domainEvent = FlashcardCreatedEvent;
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
+    @Inject(AiExamplesCompleter)
+    private readonly examplesCompleter: AiExamplesCompleter,
     @Inject(AiPhoneticsCompleter)
     private readonly phoneticsCompleter: AiPhoneticsCompleter,
   ) {
@@ -24,6 +27,8 @@ export class GenerateFlashcardPhoneticsOnFlashcardCreated extends Subscriber {
   }
 
   async on(event: DomainEvent): Promise<void> {
-    await this.phoneticsCompleter.execute({ flashcardId: event.aggregateId });
+    const flashcardId = event.aggregateId;
+    await this.examplesCompleter.execute({ flashcardId });
+    await this.phoneticsCompleter.execute({ flashcardId });
   }
 }

@@ -4,7 +4,7 @@ import { type App } from 'supertest/types';
 import { createTestApp } from '../../../shared/infrastructure/create-test-app';
 import { createAdminToken } from '../../../shared/infrastructure/create-admin-token';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { ConnectedSpeechSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { ConnectedSpeechSubcategory } from '@/shared/domain/subcategory-taxonomy';
 
 describe('content/flashcard GenerateFlashcardsPostController (e2e)', () => {
   let app: INestApplication<App>;
@@ -31,8 +31,12 @@ describe('content/flashcard GenerateFlashcardsPostController (e2e)', () => {
         })
         .expect(200);
 
-      expect(res.body.drafts).toHaveLength(3);
-      expect(res.body.drafts[0]).toMatchObject({
+      expect(res.body.meta).toMatchObject({
+        request_id: expect.any(String),
+        timestamp: expect.any(String),
+      });
+      expect(res.body.data.drafts).toHaveLength(3);
+      expect(res.body.data.drafts[0]).toMatchObject({
         category: CategoryValue.ConnectedSpeech,
         subcategory: ConnectedSpeechSubcategory.InformalGoingTo,
       });

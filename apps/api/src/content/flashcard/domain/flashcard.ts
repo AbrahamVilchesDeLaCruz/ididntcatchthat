@@ -18,6 +18,7 @@ import { FlashcardAudioGeneratingEvent } from './events/flashcard-audio-generati
 import { FlashcardAudioReadyEvent } from './events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from './events/flashcard-audio-failed.event';
 import { FlashcardExamplesCompletedEvent } from './events/flashcard-examples-completed.event';
+import { FlashcardExamplesUpdatedEvent } from './events/flashcard-examples-updated.event';
 import { FlashcardPhoneticsCompletedEvent } from './events/flashcard-phonetics-completed.event';
 
 export type ExampleInput = Omit<ExamplePrimitives, 'flashcardId'>;
@@ -207,8 +208,26 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     this._nativeSpeech = value !== null ? new NativeSpeech(value) : null;
   }
 
-  private applyExamples(examples: ExampleInput[]): void {
+  private setExamples(examples: ExampleInput[]): void {
     this._examples = Flashcard.buildExamples(this.id.value, examples);
+  }
+
+  private applyExamples(examples: ExampleInput[]): void {
+    const previous = JSON.stringify(
+      this._examples.map((example) => example.toPrimitives()),
+    );
+    this.setExamples(examples);
+    const next = JSON.stringify(
+      this._examples.map((example) => example.toPrimitives()),
+    );
+    if (previous === next) return;
+
+    this.record(
+      new FlashcardExamplesUpdatedEvent(this.id.value, {
+        flashcardId: this.id.value,
+        examples: this._examples.map((example) => example.toPrimitives()),
+      }),
+    );
   }
 
   markAudioGenerating(): void {
@@ -247,7 +266,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
       textEs: e.textEs,
       position: e.position,
     }));
-    this.applyExamples([...existing, ...newExamples]);
+    this.setExamples([...existing, ...newExamples]);
     this.record(
       new FlashcardExamplesCompletedEvent(this.id.value, {
         flashcardId: this.id.value,

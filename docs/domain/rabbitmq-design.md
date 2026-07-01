@@ -84,15 +84,25 @@ Cada handler registra automáticamente sus 3 colas al arrancar via `setupQueues(
 ### 📦 Content
 
 ```
-# FlashcardCreated → genera audio
-create_flashcard_audio_on_flashcard_created
-create_flashcard_audio_on_flashcard_created.retry
-create_flashcard_audio_on_flashcard_created.dead_letter
+# FlashcardCreated → enriquecimiento AI secuencial
+enrich_flashcard_on_flashcard_created
+enrich_flashcard_on_flashcard_created.retry
+enrich_flashcard_on_flashcard_created.dead_letter
 
-# FlashcardUpdated → regenera audio si cambió expression/examples
-regenerate_flashcard_audio_on_flashcard_updated
-regenerate_flashcard_audio_on_flashcard_updated.retry
-regenerate_flashcard_audio_on_flashcard_updated.dead_letter
+# FlashcardExamplesCompleted → genera audio (alta)
+generate_flashcard_audio_on_flashcard_examples_completed
+generate_flashcard_audio_on_flashcard_examples_completed.retry
+generate_flashcard_audio_on_flashcard_examples_completed.dead_letter
+
+# FlashcardExpressionUpdated → regenera audio
+generate_flashcard_audio_on_flashcard_expression_updated
+generate_flashcard_audio_on_flashcard_expression_updated.retry
+generate_flashcard_audio_on_flashcard_expression_updated.dead_letter
+
+# FlashcardExamplesUpdated → regenera audio
+generate_flashcard_audio_on_flashcard_examples_updated
+generate_flashcard_audio_on_flashcard_examples_updated.retry
+generate_flashcard_audio_on_flashcard_examples_updated.dead_letter
 ```
 
 ### 🎮 Gaming → 📈 Progress

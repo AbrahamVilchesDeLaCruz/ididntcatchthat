@@ -12,7 +12,7 @@ import { JestTimers } from '@test/shared/jest-timers';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { RequestFlashcardCreatorMother } from './request-flashcard-creator-mother';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { ConnectedSpeechSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { ConnectedSpeechSubcategory } from '@/shared/domain/subcategory-taxonomy';
 
 describe('content/flashcard/application/create FlashcardCreator', () => {
   const repository = mock<FlashcardRepository>();

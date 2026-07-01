@@ -3,7 +3,7 @@ import {
   type FlashcardPrimitives,
 } from '@/content/flashcard/domain/flashcard';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { NativeSoundsSubcategory } from '@/shared/domain/subcategory-taxonomy';
 import { AudioStatusValue } from '@/content/flashcard/domain/audio-status';
 import { FlashcardIdMother } from './flashcard-id-mother';
 import { ExampleMother } from './example-mother';

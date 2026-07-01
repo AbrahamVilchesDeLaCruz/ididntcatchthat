@@ -138,7 +138,9 @@ export const useGenerateFlashcards = () => {
       payload: GenerateFlashcardsApiPayload,
     ): Promise<FlashcardDraftApiModel[]> =>
       apiClient
-        .post<GenerateFlashcardsApiResult>('/flashcards/drafts', payload)
-        .then((res) => res.data.drafts),
+        .post<
+          ApiEnvelope<GenerateFlashcardsApiResult>
+        >('/flashcards/drafts', payload)
+        .then((res) => res.data.data.drafts),
   });
 };

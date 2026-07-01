@@ -1,6 +1,6 @@
 import { type RequestFlashcardCreator } from '@/content/flashcard/application/create/flashcard-creator';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { NativeSoundsSubcategory } from '@/shared/domain/subcategory-taxonomy';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { StringMother } from '@test/shared/domain/string-mother';
 import { ExampleMother } from '@test/content/flashcard/domain/example-mother';

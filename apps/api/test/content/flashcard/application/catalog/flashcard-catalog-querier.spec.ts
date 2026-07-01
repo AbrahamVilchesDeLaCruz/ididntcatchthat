@@ -1,6 +1,6 @@
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
+import { SUBCATEGORY_BY_CATEGORY } from '@/shared/domain/subcategory-taxonomy';
 import { LearningModule } from '@/shared/domain/learning-module';
 
 describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => {

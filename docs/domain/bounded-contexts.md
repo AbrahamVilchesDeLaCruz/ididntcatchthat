@@ -28,7 +28,9 @@ graph TB
     Gaming -->|FlashcardViewed| Achievement
 
     Content -->|FlashcardCreated| Content
-    Content -->|FlashcardUpdated| Content
+    Content -->|FlashcardExamplesCompleted| Content
+    Content -->|FlashcardExpressionUpdated| Content
+    Content -->|FlashcardExamplesUpdated| Content
 
     Identity -->|UserRegistered| Notification
     Identity -->|StreakUpdated| Notification
@@ -51,8 +53,10 @@ graph TB
 
 | Evento | Exchange | Emitido por | Consumido por | Efecto |
 |--------|----------|-------------|---------------|--------|
-| `FlashcardCreated` | `idct.content.flashcard.created` | Content | Content (interno) | Trigger audio pipeline async (×4 archivos) |
-| `FlashcardUpdated` | `idct.content.flashcard.updated` | Content | Content (interno) | Regenera audio si cambió `expression` o `examples` |
+| `FlashcardCreated` | `ididntcatchthat.content.flashcard.created` | Content | Content (interno) | Enriquecimiento AI secuencial (examples + phonetics) |
+| `FlashcardExamplesCompleted` | `ididntcatchthat.content.flashcard.examples_completed` | Content | Content (interno) | Genera audio tras alta |
+| `FlashcardExpressionUpdated` | `ididntcatchthat.content.flashcard.expression_updated` | Content | Content (interno) | Regenera audio tras editar expression |
+| `FlashcardExamplesUpdated` | `ididntcatchthat.content.flashcard.examples_updated` | Content | Content (interno) | Regenera audio tras editar examples |
 | `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Gaming | Progress | Actualiza `user_flashcard_stats`; en partidas random recalcula `ModuleProgress` por módulo de flashcard |
 | `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Gaming | Progress | Incrementa `times_studied` en modo study (event-driven async) |
 | `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | Ranking | Actualiza `most_accurate` y `top_scorer` vía aggregate `Ranking` |

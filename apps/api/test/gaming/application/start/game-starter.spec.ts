@@ -16,7 +16,7 @@ import { GameMother } from '@test/gaming/domain/game-mother';
 import { GameModeMother } from '@test/gaming/domain/game-mode-mother';
 import { type WeakestFlashcardIdsProvider } from '@/gaming/domain/weakest-flashcard-ids.provider';
 import { RequestGameStarterMother } from './request-game-starter-mother';
-import { NativeSoundsSubcategory } from '@/content/flashcard/domain/subcategory-catalog';
+import { NativeSoundsSubcategory } from '@/shared/domain/subcategory-taxonomy';
 
 describe('gaming/application/start GameStarter', () => {
   const gameRepository = mock<GameRepository>();

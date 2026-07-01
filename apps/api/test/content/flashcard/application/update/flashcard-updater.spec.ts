@@ -4,6 +4,7 @@ import { FlashcardUpdater } from '@/content/flashcard/application/update/flashca
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { FlashcardExpressionUpdatedEvent } from '@/content/flashcard/domain/events/flashcard-expression-updated.event';
+import { FlashcardExamplesUpdatedEvent } from '@/content/flashcard/domain/events/flashcard-examples-updated.event';
 import { FlashcardMeaningUpdatedEvent } from '@/content/flashcard/domain/events/flashcard-meaning-updated.event';
 import { FlashcardNotFound } from '@/content/flashcard/domain/exceptions/flashcard-not-found';
 import { FlashcardAccessDenied } from '@/content/flashcard/domain/exceptions/flashcard-access-denied';
@@ -69,6 +70,36 @@ describe('content/flashcard/application/update FlashcardUpdater', () => {
 
       const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
       expect(events[0]).toBeInstanceOf(FlashcardExpressionUpdatedEvent);
+    });
+
+    it('should publish FlashcardExamplesUpdatedEvent when examples change', async () => {
+      const teacherId = UuidMother.random();
+      const flashcard = FlashcardMother.random({ createdBy: teacherId });
+      repository.search.mockResolvedValue(flashcard);
+      updater = new FlashcardUpdater(repository, publisher, logger);
+
+      await updater.execute(
+        RequestFlashcardUpdaterMother.random({
+          id: flashcard.id.value,
+          requesterId: teacherId,
+          requesterRole: 'teacher',
+          fields: {
+            examples: [
+              {
+                id: UuidMother.random(),
+                textEn: 'New example',
+                textEs: 'Nuevo ejemplo',
+                position: 1,
+              },
+            ],
+          },
+        }),
+      );
+
+      const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
+      expect(
+        events.some((event) => event instanceof FlashcardExamplesUpdatedEvent),
+      ).toBe(true);
     });
 
     it('should NOT publish event when only meaning changes', async () => {
