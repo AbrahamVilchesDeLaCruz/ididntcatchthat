@@ -7,19 +7,28 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { type Request } from 'express';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import {
   GameSummaryFinder,
   type ResponseGameSummaryFinder,
 } from '@/gaming/application/summary/game-summary-finder';
 
 @ApiTags('games')
+@ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
 export class GetGameSummaryGetController {
@@ -27,6 +36,17 @@ export class GetGameSummaryGetController {
 
   @Get(':id/summary')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get game session summary',
+    description:
+      'Returns accuracy, streak and progress stats for an in-progress or completed game. Accepts JWT or guest token.',
+  })
+  @ApiOkResponse({ description: 'Game summary stats' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Validation error',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @Param('id') id: string,
     @CurrentUser() user: UserContext,

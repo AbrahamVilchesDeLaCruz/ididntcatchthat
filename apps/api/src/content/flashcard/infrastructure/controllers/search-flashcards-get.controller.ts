@@ -1,8 +1,12 @@
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse as SwaggerApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
@@ -10,11 +14,14 @@ import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { PaginatedApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { FlashcardSearcher } from '@/content/flashcard/application/search/flashcard-searcher';
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
 import { SearchFlashcardsGetQuery } from './search-flashcards-get.query';
+import { SearchFlashcardsEnvelopeSwagger } from './search-flashcards-get.swagger';
 
 @ApiTags('flashcards')
+@ApiBearerAuth('access-token')
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SearchFlashcardsGetController {
@@ -22,10 +29,20 @@ export class SearchFlashcardsGetController {
 
   @Get()
   @Roles('admin')
-  @ApiOperation({ summary: 'Search flashcards with pagination' })
-  @SwaggerApiResponse({
-    status: 200,
+  @ApiOperation({
+    summary: 'Search flashcards with pagination',
+    description:
+      'Admin-only paginated search over flashcards. Supports filters by category, subcategory and audio status.',
+  })
+  @ApiOkResponse({
     description: 'Paginated list of flashcards',
+    type: SearchFlashcardsEnvelopeSwagger,
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Admin role required' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Invalid query parameters',
+    type: ValidationErrorSwagger,
   })
   async handler(
     @Query() query: SearchFlashcardsGetQuery,

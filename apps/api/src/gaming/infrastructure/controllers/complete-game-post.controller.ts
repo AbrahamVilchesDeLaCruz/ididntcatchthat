@@ -6,16 +6,25 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import {
   GameCompleter,
   type ResponseGameCompleter,
 } from '@/gaming/application/complete/game-completer';
 
 @ApiTags('games')
+@ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
 export class CompleteGamePostController {
@@ -23,6 +32,17 @@ export class CompleteGamePostController {
 
   @Post(':id/complete')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Complete a game session',
+    description:
+      'Marks the game as completed and returns summary stats. Accepts JWT or guest token.',
+  })
+  @ApiOkResponse({ description: 'Game completed with summary stats' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Validation error',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @Param('id') id: string,
     @CurrentUser() user: UserContext,

@@ -1,6 +1,11 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID } from 'class-validator';
 
 export class RecordViewPostPayload {
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Flashcard id that was viewed',
+  })
   @IsUUID()
   flashcardId: string;
 }

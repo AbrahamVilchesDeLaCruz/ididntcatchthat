@@ -1,8 +1,12 @@
 import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse as SwaggerApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
@@ -14,6 +18,7 @@ import { FlashcardFinder } from '@/content/flashcard/application/find/flashcard-
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
 
 @ApiTags('flashcards')
+@ApiBearerAuth('access-token')
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class FindFlashcardGetController {
@@ -21,9 +26,35 @@ export class FindFlashcardGetController {
 
   @Get(':id')
   @Roles('admin')
-  @ApiOperation({ summary: 'Find a flashcard by id' })
-  @SwaggerApiResponse({ status: 200, description: 'Flashcard found' })
-  @SwaggerApiResponse({ status: 404, description: 'Flashcard not found' })
+  @ApiOperation({
+    summary: 'Find a flashcard by id',
+    description: 'Returns a single flashcard by UUID. Requires admin JWT.',
+  })
+  @ApiOkResponse({
+    description: 'Flashcard found',
+    schema: {
+      type: 'object',
+      required: ['data', 'meta'],
+      properties: {
+        data: { type: 'object', description: 'Flashcard primitives' },
+        meta: {
+          type: 'object',
+          required: ['timestamp', 'request_id'],
+          properties: {
+            timestamp: {
+              type: 'string',
+              format: 'date-time',
+              example: '2026-06-30T12:00:00.000Z',
+            },
+            request_id: { type: 'string', example: 'req_abc123' },
+          },
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Admin role required' })
+  @ApiNotFoundResponse({ description: 'Flashcard not found' })
   async handler(
     @Param('id') id: string,
     @Req() req: Request,

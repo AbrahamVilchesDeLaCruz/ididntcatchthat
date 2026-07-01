@@ -1,29 +1,50 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse as SwaggerApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { type Request } from 'express';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { GameFlashcardsFetcher } from '@/gaming/application/fetch-flashcards/game-flashcards-fetcher';
 import { type GameFlashcardDto } from '@/gaming/domain/game-flashcard-query';
 
 @ApiTags('games')
+@ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
-export class GetGameFlashcardsController {
+export class GetGameFlashcardsGetController {
   constructor(private readonly fetcher: GameFlashcardsFetcher) {}
 
   @Get(':gameId/flashcards')
-  @ApiOperation({ summary: 'Get all flashcards for a game session' })
-  @SwaggerApiResponse({
-    status: 200,
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get all flashcards for a game session',
+    description:
+      'Returns flashcards ordered by position for the given game. Accepts JWT or guest token.',
+  })
+  @ApiOkResponse({
     description: 'List of flashcards ordered by position',
   })
-  @SwaggerApiResponse({ status: 404, description: 'Game not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Validation error',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @Param('gameId') gameId: string,
     @Req() req: Request,

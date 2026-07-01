@@ -7,14 +7,24 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiNoContentResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { AttemptRecorder } from '@/gaming/application/attempt/attempt-recorder';
 import { RecordAttemptPostPayload } from './record-attempt-post.payload';
 
 @ApiTags('games')
+@ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
 export class RecordAttemptPostController {
@@ -22,6 +32,18 @@ export class RecordAttemptPostController {
 
   @Post(':id/attempts')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Record a flashcard attempt in a game',
+    description:
+      'Persists whether the user answered a flashcard correctly. Accepts JWT or guest token.',
+  })
+  @ApiBody({ type: RecordAttemptPostPayload })
+  @ApiNoContentResponse({ description: 'Attempt recorded' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Invalid flashcardId or correct flag',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @Param('id') id: string,
     @Body() body: RecordAttemptPostPayload,

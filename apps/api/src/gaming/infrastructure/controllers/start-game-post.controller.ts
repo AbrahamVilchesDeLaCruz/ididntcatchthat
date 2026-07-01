@@ -6,14 +6,24 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import { AnyAuthGuard } from '@/shared/infrastructure/auth/any-auth.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
+import { ValidationErrorSwagger } from '@/shared/infrastructure/http/response/validation-error.swagger';
 import { GameStarter } from '@/gaming/application/start/game-starter';
 import { StartGamePostPayload } from './start-game-post.payload';
 
 @ApiTags('games')
+@ApiBearerAuth('access-token')
 @Controller('games')
 @UseGuards(AnyAuthGuard)
 export class StartGamePostController {
@@ -21,6 +31,20 @@ export class StartGamePostController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Start a new game session',
+    description:
+      'Creates a game with the selected mode, module and card count. Accepts JWT or guest token.',
+  })
+  @ApiBody({ type: StartGamePostPayload })
+  @ApiCreatedResponse({
+    description: 'Game created with id and flashcard ids',
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Invalid mode, module or card count',
+    type: ValidationErrorSwagger,
+  })
   async handler(
     @Body() body: StartGamePostPayload,
     @CurrentUser() user: UserContext,

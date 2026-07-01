@@ -48,7 +48,7 @@ import { BulkCreateFlashcardPostController } from '@/content/flashcard/infrastru
 import { FindFlashcardGetController } from '@/content/flashcard/infrastructure/controllers/find-flashcard-get.controller';
 import { SearchFlashcardsGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcards-get.controller';
 import { UpdateFlashcardPatchController } from '@/content/flashcard/infrastructure/controllers/update-flashcard-patch.controller';
-import { GetFlashcardCatalogGetController } from '@/content/flashcard/infrastructure/controllers/get-flashcard-catalog-get.controller';
+import { SearchFlashcardCatalogGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcard-catalog-get.controller';
 import { SuggestExamplesPostController } from '@/content/flashcard/infrastructure/controllers/suggest-examples-post.controller';
 import { GenerateFlashcardsPostController } from '@/content/flashcard/infrastructure/controllers/generate-flashcards-post.controller';
 
@@ -86,7 +86,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
   controllers: [
     CreateFlashcardPostController,
     BulkCreateFlashcardPostController,
-    GetFlashcardCatalogGetController,
+    SearchFlashcardCatalogGetController,
     FindFlashcardGetController,
     SearchFlashcardsGetController,
     UpdateFlashcardPatchController,

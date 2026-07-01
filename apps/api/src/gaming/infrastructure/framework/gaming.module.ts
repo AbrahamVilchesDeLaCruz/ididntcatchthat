@@ -24,11 +24,11 @@ import { StartGamePostController } from '@/gaming/infrastructure/controllers/sta
 import { RecordAttemptPostController } from '@/gaming/infrastructure/controllers/record-attempt-post.controller';
 import { CompleteGamePostController } from '@/gaming/infrastructure/controllers/complete-game-post.controller';
 import { GetGameSummaryGetController } from '@/gaming/infrastructure/controllers/get-game-summary-get.controller';
-import { PatchGameController } from '@/gaming/infrastructure/controllers/patch-game.controller';
-import { ListPausedGamesGetController } from '@/gaming/infrastructure/controllers/list-paused-games-get.controller';
+import { PatchGamePatchController } from '@/gaming/infrastructure/controllers/patch-game-patch.controller';
+import { SearchPausedGamesGetController } from '@/gaming/infrastructure/controllers/search-paused-games-get.controller';
 import { ResumeGameGetController } from '@/gaming/infrastructure/controllers/resume-game-get.controller';
-import { GetGameFlashcardsController } from '@/gaming/infrastructure/controllers/get-game-flashcards.controller';
-import { GamesStatsGetController } from '@/gaming/infrastructure/controllers/games-stats-get.controller';
+import { GetGameFlashcardsGetController } from '@/gaming/infrastructure/controllers/get-game-flashcards-get.controller';
+import { SearchGamesStatsGetController } from '@/gaming/infrastructure/controllers/search-games-stats-get.controller';
 import { TypeOrmGameStatsQuery } from '@/gaming/infrastructure/persistence/typeorm-game-stats.query';
 import { GAME_STATS_QUERY } from '@/gaming/application/stats/game-stats.query';
 import { GameStatsRetriever } from '@/gaming/application/stats/game-stats-retriever';
@@ -71,11 +71,11 @@ import { ProgressWeakestFlashcardIdsProvider } from '@/gaming/infrastructure/pro
     RecordViewPostController,
     CompleteGamePostController,
     GetGameSummaryGetController,
-    PatchGameController,
-    ListPausedGamesGetController,
+    PatchGamePatchController,
+    SearchPausedGamesGetController,
     ResumeGameGetController,
-    GetGameFlashcardsController,
-    GamesStatsGetController,
+    GetGameFlashcardsGetController,
+    SearchGamesStatsGetController,
   ],
   providers: [
     // Repositories
