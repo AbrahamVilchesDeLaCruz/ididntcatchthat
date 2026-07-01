@@ -39,8 +39,11 @@ API (PinoLogger)
 ### API — ObservabilityModule
 
 - `MetricsInterceptor` global — registra `http_requests_total` y `http_request_duration_seconds` por cada request
-- `MetricsGetController` — `GET /metrics` excluido del global prefix y de Swagger
-- `ObservabilityModule` — Registry de prom-client, interceptor y controller
+- `MetricsGetController` — `GET /metrics` excluido del global prefix (scrape Prometheus)
+- `SearchMetricsSummaryGetController` — `GET /v1/metrics/summary` (admin, envelope JSON)
+- `ObservabilityModule` — Registry de prom-client, interceptor y controllers
+
+Ver [docs/apps/api/observability/README.md](apps/api/observability/README.md) para contrato HTTP y métricas `app_*`.
 
 ### API — SharedModule
 
@@ -132,10 +135,10 @@ La página `/backoffice/observability` expone los datos de Prometheus y del DB e
 
 | Tab | Fuente | Qué muestra |
 |---|---|---|
-| **HTTP** | `/admin/metrics/summary` | Total requests, tasa éxito/error (2xx/4xx/5xx separados), latencia p50/p95/p99, tabla de breakdown por ruta/método/status paginada |
-| **Runtime** | `/admin/metrics/summary` | Heap usado %, event loop lag p95, pausas de GC, uptime, handles activos, CPU acumulado |
-| **Negocio** | `/admin/metrics/summary` | Contadores `app_*`: partidas iniciadas/completadas, flashcards creadas, audio generado/errores, logins/registros por proveedor |
-| **Usuarios** | `/admin/users/stats` | Total usuarios, nuevos 7d/30d, activos 7d/30d, canal Google vs email, engagement rate, rachas |
+| **HTTP** | `GET /v1/metrics/summary` | Total requests, tasa éxito/error (2xx/4xx/5xx separados), latencia p50/p95/p99, tabla de breakdown por ruta/método/status paginada |
+| **Runtime** | `GET /v1/metrics/summary` | Heap usado %, event loop lag p95, pausas de GC, uptime, handles activos, CPU acumulado |
+| **Negocio** | `GET /v1/metrics/summary` | Contadores `app_*`: partidas iniciadas/completadas, flashcards creadas, audio generado/errores, logins/registros por proveedor |
+| **Usuarios** | `GET /v1/users/stats` | Total usuarios, nuevos 7d/30d, activos 7d/30d, canal Google vs email, engagement rate, rachas |
 
 Todos los tabs usan el componente `InsightCard` que muestra el valor numérico junto a una frase contextual y un indicador semántico verde/ámbar/rojo basado en umbrales predefinidos.
 

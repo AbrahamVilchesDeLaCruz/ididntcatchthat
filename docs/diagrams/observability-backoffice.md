@@ -20,7 +20,7 @@ flowchart LR
     end
 
     subgraph api [API — NestJS]
-        metricsEndpoint["GET /admin/metrics/summary\n(snapshot JSON)"]
+        metricsEndpoint["GET /v1/metrics/summary\n(snapshot JSON envelope)"]
         userStatsEndpoint["GET /admin/users/stats\n(DB query)"]
         userStatsUC["UserStatsRetriever\n(QueryBuilder sobre users)"]
     end

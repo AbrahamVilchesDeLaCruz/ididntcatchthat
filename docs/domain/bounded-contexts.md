@@ -93,7 +93,7 @@ graph TB
 ## Dirección de dependencias
 
 - **Analytics** es un BC **sin eventos** — escribe `page_views` y lee tablas de otros BCs vía SQL para el read model `summary`. No emite ni consume domain events.
-- **Observability** expone métricas Prometheus de runtime (`GET /admin/metrics/summary`) — separado de Analytics (histórico persistente).
+- **Observability** expone métricas Prometheus de runtime (`GET /v1/metrics/summary`) — separado de Analytics (histórico persistente).
 - **Content** se autogestiona el audio — sus eventos son internos al propio BC.
 - **Notification** es un **pure consumer** — nunca emite eventos de dominio, solo ejecuta side effects (email, push, toast).
 - **Progress** es el **hub central** — recibe de Gaming, Pronunciation e Identity, y alimenta a Ranking y Notification.
