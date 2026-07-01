@@ -1,6 +1,8 @@
+import { AggregateRoot } from '@/shared/domain/aggregate-root';
 import { UserId } from '@/shared/domain/user-id';
 import { ModuleName } from '@/progress/domain/module-name';
 import { type UserFlashcardStats } from '@/progress/domain/user-flashcard-stats';
+import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
 
 const MasteryThresholds = {
   LEVEL_3_ATTEMPTS: 20,
@@ -34,7 +36,7 @@ export type ModuleProgressComputation = {
   previousLevel: number;
 };
 
-export class ModuleProgress {
+export class ModuleProgress extends AggregateRoot<ModuleProgressPrimitives> {
   constructor(
     readonly userId: UserId,
     readonly module: ModuleName,
@@ -44,7 +46,9 @@ export class ModuleProgress {
     readonly masteryLevel: number,
     readonly lastPlayedAt: Date,
     readonly updatedAt: Date,
-  ) {}
+  ) {
+    super();
+  }
 
   static computeFrom(
     allStats: UserFlashcardStats[],
@@ -72,6 +76,18 @@ export class ModuleProgress {
       now,
       now,
     );
+
+    if (newLevel > previousLevel) {
+      progress.record(
+        new ModuleMasteryLevelIncreasedEvent(userId.value, {
+          userId: userId.value,
+          module: module.value,
+          previousLevel,
+          newLevel,
+          occurredAt: now.toISOString(),
+        }),
+      );
+    }
 
     return {
       progress,
