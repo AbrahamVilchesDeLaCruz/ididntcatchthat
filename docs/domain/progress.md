@@ -23,7 +23,7 @@ Tres responsabilidades concretas:
 graph TD
     subgraph Progress ["📈 Progress"]
         UFS["UserFlashcardStats\n(Aggregate Root)\n─────────────────\nuserId + flashcardId\ntimesStudied\ntimesPlayed\ncorrectCount\naccuracyRate\nlastSeenAt"]
-        MP["ModuleProgress\n(Entity)\n─────────────────\nuserId + module\ntotalAttempts\ncorrectCount\naccuracy\nmasteryLevel 0–3\nlastPlayedAt"]
+        MP["ModuleProgress\n(AggregateRoot)\n─────────────────\nuserId + module\ntotalAttempts\ncorrectCount\naccuracy\nmasteryLevel 0–3\nlastPlayedAt"]
         MN["ModuleName\n(Value Object)\n─────────────────\nnative_sounds\nconnected_speech\nflow_connectors\nreal_talk"]
         MP --> MN
     end

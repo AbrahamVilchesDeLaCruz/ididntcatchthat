@@ -146,16 +146,16 @@ graph LR
 ```mermaid
 graph LR
     subgraph Consumes ["Eventos que consume"]
-        C1["AttemptRecorded\nidct.gaming.attempts.attempt.recorded"]
-        C1b["FlashcardViewed\nidct.gaming.views.flashcard.viewed"]
-        C2["GameCompleted\nidct.gaming.games.game.completed"]
-        C3["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
+        C1["AttemptRecorded\nididntcatchthat.gaming.attempts.attempt.recorded"]
+        C1b["FlashcardViewed\nididntcatchthat.gaming.views.flashcard.viewed"]
+        C2["GameCompleted\nididntcatchthat.gaming.games.game.completed"]
+        C3["GuestProgressMigrated\nididntcatchthat.identity.user.guest_progress_migrated"]
         C4["PronunciationEvaluated\nidct.pronunciation.attempt.evaluated\n⚠️ planned"]
     end
 
     subgraph Progress ["📈 Progress"]
         UFS["UserFlashcardStats\n(Aggregate Root)"]
-        MP["ModuleProgress\n(Entity)"]
+        MP["ModuleProgress\n(AggregateRoot)"]
         UFS --- MP
     end
 
@@ -172,10 +172,10 @@ graph LR
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `AttemptRecorded` | `idct.gaming.attempts.attempt.recorded` | Busca o crea `UserFlashcardStats` → `recordPlay()` (modo juego) |
-| `FlashcardViewed` | `idct.gaming.views.flashcard.viewed` | Busca o crea `UserFlashcardStats` → `recordStudy()` |
-| `GameCompleted` | `idct.gaming.games.game.completed` | Agrega stats del módulo → recalcula `ModuleProgress` (mastery 0–3) |
-| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest (idempotente via inbox) |
+| `AttemptRecorded` | `ididntcatchthat.gaming.attempts.attempt.recorded` | Busca o crea `UserFlashcardStats` → `recordPlay()` (modo juego) |
+| `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Busca o crea `UserFlashcardStats` → `recordStudy()` |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Agrega stats del módulo → recalcula `ModuleProgress` (mastery 0–3) |
+| `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Bulk UPSERT `user_flashcard_stats` desde historial guest (idempotente via inbox) |
 | `PronunciationEvaluated` | `idct.pronunciation.attempt.evaluated` | ⚠️ Planned — actualiza pronunciation stats en `user_flashcard_stats` |
 
 | Evento emitido | Exchange | Trigger |

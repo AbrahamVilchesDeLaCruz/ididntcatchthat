@@ -2,12 +2,12 @@
 
 ```mermaid
 classDiagram
-    class GetWeakestFlashcardsGetController {
+    class SearchWeakestFlashcardsGetController {
         -searcher: WeakestFlashcardSearcher
-        +handle(query: GetWeakestFlashcardsGetQuery, user: UserContext): Promise~WeakestFlashcardsResponse~
+        +handle(query: SearchWeakestFlashcardsGetQuery, user: UserContext): Promise~ApiResponse~
     }
 
-    class GetWeakestFlashcardsGetQuery {
+    class SearchWeakestFlashcardsGetQuery {
         +limit: number
     }
 
@@ -52,8 +52,8 @@ classDiagram
         +findByModule(userId: UserId, module: ModuleName): Promise~UserFlashcardStats[]~
     }
 
-    GetWeakestFlashcardsGetController --> WeakestFlashcardSearcher
-    GetWeakestFlashcardsGetController --> GetWeakestFlashcardsGetQuery
+    SearchWeakestFlashcardsGetController --> WeakestFlashcardSearcher
+    SearchWeakestFlashcardsGetController --> SearchWeakestFlashcardsGetQuery
     WeakestFlashcardSearcher --> UserFlashcardStatsRepository
     WeakestFlashcardSearcher --> UserFlashcardStats
     TypeOrmUserFlashcardStatsRepository ..|> UserFlashcardStatsRepository

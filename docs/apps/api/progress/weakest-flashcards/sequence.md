@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
     actor U as Usuario Registrado
-    participant C as GetWeakestFlashcardsGetController
+    participant C as SearchWeakestFlashcardsGetController
     participant UC as WeakestFlashcardSearcher
     participant R as UserFlashcardStatsRepository
     participant DB as PostgreSQL

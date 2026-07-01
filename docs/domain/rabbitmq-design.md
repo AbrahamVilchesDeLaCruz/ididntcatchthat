@@ -23,7 +23,7 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | `content`       |         ❌          | `idct.content.flashcard.created`                |
 | `gaming`        |         ✅          | `idct.gaming.games.game.completed`              |
 | `identity`      |         ✅          | `ididntcatchthat.identity.user.registered`           |
-| `progress`      |         ✅          | `idct.progress.module_progress.module_level.up` |
+| `progress`      |         ✅          | `idct.progress.module_progress.module_mastery_level.increased` |
 | `pronunciation` |         ❌          | `idct.pronunciation.attempt.evaluated`          |
 
 ---
