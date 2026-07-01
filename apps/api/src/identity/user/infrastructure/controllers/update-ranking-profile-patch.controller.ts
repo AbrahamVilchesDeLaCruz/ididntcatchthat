@@ -20,6 +20,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { RankingProfileUpdater } from '@/identity/user/application/update-profile/ranking-profile-updater';
@@ -35,7 +36,13 @@ export class UpdateRankingProfilePatchController {
   @Patch('me/ranking-profile')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update the current user ranking profile' })
-  @ApiOkResponse({ description: 'Updated ranking profile' })
+  @ApiOkResponse({
+    description: 'Updated ranking profile',
+    schema: apiEnvelopeSchema({
+      showInRanking: true,
+      nickname: 'rankhero',
+    }),
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
     description: 'Validation error',

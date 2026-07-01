@@ -77,4 +77,17 @@ describe('identity/auth MigrateGuestAuthPostController (e2e)', () => {
       })
       .expect(401);
   });
+
+  it('should return 422 for invalid guest game payload', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/migrate-guest')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        guestDeviceId: 'guest-device-id',
+        guestGames: [{ gameId: 'not-a-uuid' }],
+      })
+      .expect(422);
+  });
 });

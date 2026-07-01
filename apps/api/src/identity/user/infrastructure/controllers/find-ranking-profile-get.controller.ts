@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { RankingProfileFinder } from '@/identity/user/application/update-profile/ranking-profile-finder';
 
@@ -31,7 +32,13 @@ export class FindRankingProfileGetController {
   @Get('me/ranking-profile')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Find the current user ranking profile' })
-  @ApiOkResponse({ description: 'Ranking profile for the authenticated user' })
+  @ApiOkResponse({
+    description: 'Ranking profile for the authenticated user',
+    schema: apiEnvelopeSchema({
+      showInRanking: true,
+      nickname: 'learner42',
+    }),
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(
     @CurrentUser() user: UserContext,

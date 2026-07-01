@@ -11,6 +11,7 @@ import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiBearerAuth,
+  ApiNoContentResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -39,6 +40,7 @@ export class LogoutAuthPostController {
       'Requires a valid JWT access token in the Authorization header.',
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNoContentResponse({ description: 'Session revoked and cookie cleared' })
   async handler(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

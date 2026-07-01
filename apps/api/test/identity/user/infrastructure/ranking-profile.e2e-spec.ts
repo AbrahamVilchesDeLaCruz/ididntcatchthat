@@ -66,4 +66,14 @@ describe('identity/user UpdateRankingProfilePatchController (e2e)', () => {
     });
     expect(res.body.meta.request_id).toBeDefined();
   });
+
+  it('should return 422 for invalid nickname', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: true, nickname: 'x' })
+      .expect(422);
+  });
 });

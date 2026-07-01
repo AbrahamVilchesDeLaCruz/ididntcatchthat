@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
 import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { UserStatsRetriever } from '@/identity/user/application/stats/user-stats-retriever';
@@ -44,6 +45,12 @@ export class SearchUserStatsGetController {
   })
   @ApiOkResponse({
     description: 'User statistics for the requested period',
+    schema: apiEnvelopeSchema({
+      period: '7d',
+      totalUsers: 120,
+      activeUsers: 45,
+      engagementRate: 37.5,
+    }),
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })

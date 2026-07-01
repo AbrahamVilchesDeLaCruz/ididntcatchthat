@@ -1,5 +1,5 @@
 import { StringValueObject } from '@/shared/domain/string-value-object';
-import { FingerprintEmpty } from './exceptions/fingerprint-empty';
+import { FingerprintEmptyException } from './exceptions/fingerprint-empty.exception';
 
 /**
  * Fingerprint — identifica el dispositivo/browser de forma anónima.
@@ -9,6 +9,6 @@ import { FingerprintEmpty } from './exceptions/fingerprint-empty';
 export class Fingerprint extends StringValueObject {
   constructor(value: string) {
     super(value);
-    if (!value?.trim()) throw new FingerprintEmpty();
+    if (!value?.trim()) throw new FingerprintEmptyException();
   }
 }

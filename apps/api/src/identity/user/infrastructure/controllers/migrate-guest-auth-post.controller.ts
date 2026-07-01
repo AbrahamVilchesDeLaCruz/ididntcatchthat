@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiNoContentResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -38,6 +39,7 @@ export class MigrateGuestAuthPostController {
       'Requires a valid JWT access token.',
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNoContentResponse({ description: 'Guest progress migration accepted' })
   @ApiUnprocessableEntityResponse({
     description: 'Invalid guest device id or malformed guest game payload',
     type: ValidationErrorResponse,
