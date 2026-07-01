@@ -122,6 +122,10 @@ export interface LandingTranslations {
     navRegister: string;
     accents: string;
   };
+  header: {
+    explore: string;
+    start: string;
+  };
 }
 
 export interface GameTranslations {

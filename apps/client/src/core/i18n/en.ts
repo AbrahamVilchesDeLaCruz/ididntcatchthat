@@ -158,6 +158,10 @@ export const en: Translations = {
       navRegister: 'Sign up',
       accents: '🇺🇸 American · 🇬🇧 British · 🇦🇺 Australian',
     },
+    header: {
+      explore: 'The method',
+      start: 'Try it',
+    },
   },
   game: {
     config: {

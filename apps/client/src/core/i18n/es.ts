@@ -159,6 +159,10 @@ export const es: Translations = {
       navRegister: 'Crear cuenta',
       accents: '🇺🇸 Americano · 🇬🇧 Británico · 🇦🇺 Australiano',
     },
+    header: {
+      explore: 'El método',
+      start: 'Pruébalo',
+    },
   },
   game: {
     config: {

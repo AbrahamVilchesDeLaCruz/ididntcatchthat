@@ -28,10 +28,10 @@ describe('LandingHeader', () => {
     );
 
     expect(
-      screen.getByRole('link', { name: en.landing.footer.navHowItWorks }),
+      screen.getByRole('link', { name: en.landing.header.explore }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: en.landing.footer.navGetStarted }),
+      screen.getByRole('link', { name: en.landing.header.start }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: en.landing.hero.navRegister }),
