@@ -21,10 +21,15 @@ export class GoogleCallbackAuthGetController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @ApiOperation({ summary: 'Google OAuth callback — redirects to frontend' })
+  @ApiOperation({
+    summary: 'Google OAuth callback handler',
+    description:
+      'Handles the redirect from Google after OAuth consent. ' +
+      'Issues JWT access token and refresh cookie, then redirects to the frontend callback URL.',
+  })
   @ApiResponse({
     status: 302,
-    description: 'Redirects to /auth/callback?token=...',
+    description: 'Redirects to frontend /auth/callback?token=<accessToken>',
   })
   async handler(
     @Ip() ip: string,

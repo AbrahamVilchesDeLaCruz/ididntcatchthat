@@ -14,8 +14,16 @@ export class GoogleAuthGetController {
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   @HttpCode(HttpStatus.FOUND)
-  @ApiOperation({ summary: 'Initiate Google OAuth flow' })
-  @ApiResponse({ status: 302, description: 'Redirect to Google' })
+  @ApiOperation({
+    summary: 'Initiate Google OAuth sign-in',
+    description:
+      'Redirects the browser to Google for OAuth authentication. ' +
+      'No request body — handled entirely by Passport.',
+  })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirect to Google consent screen',
+  })
   handler(): void {
     // Passport redirects — no body needed
   }
