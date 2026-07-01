@@ -15,6 +15,7 @@ import { UpdateRankingOnModuleMasteryLevelIncreased } from '@/ranking/applicatio
 import { UpdateRankingOnGameCompleted } from '@/ranking/application/handlers/update-ranking-on-game-completed';
 import { UpdateRankingOnAttemptRecorded } from '@/ranking/application/handlers/update-ranking-on-attempt-recorded';
 import { UpdateRankingOnStreakUpdated } from '@/ranking/application/handlers/update-ranking-on-streak-updated';
+import { UpdateRankingOnRankingProfileUpdated } from '@/ranking/application/handlers/update-ranking-on-ranking-profile-updated';
 import { SearchRankingsGetController } from '@/ranking/infrastructure/controllers/search-rankings-get.controller';
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
@@ -54,6 +55,7 @@ import { type Subscriber } from '@/shared/application/subscriber';
     UpdateRankingOnGameCompleted,
     UpdateRankingOnAttemptRecorded,
     UpdateRankingOnStreakUpdated,
+    UpdateRankingOnRankingProfileUpdated,
     {
       provide: SUBSCRIBERS,
       useFactory: (
@@ -61,12 +63,14 @@ import { type Subscriber } from '@/shared/application/subscriber';
         onGame: UpdateRankingOnGameCompleted,
         onAttempt: UpdateRankingOnAttemptRecorded,
         onStreak: UpdateRankingOnStreakUpdated,
-      ): Subscriber[] => [onMastery, onGame, onAttempt, onStreak],
+        onProfile: UpdateRankingOnRankingProfileUpdated,
+      ): Subscriber[] => [onMastery, onGame, onAttempt, onStreak, onProfile],
       inject: [
         UpdateRankingOnModuleMasteryLevelIncreased,
         UpdateRankingOnGameCompleted,
         UpdateRankingOnAttemptRecorded,
         UpdateRankingOnStreakUpdated,
+        UpdateRankingOnRankingProfileUpdated,
       ],
     },
     SubscribersBootstrapper,

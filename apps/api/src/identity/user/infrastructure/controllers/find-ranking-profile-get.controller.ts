@@ -25,12 +25,12 @@ import { RankingProfileFinder } from '@/identity/user/application/update-profile
 @ApiBearerAuth('access-token')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
-export class GetRankingProfileGetController {
+export class FindRankingProfileGetController {
   constructor(private readonly finder: RankingProfileFinder) {}
 
   @Get('me/ranking-profile')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get the current user ranking profile' })
+  @ApiOperation({ summary: 'Find the current user ranking profile' })
   @ApiOkResponse({ description: 'Ranking profile for the authenticated user' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   async handler(

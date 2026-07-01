@@ -70,14 +70,14 @@ Solo aparecen usuarios con `show_in_ranking = true` (filas existentes en la proy
 | -------- | ------- | --------------------------- |
 | `ididntcatchthat.gaming.games.game.completed` | `update_ranking_on_game_completed` | `most_active` +1 (`all_time`); weekly/monthly recalculados para ese usuario |
 | `ididntcatchthat.gaming.attempts.attempt.recorded` | `update_ranking_on_attempt_recorded` | `top_scorer` +1 si acierto; `most_accurate` recalculado para ese usuario |
-| `idct.identity.streaks.streak.updated` | `update_ranking_on_streak_updated` | `best_streak` = `current_streak` |
+| `ididntcatchthat.identity.streak.updated` | `update_ranking_on_streak_updated` | `best_streak` = `current_streak` |
 | `idct.progress.module_progress.module_mastery_level.increased` | `update_ranking_on_module_mastery_level_increased` | `module_master` = `mastery_level` del módulo |
 
 **Sincrónico (sin evento):**
 
 | Acción | Servicio | Efecto |
 | ------ | -------- | ------ |
-| `PATCH /users/me/ranking-profile` | `RankingUpdater.syncProfile` | Opt-out → `match` + `remove` por usuario; opt-in → backfill histórico del usuario |
+| `PATCH /users/me/ranking-profile` | `RankingProfileUpdated` → `UpdateRankingOnRankingProfileUpdated` | Opt-out → remove; opt-in → backfill |
 
 ---
 
