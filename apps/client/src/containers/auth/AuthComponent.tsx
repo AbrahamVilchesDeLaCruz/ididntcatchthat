@@ -54,8 +54,8 @@ export const AuthComponent = ({
           </h1>
           <p className="text-[var(--color-text-secondary)] text-sm">
             {mode === 'login'
-              ? 'Accedé a tu cuenta'
-              : 'Creá tu cuenta y empezá a aprender'}
+              ? 'Accede a tu cuenta'
+              : 'Crea tu cuenta y empieza a aprender'}
           </p>
         </div>
 

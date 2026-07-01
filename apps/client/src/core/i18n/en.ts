@@ -43,6 +43,8 @@ export const en: Translations = {
       weTeachDescription:
         'How sounds change when words connect. The 23 real phonemes. Expressions natives actually use.',
       exampleLabel: 'Connected speech — example',
+      exampleWrittenLabel: 'Written',
+      exampleNativeLabel: 'How natives say it',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
       exampleTag: 'Soft T',

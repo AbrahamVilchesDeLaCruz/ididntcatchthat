@@ -38,6 +38,8 @@ export interface LandingTranslations {
     weTeachLabel: string;
     weTeachDescription: string;
     exampleLabel: string;
+    exampleWrittenLabel: string;
+    exampleNativeLabel: string;
     exampleWritten: string;
     exampleNative: string;
     exampleTag: string;

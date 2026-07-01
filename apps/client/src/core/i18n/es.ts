@@ -7,7 +7,7 @@ export const es: Translations = {
       headline: 'Ese momento en el que un nativo habla…',
       headlineAccent: 'y no entiendes nada.',
       subheadline:
-        'La app que te enseña cómo hablan realmente los nativos — fonética real, connected speech y 3 acentos por expresión.',
+        'La aplicación que te enseña cómo hablan realmente los nativos: fonética real, connected speech y 3 acentos por expresión.',
       ctaPlay: 'Jugar ahora',
       ctaStudy: 'Estudiar',
       ctaHowItWorks: 'Ver cómo funciona',
@@ -15,7 +15,7 @@ export const es: Translations = {
       navStats: 'Mis estadísticas →',
       navDashboard: 'Panel →',
       navLogin: 'Iniciar sesión',
-      navRegister: 'Registrarse',
+      navRegister: 'Crear cuenta',
     },
     authGate: {
       title: '¿Cómo quieres jugar?',
@@ -36,7 +36,7 @@ export const es: Translations = {
       sectionLabel: 'El problema',
       headline: 'Tienes un B2. Y sigues sin entender a los nativos.',
       subheadline:
-        'No es tu culpa — es lo que te enseñaron. Las escuelas se centran en gramática. Los nativos hablan en fonética.',
+        'No es culpa tuya: es lo que te enseñaron. La escuela se centra en la gramática. Los nativos hablan en fonética.',
       duolingoLabel: 'Lo que enseña Duolingo',
       duolingoDescription:
         'Vocabulario. Gramática. Frases de libro que nunca escucharás en la vida real.',
@@ -44,6 +44,8 @@ export const es: Translations = {
       weTeachDescription:
         'Cómo cambian los sonidos al conectar palabras. Los 23 fonemas reales del inglés. Expresiones que usan los nativos de verdad.',
       exampleLabel: 'Connected speech — ejemplo',
+      exampleWrittenLabel: 'Escrito',
+      exampleNativeLabel: 'Cómo lo dicen los nativos',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
       exampleTag: 'T suave',
@@ -56,15 +58,15 @@ export const es: Translations = {
       steps: [
         {
           number: '01',
-          title: 'Ve la expresión',
+          title: 'Mira la expresión',
           description:
-            'Una flashcard muestra una palabra, fonema o expresión nativa. Tú piensas: ¿la conozco?',
+            'Una flashcard muestra una palabra, un fonema o una expresión nativa. Piensas: ¿la conozco?',
         },
         {
           number: '02',
-          title: 'Júzgate tú mismo',
+          title: 'Evalúate tú mismo',
           description:
-            'Sin trampas. Decides tú: ✓ la sabía, o ✗ no la sabía. Autoevaluación honesta como Anki.',
+            'Sin trampas. Tú decides: ✓ la sabía o ✗ no la sabía. Autoevaluación honesta, al estilo Anki.',
         },
         {
           number: '03',
@@ -90,7 +92,7 @@ export const es: Translations = {
           title: 'Sonidos nativos',
           tag: 'Fonética',
           description:
-            'Domina los 23 fonemas del inglés. Foco en los que más cuestan a los hispanohablantes.',
+            'Domina los 23 fonemas del inglés. Con enfoque en los que más cuestan a los hispanohablantes.',
         },
         {
           title: 'Habla conectada',
@@ -105,10 +107,10 @@ export const es: Translations = {
             'Conectores y estructuras para sonar fluido, no robótico.',
         },
         {
-          title: 'Inglés de calle',
+          title: 'Inglés coloquial',
           tag: 'Inglés cotidiano',
           description:
-            'El vocabulario informal que usan los nativos cada día — y que nunca te enseñaron en clase.',
+            'El vocabulario informal que usan los nativos a diario y que rara vez enseñan en clase.',
         },
       ],
     },
@@ -142,7 +144,7 @@ export const es: Translations = {
         native_sounds: 'Sonidos nativos',
         connected_speech: 'Habla conectada',
         flow_connectors: 'Fluidez y conectores',
-        real_talk: 'Inglés de calle',
+        real_talk: 'Inglés coloquial',
       },
     },
     paused: {

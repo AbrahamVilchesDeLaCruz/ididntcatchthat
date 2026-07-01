@@ -53,7 +53,9 @@ export const LandingProblem = (): ReactElement => {
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
             <div>
-              <p className="text-xs text-[var(--color-text-muted)]">Written</p>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                {p.exampleWrittenLabel}
+              </p>
               <p className="text-lg font-semibold text-[var(--color-text-primary)]">
                 {p.exampleWritten}
               </p>
@@ -64,7 +66,7 @@ export const LandingProblem = (): ReactElement => {
             />
             <div>
               <p className="text-xs text-[var(--color-text-muted)]">
-                How natives say it
+                {p.exampleNativeLabel}
               </p>
               <p className="text-lg font-semibold text-[var(--color-accent-green)]">
                 {p.exampleNative}
