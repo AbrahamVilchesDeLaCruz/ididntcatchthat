@@ -19,6 +19,7 @@ import { GameAlreadyFinished } from './exceptions/game-already-finished';
 import { AttemptRequiresGameMode } from './exceptions/attempt-requires-game-mode';
 import { ViewRequiresStudyMode } from './exceptions/view-requires-study-mode';
 import { GameSource, GameSourceValue } from './game-source';
+import { GameAlreadyAssigned } from './exceptions/game-already-assigned';
 
 export interface GamePrimitives {
   id: string;
@@ -217,6 +218,18 @@ export class Game extends AggregateRoot<GamePrimitives> {
         userId: this.userId,
       }),
     );
+  }
+
+  assignToUser(userId: string): Game {
+    if (this.userId !== null) {
+      if (this.userId === userId) return this;
+      throw new GameAlreadyAssigned(this.id.value);
+    }
+
+    return Game.fromPrimitives({
+      ...this.toPrimitives(),
+      userId,
+    });
   }
 
   completionStats(): {

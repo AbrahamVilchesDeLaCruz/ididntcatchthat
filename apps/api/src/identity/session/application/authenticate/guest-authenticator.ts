@@ -8,8 +8,11 @@ import {
   type TokenGenerator,
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
-import { SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { type RequestGuestAuthenticator } from './request-guest-authenticator';
 import { type ResponseGuestAuthenticator } from './response-guest-authenticator';
 
@@ -22,9 +25,10 @@ export class GuestAuthenticator {
     private readonly repository: UserSessionRepository,
     @Inject(TOKEN_GENERATOR)
     private readonly generator: TokenGenerator,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
-    private readonly sessionEvents: SessionEventPublisher,
   ) {}
 
   async execute(
@@ -47,7 +51,7 @@ export class GuestAuthenticator {
     );
 
     await this.repository.save(session);
-    await this.sessionEvents.publishFromSessions(session);
+    await this.publisher.publish(session.pullDomainEvents());
 
     this.logger.info('Guest authenticated', { deviceId });
 

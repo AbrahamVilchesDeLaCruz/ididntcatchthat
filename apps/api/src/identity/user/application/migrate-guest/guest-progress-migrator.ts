@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { GuestProgressMigratedEvent } from '@/identity/user/domain/events/guest-progress-migrated.event';
+import { UserId } from '@/shared/domain/user-id';
+import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-not-found.exception';
+import {
+  type UserRepository,
+  USER_REPOSITORY,
+} from '@/identity/user/domain/user.repository';
 import {
   type DomainEventPublisher,
   DOMAIN_EVENT_PUBLISHER,
@@ -12,6 +17,8 @@ export type { RequestGuestProgressMigrator };
 @Injectable()
 export class GuestProgressMigrator {
   constructor(
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
@@ -23,16 +30,18 @@ export class GuestProgressMigrator {
 
     if (guestGames.length === 0) return;
 
-    const gameIds = guestGames.map((g) => g.gameId);
+    const user = await this.userRepository.search(new UserId(userId));
+    if (!user) throw new UserNotFoundException(userId);
 
-    await this.publisher.publish([
-      new GuestProgressMigratedEvent(userId, {
-        userId,
-        deviceId,
-        guestDeviceId,
-        gameIds,
-      }),
-    ]);
+    const gameIds = guestGames.map((g) => g.gameId);
+    const updated = user.requestGuestProgressMigration(
+      deviceId,
+      guestDeviceId,
+      gameIds,
+    );
+
+    await this.userRepository.save(updated);
+    await this.publisher.publish(updated.pullDomainEvents());
 
     this.logger.info('Guest progress migration requested', {
       userId,

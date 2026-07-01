@@ -6,7 +6,7 @@ import { type PasswordHasher } from '@/identity/user/domain/password-hasher';
 import { type TokenGenerator } from '@/identity/shared/domain/token-generator';
 import { type Logger } from '@/shared/domain/logger';
 import { type AppMetrics } from '@/shared/domain/app-metrics';
-import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
+import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { InvalidCredentialsException } from '@/identity/user/domain/exceptions/invalid-credentials.exception';
 import { UserMother } from '@test/identity/user/domain/user-mother';
 import { RequestUserAuthenticatorMother } from './request-user-authenticator-mother';
@@ -20,7 +20,7 @@ describe('identity/application/login UserAuthenticator', () => {
   const generator = mock<TokenGenerator>();
   const logger = mock<Logger>();
   const metrics = mock<AppMetrics>();
-  const sessionEvents = mock<SessionEventPublisher>();
+  const publisher = mock<DomainEventPublisher>();
   let useCase: UserAuthenticator;
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('identity/application/login UserAuthenticator', () => {
       accessToken: 'access-token',
       refreshTokenId: UuidMother.random(),
     });
-    sessionEvents.publishFromSessions.mockResolvedValue(undefined);
+    publisher.publish.mockResolvedValue(undefined);
 
     useCase = new UserAuthenticator(
       userRepository,
@@ -43,7 +43,7 @@ describe('identity/application/login UserAuthenticator', () => {
       generator,
       logger,
       metrics,
-      sessionEvents,
+      publisher,
     );
   });
 

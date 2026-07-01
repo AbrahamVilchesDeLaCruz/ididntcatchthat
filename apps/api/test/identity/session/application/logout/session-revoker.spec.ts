@@ -2,7 +2,7 @@ import { mock } from 'jest-mock-extended';
 import { SessionRevoker } from '@/identity/session/application/logout/session-revoker';
 import { type UserSessionRepository } from '@/identity/session/domain/user-session.repository';
 import { type Logger } from '@/shared/domain/logger';
-import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
+import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { UserSessionMother } from '@test/identity/session/domain/user-session-mother';
 import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { RequestSessionRevokerMother } from './request-session-revoker-mother';
@@ -10,14 +10,15 @@ import { RequestSessionRevokerMother } from './request-session-revoker-mother';
 describe('identity/application/logout SessionRevoker', () => {
   const repository = mock<UserSessionRepository>();
   const logger = mock<Logger>();
-  const sessionEvents = mock<SessionEventPublisher>();
+  const publisher = mock<DomainEventPublisher>();
   let useCase: SessionRevoker;
 
   beforeEach(() => {
     repository.match.mockReset();
     repository.save.mockReset();
-    sessionEvents.publishFromSessions.mockResolvedValue(undefined);
-    useCase = new SessionRevoker(repository, logger, sessionEvents);
+    publisher.publish.mockReset();
+    publisher.publish.mockResolvedValue(undefined);
+    useCase = new SessionRevoker(repository, publisher, logger);
   });
 
   it('should revoke the session on logout', async () => {
@@ -29,7 +30,7 @@ describe('identity/application/logout SessionRevoker', () => {
     expect(repository.save).toHaveBeenCalledTimes(1);
     const saved = repository.save.mock.calls[0][0];
     expect(saved.isRevoked()).toBe(true);
-    expect(sessionEvents.publishFromSessions).toHaveBeenCalledTimes(1);
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
   });
 
   it('should be idempotent when session is already revoked', async () => {

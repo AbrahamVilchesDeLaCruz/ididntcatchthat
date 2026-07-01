@@ -9,6 +9,7 @@ import { UserRegisteredEvent } from '@/identity/user/domain/events/user-register
 import { StreakUpdatedEvent } from '@/identity/user/domain/events/streak-updated.event';
 import { StreakBrokenEvent } from '@/identity/user/domain/events/streak-broken.event';
 import { RankingProfileUpdatedEvent } from '@/identity/user/domain/events/ranking-profile-updated.event';
+import { GuestProgressMigratedEvent } from '@/identity/user/domain/events/guest-progress-migrated.event';
 
 export type UserPrimitives = {
   id: string;
@@ -123,6 +124,30 @@ export class User extends AggregateRoot<UserPrimitives> {
         userId: user.id.value,
         showInRanking,
         nickname: nick.value,
+      }),
+    );
+
+    return user;
+  }
+
+  requestGuestProgressMigration(
+    deviceId: string,
+    guestDeviceId: string,
+    gameIds: string[],
+  ): User {
+    if (gameIds.length === 0) return this;
+
+    const user = User.fromPrimitives({
+      ...this.toPrimitives(),
+      updatedAt: new Date(),
+    });
+
+    user.record(
+      new GuestProgressMigratedEvent(user.id.value, {
+        userId: user.id.value,
+        deviceId,
+        guestDeviceId,
+        gameIds,
       }),
     );
 

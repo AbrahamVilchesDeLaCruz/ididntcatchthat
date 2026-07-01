@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserSession } from '@/identity/session/domain/user-session';
 import { Criteria, FilterOperator } from '@/shared/domain/criteria';
 import { InvalidRefreshTokenException } from '@/identity/session/domain/exceptions/invalid-refresh-token.exception';
 import { ExpiredRefreshTokenException } from '@/identity/session/domain/exceptions/expired-refresh-token.exception';
@@ -17,9 +16,12 @@ import {
   type TokenGenerator,
   TOKEN_GENERATOR,
 } from '@/identity/shared/domain/token-generator';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
 import { UserId } from '@/shared/domain/user-id';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
-import { SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { type RequestTokenRefresher } from './request-token-refresher';
 import { type ResponseTokenRefresher } from './response-token-refresher';
 
@@ -34,9 +36,10 @@ export class TokenRefresher {
     private readonly userRepository: UserRepository,
     @Inject(TOKEN_GENERATOR)
     private readonly generator: TokenGenerator,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
-    private readonly sessionEvents: SessionEventPublisher,
   ) {}
 
   async execute(
@@ -63,14 +66,16 @@ export class TokenRefresher {
         ]),
       );
 
-      const events = [session.compromisedEvent()];
+      const compromised = session.reportCompromised();
+      const events = [...compromised.pullDomainEvents()];
+
       for (const active of ownerSessions.filter((s) => !s.isRevoked())) {
         const revoked = active.revoke();
         await this.sessionRepository.save(revoked);
         events.push(...revoked.pullDomainEvents());
       }
 
-      await this.sessionEvents.publishEvents(events);
+      await this.publisher.publish(events);
 
       this.logger.warn('Token reuse detected — all sessions revoked', {
         ownerId: session.ownerId,
@@ -96,22 +101,18 @@ export class TokenRefresher {
       roles: [user.role.value],
     });
 
-    const rotationEvent = session.rotationEvent(newSessionId);
-    const revokedSession = session.revoke();
-    const newSession = UserSession.create(
+    const { revoked, started } = session.refreshTokens(
       newSessionId,
       refreshTokenId,
-      user.id.value,
       deviceId,
       fingerprint,
     );
 
-    await this.sessionRepository.save(revokedSession);
-    await this.sessionRepository.save(newSession);
-    await this.sessionEvents.publishEvents([
-      rotationEvent,
-      ...revokedSession.pullDomainEvents(),
-      ...newSession.pullDomainEvents(),
+    await this.sessionRepository.save(revoked);
+    await this.sessionRepository.save(started);
+    await this.publisher.publish([
+      ...revoked.pullDomainEvents(),
+      ...started.pullDomainEvents(),
     ]);
 
     this.logger.info('Token refreshed', { userId: user.id.value });

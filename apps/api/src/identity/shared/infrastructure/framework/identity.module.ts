@@ -46,7 +46,6 @@ import { StreakUpdater } from '@/identity/user/application/update-streak/streak-
 import { StreakUpdaterOnGameCompleted } from '@/identity/user/application/update-streak/update-streak-on-game-completed';
 import { StreakUpdaterOnFlashcardViewed } from '@/identity/user/application/update-streak/update-streak-on-flashcard-viewed';
 import { StreakBrokenCronJob } from '@/identity/user/application/update-streak/streak-broken-cron.job';
-import { SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { RankingProfileUpdater } from '@/identity/user/application/update-profile/ranking-profile-updater';
 import { RankingProfileFinder } from '@/identity/user/application/update-profile/ranking-profile-finder';
 import { UserStatsRetriever } from '@/identity/user/application/stats/user-stats-retriever';
@@ -117,7 +116,6 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     StreakUpdaterOnGameCompleted,
     StreakUpdaterOnFlashcardViewed,
     StreakBrokenCronJob,
-    SessionEventPublisher,
     RankingProfileUpdater,
     RankingProfileFinder,
     // User stats

@@ -163,31 +163,49 @@ export class UserSession extends AggregateRoot<UserSessionPrimitives> {
     return revoked;
   }
 
-  rotate(newTokenId: string, newSessionId: string): UserSession {
-    const rotated = UserSession.create(
+  reportCompromised(): UserSession {
+    const session = UserSession.fromPrimitives(this.toPrimitives());
+    session.record(
+      new SessionCompromisedEvent(this.id, {
+        ownerId: this.ownerId,
+        tokenId: this.tokenId,
+      }),
+    );
+    return session;
+  }
+
+  refreshTokens(
+    newSessionId: string,
+    newTokenId: string,
+    deviceId: string,
+    fingerprint: string,
+  ): { revoked: UserSession; started: UserSession } {
+    const revoked = UserSession.fromPrimitives({
+      ...this.toPrimitives(),
+      revokedAt: new Date(),
+    });
+
+    revoked.record(
+      new SessionRotatedEvent(this.id, {
+        newSessionId,
+        ownerId: this.ownerId,
+      }),
+    );
+    revoked.record(
+      new SessionRevokedEvent(this.id, {
+        ownerId: this.ownerId,
+        ownerType: this.ownerType,
+      }),
+    );
+
+    const started = UserSession.create(
       newSessionId,
       newTokenId,
       this.ownerId,
-      this.deviceId,
-      this.fingerprint,
+      deviceId,
+      fingerprint,
     );
-    this.record(
-      new SessionRotatedEvent(this.id, { newSessionId, ownerId: this.ownerId }),
-    );
-    return rotated;
-  }
 
-  rotationEvent(newSessionId: string): SessionRotatedEvent {
-    return new SessionRotatedEvent(this.id, {
-      newSessionId,
-      ownerId: this.ownerId,
-    });
-  }
-
-  compromisedEvent(): SessionCompromisedEvent {
-    return new SessionCompromisedEvent(this.id, {
-      ownerId: this.ownerId,
-      tokenId: this.tokenId,
-    });
+    return { revoked, started };
   }
 }

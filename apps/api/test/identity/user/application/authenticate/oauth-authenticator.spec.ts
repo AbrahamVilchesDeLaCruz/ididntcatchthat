@@ -8,6 +8,7 @@ import { type NicknameResolver } from '@/identity/user/domain/nickname-resolver'
 import { type Logger } from '@/shared/domain/logger';
 import { type AppMetrics } from '@/shared/domain/app-metrics';
 import { UserRegisteredEvent } from '@/identity/user/domain/events/user-registered.event';
+import { SessionStartedEvent } from '@/identity/session/domain/events/session-started.event';
 import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type User } from '@/identity/user/domain/user';
 import { UserMother } from '@test/identity/user/domain/user-mother';
@@ -15,7 +16,6 @@ import { UuidMother } from '@test/shared/domain/uuid-mother';
 import { EmailMother } from '@test/identity/user/domain/email-mother';
 import { JestTimers } from '@test/shared/jest-timers';
 import { type UserSearcher } from '@/identity/user/domain/user-searcher';
-import { type SessionEventPublisher } from '@/identity/session/application/session-event-publisher';
 import { RequestOAuthAuthenticatorMother } from './request-oauth-authenticator-mother';
 
 describe('identity/application/google OAuthAuthenticator', () => {
@@ -27,7 +27,6 @@ describe('identity/application/google OAuthAuthenticator', () => {
   const logger = mock<Logger>();
   const searcher = mock<UserSearcher>();
   const metrics = mock<AppMetrics>();
-  const sessionEvents = mock<SessionEventPublisher>();
   let authenticator: OAuthAuthenticator;
 
   beforeEach((): void => {
@@ -45,7 +44,6 @@ describe('identity/application/google OAuthAuthenticator', () => {
     });
     publisher.publish.mockResolvedValue(undefined);
     nicknameResolver.resolve.mockResolvedValue('test-user');
-    sessionEvents.publishFromSessions.mockResolvedValue(undefined);
 
     authenticator = new OAuthAuthenticator(
       userRepository,
@@ -56,7 +54,6 @@ describe('identity/application/google OAuthAuthenticator', () => {
       logger,
       searcher,
       metrics,
-      sessionEvents,
     );
   });
 
@@ -74,12 +71,12 @@ describe('identity/application/google OAuthAuthenticator', () => {
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(UserRegisteredEvent);
-    expect(sessionEvents.publishFromSessions).toHaveBeenCalledTimes(1);
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
     const savedSession = sessionRepository.save.mock.calls[0][0];
     expect(savedSession.isGuest()).toBe(false);
   });
 
-  it('should return existing user, update avatar and not emit event', async () => {
+  it('should return existing user, update avatar and emit only session events', async () => {
     const email = EmailMother.random().value;
     const existing = UserMother.random({ email });
     const request = RequestOAuthAuthenticatorMother.random({
@@ -91,12 +88,14 @@ describe('identity/application/google OAuthAuthenticator', () => {
 
     await authenticator.execute(request);
 
-    expect(publisher.publish).not.toHaveBeenCalled();
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
+    const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
+    expect(events.every((e) => e instanceof SessionStartedEvent)).toBe(true);
     const saved: User = userRepository.save.mock.calls[0][0];
     expect(saved.avatarUrl).toBe('https://cdn.example.com/avatar.jpg');
   });
 
-  it('should not emit event for existing user', async () => {
+  it('should emit only SessionStartedEvent for existing user without avatar change', async () => {
     const existing = UserMother.random();
     const request = RequestOAuthAuthenticatorMother.random({
       email: existing.email.value,
@@ -106,7 +105,10 @@ describe('identity/application/google OAuthAuthenticator', () => {
 
     await authenticator.execute(request);
 
-    expect(publisher.publish).not.toHaveBeenCalled();
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
+    const events: DomainEvent[] = publisher.publish.mock.calls[0][0];
+    expect(events).toHaveLength(1);
+    expect(events[0]).toBeInstanceOf(SessionStartedEvent);
   });
 
   it('should keep existing user unchanged when avatarUrl is null', async () => {
