@@ -19,7 +19,7 @@ identity/
 | `POST` | `/auth/refresh` | Cookie | `{ accessToken }` |
 | `POST` | `/auth/logout` | JWT | 204 void |
 | `GET` | `/auth/google` | — | redirect OAuth |
-| `GET` | `/auth/google/callback` | Google | redirect + cookie |
+| `GET` | `/auth/google/callback` | Google | redirect + cookie refresh |
 | `POST` | `/auth/migrate-guest` | JWT | 204 void |
 | `GET` | `/users/me/ranking-profile` | JWT | envelope |
 | `PATCH` | `/users/me/ranking-profile` | JWT | envelope |
@@ -34,16 +34,17 @@ identity/
 | `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Cron detecta racha rota |
 | `RankingProfileUpdated` | `ididntcatchthat.identity.user.ranking_profile_updated` | PATCH ranking profile |
 | `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Migrate guest tras registro |
-| `SessionStarted` | `ididntcatchthat.identity.session.started` | Login / register / OAuth |
+| `SessionStarted` | `ididntcatchthat.identity.session.started` | Login / register / OAuth / guest |
 | `SessionRevoked` | `ididntcatchthat.identity.session.revoked` | Logout |
 | `SessionRotated` | `ididntcatchthat.identity.session.rotated` | Refresh token |
 | `SessionCompromised` | `ididntcatchthat.identity.session.compromised` | Reuse detection |
 
 ## Eventos consumidos
 
-| Evento | Handler | Efecto |
-|--------|---------|--------|
-| `GameCompleted` | `StreakUpdaterOnGameCompleted` | Incrementa streak si primera actividad del día |
+| Evento | Handler | Cola | Efecto |
+|--------|---------|------|--------|
+| `GameCompleted` | `StreakUpdaterOnGameCompleted` | `identity.update_streak_on_game_completed` | Incrementa streak si primera actividad del día |
+| `FlashcardViewed` | `StreakUpdaterOnFlashcardViewed` | `identity.update_streak_on_flashcard_viewed` | Incrementa streak en study (userId no null) |
 
 ## Tablas
 
@@ -59,7 +60,7 @@ identity/
 | Ranking sync | `RankingProfileUpdated` → `UpdateRankingOnRankingProfileUpdated` |
 | Gaming guest games | `GuestProgressMigrated` → `MigrateGuestGamesOnGuestProgressMigrated` |
 | Progress guest stats | `GuestProgressMigrated` → `GuestProgressImporterOnGuestProgressMigrated` |
-| Gaming stats (admin) | SQL read en `TypeOrmUserStatsQuery` (`games` join) — deuda conocida |
+| Gaming activity (admin stats) | Read port `GamingUserActivityQuery` exportado por GamingModule |
 
 ## Referencias
 

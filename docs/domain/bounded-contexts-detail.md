@@ -17,33 +17,45 @@ graph LR
     end
 
     subgraph Emits ["Eventos que emite"]
-        E1["UserRegistered\nidct.identity.users.user.registered"]
+        E1["UserRegistered\nididntcatchthat.identity.user.registered"]
         E2["StreakUpdated\nididntcatchthat.identity.streak.updated"]
         E3["StreakBroken\nididntcatchthat.identity.streak.broken"]
-        E4["GuestProgressMigrated\nidct.identity.users.guest_progress.migrated"]
+        E4["GuestProgressMigrated\nididntcatchthat.identity.user.guest_progress_migrated"]
+        E5["RankingProfileUpdated\nididntcatchthat.identity.user.ranking_profile_updated"]
+        E6["SessionStarted / Revoked / Rotated / Compromised"]
     end
 
     subgraph Consumes ["Eventos que consume"]
-        C1["GameCompleted\nidct.gaming.games.game.completed"]
+        C1["GameCompleted\nididntcatchthat.gaming.games.game.completed"]
+        C2["FlashcardViewed\nididntcatchthat.gaming.views.flashcard.viewed"]
     end
 
     Identity -->|emite| E1
     Identity -->|emite| E2
     Identity -->|emite| E3
     Identity -->|emite| E4
+    Identity -->|emite| E5
+    Identity -->|emite| E6
     C1 -->|consume| Identity
+    C2 -->|consume| Identity
 ```
 
 | Evento emitido | Exchange | Trigger |
 |----------------|----------|---------|
-| `UserRegistered` | `idct.identity.users.user.registered` | Usuario completa registro (email o OAuth) |
-| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | `GameCompleted` o sesión de estudio — primera del día |
+| `UserRegistered` | `ididntcatchthat.identity.user.registered` | Usuario completa registro (email o OAuth) |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | `GameCompleted` o `FlashcardViewed` — primera actividad del día |
 | `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Job nocturno detecta que `last_activity_date < ayer` |
-| `GuestProgressMigrated` | `idct.identity.users.guest_progress.migrated` | Guest completa registro y envía estado Zustand |
+| `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Usuario autenticado migra progreso guest |
+| `RankingProfileUpdated` | `ididntcatchthat.identity.user.ranking_profile_updated` | PATCH ranking profile |
+| `SessionStarted` | `ididntcatchthat.identity.session.started` | Login, register, OAuth, guest |
+| `SessionRevoked` | `ididntcatchthat.identity.session.revoked` | Logout |
+| `SessionRotated` | `ididntcatchthat.identity.session.rotated` | Refresh token |
+| `SessionCompromised` | `ididntcatchthat.identity.session.compromised` | Reuse detection |
 
 | Evento consumido | Exchange | Acción |
 |-----------------|----------|--------|
-| `GameCompleted` | `idct.gaming.games.game.completed` | Evalúa si incrementar streak (una vez por día) |
+| `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Evalúa si incrementar streak (una vez por día) |
+| `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Incrementa streak en study si `userId` presente |
 
 ---
 

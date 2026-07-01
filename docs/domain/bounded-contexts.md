@@ -23,6 +23,7 @@ graph TB
     Gaming -->|FlashcardViewed| Progress
     Gaming -->|GameCompleted| Progress
     Gaming -->|GameCompleted| Identity
+    Gaming -->|FlashcardViewed| Identity
     Gaming -->|GameCompleted| Achievement
     Gaming -->|AttemptRecorded| Achievement
     Gaming -->|FlashcardViewed| Achievement
@@ -66,6 +67,7 @@ graph TB
 | `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Gaming | Achievement | Registra módulo tocado en `user_achievement_progress` |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Progress | Recalcula `ModuleProgress` (módulo fijo o batch en random) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Identity | Incrementa streak si no se incrementó hoy |
+| `FlashcardViewed` | `ididntcatchthat.gaming.views.flashcard.viewed` | Gaming | Identity | Incrementa streak en modo study (primera actividad del día) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Achievement | Evalúa y desbloquea logros (game/study) |
 | `GameCompleted` | `ididntcatchthat.gaming.games.game.completed` | Gaming | Ranking | Actualiza `most_active` vía aggregate `Ranking` |
 | `AchievementUnlocked` | `ididntcatchthat.achievement.user_achievement.unlocked` | Achievement | Notification (futuro) | Toast in-app vía cliente poll; push/email pendiente |
@@ -77,6 +79,10 @@ graph TB
 | `RankingProfileUpdated` | `ididntcatchthat.identity.user.ranking_profile_updated` | Identity | Ranking | Sincroniza opt-in/out y nickname en tablas de ranking |
 | `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | Gaming | Reasigna `games.user_id` de guest → usuario registrado |
 | `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | Progress | Importa attempts de games migrados → `user_flashcard_stats` |
+| `SessionStarted` | `ididntcatchthat.identity.session.started` | Identity | — | Observabilidad / futuros consumidores |
+| `SessionRevoked` | `ididntcatchthat.identity.session.revoked` | Identity | — | Logout |
+| `SessionRotated` | `ididntcatchthat.identity.session.rotated` | Identity | — | Refresh token |
+| `SessionCompromised` | `ididntcatchthat.identity.session.compromised` | Identity | — | Reuse detection |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Notification | Toast de logro en app |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Achievement | Desbloquea module_mastery_2/3 |
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | Progress | Ranking | Actualiza `module_master` vía aggregate `Ranking` |

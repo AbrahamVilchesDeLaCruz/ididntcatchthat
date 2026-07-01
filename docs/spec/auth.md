@@ -449,8 +449,12 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 
 | Evento                       | `eventName`                                              | Cuándo                                        |
 | ---------------------------- | -------------------------------------------------------- | --------------------------------------------- |
-| `UserRegisteredEvent`        | `ididntcatchthat.identity.users.user.registered`         | `User.register()` — solo si el user es nuevo  |
-| `GuestProgressMigratedEvent` | `ididntcatchthat.identity.users.guest_progress.migrated` | `GuestProgressMigrator` completa la migración |
+| `UserRegisteredEvent`        | `ididntcatchthat.identity.user.registered`               | `User.register()` — solo si el user es nuevo  |
+| `GuestProgressMigratedEvent` | `ididntcatchthat.identity.user.guest_progress_migrated` | `User.requestGuestProgressMigration()`        |
+| `SessionStartedEvent`        | `ididntcatchthat.identity.session.started`               | `UserSession.create()` / `createGuest()`        |
+| `SessionRevokedEvent`        | `ididntcatchthat.identity.session.revoked`               | `UserSession.revoke()`                        |
+| `SessionRotatedEvent`        | `ididntcatchthat.identity.session.rotated`               | `UserSession.refreshTokens()`                 |
+| `SessionCompromisedEvent`    | `ididntcatchthat.identity.session.compromised`           | `UserSession.reportCompromised()`             |
 
 ---
 

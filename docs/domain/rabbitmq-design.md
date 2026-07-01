@@ -37,7 +37,8 @@ Diseño completo de la mensajería asíncrona de **ididntcatchthat**. Basado en 
 | `ididntcatchthat.gaming.attempts.attempt.recorded`         | Gaming        | Progress      | `update_flashcard_stats_on_attempt_recorded`            |
 | `ididntcatchthat.gaming.views.flashcard.viewed`            | Gaming        | Progress      | `update_flashcard_stats_on_flashcard_viewed`            |
 | `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Progress      | `update_module_progress_on_game_completed`              |
-| `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Identity      | `update_streak_on_game_completed`                       |
+| `ididntcatchthat.gaming.games.game.completed`              | Gaming        | Identity      | `identity.update_streak_on_game_completed`              |
+| `ididntcatchthat.gaming.views.flashcard.viewed`            | Gaming        | Identity      | `identity.update_streak_on_flashcard_viewed`            |
 | `ididntcatchthat.identity.user.registered`           | Identity      | Notification  | `send_welcome_email_on_user_registered`                 |
 | `ididntcatchthat.identity.streak.updated`          | Identity      | Notification  | `notify_streak_milestone_on_streak_updated`             |
 | `ididntcatchthat.identity.streak.broken`           | Identity      | Notification  | `notify_streak_broken_on_streak_broken`                 |
