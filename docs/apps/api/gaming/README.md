@@ -87,6 +87,22 @@ Ninguno (Progress, Identity, Achievement y Ranking consumen los eventos anterior
 | Progress weakest | `ProgressModule` → `WEAKEST_FLASHCARD_QUERY` |
 | Taxonomía | `@/shared/domain/subcategory-taxonomy` |
 
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Start](./start/) | `POST /games` | [Clases](./start/classes.md) · [Secuencia](./start/sequence.md) · [Casos de uso](./start/usecases.md) |
+| [Attempt](./attempt/) | `POST /games/:id/attempts` | [Clases](./attempt/classes.md) · [Secuencia](./attempt/sequence.md) · [Casos de uso](./attempt/usecases.md) |
+| [Views](./views/) | `POST /games/:id/views` (study) | [Clases](./views/classes.md) · [Secuencia](./views/sequence.md) · [Casos de uso](./views/usecases.md) |
+| [Complete](./complete/) | `POST /games/:id/complete` | [Clases](./complete/classes.md) · [Secuencia](./complete/sequence.md) · [Casos de uso](./complete/usecases.md) |
+| [Game Summary](./game-summary/) | `GET /games/:id/summary` | [Clases](./game-summary/classes.md) · [Secuencia](./game-summary/sequence.md) · [Casos de uso](./game-summary/usecases.md) |
+| [Pause](./pause/) | `PATCH /games/:id` (paused) | [Clases](./pause/classes.md) · [Secuencia](./pause/sequence.md) · [Casos de uso](./pause/usecases.md) |
+| [List Paused Games](./list-paused-games/) | `GET /games?status=paused` | [Clases](./list-paused-games/classes.md) · [Secuencia](./list-paused-games/sequence.md) · [Casos de uso](./list-paused-games/usecases.md) |
+| [Resume](./resume/) | `POST /games/:id/resume` | [Clases](./resume/classes.md) · [Secuencia](./resume/sequence.md) · [Casos de uso](./resume/usecases.md) |
+| [Abandon](./abandon/) | `PATCH /games/:id` (abandoned) | [Clases](./abandon/classes.md) · [Secuencia](./abandon/sequence.md) · [Casos de uso](./abandon/usecases.md) |
+| [Game Flashcards](./game-flashcards/) | `GET /games/:id/flashcards` | [Clases](./game-flashcards/classes.md) · [Secuencia](./game-flashcards/sequence.md) · [Casos de uso](./game-flashcards/usecases.md) |
+| [Admin Game Stats](./admin-game-stats/) | `GET /games/stats?period=` | [Clases](./admin-game-stats/classes.md) · [Secuencia](./admin-game-stats/sequence.md) · [Casos de uso](./admin-game-stats/usecases.md) |
+
 ## Referencias
 
 - [Spec de Gaming](../../../spec/gaming.md)
