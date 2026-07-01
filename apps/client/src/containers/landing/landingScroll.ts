@@ -1,5 +1,5 @@
-/** Matches fixed `LandingHeader` height + breathing room. */
-export const LANDING_HEADER_SCROLL_OFFSET_PX = 72;
+/** Matches fixed `LandingHeader` height (h-16) + breathing room. */
+export const LANDING_HEADER_SCROLL_OFFSET_PX = 80;
 
 export function scrollToLandingSection(sectionId: string): void {
   const el = document.getElementById(sectionId);

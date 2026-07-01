@@ -15,7 +15,7 @@ export const LandingFinalCta = ({
   return (
     <section
       id="get-started"
-      className="scroll-mt-[4.5rem] border-t border-[var(--color-border)] px-5 py-20"
+      className="scroll-mt-20 border-t border-[var(--color-border)] px-5 py-20"
     >
       <div className="mx-auto max-w-xl">
         <div className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-8 text-center sm:p-12">

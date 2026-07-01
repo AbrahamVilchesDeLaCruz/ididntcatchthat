@@ -23,7 +23,7 @@ export const LandingHero = ({ onPlay }: LandingHeroProps): ReactElement => {
   return (
     <section
       id="top"
-      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 pb-16 pt-28 text-center sm:pt-32"
+      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 pb-16 pt-24 text-center sm:pt-28"
     >
       <div
         aria-hidden
