@@ -5,8 +5,8 @@
 | Skill | Por qué leerla |
 |---|---|
 | `api-domain-events` | Cómo se definen los `DomainEvent` que los subscribers consumen |
-| `api-events-infra` | `AmqpMessageBus` — implementación de `EventBus` y `DomainEventConsumer` |
-| `api-application` | Use cases — dónde se llama a `eventBus.publish()` |
+| `api-events-infra` | `AmqpMessageBus` — implementación de `DomainEventPublisher` y `DomainEventConsumer` |
+| `api-application` | Use cases — dónde se llama a `domainEventPublisher.publish()` |
 | `api-di` | Cómo registrar `DOMAIN_EVENT_PUBLISHER` y `DOMAIN_EVENT_CONSUMER` en módulos |
 
 ## Architectural Decision
