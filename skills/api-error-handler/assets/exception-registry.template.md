@@ -5,29 +5,24 @@ Copy this template when adding error handling to a new module.
 ## File: `{context}/infrastructure/framework/{context}-exception-registry.ts`
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common';
-import { GlobalExceptionRegistry } from '@/shared/infrastructure/http/global-exception-registry';
-import { {Entity}NotFound } from '../../domain/{entity}-not-found';
-import { {Entity}AlreadyExists } from '../../domain/{entity}-already-exists';
+import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { GlobalExceptionRegistry } from '@/shared/infrastructure/exceptions/global-exception-registry';
+import { {Entity}NotFound } from '../../domain/exceptions/{entity}-not-found';
+import { {Entity}AlreadyExists } from '../../domain/exceptions/{entity}-already-exists';
 // Import all domain errors of this BC
 
 @Injectable()
-export class {Context}ExceptionRegistry {
-  constructor(private readonly registry: GlobalExceptionRegistry) {}
+export class {Context}ExceptionRegistry implements OnModuleInit {
+  constructor(private readonly globalRegistry: GlobalExceptionRegistry) {}
 
-  register(): void {
-    this.registry.add({Entity}NotFound, {
-      status: HttpStatus.NOT_FOUND,
-      code: '{entity}_not_found',
-    });
-
-    this.registry.add({Entity}AlreadyExists, {
-      status: HttpStatus.CONFLICT,
-      code: '{entity}_already_exists',
-    });
-
-    // Add more domain errors here
+  onModuleInit(): void {
+    this.globalRegistry.register(
+      new Map<string, number>([
+        [{Entity}NotFound.name, HttpStatus.NOT_FOUND],
+        [{Entity}AlreadyExists.name, HttpStatus.CONFLICT],
+        // Add more domain errors here
+      ]),
+    );
   }
 }
 ```
@@ -38,33 +33,31 @@ export class {Context}ExceptionRegistry {
 // {context}/infrastructure/framework/{context}.module.ts
 @Module({
   providers: [
-    {Context}ExceptionRegistry,
+    {Context}ExceptionRegistry, // ← just add as provider; onModuleInit runs automatically
     // ... other providers
   ],
 })
-export class {Context}Module implements OnModuleInit {
-  constructor(private readonly registry: {Context}ExceptionRegistry) {}
-
-  onModuleInit(): void {
-    this.registry.register();
-  }
-}
+export class {Context}Module {}
 ```
+
+> The registry itself implements `OnModuleInit` — NestJS calls `onModuleInit()` automatically after the module is initialized, before the first request arrives. The module class does **not** need to implement `OnModuleInit`.
 
 ## HTTP Status mapping reference
 
-| Domain Error type | HTTP Status | Code pattern |
-|---|---|---|
-| NotFound errors | `404 NOT_FOUND` | `{entity}_not_found` |
-| AlreadyExists errors | `409 CONFLICT` | `{entity}_already_exists` |
-| Validation / invariant errors | `422 UNPROCESSABLE_ENTITY` | `{entity}_{reason}` |
-| Forbidden / not allowed | `403 FORBIDDEN` | `{entity}_{action}_not_allowed` |
-| External service failure | `502 BAD_GATEWAY` | `{service}_unavailable` |
+| Domain Error type | HTTP Status |
+|---|---|
+| NotFound errors | `404 NOT_FOUND` |
+| AlreadyExists errors | `409 CONFLICT` |
+| Validation / invariant errors | `422 UNPROCESSABLE_ENTITY` |
+| Forbidden / not allowed | `403 FORBIDDEN` |
+| Credentials invalid / token expired | `401 UNAUTHORIZED` |
+| Rate limit / quota exceeded | `429 TOO_MANY_REQUESTS` |
+| External service failure | `502 BAD_GATEWAY` |
 
 ## Checklist
 
-- [ ] Un registry por bounded context — no mezclad errores de distintos BCs
+- [ ] Un registry por bounded context — no mezclar errores de distintos BCs
 - [ ] Todos los domain errors del BC están registrados antes del primer request
-- [ ] El código (`code`) es `snake_case`, identifica unívocamente el error
 - [ ] `GlobalExceptionRegistry` es el único punto donde se mapea DomainError → HTTP
-- [ ] `onModuleInit()` en el módulo — no en el constructor del registry
+- [ ] El registry implementa `OnModuleInit` — no el módulo
+- [ ] El registry está declarado como provider en el módulo NestJS del BC

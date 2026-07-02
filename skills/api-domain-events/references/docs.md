@@ -26,9 +26,9 @@ Verb:       created | updated | deleted | completed | recorded | migrated
 
 Ejemplos canónicos del proyecto:
 - `ididntcatchthat.content.flashcard.created`
-- `ididntcatchthat.gaming.game.completed`
-- `ididntcatchthat.gaming.attempt.recorded`
-- `ididntcatchthat.identity.guest-progress.migrated`
+- `ididntcatchthat.gaming.games.game.completed`
+- `ididntcatchthat.gaming.attempts.attempt.recorded`
+- `ididntcatchthat.identity.guest_progress.migrated`
 
 ## Internal Docs
 

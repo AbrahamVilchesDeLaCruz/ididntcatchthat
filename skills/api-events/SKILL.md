@@ -1,6 +1,6 @@
 ---
 name: api-events
-description: "EventBus interface, DomainEventConsumer, Subscriber abstract en apps/api/. Trigger: Al definir el EventBus, crear un Subscriber concreto en application, o entender el flujo de domain events."
+description: "DomainEventPublisher interface, DomainEventConsumer, Subscriber abstract en apps/api/. Trigger: Al definir el DomainEventPublisher, crear un Subscriber concreto en application, o entender el flujo de domain events."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -9,7 +9,7 @@ metadata:
 
 ## When to Use
 
-- Al definir el `EventBus` interface o `DomainEventConsumer` interface
+- Al definir el `DomainEventPublisher` interface o `DomainEventConsumer` interface
 - Al crear un `Subscriber` concreto en application
 - Al entender el flujo de eventos y la regla de dependencia
 
@@ -22,7 +22,7 @@ metadata:
 ## Capas y responsabilidades
 
 ```
-Domain         → DomainEvent, EventBus interface
+Domain         → DomainEvent, DomainEventPublisher interface
 Application    → Subscriber (abstract), DomainEventConsumer interface
 Infrastructure → AmqpMessageBus, SubscribersBootstrapper, módulos NestJS
 ```
@@ -33,7 +33,7 @@ Infrastructure → AmqpMessageBus, SubscribersBootstrapper, módulos NestJS
 
 ```
 UseCase
-  → eventBus.publish(aggregate.pullDomainEvents())
+  → domainEventPublisher.publish(aggregate.pullDomainEvents())
     → AmqpMessageBus.publish() → RabbitMQ exchange
       → cola del subscriber
         → SubscribersBootstrapper.onModuleInit() → subscriber.init()
@@ -43,15 +43,15 @@ UseCase
 
 ---
 
-## Domain — `EventBus` interface
+## Domain — `DomainEventPublisher` interface
 
 ```typescript
-// src/shared/domain/event-bus.ts
-export interface EventBus {
+// src/shared/domain/domain-event-publisher.ts
+export interface DomainEventPublisher {
   publish(events: DomainEvent[]): Promise<void>;
 }
 
-export const EVENT_BUS = Symbol('EventBus');
+export const DOMAIN_EVENT_PUBLISHER = Symbol('DomainEventPublisher');
 ```
 
 ## Application — `DomainEventConsumer` interface
@@ -63,8 +63,8 @@ export interface DomainEventConsumer {
     queueName: string,
     eventName: string,
     exchangeName: string,
-    domainEvent: new (...args: never) => DomainEvent,
-    on: (event: DomainEvent) => Promise<void>,
+    domainEvent: new (...args: unknown[]) => DomainEvent,
+    handler: (event: DomainEvent) => Promise<void>,
   ): Promise<void>;
 }
 
@@ -94,5 +94,5 @@ Las colas `.retry` y `.dead_letter` se crean automáticamente — ver `api-event
 - `OnModuleInit` vive en infrastructure (`SubscribersBootstrapper`) — nunca en application
 - `on()` **siempre delega a un UseCase** — sin lógica de negocio propia
 - El subscriber vive **junto al use case que dispara** — nunca en carpeta `subscribers/` independiente
-- `eventBus.publish()` se llama **después** de `repository.save()` — nunca antes
+- `domainEventPublisher.publish()` se llama **después** de `repository.save()` — nunca antes
 - Ver implementación de infrastructure: skill `api-events-infra`

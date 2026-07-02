@@ -7,7 +7,7 @@
 | `api-domain-events` | Cómo se definen los `DomainEvent` que los subscribers consumen |
 | `api-events-infra` | `AmqpMessageBus` — implementación de `EventBus` y `DomainEventConsumer` |
 | `api-application` | Use cases — dónde se llama a `eventBus.publish()` |
-| `api-di` | Cómo registrar `EVENT_BUS` y `DOMAIN_EVENT_CONSUMER` en módulos |
+| `api-di` | Cómo registrar `DOMAIN_EVENT_PUBLISHER` y `DOMAIN_EVENT_CONSUMER` en módulos |
 
 ## Architectural Decision
 

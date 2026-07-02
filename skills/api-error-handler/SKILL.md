@@ -58,15 +58,18 @@ export class GlobalExceptionRegistry {
 @Catch()
 @Injectable()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private readonly registry: GlobalExceptionRegistry) {}
+  constructor(
+    private readonly registry: GlobalExceptionRegistry,
+    @Inject(LOGGER_SERVICE) private readonly logger: Logger,
+  ) {}
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: string | object = "Internal server error";
+    let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message: string | object = 'Internal server error';
     let errorType: string | null = null;
 
     if (exception instanceof HttpException) {
@@ -74,9 +77,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = exception.getResponse();
     } else if (exception instanceof Error) {
       const registered = this.registry.getStatusCode(exception.constructor.name);
-      if (registered) status = registered;
+      if (registered !== undefined) status = registered;
       message = exception.message;
       errorType = exception.constructor.name;
+    }
+
+    const logContext = { status, path: request.url, method: request.method, errorType };
+
+    if (status >= 500) {
+      this.logger.error('Unhandled exception', exception instanceof Error ? exception : undefined, logContext);
+    } else if (status >= 400 && errorType !== null) {
+      this.logger.warn(exception instanceof Error ? exception.message : 'Domain error', logContext);
+    } else if (status >= 400) {
+      const msg = typeof message === 'string' ? message : 'HTTP client error';
+      this.logger.warn(msg, logContext);
     }
 
     response.status(status).json({
@@ -136,6 +150,8 @@ export class FlashcardModule {}
 | Conflicto de estado (`AlreadyExists`, `InvalidStatus`) | `409 CONFLICT`             |
 | Acción no permitida (`CannotX`)                        | `400 BAD_REQUEST`          |
 | Sin permisos                                           | `403 FORBIDDEN`            |
+| Credenciales inválidas / token expirado                | `401 UNAUTHORIZED`         |
+| Límite de uso superado (`LimitExceeded`)               | `429 TOO_MANY_REQUESTS`    |
 
 ## Reglas
 
@@ -148,7 +164,7 @@ export class FlashcardModule {}
 
 ```typescript
 // ❌ Domain error con HTTP status
-export class FlashcardNotFound extends DomainError {
+export class FlashcardNotFound extends DomainException {
   readonly statusCode = 404; // el dominio no sabe de HTTP
 }
 

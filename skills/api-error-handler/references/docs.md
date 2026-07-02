@@ -19,19 +19,21 @@
 
 ```json
 {
-  "error": {
-    "code": "flashcard_not_found",
-    "message": "Flashcard with id abc123 does not exist",
-    "status": 404
-  },
-  "meta": {
-    "timestamp": "2026-05-21T12:00:00Z",
-    "request_id": "req_abc123"
-  }
+  "statusCode": 404,
+  "message": "Game with id <abc123> not found",
+  "errorType": "GameNotFound",
+  "path": "/api/games/abc123",
+  "timestamp": "2026-05-21T12:00:00.000Z"
 }
 ```
 
 Este formato lo genera `HttpExceptionFilter` automáticamente — no construirlo manualmente en controllers.
+
+- `statusCode`: HTTP status code numérico
+- `message`: mensaje del error (string del domain error, o response body si es `HttpException`)
+- `errorType`: nombre de la clase de la excepción (solo para errores de dominio; `null` para `HttpException`)
+- `path`: URL de la request
+- `timestamp`: ISO 8601
 
 ## Internal Docs
 

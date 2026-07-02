@@ -14,7 +14,7 @@ export type {Entity}{PastVerb}Attributes = {
 };
 
 export class {Entity}{PastVerb}Event extends DomainEvent {
-  // 2. Static constant following: {namespace}.{context}.{entity}.{past-verb}
+  // 2. Static constant following: {namespace}.{context}.{module?}.{entity}.{past-verb}
   static readonly EVENT_NAME = 'ididntcatchthat.{context}.{entity}.{past-verb}';
 
   constructor(
@@ -71,10 +71,10 @@ Event class:  {Entity}{PastVerb}Event
               GameCompletedEvent
               AttemptRecordedEvent
 
-EVENT_NAME:   ididntcatchthat.{context}.{entity}.{past-verb}
+EVENT_NAME:   ididntcatchthat.{context}.{module}.{entity}.{past-verb}  ← module is optional
               ididntcatchthat.content.flashcard.created
-              ididntcatchthat.gaming.game.completed
-              ididntcatchthat.gaming.attempt.recorded
+              ididntcatchthat.gaming.games.game.completed
+              ididntcatchthat.gaming.attempts.attempt.recorded
 
 File:         {entity}-{past-verb}.event.ts
               flashcard-created.event.ts
@@ -88,5 +88,5 @@ File:         {entity}-{past-verb}.event.ts
 - [ ] Constructor acepta `eventId?` y `occurredOn?` opcionales (para replay)
 - [ ] `fromPrimitives()` estático — necesario para el consumer AMQP
 - [ ] Atributos son **solo primitivos** — sin Value Objects ni clases de dominio
-- [ ] Namespace correcto: `ididntcatchthat.{context}.{entity}.{past-verb}`
+- [ ] Namespace correcto: `ididntcatchthat.{context}.{module?}.{entity}.{past-verb}`
 - [ ] El evento se registra en el aggregate con `this.record()` — nunca fuera

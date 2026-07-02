@@ -40,8 +40,10 @@ export enum FilterOperator {
   LIKE = 'LIKE', IN = 'IN',
 }
 
+export enum OrderDirection { ASC = 'ASC', DESC = 'DESC' }
+
 export type Filter = { field: string; operator: FilterOperator; value: unknown; };
-export type Order = { field: string; direction: 'ASC' | 'DESC'; };
+export type Order  = { field: string; direction: OrderDirection; };
 ```
 
 ---
@@ -69,12 +71,49 @@ const criteria = new Criteria([
 
 ---
 
+## Filtros opcionales — construcción condicional
+
+Cuando no todos los filtros son obligatorios, construir el array dinámicamente:
+
+```typescript
+const filters: Filter[] = [];
+
+if (request.category)
+  filters.push({ field: 'category', operator: FilterOperator.EQ, value: request.category });
+if (request.subcategory)
+  filters.push({ field: 'subcategory', operator: FilterOperator.EQ, value: request.subcategory });
+
+const criteria = new Criteria(filters, null, pageSize, (page - 1) * pageSize);
+```
+
+## Paginación con `page`/`pageSize` y `count()`
+
+El cliente envía `page` + `pageSize` (más natural que `offset`). El use case convierte y ejecuta `match` y `count` en paralelo:
+
+```typescript
+// request: { page?: number; pageSize?: number }
+const page     = request.page     ?? 1;
+const pageSize = request.pageSize ?? 20;
+
+const criteria = new Criteria(filters, null, pageSize, (page - 1) * pageSize);
+
+const [items, total] = await Promise.all([
+  this.repository.match(criteria),
+  this.repository.count(criteria),  // mismo Criteria — sin duplicar filtros
+]);
+
+return { data: items.map(i => i.toPrimitives()), total, page, pageSize };
+```
+
+El repositorio debe exponer `count(criteria: Criteria): Promise<number>` junto a `match()`.
+
 ## Reglas
 
-- `Criteria` lo construye el **use case** — nunca el controller ni el repositorio
-- El controller pasa primitivos como parte del `Request*` del use case
-- El repositorio solo consume `Criteria` — nunca recibe filtros sueltos por separado
+- `Criteria` lo construyen el **use case o domain services** — nunca el controller ni el repositorio
+- El controller pasa primitivos como parte del `Request*` — nunca pasa un objeto `Criteria`
+- El repositorio solo consume `Criteria` — nunca recibe filtros sueltos por parámetro
 - `value: null` con `EQ`/`NEQ` → `IS NULL` / `IS NOT NULL` (nunca `= null` en SQL)
+- Usar `OrderDirection` enum — no strings literales `'ASC'` / `'DESC'`
 - No existe `Criteria.fromPrimitives()` — usar el constructor directamente
 
 ---

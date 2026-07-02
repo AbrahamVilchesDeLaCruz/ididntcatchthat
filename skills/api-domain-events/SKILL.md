@@ -24,12 +24,18 @@ metadata:
 ```typescript
 // shared/domain/domain-event.ts
 export abstract class DomainEvent {
+  readonly eventId: string;
+  readonly occurredOn: Date;
+
   constructor(
-    public readonly aggregateId: string,
-    public readonly attributes: DomainEventAttributes,
-    public readonly eventId: string = crypto.randomUUID(),
-    public readonly occurredOn: Date = new Date(),
-  ) {}
+    readonly aggregateId: string,
+    readonly attributes: DomainEventAttributes,
+    eventId?: string,
+    occurredOn?: Date,
+  ) {
+    this.eventId = eventId ?? crypto.randomUUID();
+    this.occurredOn = occurredOn ?? new Date();
+  }
 
   abstract eventName(): string;
 }
@@ -91,7 +97,7 @@ Formato: `<project>.<bounded_context>.<module?>.<aggregate>.<action_past>`
 ```
 ididntcatchthat.content.flashcard.created
 ididntcatchthat.gaming.attempts.attempt.recorded
-ididntcatchthat.gaming.game.completed
+ididntcatchthat.gaming.games.game.completed
 ididntcatchthat.achievement.catalog.achievement.unlocked   ← con módulo intermedio
 ```
 
@@ -107,8 +113,14 @@ ididntcatchthat.achievement.catalog.achievement.unlocked   ← con módulo inter
 ```typescript
 // gaming/domain/game.ts
 recordAttempt(flashcardId: string, correct: boolean, flashcardModule: string | null): Attempt {
+  if (this.mode.isStudy()) {
+    throw new AttemptRequiresGameMode(this.id.value);
+  }
   if (!this._status.isInProgress()) {
     throw new GameNotInProgress(this.id.value);
+  }
+  if (!this.flashcardIds.includes(flashcardId)) {
+    throw new FlashcardNotInGame(flashcardId, this.id.value);
   }
 
   const attempt = Attempt.create(this.id.value, flashcardId, correct);

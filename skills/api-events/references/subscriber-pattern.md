@@ -46,9 +46,9 @@ El subscriber vive **junto al use case que dispara**, no en una carpeta `subscri
 ```
 progress/application/
   update/
-    update-flashcard-stats.ts                        ← use case
-    request-update-flashcard-stats.ts                ← type del request
-    update-flashcard-stats-on-attempt-recorded.ts    ← subscriber
+    flashcard-stats-updater.ts                        ← use case
+    random-module-progress-updater.ts                 ← use case
+    update-flashcard-stats-on-attempt-recorded.ts     ← subscriber
 ```
 
 ```typescript
@@ -64,18 +64,22 @@ import {
   AttemptRecordedEvent,
   type AttemptRecordedAttributes,
 } from '@/gaming/domain/events/attempt-recorded.event';
-import { UpdateFlashcardStats } from './update-flashcard-stats';
+import { FlashcardStatsUpdater } from './flashcard-stats-updater';
+import { RandomModuleProgressUpdater } from './random-module-progress-updater';
 
 @Injectable()
-export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
+export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
   readonly queueName = 'progress.update_flashcard_stats_on_attempt_recorded';
-  readonly eventName = AttemptRecordedEvent.EVENT_NAME;
-  readonly exchangeName = AttemptRecordedEvent.EVENT_NAME;
+  readonly eventName = 'ididntcatchthat.gaming.attempts.attempt.recorded';
+  readonly exchangeName = 'ididntcatchthat.gaming.attempts.attempt.recorded';
   readonly domainEvent = AttemptRecordedEvent;
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
-    private readonly useCase: UpdateFlashcardStats,
+    @Inject(FlashcardStatsUpdater)
+    private readonly flashcardStatsUpdater: FlashcardStatsUpdater,
+    @Inject(RandomModuleProgressUpdater)
+    private readonly randomModuleProgressUpdater: RandomModuleProgressUpdater,
   ) {
     super(consumer);
   }
@@ -83,12 +87,21 @@ export class UpdateFlashcardStatsOnAttemptRecorded extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as AttemptRecordedAttributes;
     if (attrs.userId === null) return;
-    await this.useCase.execute({
+
+    await this.flashcardStatsUpdater.execute({
       userId: attrs.userId,
       flashcardId: attrs.flashcardId,
       correct: attrs.correct,
       mode: attrs.mode,
     });
+
+    if (attrs.mode === 'game') {
+      await this.randomModuleProgressUpdater.executeForRandomAttempt({
+        userId: attrs.userId,
+        gameId: attrs.gameId,
+        flashcardId: attrs.flashcardId,
+      });
+    }
   }
 }
 ```
@@ -114,16 +127,21 @@ export class SubscribersBootstrapper implements OnModuleInit {
 ```typescript
 @Module({
   providers: [
-    UpdateFlashcardStatsOnAttemptRecorded,
+    // Use cases
+    FlashcardStatsUpdater,
+    RandomModuleProgressUpdater,
+
+    // Event subscribers
+    FlashcardStatsUpdaterOnAttemptRecorded,
     {
       provide: SUBSCRIBERS,
-      useExisting: UpdateFlashcardStatsOnAttemptRecorded,
-      multi: true,
+      useFactory: (s1: FlashcardStatsUpdaterOnAttemptRecorded): Subscriber[] => [s1],
+      inject: [FlashcardStatsUpdaterOnAttemptRecorded],
     },
     SubscribersBootstrapper,
-    { provide: DOMAIN_EVENT_CONSUMER, useClass: AmqpMessageBus },
-    { provide: EVENT_BUS, useClass: AmqpMessageBus },
   ],
 })
 export class ProgressModule {}
 ```
+
+> `DOMAIN_EVENT_CONSUMER` y `DOMAIN_EVENT_PUBLISHER` se proveen en `SharedModule` — no es necesario redeclararlos en cada módulo de BC.

@@ -72,6 +72,38 @@ export class PausedGamesLister {
 }
 ```
 
+## `count()` en repositorio — para paginación
+
+Si el endpoint devuelve paginación, el repositorio también implementa `count()` con el mismo `Criteria` (sin `limit`/`offset` para el total):
+
+```typescript
+async count(criteria: Criteria): Promise<number> {
+  const qb = this.flashcardRepo.createQueryBuilder('f');
+
+  for (const filter of criteria.filters) {
+    const param = `p_${filter.field}`;
+    if (filter.value === null) {
+      qb.andWhere(filter.operator === FilterOperator.EQ
+        ? `f.${filter.field} IS NULL`
+        : `f.${filter.field} IS NOT NULL`);
+    } else {
+      qb.andWhere(`f.${filter.field} ${filter.operator} :${param}`, { [param]: filter.value });
+    }
+  }
+
+  return qb.getCount();
+}
+```
+
+Llamar ambos en paralelo desde el use case — nunca secuencial:
+
+```typescript
+const [items, total] = await Promise.all([
+  this.repository.match(criteria),
+  this.repository.count(criteria),
+]);
+```
+
 ## Operadores disponibles
 
 | Operador | SQL generado | Caso de uso |
