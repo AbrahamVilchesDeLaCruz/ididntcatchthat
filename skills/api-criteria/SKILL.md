@@ -1,12 +1,10 @@
 ---
 name: api-criteria
-description: >
-  Convenciones del patrón Criteria en la API: construcción desde query params, uso en use cases y repositorios.
-  Trigger: Al construir queries con filtros, orden o paginación en apps/api/.
+description: "Convenciones del patrón Criteria en la API: construcción desde query params, uso en use cases y repositorios. Trigger: Al construir queries con filtros, orden o paginación en apps/api/."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## When to Use
@@ -15,132 +13,87 @@ metadata:
 - Al pasar criterios de búsqueda desde controller a use case a repositorio
 - Al implementar `match(criteria)` en un repositorio TypeORM
 
-## Critical Patterns
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
-### Estructura de Criteria
+> Lee `references/repository-criteria.md` para la implementación completa del `match()`, el flujo Controller → UseCase → Repository y la tabla de operadores.
 
-`Criteria` vive en `shared/domain/` — es un concepto transversal.
+---
 
-```
-shared/domain/criteria/
-├── criteria.ts
-├── filter.ts         ← FiltersPrimitives, Filter, Operator
-├── filters.ts        ← Filters (colección de Filter)
-├── order.ts          ← Order, OrderPrimitives
-├── order-type.ts     ← OrderTypes enum (ASC, DESC, NONE)
-└── pagination.ts     ← Pagination, PaginationPrimitives
-```
+## Estructura de `Criteria`
 
-### Lógica AND / OR
-
-Los filtros top-level se unen por AND. Un array anidado se une por OR internamente y se AND con el resto.
+`Criteria` vive en `shared/domain/` — es transversal a todos los bounded contexts:
 
 ```typescript
-// SQL: WHERE start_date >= X AND start_date <= Y AND (assigned_to = Z OR assigned_by = Z)
-Criteria.fromPrimitives(
-  [
-    { field: "startDate", operator: ">=", value: X }, // AND
-    { field: "startDate", operator: "<=", value: Y }, // AND
-    [
-      // AND (
-      { field: "assignedTo", operator: "=", value: Z }, //   OR
-      { field: "assignedBy", operator: "=", value: Z }, //
-    ], // )
-  ],
-  { orderBy: "startDate", orderType: "ASC" },
-  { limit: 10, offset: 0 },
-);
-```
-
-### Flujo: Controller → Use Case → Repository
-
-**Controller** — extrae query params y los pasa como primitivos al use case:
-
-```typescript
-@Get()
-async handler(@Query() query: FlashcardQueryDto): Promise<FlashcardPrimitives[]> {
-  return this.searcher.execute(
-    query.filters ?? [],
-    { orderBy: query.orderBy ?? 'createdAt', orderType: query.orderType ?? 'DESC' },
-    { limit: query.limit ?? 20, offset: query.offset ?? 0 },
-  );
-}
-```
-
-**Use Case** — construye `Criteria` y lo pasa al repositorio:
-
-```typescript
-// flashcards/application/search/flashcard-searcher.ts
-@Injectable()
-export class FlashcardSearcher {
+// shared/domain/criteria.ts
+export class Criteria {
   constructor(
-    @Inject(FLASHCARD_REPOSITORY)
-    private readonly repository: FlashcardRepository,
+    readonly filters: Filter[] = [],
+    readonly order: Order | null = null,
+    readonly limit: number | null = null,
+    readonly offset: number | null = null,
   ) {}
-
-  async execute(
-    filters: CriteriaFilterItem[],
-    order: OrderPrimitives,
-    pagination: PaginationPrimitives,
-  ): Promise<FlashcardPrimitives[]> {
-    const criteria = Criteria.fromPrimitives(filters, order, pagination);
-    const flashcards = await this.repository.match(criteria);
-    return flashcards.map((f) => f.toPrimitives());
-  }
 }
+
+export enum FilterOperator {
+  EQ = '=', NEQ = '!=',
+  GT = '>', LT = '<', GTE = '>=', LTE = '<=',
+  LIKE = 'LIKE', IN = 'IN',
+}
+
+export type Filter = { field: string; operator: FilterOperator; value: unknown; };
+export type Order = { field: string; direction: 'ASC' | 'DESC'; };
 ```
 
-**Repository** — aplica `Criteria` sobre el QueryBuilder de TypeORM:
+---
+
+## Construcción — siempre `new Criteria([...])`
 
 ```typescript
-async match(criteria: Criteria): Promise<Flashcard[]> {
-  const qb = this.repo.createQueryBuilder('flashcard');
+// Criteria con filtros, orden y paginación
+const criteria = new Criteria(
+  [
+    { field: 'userId', operator: FilterOperator.EQ, value: userId },
+    { field: 'status', operator: FilterOperator.EQ, value: 'active' },
+    { field: 'startedAt', operator: FilterOperator.GTE, value: today },
+  ],
+  { field: 'startedAt', direction: OrderDirection.DESC },
+  20,  // limit
+  0,   // offset
+);
 
-  if (criteria.hasFilters()) {
-    criteria.filters.value.forEach((filter) => {
-      qb.andWhere(`flashcard.${filter.field.value} ${filter.operator.value} :${filter.field.value}`, {
-        [filter.field.value]: filter.value.value,
-      });
-    });
-  }
-
-  if (criteria.hasOrGroups()) {
-    criteria.orGroups.forEach((group) => {
-      const orConditions = group.value.map((f) =>
-        `flashcard.${f.field.value} ${f.operator.value} :${f.field.value}`
-      );
-      qb.andWhere(`(${orConditions.join(' OR ')})`, /* params */);
-    });
-  }
-
-  if (criteria.hasOrder()) {
-    qb.orderBy(`flashcard.${criteria.order.orderBy.value}`, criteria.order.orderType.value as 'ASC' | 'DESC');
-  }
-
-  qb.skip(criteria.pagination.offset.value).take(criteria.pagination.limit.value);
-
-  const entities = await qb.getMany();
-  return entities.map(this.toDomain.bind(this));
-}
+// value: null → IS NULL / IS NOT NULL (el repositorio lo traduce)
+const criteria = new Criteria([
+  { field: 'finishedAt', operator: FilterOperator.EQ, value: null },  // IS NULL
+]);
 ```
+
+---
 
 ## Reglas
 
 - `Criteria` lo construye el **use case** — nunca el controller ni el repositorio
-- El controller pasa primitivos (`CriteriaFilterItem[]`, `OrderPrimitives`, `PaginationPrimitives`)
-- El repositorio solo consume `Criteria` — nunca construye queries con parámetros sueltos
-- `Criteria` vive en `shared/domain/` — es reutilizable por todos los features
+- El controller pasa primitivos como parte del `Request*` del use case
+- El repositorio solo consume `Criteria` — nunca recibe filtros sueltos por separado
+- `value: null` con `EQ`/`NEQ` → `IS NULL` / `IS NOT NULL` (nunca `= null` en SQL)
+- No existe `Criteria.fromPrimitives()` — usar el constructor directamente
+
+---
 
 ## Anti-patterns
 
 ```typescript
 // ❌ Criteria construido en el controller
-const criteria = Criteria.fromPrimitives(filters, order, pagination);
-await this.searcher.execute(criteria); // el use case recibe primitivos, no Criteria
+const criteria = new Criteria([...]);
+await this.searcher.execute(criteria); // el use case recibe Request*, no Criteria
 
 // ❌ Repositorio recibe filtros sueltos
-async findByFront(front: string): Promise<Flashcard[]> {} // usar match(criteria)
+async findByUserId(userId: string): Promise<Game[]> {}
 
-// ❌ QueryBuilder directo sin pasar por Criteria
-this.repo.find({ where: { front } }); // en un repositorio que implementa match()
+// ❌ QueryBuilder directo sin Criteria
+this.repo.find({ where: { userId } });
+
+// ❌ match() que ignora criteria
+async match(criteria: Criteria): Promise<Game[]> {
+  return this.repo.find(); // criteria ignorado
+}
 ```
