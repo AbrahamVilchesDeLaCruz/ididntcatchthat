@@ -24,10 +24,8 @@ app.useGlobalPipes(
   new ValidationPipe({
     whitelist: true,               // strip unknown properties
     forbidNonWhitelisted: true,    // throw on unknown properties
-    transform: true,               // auto-transform (needed for @Type())
-    transformOptions: {
-      enableImplicitConversion: false, // require explicit @Type() — safer
-    },
+    transform: true,               // auto-transform — needed for @Type() in query params
+    errorHttpStatusCode: 422,      // validation errors → 422 Unprocessable Entity
   }),
 );
 ```

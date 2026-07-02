@@ -23,150 +23,202 @@ metadata:
 
 ```typescript
 // src/main.ts
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from '@shared/infrastructure/http/filters/http-exception.filter';
-import { ExceptionStatusRegistry } from '@shared/infrastructure/http/filters/exception-status.registry';
-import { JwtAuthGuard } from '@shared/infrastructure/auth/guards/jwt-auth.guard';
-import { LOGGER_SERVICE } from '@shared/domain/logger';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,              // elimina propiedades no decoradas
-      transform: false,             // NO transformar tipos — los primitivos llegan como string y se convierten en domain
-      forbidNonWhitelisted: true,   // lanza error si llegan propiedades extra
+      whitelist: true,              // strip unknown properties
+      forbidNonWhitelisted: true,   // throw on unknown properties
+      transform: true,              // coerce query params / path params to declared types (needed for @Type())
+      errorHttpStatusCode: 422,     // validation errors → 422 Unprocessable Entity
     }),
   );
 
-  const reflector = app.get(Reflector);
-  const logger = app.get(LOGGER_SERVICE);
+  // ... CORS, cookieParser, Swagger setup, global prefix ...
 
-  app.useGlobalGuards(new JwtAuthGuard(reflector));
-  app.useGlobalFilters(
-    new HttpExceptionFilter(new ExceptionStatusRegistry(), logger),
-  );
-
-  const port = app.get(ConfigService).get<number>('PORT') ?? 3000;
+  const port = Number(process.env.PORT ?? 3000);
   await app.listen(port);
 }
 
-bootstrap();
+void bootstrap();
 ```
 
-**Por qué `transform: false`:**
-El payload llega como string desde HTTP. La conversión de tipos ocurre en el constructor del Value Object en domain — no en el transporte. Si NestJS transforma, el dominio pierde control sobre la validación.
+**Por qué `transform: true`:**
+Los query params de HTTP siempre llegan como strings. Con `transform: true`, `@Type(() => Number)` en los Query DTOs convierte automáticamente `"1"` → `1` para que `@IsInt()` y `@Min()` funcionen. Los body JSON ya vienen tipados desde el cliente.
+
+> **Guards y filtros globales no van en `main.ts`** — se registran mediante DI en los módulos de NestJS:
+> - `HttpExceptionFilter` → registrado como `APP_FILTER` en `SharedModule`
+> - `JwtAuthGuard`, `GuestAuthGuard`, etc. → provistos y exportados desde `AuthModule`
 
 ---
 
 ## Payload — Request Body
 
 ```typescript
-// src/flashcards/infrastructure/controllers/create-flashcard/create-flashcard-post.payload.ts
-import { ApiProperty } from '@nestjs/swagger';
-import { UuidValueObject } from '@shared/domain/value-objects/uuid.value-object';
+// src/content/flashcard/infrastructure/controllers/create-flashcard-post.payload.ts
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
+  IsInt,
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
   IsString,
-  IsUUID,
+  Max,
+  Min,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class ExampleItem {
+  @ApiProperty({ example: '660e8400-e29b-41d4-a716-446655440001' })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty({ example: 'I need to catch up on my emails.' })
+  @IsString()
+  @IsNotEmpty()
+  textEn: string;
+
+  @ApiProperty({ example: 'Necesito ponerme al día con mis correos.' })
+  @IsString()
+  @IsNotEmpty()
+  textEs: string;
+
+  @ApiProperty({ example: 1, minimum: 1, maximum: 3 })
+  @IsNumber()
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  position: number;
+}
 
 export class CreateFlashcardPostPayload {
-  @ApiProperty({
-    description: 'Optional client-provided UUID. If omitted, backend generates one.',
-    example: UuidValueObject.random().value,
-  })
-  @ValidateIf((o) => o.id !== undefined)  // solo valida si el campo viene
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   @IsString()
   @IsNotEmpty()
-  @IsUUID()
-  id?: string;
+  id: string;
 
-  @ApiProperty({
-    description: 'The English phrase to learn',
-    example: "I didn't catch that",
-  })
+  @ApiProperty({ example: 'catch up' })
   @IsString()
   @IsNotEmpty()
-  phrase: string;
+  expression: string;
 
-  @ApiProperty({
-    description: 'Spanish translation',
-    example: 'No entendí eso',
-  })
+  @ApiProperty({ example: 'ponerse al día' })
   @IsString()
   @IsNotEmpty()
-  translation: string;
+  meaning: string;
+
+  @ApiProperty({ example: 'phrasal_verbs' })
+  @IsString()
+  @IsNotEmpty()
+  category: string;
+
+  @ApiProperty({ example: 'daily_life' })
+  @IsString()
+  @IsNotEmpty()
+  subcategory: string;
+
+  @ApiPropertyOptional({ example: '/kætʃ ʌp/', nullable: true })
+  @IsOptional()
+  @ValidateIf((_, v) => v !== null)  // valida solo si el valor no es null (permite null explícito)
+  @IsString()
+  @IsNotEmpty()
+  ipaNotation: string | null = null;
+
+  @ApiProperty({ type: [ExampleItem] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ExampleItem)
+  examples: ExampleItem[];
 }
 ```
 
 ### Reglas de Payload
 
 - Nombre: `{Action}{Entity}{Method}Payload` → `CreateFlashcardPostPayload`
-- Todos los campos son **strings o números primitivos** — sin Value Objects
-- Para campos opcionales simples: `@IsOptional()` es suficiente cuando no hay validaciones adicionales complejas
-- Para campos opcionales con validaciones condicionales complejas: `@ValidateIf((o) => o.field !== undefined)`
-- `@ApiProperty` / `@ApiPropertyOptional` en todos los campos — documentación Swagger obligatoria con `example`
-- `example` usando el Value Object (`UuidValueObject.random().value`) — no strings hardcodeados
+- Todos los campos son **strings, números o arrays primitivos** — sin Value Objects
+- Para campos opcionales simples: `@IsOptional()` + `@ApiPropertyOptional`
+- Para campos que aceptan `null` explícito: `@IsOptional()` + `@ValidateIf((_, v) => v !== null)` para saltar validaciones cuando el valor es `null`
+- Para objetos anidados: `@ValidateNested({ each: true })` + `@Type(() => NestedClass)` + `@IsArray()`
+- `@ApiProperty` / `@ApiPropertyOptional` en todos los campos — Swagger obligatorio con `example`
+- Los `example` usan strings UUID hardcodeados — no se importan Value Objects en Payloads
 
 ---
 
 ## Query — Query Params
 
 ```typescript
-// src/flashcards/infrastructure/controllers/search-flashcards/search-flashcards-get.query.ts
+// src/content/flashcard/infrastructure/controllers/search-flashcards-get.query.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsInt, Min, Max, IsString } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchFlashcardsGetQuery {
-  @ApiPropertyOptional({ example: 'catch', description: 'Filter by phrase content' })
+  @ApiPropertyOptional({ example: 'native_sounds' })
   @IsOptional()
   @IsString()
-  phrase?: string;
+  category?: string;
 
-  @ApiPropertyOptional({ example: 1, default: 1 })
+  @ApiPropertyOptional({ example: 'vowel_sounds' })
   @IsOptional()
-  @Type(() => Number)   // EXCEPCIÓN: query params siempre llegan como string — transformar aquí
+  @IsString()
+  subcategory?: string;
+
+  @ApiPropertyOptional({
+    enum: ['pending', 'generating', 'ready', 'failed'],
+    example: 'ready',
+  })
+  @IsOptional()
+  @IsIn(['pending', 'generating', 'ready', 'failed'])
+  audioStatus?: string;
+
+  @ApiPropertyOptional({ example: 1, minimum: 1, default: 1 })
+  @IsOptional()
+  @Type(() => Number)   // query params siempre llegan como string — @Type() convierte antes de validar
   @IsInt()
   @Min(1)
-  page?: number = 1;
+  page?: number;
 
-  @ApiPropertyOptional({ example: 10, default: 10 })
+  @ApiPropertyOptional({ example: 20, minimum: 1, maximum: 100, default: 20 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit?: number = 10;
+  pageSize?: number;
 }
 ```
 
-**`@Type(() => Number)` en Query únicamente** — los query params de HTTP siempre son strings. Esta es la única excepción donde se transforma en el payload, porque no hay Value Object de por medio.
+**`@Type(() => Number)` en Query únicamente** — los query params de HTTP siempre son strings. Con `transform: true` en ValidationPipe, `@Type(() => Number)` convierte `"1"` → `1` para que `@IsInt()` y `@Min()` validen correctamente. No usar `@Type()` en Payloads: el body JSON ya viene tipado.
 
 ---
 
 ## Guard Global — JwtAuthGuard
 
-El guard JWT es global. Los endpoints públicos se marcan con el decorator `@Public()`:
+El guard JWT se registra via DI en `AuthModule` (no en `main.ts`). Los endpoints públicos se marcan con el decorator `@Public()`.
 
 ```typescript
-// src/shared/infrastructure/auth/decorators/public.decorator.ts
+// src/shared/infrastructure/auth/public.decorator.ts
 import { SetMetadata } from '@nestjs/common';
 export const IS_PUBLIC_KEY = 'isPublic';
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const Public = (): ReturnType<typeof SetMetadata> =>
+  SetMetadata(IS_PUBLIC_KEY, true);
 ```
 
 ```typescript
-// src/shared/infrastructure/auth/guards/jwt-auth.guard.ts
+// src/shared/infrastructure/auth/jwt.guard.ts  (no jwt-auth.guard.ts)
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -185,6 +237,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 }
 ```
 
+> El guard se provee y exporta desde `AuthModule`. Ver skill `api-auth` para el wiring completo.
+
 Uso en controller:
 
 ```typescript
@@ -198,7 +252,9 @@ async guestLogin(): Promise<void> { ... }
 ## Rules
 
 - `whitelist: true` + `forbidNonWhitelisted: true` — **siempre** — rechaza campos extra
-- `transform: false` — **siempre** — la transformación de tipos ocurre en domain
-- **Excepción:** `@Type(() => Number)` en Query params para `page`, `limit` y similares — son strings en HTTP inevitablemente
-- `@IsOptional()` para campos opcionales sin condiciones extra; `@ValidateIf` solo cuando la validación depende de otros campos
+- `transform: true` + `errorHttpStatusCode: 422` — **siempre** — habilita `@Type()` en queries y mapea errores de validación a 422
+- `@Type(() => Number)` **solo en Query** para `page`, `pageSize`, `limit` y similares — query params llegan como string desde HTTP
+- Nunca `@Type()` en Payloads — el body JSON ya viene tipado
+- `@IsOptional()` para campos opcionales simples; `@ValidateIf((_, v) => v !== null)` para campos que aceptan `null` explícito con validaciones adicionales
+- `@ValidateNested({ each: true })` + `@Type(() => NestedClass)` para arrays de objetos anidados
 - `@ApiProperty` / `@ApiPropertyOptional` en todos los campos de Payload y Query — Swagger es obligatorio

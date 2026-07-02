@@ -16,18 +16,23 @@
 ## Migration commands
 
 ```bash
-# Generate migration from entity changes
-pnpm typeorm migration:generate src/migrations/MigrationName
-
-# Run pending migrations
-pnpm typeorm migration:run
+# Run pending migrations (requires Doppler credentials)
+pnpm migration:run
 
 # Revert last migration
-pnpm typeorm migration:revert
+pnpm migration:revert
 
 # Show migration status
-pnpm typeorm migration:show
+pnpm migration:show
+
+# Run migrations locally (uses .env.local, no Doppler)
+pnpm migration:run:local
+
+# Run local demo seeds (runs migrations first, then seeds)
+pnpm seed:local
 ```
+
+> Las migraciones se crean a mano — no hay script `migration:generate`. Ver `assets/migration.template.md` para el template.
 
 ## Template disponible
 
