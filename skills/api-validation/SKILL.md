@@ -1,21 +1,21 @@
 ---
 name: api-validation
-description: >
-  ValidationPipe global, Payload/Query con class-validator en apps/api/.
-  Trigger: Al configurar ValidationPipe en main.ts, crear Payload o Query DTOs con class-validator, o guards globales.
+description: "ValidationPipe global, Payload/Query con class-validator en apps/api/. Trigger: Al configurar ValidationPipe en main.ts, crear Payload o Query DTOs con class-validator, o guards globales."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
   version: "1.0"
 ---
 
-# Skill: api-validation
 
 ## When to Use
 
 - Al configurar el `ValidationPipe` global en `main.ts`
 - Al crear un `Payload` (body) o `Query` (query params) con `class-validator`
 - Al definir guards globales y filtros globales en bootstrap
+
+> Usa el template de `assets/payload.template.md` al crear Payloads y Queries.
+> Lee `references/docs.md` para docs externos de class-validator y ValidationPipe config.
 
 ---
 
@@ -108,8 +108,9 @@ export class CreateFlashcardPostPayload {
 
 - Nombre: `{Action}{Entity}{Method}Payload` → `CreateFlashcardPostPayload`
 - Todos los campos son **strings o números primitivos** — sin Value Objects
-- `@ValidateIf((o) => o.field !== undefined)` para campos opcionales — nunca `@IsOptional()` solo
-- `@ApiProperty` en todos los campos — documentación Swagger obligatoria con `example`
+- Para campos opcionales simples: `@IsOptional()` es suficiente cuando no hay validaciones adicionales complejas
+- Para campos opcionales con validaciones condicionales complejas: `@ValidateIf((o) => o.field !== undefined)`
+- `@ApiProperty` / `@ApiPropertyOptional` en todos los campos — documentación Swagger obligatoria con `example`
 - `example` usando el Value Object (`UuidValueObject.random().value`) — no strings hardcodeados
 
 ---
@@ -199,5 +200,5 @@ async guestLogin(): Promise<void> { ... }
 - `whitelist: true` + `forbidNonWhitelisted: true` — **siempre** — rechaza campos extra
 - `transform: false` — **siempre** — la transformación de tipos ocurre en domain
 - **Excepción:** `@Type(() => Number)` en Query params para `page`, `limit` y similares — son strings en HTTP inevitablemente
-- `@ValidateIf` para campos opcionales con validaciones adicionales — nunca `@IsOptional()` sin condición
-- `@ApiProperty` en todos los campos de Payload y Query — Swagger es obligatorio
+- `@IsOptional()` para campos opcionales sin condiciones extra; `@ValidateIf` solo cuando la validación depende de otros campos
+- `@ApiProperty` / `@ApiPropertyOptional` en todos los campos de Payload y Query — Swagger es obligatorio

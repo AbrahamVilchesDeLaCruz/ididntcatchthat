@@ -1,8 +1,6 @@
 ---
 name: api-error-handler
-description: >
-  Convenciones de manejo de errores HTTP en la API: GlobalExceptionRegistry, filtros por módulo y HttpExceptionFilter.
-  Trigger: Al crear domain errors, al registrar excepciones en un módulo, o al configurar el filtro HTTP en apps/api/.
+description: "Convenciones de manejo de errores HTTP en la API: GlobalExceptionRegistry, filtros por módulo y HttpExceptionFilter. Trigger: Al crear domain errors, al registrar excepciones en un módulo, o al configurar el filtro HTTP en apps/api/."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -14,6 +12,9 @@ metadata:
 - Al crear un nuevo domain error que debe mapearse a un HTTP status
 - Al añadir un nuevo módulo con sus propias excepciones
 - Al configurar el filtro global de excepciones
+
+> Usa el template de `assets/exception-registry.template.md` al crear el registry de un nuevo BC.
+> Lee `references/docs.md` para el formato del error envelope y docs externos.
 
 ## Critical Patterns
 

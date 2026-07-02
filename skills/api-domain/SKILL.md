@@ -1,8 +1,6 @@
 ---
 name: api-domain
-description: >
-  Convenciones de la capa Domain en la API: AggregateRoot, Value Objects, Repository interface y Domain Errors.
-  Trigger: Al crear o modificar aggregates, value objects, interfaces de repositorio o errores de dominio en apps/api/.
+description: "Convenciones de la capa Domain en la API: AggregateRoot, Value Objects, Repository interface y Domain Errors. Trigger: Al crear o modificar aggregates, value objects, interfaces de repositorio o errores de dominio en apps/api/."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -15,6 +13,9 @@ metadata:
 - Al crear o modificar un value object
 - Al definir una interface de repositorio
 - Al crear un error de dominio
+
+> Usa los templates de `assets/aggregate-root.template.md` y `assets/value-object.template.md`.
+> Lee `references/docs.md` para invariants vs. domain errors y referencias DDD.
 
 ## Critical Patterns
 
