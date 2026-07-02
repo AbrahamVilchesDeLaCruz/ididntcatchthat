@@ -11,7 +11,7 @@
 
 ## Architectural Decision
 
-- ADR 020: [docs/adr/020-observability-strategy.md](../../docs/adr/020-observability-strategy.md)
+- ADR 020: [docs/adr/020-observability-strategy.md](../../../docs/adr/020-observability-strategy.md)
 
 ## External Documentation
 
@@ -34,3 +34,11 @@ Pino emite JSON en una línea por log. Ejemplo:
 {"level":"info","time":"2026-05-21T12:00:00.000Z","flashcardId":"abc123","phrase":"what is liaison","msg":"Flashcard created"}
 {"level":"error","time":"2026-05-21T12:00:01.000Z","flashcardId":"abc123","provider":"elevenlabs","err":{"type":"Error","message":"timeout","stack":"..."},"msg":"Audio generation failed"}
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [observability.md](../../../docs/observability.md) — también en `resources/setup.md` | Setup completo: Loki, Prometheus, Grafana, OTel — configuración real del stack |
+| [adr/020-observability-strategy.md](../../../docs/adr/020-observability-strategy.md) | Decisión: Pino + OTel + Prometheus como stack de observabilidad |
+| [adr/010-observability.md](../../../docs/adr/010-observability.md) | Decisión inicial de observabilidad |

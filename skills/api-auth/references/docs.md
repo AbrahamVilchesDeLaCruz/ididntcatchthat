@@ -11,7 +11,7 @@
 
 ## Architectural Decision
 
-- ADR 018: [docs/adr/018-auth-strategy.md](../../docs/adr/018-auth-strategy.md)
+- ADR 018: [docs/adr/018-auth-strategy.md](../../../docs/adr/018-auth-strategy.md)
 
 ## External Documentation
 
@@ -30,3 +30,12 @@
 | Guest token | In-memory (client) | 30 days | `Authorization: Bearer` header |
 
 Never store access tokens in `localStorage` — XSS vectors can read them.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/auth-guest.md](../../../docs/domain/auth-guest.md) | Diseño completo del flujo guest→registered: tokens, `deviceId`, trazabilidad |
+| [spec/auth.md](../../../docs/spec/auth.md) | Especificación funcional de autenticación — qué endpoints existen y qué hacen |
+| [adr/018-auth-strategy.md](../../../docs/adr/018-auth-strategy.md) | Decisión: JWT + httpOnly cookies + guest token |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Por qué el `deviceId` lo genera el backend (SRP, seguridad) |

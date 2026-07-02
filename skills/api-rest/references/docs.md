@@ -31,3 +31,11 @@ POST   /resources/:id/complete   → GameCompleter
 POST   /resources/:id/abandon    → GameAbandonner
 POST   /resources/:id/pause      → GamePauser
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Controllers en Infrastructure — sin lógica, solo orquestar request→use case→response |
+| [adr/022-swagger-openapi.md](../../../docs/adr/022-swagger-openapi.md) | Decisión: Swagger obligatorio en todos los endpoints del proyecto |
+| [domain/bounded-contexts.md](../../../docs/domain/bounded-contexts.md) | Qué endpoints expone cada BC — contexto de cada ruta |

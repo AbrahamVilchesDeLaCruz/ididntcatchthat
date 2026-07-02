@@ -38,3 +38,9 @@ metadata:
   version: "1.0"
 ---
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Los principios que las nuevas skills deben reflejar — SRP, consistencia, por qué importa |

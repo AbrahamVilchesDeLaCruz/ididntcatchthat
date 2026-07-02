@@ -25,3 +25,10 @@ Este patrón permite:
 1. Cambiar el backend sin tocar los tests de componente
 2. Testear el mapper en aislamiento (función pura)
 3. Razonar sobre el estado de la UI sin conocer los detalles de la API
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [frontend-architecture.md](../../../docs/frontend-architecture.md) | Cómo la capa api/ encaja en la arquitectura de pods |
+| [client-pods.md](../../../docs/client-pods.md) | Endpoints reales que cada pod consume — qué devuelve la API para cada pod |

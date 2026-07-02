@@ -37,3 +37,11 @@ perf     → mejora de rendimiento
 ci       → cambios en CI/CD
 revert   → reverter un commit anterior
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [git-workflow.md](../../../docs/git-workflow.md) | Guía completa de branching, merge strategy y protección de ramas del proyecto |
+| [adr/013-git-workflow.md](../../../docs/adr/013-git-workflow.md) | Decisión: GitHub Flow + Conventional Commits |
+| [adr/014-ci-path-filters.md](../../../docs/adr/014-ci-path-filters.md) | Decisión: path filters en CI para evitar builds innecesarios |

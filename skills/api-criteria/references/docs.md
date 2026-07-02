@@ -31,3 +31,10 @@ qb.andWhere(`g.${filter.field} = :p_status`, { p_status: filter.value });
 // ❌ Vulnerable — interpolación directa
 qb.andWhere(`g.status = '${filter.value}'`);
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Por qué `Criteria` vive en Domain (transversal, sin dependencias de infrastructure) |
+| [domain/db-schema.md](../../../docs/domain/db-schema.md) | Nombres reales de columnas en DB — los `field` de los filtros deben coincidir |

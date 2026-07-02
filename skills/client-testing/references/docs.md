@@ -34,3 +34,10 @@ afterAll(() => server.close());
 import { setupServer } from 'msw/node';
 export const server = setupServer();
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [testing.md](../../../docs/testing.md) | Pirámide de tests real del monorepo, comandos de ejecución |
+| [frontend-architecture.md](../../../docs/frontend-architecture.md) | Container-Presentational — qué testear con props (Component) y qué con MSW (Container) |

@@ -22,3 +22,10 @@ El patrón de respuesta sigue el principio CQRS (Command Query Responsibility Se
 - **Commands** (PATCH, DELETE, acciones POST) → retornan solo el resultado de la operación — `void` + status code
 
 Esto hace que el API sea predecible: si el endpoint es GET, siempre hay un `data` field.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Envelopes en Infrastructure — los use cases devuelven primitivos, los controllers envuelven |
+| [adr/022-swagger-openapi.md](../../../docs/adr/022-swagger-openapi.md) | Swagger — documentación de responses en todos los endpoints |

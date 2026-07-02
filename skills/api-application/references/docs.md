@@ -20,3 +20,11 @@
 - La capa application **nunca** importa de `@nestjs/common` (salvo `@Injectable` y `@Inject`)
 - Domain Services vs Use Cases: los Domain Services coordinan lógica de dominio **pura**; los Use Cases coordinan infraestructura (repositorios, eventBus, logger)
 - Un Use Case = una transacción de negocio. Si necesitas dos acciones atómicas, consideran un Use Case que las coordine o un Domain Service compartido.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [engineering-principles.md](../../../docs/engineering-principles.md) | SRP — un use case = una razón para cambiar; inversión de dependencias |
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Qué puede importar Application (Domain sí, Infrastructure no) |
+| [domain/bounded-contexts-detail.md](../../../docs/domain/bounded-contexts-detail.md) | Use cases existentes por BC — evita duplicar lógica ya implementada |

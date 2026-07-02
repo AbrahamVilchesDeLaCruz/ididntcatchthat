@@ -11,7 +11,7 @@
 
 ## Architectural Decision
 
-- ADR 019: [docs/adr/019-event-bus-strategy.md](../../docs/adr/019-event-bus-strategy.md)
+- ADR 019: [docs/adr/019-event-bus-strategy.md](../../../docs/adr/019-event-bus-strategy.md)
 
 ## External Documentation
 
@@ -37,3 +37,10 @@ retryCount < 3 ?
          ↓
          Manual intervention required
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/rabbitmq-design.md](../../../docs/domain/rabbitmq-design.md) | Diseño completo: exchanges, naming de colas, flujo retry, DLQ — fuente de verdad de AMQP |
+| [adr/019-event-bus-strategy.md](../../../docs/adr/019-event-bus-strategy.md) | Decisión: AMQP async con retry exponencial y DLQ |

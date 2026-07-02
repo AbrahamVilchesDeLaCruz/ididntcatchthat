@@ -32,3 +32,10 @@
 ```
 
 Este formato lo genera `HttpExceptionFilter` automáticamente — no construirlo manualmente en controllers.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Los errores de dominio se lanzan en Domain, se mapean a HTTP en Infrastructure |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | SRP — el mapping DomainError→HTTP es una responsabilidad exclusiva del filter |

@@ -22,3 +22,10 @@ Este proyecto usa el patrón tupla `[state, handlers]` (inspirado en `useState`)
 
 1. **Destructuring con rename**: `const [flashcardState, flashcardHandlers] = useFlashcardState()` — sin conflictos de nombres cuando el Container usa varios state hooks
 2. **Convención clara**: `state` = solo lectura, `handlers` = solo escritura — la tupla enforce el contrato visualmente
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [frontend-architecture.md](../../../docs/frontend-architecture.md) | Cuándo extraer hooks en el contexto de la arquitectura del proyecto |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | SRP en el frontend — un hook = una responsabilidad |

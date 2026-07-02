@@ -29,3 +29,9 @@ After creating or modifying any skill, update these two tables in `AGENTS.md`:
 | `global` | Skill applies to the whole monorepo (git-workflow, tdd-workflow) |
 | `api` | Skill applies only to `apps/api/` |
 | `client` | Skill applies only to `apps/client/` |
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [AGENTS.md](../../../AGENTS.md) | Las tablas que hay que sincronizar: Auto-invoke Skills y Available Skills |

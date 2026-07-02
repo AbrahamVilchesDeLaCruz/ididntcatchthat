@@ -35,3 +35,10 @@ REFACTOR: Clean up without breaking tests
 
 - **api (Jest)**: `pnpm --filter @ididntcatchthat/api test --watch`
 - **client (Vitest)**: `pnpm --filter @ididntcatchthat/client test --watch`
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [testing.md](../../../docs/testing.md) | Cómo se ejecutan los tests en el monorepo — comandos reales para el ciclo Red→Green→Refactor |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Por qué TDD: feedback rápido, diseño guiado por tests, inversión de dependencias |

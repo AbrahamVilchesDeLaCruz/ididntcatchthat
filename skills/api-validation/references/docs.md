@@ -31,3 +31,10 @@ app.useGlobalPipes(
   }),
 );
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [adr/022-swagger-openapi.md](../../../docs/adr/022-swagger-openapi.md) | Decisión: Swagger obligatorio — por eso `@ApiProperty` va en todos los Payloads |
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Los Payloads viven en Infrastructure — nunca pasan a Application |

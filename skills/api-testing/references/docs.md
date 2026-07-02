@@ -27,3 +27,10 @@
 | Unit (domain) | Many — 1 per invariant | < 1ms each |
 | Integration (use case) | 2–5 per use case | < 50ms each |
 | E2E (HTTP) | 1–2 per endpoint | < 2s each |
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [testing.md](../../../docs/testing.md) | Cómo ejecutar tests en el monorepo, pirámide real del proyecto, comandos |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Por qué testear el comportamiento, no la implementación (TDD, inversión de dependencias) |

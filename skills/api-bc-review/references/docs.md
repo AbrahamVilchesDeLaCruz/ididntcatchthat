@@ -22,3 +22,12 @@
 - BCs comunican solo via domain events (AMQP) o API calls — nunca shared repositories
 - Un BC puede tener múltiples módulos NestJS internos si tiene mucha carga
 - El `shared/` dentro de un BC exporta interfaces, no implementaciones
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/bounded-contexts.md](../../../docs/domain/bounded-contexts.md) | Mapa de BCs y eventos — qué BCs existen y cómo se comunican |
+| [domain/bounded-contexts-detail.md](../../../docs/domain/bounded-contexts-detail.md) | Detalle de cada BC: aggregates, VOs, repositorios — punto de partida de la auditoría |
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Reglas de la arquitectura que se auditan (capas, dependencias, módulos) |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Principios que cada BC debe respetar (SRP, DIP, OCP) |

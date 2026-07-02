@@ -27,3 +27,10 @@
 export const GAME_REPOSITORY = Symbol('GameRepository');
 { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository }
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Inversión de dependencias — por qué el use case depende de interfaces, no de clases concretas |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | DIP (Dependency Inversion Principle) — el fundamento de los tokens Symbol |

@@ -21,3 +21,10 @@
 `@nestjs/config` integra nativamente con Joi via `validationSchema` en `ConfigModule.forRoot()`. Usar Zod requeriría un wrapper adicional. Para este caso específico (validación en bootstrap, no en runtime), Joi es la opción con menos fricción.
 
 Para validación de DTOs en controllers, se usa `class-validator` (ver `api-validation`).
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Qué pone en SharedModule vs. qué pone en cada BC module |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | DRY vs. acoplamiento — cuándo algo merece ser shared y cuándo no |

@@ -32,3 +32,10 @@ Esto permite invalidar con distintos niveles de granularidad:
 - `invalidateQueries({ queryKey: flashcardKeys.all })` → invalida todo
 - `invalidateQueries({ queryKey: flashcardKeys.lists() })` → solo listas
 - `invalidateQueries({ queryKey: flashcardKeys.detail(id) })` → solo ese id
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [frontend-architecture.md](../../../docs/frontend-architecture.md) | Cómo TanStack Query encaja en la arquitectura de pods del proyecto |
+| [client-pods.md](../../../docs/client-pods.md) | Qué queries/mutations usa cada pod existente — referencias concretas |

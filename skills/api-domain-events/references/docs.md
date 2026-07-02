@@ -29,3 +29,12 @@ Ejemplos canónicos del proyecto:
 - `ididntcatchthat.gaming.game.completed`
 - `ididntcatchthat.gaming.attempt.recorded`
 - `ididntcatchthat.identity.guest-progress.migrated`
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/rabbitmq-design.md](../../../docs/domain/rabbitmq-design.md) | Naming canónico de exchanges, colas, retry y DLQ — la fuente de verdad para `EVENT_NAME` |
+| [domain/bounded-contexts.md](../../../docs/domain/bounded-contexts.md) | Qué eventos fluyen entre qué BCs — contexto de cada evento |
+| [adr/019-event-bus-strategy.md](../../../docs/adr/019-event-bus-strategy.md) | Decisión: por qué AMQP async en lugar de EventEmitter in-process |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | Por qué los eventos tienen atributos primitivos (inmutabilidad, serialización) |

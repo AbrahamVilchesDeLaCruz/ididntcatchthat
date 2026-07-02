@@ -34,3 +34,13 @@ export class FlashcardFront extends StringValueObject {
   }
 }
 ```
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [engineering-principles.md](../../../docs/engineering-principles.md) | SOLID, SRP, inversión de dependencias — el **por qué** de cada regla de domain |
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Capas (Domain→Application→Infrastructure), regla de dependencia, qué puede importar cada capa |
+| [domain/domain-model.md](../../../docs/domain/domain-model.md) | Modelo de dominio completo — aggregates, VOs y relaciones del proyecto |
+| [domain/bounded-contexts.md](../../../docs/domain/bounded-contexts.md) | Mapa de BCs y eventos de dominio entre ellos |
+| [domain/bounded-contexts-detail.md](../../../docs/domain/bounded-contexts-detail.md) | Detalle de cada BC: aggregates, VOs, repositorios y responsabilidades |

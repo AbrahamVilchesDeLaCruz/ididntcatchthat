@@ -21,3 +21,10 @@ Con TanStack Query es tentador poner `useQuery` directamente en cualquier compon
 1. Hace el Component testeale con props mockeadas (sin necesidad de MSW)
 2. Aísla la responsabilidad de fetching — más fácil de razonar
 3. Permite cambiar la estrategia de fetching sin tocar la UI
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [frontend-architecture.md](../../../docs/frontend-architecture.md) | Container-Presentational pattern: contratos, ejemplos, estructura — fuente de verdad |
+| [engineering-principles.md](../../../docs/engineering-principles.md) | SRP en el frontend — un Container = una fuente de datos, un Component = UI |

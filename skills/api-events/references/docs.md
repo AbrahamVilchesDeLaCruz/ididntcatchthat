@@ -11,7 +11,7 @@
 
 ## Architectural Decision
 
-- ADR 019: [docs/adr/019-event-bus-strategy.md](../../docs/adr/019-event-bus-strategy.md)
+- ADR 019: [docs/adr/019-event-bus-strategy.md](../../../docs/adr/019-event-bus-strategy.md)
 
 ## External Documentation
 
@@ -24,3 +24,12 @@
 NestJS EventEmitter es in-process — si el proceso muere, los eventos se pierden. RabbitMQ es durable y permite retry, DLQ y distribución entre múltiples instancias. Para un sistema de producción, el bus async es la elección correcta.
 
 Ver ADR 019 para la decisión completa.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/rabbitmq-design.md](../../../docs/domain/rabbitmq-design.md) | Naming canónico de queues y exchanges, flujo retry→DLQ del proyecto |
+| [domain/bounded-contexts.md](../../../docs/domain/bounded-contexts.md) | Qué eventos publica cada BC y cuáles consumen otros — el mapa completo |
+| [adr/019-event-bus-strategy.md](../../../docs/adr/019-event-bus-strategy.md) | Decisión: AmqpMessageBus como implementación del EventBus |
+| [backend-architecture.md](../../../docs/backend-architecture.md) | Por qué `Subscriber` no importa NestJS (regla de dependencia) |

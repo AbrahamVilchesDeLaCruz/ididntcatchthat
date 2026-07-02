@@ -36,3 +36,9 @@ pnpm typeorm migration:show
 ## Never use `synchronize: true` in production
 
 `synchronize: true` aplica cambios de schema automáticamente al arrancar — puede borrar columnas o datos en producción. Siempre usar migrations explícitas.
+
+## Internal Docs
+
+| Doc | Contenido relevante |
+|---|---|
+| [domain/db-schema.md](../../../docs/domain/db-schema.md) | Esquema real de la DB — las migrations deben coincidir con este diagrama ER |
