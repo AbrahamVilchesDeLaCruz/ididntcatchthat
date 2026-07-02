@@ -183,6 +183,9 @@ Trazabilidad completa de cada bounded context: secuencia, clases y casos de uso 
 |---|---|
 | [conventions/eslint-prettier.md](./conventions/eslint-prettier.md) | ESLint + Prettier: configuración y reglas |
 | [conventions/jest-esm.md](./conventions/jest-esm.md) | Setup de Jest con ESM: problemas conocidos y soluciones |
+| [conventions/scaffold-nestjs.md](./conventions/scaffold-nestjs.md) | Scaffold inicial de la API NestJS |
+| [conventions/scaffold-vite-react.md](./conventions/scaffold-vite-react.md) | Scaffold inicial del cliente React + Vite |
+| [conventions/validate-docker-setup.md](./conventions/validate-docker-setup.md) | Validación del setup de Docker Compose |
 
 ---
 
