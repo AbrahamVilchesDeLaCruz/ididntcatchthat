@@ -57,6 +57,53 @@ export const LOGGER_SERVICE = Symbol('Logger');
 
 ---
 
+## `AppMetrics` Interface (domain)
+
+```typescript
+// src/shared/domain/app-metrics.ts
+export interface AppMetrics {
+  increment(metric: string, labels?: Record<string, string>): void;
+}
+
+export const APP_METRICS = Symbol('AppMetrics');
+```
+
+Solo tiene `increment` — todos los contadores de negocio son `Counter` de Prometheus.
+No hay `gauge` ni `histogram` en la interfaz de dominio: el `MetricsInterceptor` gestiona los histogramas HTTP directamente.
+
+| Métrica | Labels | Dónde se incrementa |
+|---|---|---|
+| `app_flashcards_created_total` | — | `FlashcardCreator` |
+| `app_games_started_total` | — | `GameStarter` |
+| `app_games_completed_total` | — | `GameCompleter` |
+| `app_audio_generated_total` | `provider` | `FlashcardAudioGenerator` |
+| `app_auth_logins_total` | `provider` | `UserAuthenticator` |
+| `app_auth_registrations_total` | `provider` | `UserRegistrar` |
+
+### Inyección en use case
+
+```typescript
+constructor(
+  @Inject(LOGGER_SERVICE)
+  private readonly logger: Logger,
+  @Inject(APP_METRICS)
+  private readonly metrics: AppMetrics,
+) {}
+
+async execute(request: ...): Promise<...> {
+  // ... lógica ...
+  this.logger.info('Flashcard created', { flashcardId: id, expression, createdBy });
+  this.metrics.increment('app_flashcards_created_total');
+}
+
+// Con labels:
+this.metrics.increment('app_audio_generated_total', { provider: 'elevenlabs' });
+```
+
+> `APP_METRICS` se inyecta igual que `LOGGER_SERVICE` — el módulo `ObservabilityModule` lo exporta como global.
+
+---
+
 ## Dónde loguear
 
 ### Use Case — eventos de negocio
@@ -90,10 +137,12 @@ this.logger.error(error.message);
 
 ## Reglas
 
-- `Logger` interface vive en `shared/domain/` — nunca importar pino u OTel en domain/application
+- `Logger` y `AppMetrics` interfaces viven en `shared/domain/` — nunca importar pino, prom-client u OTel en domain/application
 - Loguear **eventos de negocio** en use cases (`info`)
+- Incrementar métricas de negocio en use cases con `this.metrics.increment('app_<metric>_total')`
 - Loguear **errores con el objeto `Error`** completo — preserva stack trace
 - **No loguear en controllers** — el filter e interceptor lo hacen automáticamente
 - Re-throw en subscribers después de loguear — para retry y DLQ
+- `APP_METRICS` se registra en `ObservabilityModule`, no en `SharedModule`
 
 > ADR: [docs/adr/020-observability-strategy.md](../../docs/adr/020-observability-strategy.md)

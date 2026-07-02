@@ -21,11 +21,12 @@ metadata:
 
 ## Concepto
 
-`AmqpMessageBus` implementa **dos interfaces** a la vez:
+`AmqpMessageBus` implementa **tres interfaces** a la vez:
 
 ```
-EventBus (domain)              → publish(events)
+DomainEventPublisher (domain)  → publish(events)
 DomainEventConsumer (app)      → consume(queue, eventName, exchange, DomainEventClass, handler)
+OnModuleDestroy (NestJS)       → onModuleDestroy() — cierra channel + connection al apagar
 ```
 
 `SubscribersBootstrapper` llama a `subscriber.init()` en `onModuleInit()` — registra todos los consumers al arrancar.
@@ -79,10 +80,14 @@ Tabla: `processed_events(event_id UUID PK, event_name, processed_at)` — purgar
 ## Reglas
 
 - `AmqpMessageBus` vive en `shared/infrastructure/` — es transversal a todos los BC
+- `AmqpMessageBus` se registra **una sola vez** en `SharedModule` como singleton vía `useExisting`; los módulos BC no lo re-registran
 - `SubscribersBootstrapper` y el token `SUBSCRIBERS` se importan desde shared
 - `OnModuleInit` solo en `SubscribersBootstrapper` — nunca en subscribers ni use cases
+- `SUBSCRIBERS` se registra con `useFactory` que devuelve un array de subscribers — nunca `useExisting + multi: true`
 - El DLQ no se re-encola automáticamente — requiere fix manual + re-encolado explícito
 - `prefetch(1)` siempre — procesamiento secuencial por consumer
-- Usar `never` en `DomainEventClass: new (...args: never) => DomainEvent` — no `any`
+- `DomainEventClass` es `new (...args: unknown[]) => DomainEvent` — no `never`, no `any`
+- El payload publicado usa el campo `data` para los atributos del evento, no `attributes` ni `toPrimitives()`
+- `AmqpMessageBus` tiene reconexión automática: al cerrar la conexión, espera `RECONNECT_DELAY_MS` y re-registra todos los consumers
 
 > ADR de decisión: [docs/adr/019-event-bus-strategy.md](../../docs/adr/019-event-bus-strategy.md)

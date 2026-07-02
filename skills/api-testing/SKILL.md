@@ -44,11 +44,11 @@ metadata:
 Replica exactamente la estructura de `/src`:
 
 ```
-api/src/contexts/flashcards/
+apps/api/src/flashcards/
 ├── application/create/flashcard-creator.ts
 └── domain/flashcard.ts
 
-api/test/contexts/flashcards/
+apps/api/test/flashcards/
 ├── application/create/
 │   ├── flashcard-creator.spec.ts
 │   └── request-flashcard-creator-mother.ts
@@ -61,12 +61,18 @@ api/test/contexts/flashcards/
 Mothers de primitivos compartidos:
 
 ```
-api/test/contexts/shared/domain/
+apps/api/test/shared/domain/
 ├── mother-creator.ts    ← faker vive aquí — único punto de cambio
 ├── string-mother.ts
 ├── uuid-mother.ts
 ├── date-mother.ts
 └── boolean-mother.ts
+```
+
+Helper de timers compartido:
+
+```
+apps/api/test/shared/jest-timers.ts   ← JestTimers.setup() / teardown()
 ```
 
 ---
@@ -101,14 +107,15 @@ RequestFlashcardCreatorMother  ← Mother del Request* del use case
 
 ## Reglas
 
-- `container.reset()` siempre primero en `beforeEach`
+- Los use cases se instancian directamente con `new UseCase(dep1, dep2, ...)` en `beforeEach` — no se usa DI container
 - Resetear solo los métodos que el test usa (`.mockReset()`)
-- `jest.useFakeTimers()` cuando el aggregate o evento dependen de `new Date()`
+- Usar `JestTimers.setup()` / `JestTimers.teardown()` (de `@test/shared/jest-timers`) cuando el aggregate o evento dependen de `new Date()`
 - Cada Mother en su propio archivo — nunca inline en el spec
 - `random(overrides?)` siempre acepta overrides parciales
 - `from(request)` cuando el use case recibe un objeto de request
 - Value Object Mothers exponen `invalid()` cuando el test lo necesita
 - Un comportamiento por test
+- Imports de src usan el alias `@/`; imports de test usan `@test/`
 
 ---
 

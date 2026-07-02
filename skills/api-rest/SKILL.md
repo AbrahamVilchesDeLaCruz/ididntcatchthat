@@ -37,18 +37,20 @@ DELETE /flashcards/:id          ← eliminar
 
 ### Status codes
 
-| Situación                                     | Status                     |
-| --------------------------------------------- | -------------------------- |
-| GET exitoso con resultado                     | `200 OK`                   |
-| GET exitoso sin resultado (lista vacía)       | `200 OK` con `[]`          |
-| POST creación exitosa                         | `201 CREATED`              |
-| PATCH / acción exitosa sin body               | `204 NO CONTENT`           |
-| PATCH / acción exitosa con body               | `200 OK`                   |
-| Recurso no encontrado                         | `404 NOT FOUND`            |
-| Validación fallida (campo inválido)           | `422 UNPROCESSABLE ENTITY` |
-| Conflicto de estado                           | `409 CONFLICT`             |
-| No autorizado (sin token)                     | `401 UNAUTHORIZED`         |
-| Sin permisos (token válido, acción prohibida) | `403 FORBIDDEN`            |
+| Situación                                            | Status                     |
+| ---------------------------------------------------- | -------------------------- |
+| GET exitoso con resultado                            | `200 OK`                   |
+| GET exitoso sin resultado (lista vacía)              | `200 OK` con `[]`          |
+| POST creación de recurso exitosa                     | `201 CREATED`              |
+| PATCH / POST acción DDD exitosa sin body             | `204 NO CONTENT`           |
+| PATCH / POST acción DDD exitosa con body             | `200 OK`                   |
+| Recurso no encontrado                                | `404 NOT FOUND`            |
+| Validación fallida (campo inválido)                  | `422 UNPROCESSABLE ENTITY` |
+| Conflicto de estado                                  | `409 CONFLICT`             |
+| No autorizado (sin token)                            | `401 UNAUTHORIZED`         |
+| Sin permisos (token válido, acción prohibida)        | `403 FORBIDDEN`            |
+
+> Las acciones DDD con POST (`/games/:id/complete`, `/games/:id/resume`) usan `200 OK` si devuelven body o `204 NO CONTENT` si no. Nunca `201` — ese código es exclusivo de creaciones de recurso.
 
 ### Acciones DDD con POST
 
@@ -57,10 +59,13 @@ Cuando una acción de dominio no es CRUD puro — tiene semántica propia — se
 ```
 POST /flashcards/:id/review          ← revisar una flashcard (spaced repetition)
 POST /flashcards/:id/archive         ← archivar
-POST /games/:id/start                ← iniciar partida
-POST /games/:id/answer               ← registrar respuesta
+POST /games/:id/complete             ← completar partida (devuelve stats)
+POST /games/:id/resume               ← reanudar partida pausada (devuelve estado)
+POST /games/:id/attempts             ← registrar intento (sin body de respuesta)
 POST /pronunciation-sessions/:id/end ← finalizar sesión
 ```
+
+> `POST /games` (sin `:id`) es creación de recurso → devuelve `201 CREATED`. Las acciones DDD van siempre sobre un recurso existente: `/games/:id/{acción}`.
 
 **Cuándo usar acción DDD vs PATCH:**
 
@@ -72,19 +77,95 @@ POST /pronunciation-sessions/:id/end ← finalizar sesión
 | Idempotente                                                         | ✅         | depende             |
 
 ```typescript
-// ✅ Acción DDD — tiene semántica propia en el dominio
-@Post(':id/review')
+// ✅ Acción DDD sin body de respuesta → 204
+@Post(':id/attempts')
 @HttpCode(HttpStatus.NO_CONTENT)
 async handler(
   @Param('id') id: string,
-  @Body() body: ReviewFlashcardDto,
+  @Body() body: RecordAttemptPostPayload,
+  @CurrentUser() user: UserContext,
 ): Promise<void> {
-  await this.reviewer.execute(id, body.quality);
+  await this.recorder.execute({
+    gameId: id,
+    flashcardId: body.flashcardId,
+    correct: body.correct,
+    userId: user.userId ?? null,
+  });
+}
+
+// ✅ Acción DDD con body de respuesta → 200
+@Post(':id/complete')
+@HttpCode(HttpStatus.OK)
+async handler(
+  @Param('id') id: string,
+  @CurrentUser() user: UserContext,
+): Promise<ApiResponse<ResponseGameCompleter>> {
+  const data = await this.completer.execute({ gameId: id, userId: user.userId ?? null });
+  return ApiResponse.of(data, resolveRequestId(req));
 }
 
 // ❌ Verbo en la ruta
 @Post(':id/doReview')
 @Post('review/:id')
+```
+
+### Swagger — decoradores obligatorios
+
+Todo endpoint debe estar documentado con Swagger (ADR 022). Los decoradores se aplican en dos niveles:
+
+**A nivel de clase:**
+
+```typescript
+@ApiTags('gaming')               // ← nombre del bounded context / recurso
+@ApiBearerAuth('access-token')   // ← si el endpoint requiere JWT (omitir en endpoints públicos)
+@Controller('games')
+@UseGuards(JwtAuthGuard)
+export class CompleteGamePostController { ... }
+```
+
+**A nivel de método:**
+
+```typescript
+@Post(':id/complete')
+@HttpCode(HttpStatus.OK)
+@ApiOperation({
+  summary: 'Complete a game session',
+  description: 'Marks the game as completed and returns summary stats.',
+})
+@ApiOkResponse({ description: 'Game completed with summary stats' })
+@ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+@ApiUnprocessableEntityResponse({
+  description: 'Validation error',
+  type: ValidationErrorResponse,
+})
+async handler(...) { ... }
+```
+
+**Decoradores de respuesta por status code:**
+
+| Status | Decorador Swagger |
+| ------ | ----------------- |
+| `200`  | `@ApiOkResponse({ description: '...' })` |
+| `201`  | `@ApiCreatedResponse({ description: '...' })` |
+| `204`  | (ninguno — 204 no lleva body ni decorador de respuesta exitosa) |
+| `401`  | `@ApiUnauthorizedResponse({ description: '...' })` |
+| `403`  | `@ApiForbiddenResponse({ description: '...' })` |
+| `404`  | `@ApiNotFoundResponse({ description: '...' })` |
+| `409`  | `@ApiConflictResponse({ description: '...' })` |
+| `422`  | `@ApiUnprocessableEntityResponse({ description: '...', type: ValidationErrorResponse })` |
+
+> Incluir solo los status codes que el endpoint puede devolver realmente — no añadir decoradores genéricos que no apliquen.
+
+### Naming del método de acción
+
+El método de acción siempre se llama `handler`:
+
+```typescript
+async handler(
+  @Param('id') id: string,
+  @Body() body: RecordAttemptPostPayload,
+  @CurrentUser() user: UserContext,
+): Promise<void> { ... }
 ```
 
 ### Un controller por acción
