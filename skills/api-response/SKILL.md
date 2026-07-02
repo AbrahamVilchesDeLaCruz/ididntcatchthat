@@ -26,6 +26,9 @@ metadata:
 | **Query** (GET) | `ApiResponse<T>` o `PaginatedApiResponse<T>` | `200` |
 | **Command con datos** (POST que devuelve ID/datos) | `ApiResponse<T>` | `201` |
 | **Command puro** (PATCH/DELETE/acciones) | `void` — solo status code | `204` |
+| **Auth** (login/register/guest/refresh) | Raw `{ accessToken: string }` — excepción válida | `200` / `201` |
+
+> Auth endpoints usan `@Res({ passthrough: true })` para manejar cookies y devuelven el token directamente sin envelope. Es la única excepción al patrón `ApiResponse<T>`.
 
 ---
 
@@ -84,7 +87,7 @@ Con paginación:
 // ❌ Archivos .response.ts por controller — PROHIBIDO
 // search-games-get.response.ts
 
-// ❌ resolveRequestId inline en el controller
+// ❌ resolveRequestId inline en el controller (unsafe: no valida array ni empty string)
 return ApiResponse.of(data, req.headers['x-request-id'] as string ?? crypto.randomUUID());
 
 // ❌ Envelope en commands puros
@@ -93,4 +96,8 @@ async handler(): Promise<{ success: true }> { ... }
 
 // ❌ Sin resolveRequestId
 return ApiResponse.of(data, 'hardcoded-id');
+
+// ❌ Omitir ApiResponse en endpoints que no son auth
+@Get('flashcards')
+async handler(): Promise<FlashcardPrimitives[]> { ... } // debe ser ApiResponse<FlashcardPrimitives[]>
 ```

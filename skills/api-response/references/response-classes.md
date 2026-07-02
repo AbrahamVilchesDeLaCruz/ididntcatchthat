@@ -59,15 +59,42 @@ export interface PaginationMeta {
 import { type Request } from 'express';
 
 export function resolveRequestId(req: Request): string {
-  return (req.headers['x-request-id'] as string) ?? crypto.randomUUID();
+  const header = req.headers['x-request-id'];
+  if (typeof header === 'string' && header.trim()) {
+    return header;
+  }
+  return crypto.randomUUID();
 }
 ```
+
+> `header` can be a `string[]` when the same header is sent multiple times, so a plain `as string` cast is unsafe.  The real implementation checks `typeof === 'string'` before using the value and rejects empty strings via `.trim()`.  Never use the inline cast pattern shown in the anti-patterns section.
 
 Importar en todos los controllers que devuelvan envelope:
 
 ```typescript
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 ```
+
+## `apiEnvelopeSchema` — Swagger helper
+
+Use this helper when documenting query responses with `@ApiOkResponse`:
+
+```typescript
+// shared/infrastructure/http/response/api-envelope.schema.ts
+import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
+
+@ApiOkResponse({
+  description: 'Ranking entries with viewer context',
+  schema: apiEnvelopeSchema({
+    entries: [{ rank: 1, userId: 'user-uuid', score: 12 }],
+    currentUser: { rank: 1, userId: 'user-uuid', score: 12 },
+  }),
+})
+```
+
+This generates an OpenAPI `{ data, meta }` schema fragment from an example value.  Only needed when the generic Swagger types are insufficient to describe the response shape.
+
+---
 
 ## Controllers — ejemplos completos
 
@@ -83,15 +110,18 @@ async handler(
 ): Promise<PaginatedApiResponse<GamePrimitives>> {
   const result = await this.searcher.execute({ userId: user.userId, ...query });
 
+  const limit = result.pageSize;
+  const totalPages = Math.ceil(result.total / limit);
+
   return PaginatedApiResponse.of(
-    result.items,
+    result.data,
     {
-      page: query.page ?? 1,
-      limit: query.limit ?? 20,
+      page: result.page,
+      limit,
       total_items: result.total,
-      total_pages: Math.ceil(result.total / (query.limit ?? 20)),
-      has_next_page: (query.page ?? 1) * (query.limit ?? 20) < result.total,
-      has_prev_page: (query.page ?? 1) > 1,
+      total_pages: totalPages,
+      has_next_page: result.page < totalPages,
+      has_prev_page: result.page > 1,
     },
     resolveRequestId(req),
   );
@@ -133,3 +163,24 @@ async handler(@Param('id') id: string): Promise<void> {
   await this.deleter.execute({ id });
 }
 ```
+
+### Excepción legítima: endpoints de auth (tokens + cookies)
+
+Auth endpoints (`/auth/login`, `/auth/register`, `/auth/guest`, `/auth/refresh`) do **not** use `ApiResponse<T>`.  They return raw data because:
+- They manage `Set-Cookie` headers for the `refreshToken` via `@Res({ passthrough: true })`
+- The client only needs `{ accessToken: string }` — wrapping in an envelope adds no value
+
+```typescript
+@Post('login')
+@HttpCode(HttpStatus.OK)
+async handler(
+  @Body() body: LoginAuthPostPayload,
+  @Res({ passthrough: true }) res: Response,
+): Promise<{ accessToken: string }> {
+  const result = await this.authenticator.execute({ ... });
+  res.cookie('refreshToken', result.refreshTokenId, { httpOnly: true, ... });
+  return { accessToken: result.accessToken };
+}
+```
+
+This is the only valid exemption from the envelope rule.  Non-auth endpoints that skip `ApiResponse` are a bug.

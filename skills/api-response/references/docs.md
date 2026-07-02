@@ -29,3 +29,11 @@ Esto hace que el API sea predecible: si el endpoint es GET, siempre hay un `data
 |---|---|
 | [backend-architecture.md](../../../docs/backend-architecture.md) | Envelopes en Infrastructure — los use cases devuelven primitivos, los controllers envuelven |
 | [adr/022-swagger-openapi.md](../../../docs/adr/022-swagger-openapi.md) | Swagger — documentación de responses en todos los endpoints |
+
+## Archivos de infraestructura relevantes
+
+| Archivo | Propósito |
+|---|---|
+| `shared/infrastructure/http/response/api-response.ts` | `ApiResponse<T>`, `PaginatedApiResponse<T>`, `ResponseMeta`, `PaginationMeta` |
+| `shared/infrastructure/http/resolve-request-id.ts` | `resolveRequestId(req)` — obtiene o genera el request ID |
+| `shared/infrastructure/http/response/api-envelope.schema.ts` | `apiEnvelopeSchema(example)` — helper para Swagger `@ApiOkResponse({ schema: ... })` |
