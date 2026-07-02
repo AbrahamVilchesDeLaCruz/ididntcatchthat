@@ -2,13 +2,13 @@
 
 ## Related Skills
 
-| Skill | Por qué leerla |
-|---|---|
-| `api-domain` | Aggregate, Value Objects y Domain Errors que el use case consume |
-| `api-di` | Cómo definir tokens y registrar el use case como provider |
-| `api-infrastructure` | Cómo el controller construye el `Request*` y llama al use case |
-| `api-events` | `EventBus` interface y cómo publicar domain events |
-| `api-testing` | Cómo testear use cases con jest-mock-extended y Object Mothers |
+| Skill                | Por qué leerla                                                   |
+| -------------------- | ---------------------------------------------------------------- |
+| `api-domain`         | Aggregate, Value Objects y Domain Errors que el use case consume |
+| `api-di`             | Cómo definir tokens y registrar el use case como provider        |
+| `api-infrastructure` | Cómo el controller construye el `Request*` y llama al use case   |
+| `api-events`         | `EventBus` interface y cómo publicar domain events               |
+| `api-testing`        | Cómo testear use cases con jest-mock-extended y Object Mothers   |
 
 ## External Documentation
 
@@ -23,8 +23,8 @@
 
 ## Internal Docs
 
-| Doc | Contenido relevante |
-|---|---|
-| [engineering-principles.md](../../../docs/engineering-principles.md) | SRP — un use case = una razón para cambiar; inversión de dependencias |
-| [backend-architecture.md](../../../docs/backend-architecture.md) | Qué puede importar Application (Domain sí, Infrastructure no) |
-| [domain/bounded-contexts-detail.md](../../../docs/domain/bounded-contexts-detail.md) | Use cases existentes por BC — evita duplicar lógica ya implementada |
+| Doc                                                                                  | Contenido relevante                                                   |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [engineering-principles.md](../../../docs/engineering-principles.md)                 | SRP — un use case = una razón para cambiar; inversión de dependencias |
+| [backend-architecture.md](../../../docs/backend-architecture.md)                     | Qué puede importar Application (Domain sí, Infrastructure no)         |
+| [domain/bounded-contexts-detail.md](../../../docs/domain/bounded-contexts-detail.md) | Use cases existentes por BC — evita duplicar lógica ya implementada   |

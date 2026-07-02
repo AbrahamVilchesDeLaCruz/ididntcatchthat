@@ -23,8 +23,9 @@ Use this checklist when auditing an existing bounded context or designing a new 
 - [ ] One use case per file — single responsibility
 - [ ] Use cases receive `Request*` type — never raw HTTP payloads
 - [ ] All ports injected by token — `@Inject(TOKEN)` pattern
-- [ ] `repository.save()` before `eventBus.publish()`
-- [ ] No business logic in subscribers — they delegate to a use case
+- [ ] `repository.save()` before `publisher.publish()` (token: `DOMAIN_EVENT_PUBLISHER`)
+- [ ] Write use cases always inject `DOMAIN_EVENT_PUBLISHER` — if aggregate emits no events, fix the aggregate
+- [ ] No business logic in subscribers — they delegate to a use case or domain service
 - [ ] Domain services are stateless (or managed by NestJS with `@Injectable()`)
 
 ## Phase 4 — Infrastructure Layer
@@ -48,14 +49,15 @@ Use this checklist when auditing an existing bounded context or designing a new 
 - [ ] Event class has `static readonly EVENT_NAME`
 - [ ] `eventName()` instance method returns `EVENT_NAME`
 - [ ] `fromPrimitives()` static method exists for AMQP deserialization
-- [ ] Subscriber queue name follows: `{bc}.{action}_on_{event_past_verb}`
+- [ ] Subscriber queue name follows: `{bc}.{verb}_{object}_on_{event_past_tense}` — e.g. `achievement.unlock_achievement_on_game_completed`
+- [ ] Subscriber class name follows: `{DomainService}On{EventName}` — e.g. `UnlockUserAchievementOnGameCompleted`
 - [ ] Subscribers handle idempotency (Option A: natural check, Option B: inbox table)
 
 ## Phase 7 — Testing
 
 - [ ] Use case tests use `mock<Repository>()` — no concrete adapters
 - [ ] Object Mothers exist for every aggregate and request type
-- [ ] `container.reset()` in `beforeEach`
+- [ ] `beforeEach` resets each mock method explicitly (`mock.method.mockReset()`) and recreates the use case instance
 - [ ] `jest.useFakeTimers()` when aggregate depends on `new Date()`
 
 ## Debt Score
