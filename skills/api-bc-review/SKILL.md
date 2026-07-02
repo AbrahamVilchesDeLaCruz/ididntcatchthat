@@ -1,9 +1,6 @@
 ---
 name: api-bc-review
-description: >
-  Proceso de revisión y refactor de bounded contexts en apps/api/: límites DDD, submódulos,
-  alineación con skills y checklist de deuda. Trigger: Al auditar un BC existente, dividir
-  agregados en submódulos, o evaluar si un concepto merece BC propio.
+description: "Proceso de revisión y refactor de bounded contexts en apps/api/: límites DDD, submódulos, alineación con skills y checklist de deuda. Trigger: Al auditar un BC existente, dividir agregados en submódulos, o evaluar si un concepto merece BC propio."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -16,6 +13,9 @@ metadata:
 - Antes de crear un BC nuevo — decidir si es BC propio, submódulo de otro, o shared
 - Cuando un BC crece y mezcla varios agregados sin límites claros
 - Tras un rediseño de dominio (catálogo dinámico, nuevos eventos, backoffice)
+
+> Usa el checklist de `assets/audit-checklist.md` durante la auditoría.
+> Lee `references/docs.md` para referencias DDD y skills relacionadas.
 
 **No sustituye** las skills de capa (`api-domain`, `api-application`, etc.) — las **orquesta** en orden.
 

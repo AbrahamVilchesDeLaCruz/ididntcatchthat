@@ -25,7 +25,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 Pods + Container-Presentational pattern.
 
-> Referencia completa: [docs/frontend-architecture.md](../../docs/frontend-architecture.md)
+> Referencia completa: [docs/engineering/frontend-architecture.md](../../docs/engineering/frontend-architecture.md)
 
 ```
 apps/client/src/

@@ -1,8 +1,6 @@
 ---
 name: git-workflow
-description: >
-  Guía de branching, naming y merge strategy para ididntcatchthat.
-  Trigger: Cuando se crea una rama, se abre un PR, o se mergea código.
+description: "Guía de branching, naming y merge strategy para ididntcatchthat. Trigger: Cuando se crea una rama, se abre un PR, o se mergea código."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -15,6 +13,8 @@ metadata:
 - Al abrir un PR (feat/* o fix/* → dev, o dev → main)
 - Al mergear un PR — elegir la estrategia correcta
 - Al nombrar una rama o escribir el título de un PR
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
 ## Critical Patterns
 

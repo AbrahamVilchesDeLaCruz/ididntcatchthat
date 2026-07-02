@@ -1,5 +1,10 @@
 # Spec: Gaming — Cliente
 
+**Estado**: En progreso  
+**Tasks**: [docs/tasks/gaming-client.md](../tasks/gaming-client.md)  
+**API**: [docs/spec/gaming.md](./gaming.md)  
+**Pod**: `apps/client/src/containers/game/`
+
 ## Visión de producto
 
 La feature de Gaming es el núcleo interactivo de la plataforma. Permite a los usuarios (invitados o registrados) enfrentarse a _flashcards_ con un enfoque en fonética real, _connected speech_ y expresiones nativas.

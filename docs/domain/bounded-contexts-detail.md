@@ -61,7 +61,7 @@ graph LR
 
 ## 📦 Content
 
-**Responsabilidad**: Gestionar el catálogo de flashcards y el pipeline de generación de audio.
+**Responsabilidad**: Gestionar el catálogo de flashcards y el pipeline de generación de audio e IA.
 
 ```mermaid
 graph LR
@@ -71,30 +71,47 @@ graph LR
         Flashcard --- Example
     end
 
-    subgraph Emits ["Eventos que emite"]
-        E1["FlashcardCreated\nidct.content.flashcard.created"]
-        E2["FlashcardUpdated\nidct.content.flashcard.updated"]
-    end
-
-    subgraph Internal ["Handlers internos"]
-        H1["AudioGenerationHandler\n(ElevenLabs × 4 archivos)"]
+    subgraph Pipeline ["Pipeline interno (auto-handlers)"]
+        E1["FlashcardCreated\nididntcatchthat.content.flashcard.created"]
+        E2["FlashcardExamplesCompleted\nididntcatchthat.content.flashcard.examples_completed"]
+        E3["FlashcardPhoneticsCompleted\nididntcatchthat.content.flashcard.phonetics_completed"]
+        E4["FlashcardExpressionUpdated\nididntcatchthat.content.flashcard.expression_updated"]
+        E5["FlashcardExamplesUpdated\nididntcatchthat.content.flashcard.examples_updated"]
+        E6["FlashcardMeaningUpdated\nididntcatchthat.content.flashcard.meaning_updated"]
+        A1["FlashcardAudioGenerating\nididntcatchthat.content.flashcard.audio_generating"]
+        A2["FlashcardAudioReady\nididntcatchthat.content.flashcard.audio_ready"]
+        A3["FlashcardAudioFailed\nididntcatchthat.content.flashcard.audio_failed"]
     end
 
     Content -->|emite| E1
-    Content -->|emite| E2
-    E1 -->|consume interno| H1
-    E2 -->|consume interno — si cambió expression/examples| H1
+    E1 -->|EnrichFlashcardOnCreated\n→ DeepSeek AI| E2
+    E2 -->|GenerateAudioOnExamplesCompleted\n→ ElevenLabs| A1
+    A1 -->|en progreso| A2
+    A1 -->|en error| A3
+    E3 -.->|fonética lista| Content
+    E4 -->|GenerateAudioOnExpressionUpdated| A1
+    E5 -->|GenerateAudioOnExamplesUpdated| A1
+    E6 -.->|auditoría| Content
 ```
 
 | Evento emitido | Exchange | Trigger |
 |----------------|----------|---------|
-| `FlashcardCreated` | `idct.content.flashcard.created` | Teacher publica nueva flashcard (manual, bulk JSON o PDF) |
-| `FlashcardUpdated` | `idct.content.flashcard.updated` | Teacher edita una flashcard existente |
+| `FlashcardCreated` | `ididntcatchthat.content.flashcard.created` | Teacher publica nueva flashcard (manual, bulk JSON o PDF) |
+| `FlashcardExamplesCompleted` | `ididntcatchthat.content.flashcard.examples_completed` | AI completa los examples de la flashcard |
+| `FlashcardPhoneticsCompleted` | `ididntcatchthat.content.flashcard.phonetics_completed` | AI completa IPA notation y native speech |
+| `FlashcardExpressionUpdated` | `ididntcatchthat.content.flashcard.expression_updated` | Teacher edita el campo `expression` |
+| `FlashcardExamplesUpdated` | `ididntcatchthat.content.flashcard.examples_updated` | Teacher edita los examples |
+| `FlashcardMeaningUpdated` | `ididntcatchthat.content.flashcard.meaning_updated` | Teacher edita el campo `meaning` |
+| `FlashcardAudioGenerating` | `ididntcatchthat.content.flashcard.audio_generating` | ElevenLabs call iniciada |
+| `FlashcardAudioReady` | `ididntcatchthat.content.flashcard.audio_ready` | Audio subido al CDN con éxito |
+| `FlashcardAudioFailed` | `ididntcatchthat.content.flashcard.audio_failed` | ElevenLabs devuelve error |
 
-| Evento consumido | Exchange | Acción |
-|-----------------|----------|--------|
-| `FlashcardCreated` | `idct.content.flashcard.created` | AudioGenerationHandler → ElevenLabs → CDN → `audio_status: ready` |
-| `FlashcardUpdated` | `idct.content.flashcard.updated` | AudioGenerationHandler (solo si cambió `expression` o `examples`) |
+| Evento consumido (handlers internos) | Exchange | Acción |
+|--------------------------------------|----------|--------|
+| `FlashcardCreated` | `ididntcatchthat.content.flashcard.created` | `EnrichFlashcardOnFlashcardCreated` → DeepSeek genera examples + phonetics |
+| `FlashcardExamplesCompleted` | `ididntcatchthat.content.flashcard.examples_completed` | `GenerateFlashcardAudioOnExamplesCompleted` → ElevenLabs × 4 archivos |
+| `FlashcardExpressionUpdated` | `ididntcatchthat.content.flashcard.expression_updated` | `GenerateFlashcardAudioOnExpressionUpdated` → regenera audio |
+| `FlashcardExamplesUpdated` | `ididntcatchthat.content.flashcard.examples_updated` | `GenerateFlashcardAudioOnExamplesUpdated` → regenera audio |
 
 ---
 
@@ -184,7 +201,9 @@ graph LR
 
 ---
 
-## 🎤 Pronunciation
+## 🎤 Pronunciation ⚠️ Planned
+
+> **No implementado.** BC diseñado y documentado. Pendiente de integrar Azure Speech Service. Los eventos que emite están definidos en el diseño pero no existen en código.
 
 **Responsabilidad**: Evaluar la pronunciación del usuario y emitir el resultado.
 
@@ -257,7 +276,9 @@ Write-time usa queries scoped al usuario (o incrementos) — no hay recomputo gl
 
 ---
 
-## 🔔 Notification
+## 🔔 Notification ⚠️ Planned
+
+> **No implementado.** BC diseñado y documentado. Los eventos que debería consumir se emiten correctamente desde Identity, Progress y Achievement — solo falta crear los subscribers. Pendiente de integrar Resend (email) y VAPID (push).
 
 **Responsabilidad**: Enviar notificaciones al usuario por los canales disponibles (toast, push, email).
 

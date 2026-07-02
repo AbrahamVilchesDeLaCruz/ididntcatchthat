@@ -1,15 +1,11 @@
 ---
 name: api-response
-description: >
-  Envelope de respuesta, paginación, commands sin body en apps/api/.
-  Trigger: Al definir el formato de respuesta de un endpoint, implementar paginación, o respuestas de commands.
+description: "Envelope de respuesta, paginación, commands sin body en apps/api/. Trigger: Al definir el formato de respuesta de un endpoint, implementar paginación, o respuestas de commands."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "2.0"
 ---
-
-# Skill: api-response
 
 ## When to Use
 
@@ -17,20 +13,26 @@ metadata:
 - Al definir la respuesta de endpoints que modifican estado (commands)
 - Al implementar el response envelope en controllers
 
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
+
+> Lee `references/response-classes.md` para las implementaciones completas de `ApiResponse`, `PaginatedApiResponse`, `resolveRequestId` y ejemplos completos de controllers.
+
 ---
 
-## Principles
+## Principios CQRS
 
-Este proyecto sigue una separación estricta inspirada en CQRS:
-
-| Tipo | Respuesta | Cuándo |
+| Tipo | Respuesta | Status |
 |---|---|---|
-| **Query** (GET, búsquedas) | Envelope con `data` + `pagination` opcional | Siempre que devuelva datos |
-| **Command** (POST/PUT/PATCH/DELETE que modifican estado) | Solo status code HTTP | Siempre |
+| **Query** (GET) | `ApiResponse<T>` o `PaginatedApiResponse<T>` | `200` |
+| **Command con datos** (POST que devuelve ID/datos) | `ApiResponse<T>` | `201` |
+| **Command puro** (PATCH/DELETE/acciones) | `void` — solo status code | `204` |
+| **Auth** (login/register/guest/refresh) | Raw `{ accessToken: string }` — excepción válida | `200` / `201` |
+
+> Auth endpoints usan `@Res({ passthrough: true })` para manejar cookies y devuelven el token directamente sin envelope. Es la única excepción al patrón `ApiResponse<T>`.
 
 ---
 
-## Query Response — Envelope
+## Formato del envelope
 
 ```json
 {
@@ -42,143 +44,28 @@ Este proyecto sigue una separación estricta inspirada en CQRS:
 }
 ```
 
-Con paginación (solo cuando el endpoint pagina):
+Con paginación:
 
 ```json
 {
-  "data": [
-    {
-      "id": "uuid-1",
-      "phrase": "I didn't catch that",
-      "created_at": "2026-05-21T10:00:00Z"
-    }
-  ],
+  "data": [...],
   "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total_items": 125,
-    "total_pages": 13,
-    "has_next_page": true,
-    "has_prev_page": false
+    "page": 1, "limit": 10,
+    "total_items": 125, "total_pages": 13,
+    "has_next_page": true, "has_prev_page": false
   },
-  "meta": {
-    "timestamp": "2026-05-21T12:00:00Z",
-    "request_id": "req_abc123"
-  }
+  "meta": { "timestamp": "...", "request_id": "..." }
 }
 ```
 
-**Reglas del envelope:**
+---
+
+## Reglas del envelope
+
 - Sin campo `success` — el status HTTP lo expresa
-- Sin campo `message` — los errores tienen su propio formato (HttpExceptionFilter)
-- `pagination` solo aparece si el endpoint pagina — no en respuestas de un único recurso
-- `meta.request_id` se propaga desde el header `X-Request-Id` (o se genera en el filter)
-
----
-
-## Response Classes
-
-```typescript
-// src/shared/infrastructure/http/response/api-response.ts
-export class ApiResponse<T> {
-  constructor(
-    readonly data: T,
-    readonly meta: ResponseMeta,
-  ) {}
-
-  static of<T>(data: T, requestId: string): ApiResponse<T> {
-    return new ApiResponse(data, {
-      timestamp: new Date().toISOString(),
-      request_id: requestId,
-    });
-  }
-}
-
-export class PaginatedApiResponse<T> {
-  constructor(
-    readonly data: T[],
-    readonly pagination: PaginationMeta,
-    readonly meta: ResponseMeta,
-  ) {}
-
-  static of<T>(
-    data: T[],
-    pagination: PaginationMeta,
-    requestId: string,
-  ): PaginatedApiResponse<T> {
-    return new PaginatedApiResponse(data, pagination, {
-      timestamp: new Date().toISOString(),
-      request_id: requestId,
-    });
-  }
-}
-
-export interface ResponseMeta {
-  timestamp: string;
-  request_id: string;
-}
-
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  total_items: number;
-  total_pages: number;
-  has_next_page: boolean;
-  has_prev_page: boolean;
-}
-```
-
----
-
-## Controller Usage
-
-### Query — respuesta con datos
-
-```typescript
-@Get()
-async handler(
-  @Query() query: SearchFlashcardsGetQuery,
-  @Req() req: Request,
-): Promise<PaginatedApiResponse<FlashcardResponse>> {
-  const result = await this.useCase.execute({ ... });
-
-  return PaginatedApiResponse.of(
-    result.flashcards,
-    {
-      page: result.page,
-      limit: result.limit,
-      total_items: result.total,
-      total_pages: Math.ceil(result.total / result.limit),
-      has_next_page: result.page * result.limit < result.total,
-      has_prev_page: result.page > 1,
-    },
-    req.headers['x-request-id'] as string ?? crypto.randomUUID(),
-  );
-}
-```
-
-### Command — solo status code
-
-```typescript
-@Post()
-@HttpCode(HttpStatus.CREATED)
-async handler(@Body() payload: CreateFlashcardPostPayload): Promise<void> {
-  await this.useCase.execute({ ... });
-  // sin return — NestJS envía 201 vacío
-}
-
-@Patch(':id')
-@HttpCode(HttpStatus.NO_CONTENT)
-async handler(@Param('id') id: string, @Body() payload: UpdateFlashcardPatchPayload): Promise<void> {
-  await this.useCase.execute({ id, ...payload });
-}
-
-@Delete(':id')
-@HttpCode(HttpStatus.NO_CONTENT)
-async handler(@Param('id') id: string): Promise<void> {
-  await this.useCase.execute({ id });
-}
-```
+- Sin campo `message` — los errores tienen su propio formato (ver `api-error-handler`)
+- `pagination` solo si el endpoint acepta `page` y `limit`
+- `meta.request_id` siempre vía `resolveRequestId(req)` — nunca inline
 
 ---
 
@@ -186,23 +73,11 @@ async handler(@Param('id') id: string): Promise<void> {
 
 | Operación | Status |
 |---|---|
-| GET (recurso único) | `200 OK` |
-| GET (colección) | `200 OK` |
-| POST (crear recurso) | `201 Created` |
-| POST (acción DDD) | `200 OK` |
-| PATCH / PUT (actualizar) | `204 No Content` |
+| GET (único o colección) | `200 OK` |
+| POST (crear con respuesta) | `201 Created` + `ApiResponse<T>` |
+| POST (acción DDD sin respuesta) | `204 No Content` |
+| PATCH / PUT | `204 No Content` |
 | DELETE | `204 No Content` |
-
----
-
-## Rules
-
-- Los endpoints de **comando** (mutación) devuelven **solo status code** — sin body
-- Los endpoints de **query** (lectura) devuelven siempre el **envelope** con `data` y `meta` — usar `ApiResponse.of()` / `PaginatedApiResponse.of()` desde `shared/infrastructure/http/response/api-response.ts`
-- `resolveRequestId(req)` desde `shared/infrastructure/http/resolve-request-id.ts`
-- `pagination` solo si el endpoint acepta `page` y `limit` en la query
-- Sin `success`, sin `message` en respuestas exitosas
-- El `request_id` se lee del header `X-Request-Id` si viene del cliente, o se genera con `crypto.randomUUID()`
 
 ---
 
@@ -210,12 +85,19 @@ async handler(@Param('id') id: string): Promise<void> {
 
 ```typescript
 // ❌ Archivos .response.ts por controller — PROHIBIDO
-// search-flashcards-get.response.ts  ← no crear
-// find-flashcard-get.response.ts     ← no crear
+// search-games-get.response.ts
 
-// ✅ Correcto: el controller devuelve primitivos del dominio o un tipo inline
-async handler(): Promise<ApiResponse<FlashcardPrimitives>> { ... }
+// ❌ resolveRequestId inline en el controller (unsafe: no valida array ni empty string)
+return ApiResponse.of(data, req.headers['x-request-id'] as string ?? crypto.randomUUID());
 
-// ✅ Si necesitás un tipo de respuesta nombrado, va en shared como interface genérica
-// shared/infrastructure/http/response/api-response.ts  ← único lugar para tipos de respuesta
+// ❌ Envelope en commands puros
+@Patch(':id')
+async handler(): Promise<{ success: true }> { ... }
+
+// ❌ Sin resolveRequestId
+return ApiResponse.of(data, 'hardcoded-id');
+
+// ❌ Omitir ApiResponse en endpoints que no son auth
+@Get('flashcards')
+async handler(): Promise<FlashcardPrimitives[]> { ... } // debe ser ApiResponse<FlashcardPrimitives[]>
 ```

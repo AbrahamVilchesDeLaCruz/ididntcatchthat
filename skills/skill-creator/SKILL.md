@@ -1,8 +1,6 @@
 ---
 name: skill-creator
-description: >
-  Creates new AI agent skills for this repo following the agentskills.io spec.
-  Trigger: When user asks to create a new skill, add agent instructions, or document patterns for AI.
+description: "Creates new AI agent skills for this repo following the agentskills.io spec. Trigger: When user asks to create a new skill, add agent instructions, or document patterns for AI."
 license: Apache-2.0
 metadata:
   author: ididntcatchthat
@@ -20,6 +18,8 @@ Create a skill when:
 **Don't create a skill when:**
 - The pattern is trivial or self-explanatory
 - It's a one-off task
+
+> Lee `references/docs.md` para el spec completo de agentskills.io y la estructura de directorios esperada.
 
 ---
 
@@ -40,9 +40,7 @@ Skills live in `skills/` in the repo root. Never in `.claude/`, `.github/`, or `
 ```markdown
 ---
 name: {skill-name}
-description: >
-  {One-line description of what this skill does}.
-  Trigger: {When the AI should load this skill}.
+description: "{One-line description of what this skill does}. Trigger: {When the AI should load this skill}."
 license: Apache-2.0
 metadata:
   author: ididntcatchthat

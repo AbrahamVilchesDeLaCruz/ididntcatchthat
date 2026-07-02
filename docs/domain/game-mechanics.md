@@ -209,7 +209,7 @@ sequenceDiagram
     FE->>U: Banner "Tenés juegos en curso"
 
     U->>FE: Elige retomar un juego
-    FE->>API: GET /games/:id/resume
+    FE->>API: POST /games/:id/resume
     API-->>FE: flashcards pendientes[] (desde last_flashcard_id)
     FE->>U: Continúa desde donde lo dejó
 ```
