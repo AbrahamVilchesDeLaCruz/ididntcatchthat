@@ -1,8 +1,6 @@
 ---
 name: tdd-workflow
-description: >
-  Workflow obligatorio de TDD antes de escribir cualquier código nuevo: Red → Green → Refactor.
-  Aplica a api (Jest) y client (Vitest + RTL). Trigger: Antes de implementar cualquier feature, use case, hook o componente nuevo.
+description: "Workflow obligatorio de TDD antes de escribir cualquier código nuevo: Red → Green → Refactor. Aplica a api (Jest) y client (Vitest + RTL). Trigger: Antes de implementar cualquier feature, use case, hook o componente nuevo."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -18,6 +16,8 @@ Cargar esta skill ANTES de escribir cualquier código nuevo:
 - Nuevo hook de pod (client)
 - Nuevo Container o Component (client)
 - Nuevo mapper, helper o función utilitaria (api o client)
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
 **NO aplica a**: cambios de configuración, migraciones, refactors puros sin nuevo comportamiento.
 

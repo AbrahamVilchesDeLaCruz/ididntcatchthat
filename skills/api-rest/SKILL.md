@@ -1,8 +1,6 @@
 ---
 name: api-rest
-description: >
-  Convenciones RESTful de la API: rutas, métodos HTTP, status codes y acciones DDD con POST.
-  Trigger: Al diseñar o implementar endpoints en apps/api/.
+description: "Convenciones RESTful de la API: rutas, métodos HTTP, status codes y acciones DDD con POST. Trigger: Al diseñar o implementar endpoints en apps/api/."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
@@ -15,6 +13,8 @@ metadata:
 - Al elegir el método HTTP correcto para una acción
 - Al decidir el status code de una respuesta
 - Al modelar acciones de dominio que no encajan en CRUD puro
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
 ## Critical Patterns
 

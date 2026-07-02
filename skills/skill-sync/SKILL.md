@@ -1,8 +1,6 @@
 ---
 name: skill-sync
-description: >
-  Syncs skill metadata to AGENTS.md Auto-invoke and Available Skills tables.
-  Trigger: After creating or modifying a skill, or when AGENTS.md tables are out of sync.
+description: "Syncs skill metadata to AGENTS.md Auto-invoke and Available Skills tables. Trigger: After creating or modifying a skill, or when AGENTS.md tables are out of sync."
 license: Apache-2.0
 metadata:
   author: ididntcatchthat
@@ -15,6 +13,8 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 - After creating a new skill
 - After modifying a skill's name or description
 - When the Available Skills or Auto-invoke table in `AGENTS.md` is out of sync
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
 ---
 
