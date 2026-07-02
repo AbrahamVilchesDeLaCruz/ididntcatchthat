@@ -122,6 +122,7 @@
     2. `search(userId, flashcardId)` — si no existe, crear nuevo con `UserFlashcardStats.create(...)`.
     3. Si `mode = study` → `recordStudy(correct)`. Si `mode = game` → `recordPlay(correct)`.
     4. `save(stats)`.
+    5. Si `mode = game` → `RandomModuleProgressUpdater.executeForRandomAttempt(...)` (solo si `games.module IS NULL`).
   - **Test (RED primero)**:
     - Guest (userId null) → no llama a repositorio.
     - Nuevo stats → crea y guarda.
@@ -132,15 +133,16 @@
 - [x] **TASK-PROGRESS-10** — `UpdateModuleProgressOnGameCompleted`
   - Extiende `Handler` abstracto. Suscrito a `GameCompletedEvent`.
   - Flow:
-    1. Si `module = null` → return (random game, skip).
-    2. `findByModule(userId, module)` → obtener todos los `UserFlashcardStats` del módulo.
-    3. Calcular `totalAttempts`, `correctCount`, `accuracy`.
-    4. `computeMasteryLevel(totalAttempts, accuracy)`.
-    5. Comparar con `masteryLevel` anterior (leer `ModuleProgressRepository.findByModule`).
-    6. UPSERT `module_progress`.
-    7. Si `masteryLevel` subió → publicar `ModuleLevelUpEvent`.
+    1. Si `userId = null` → return (guest).
+    2. Si `module != null` → recalcular ese módulo (comportamiento existente).
+    3. Si `module = null` (random) → obtener distinct `flashcards.category` de los attempts del juego y recalcular cada módulo.
+    4. Calcular `totalAttempts`, `correctCount`, `accuracy` por módulo desde stats agregadas.
+    5. `computeMasteryLevel(totalAttempts, accuracy)`.
+    6. Comparar con `masteryLevel` anterior (leer `ModuleProgressRepository.findByModule`).
+    7. UPSERT `module_progress`.
+    8. Si `masteryLevel` subió → publicar `ModuleLevelUpEvent`.
   - **Test (RED primero)**:
-    - module null → skip.
+    - module null + random game → recalc N módulos tocados.
     - Primera vez → crea `ModuleProgress` con nivel 0.
     - Nivel sube → publica `ModuleLevelUpEvent`.
     - Nivel no sube → no publica evento.

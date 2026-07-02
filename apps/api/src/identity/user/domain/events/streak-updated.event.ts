@@ -11,7 +11,7 @@ export interface StreakUpdatedAttributes extends DomainEventAttributes {
 }
 
 export class StreakUpdatedEvent extends DomainEvent {
-  static readonly EVENT_NAME = 'idct.identity.streaks.streak.updated';
+  static readonly EVENT_NAME = 'ididntcatchthat.identity.streak.updated';
 
   constructor(
     aggregateId: string,
@@ -24,5 +24,19 @@ export class StreakUpdatedEvent extends DomainEvent {
 
   eventName(): string {
     return StreakUpdatedEvent.EVENT_NAME;
+  }
+
+  static fromPrimitives(
+    aggregateId: string,
+    eventId: string,
+    occurredOn: Date,
+    attributes: DomainEventAttributes,
+  ): StreakUpdatedEvent {
+    return new StreakUpdatedEvent(
+      aggregateId,
+      attributes as StreakUpdatedAttributes,
+      eventId,
+      occurredOn,
+    );
   }
 }

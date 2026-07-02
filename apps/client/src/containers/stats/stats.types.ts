@@ -38,10 +38,3 @@ export interface ProgressSummaryVM {
   gamesCompleted: number;
   lastPlayedAt: Date | null;
 }
-
-export interface AchievementVM {
-  key: string;
-  title: string;
-  description: string;
-  unlockedAt: Date | null;
-}

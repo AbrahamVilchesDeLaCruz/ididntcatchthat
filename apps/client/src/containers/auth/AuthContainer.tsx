@@ -15,7 +15,7 @@ import { AuthComponent } from './AuthComponent';
  * Maps raw API/network errors to user-friendly Spanish messages.
  */
 function mapAuthError(error: unknown): string {
-  if (!error) return 'Error desconocido. Intentá de nuevo.';
+  if (!error) return 'Error desconocido. Inténtalo de nuevo.';
 
   const message = error instanceof Error ? error.message : 'Error desconocido';
 
@@ -28,26 +28,26 @@ function mapAuthError(error: unknown): string {
     message.includes('already taken') ||
     message.includes('already exists')
   ) {
-    return 'El email o nickname ya está en uso. Probá con otro.';
+    return 'El email o nickname ya está en uso. Prueba con otro.';
   }
   if (message.includes('422') || message.includes('Unprocessable')) {
-    return 'Revisá que los datos ingresados sean correctos.';
+    return 'Comprueba que los datos introducidos sean correctos.';
   }
   if (message.includes('429') || message.includes('Too Many')) {
-    return 'Demasiados intentos. Esperá un momento y volvé a intentarlo.';
+    return 'Demasiados intentos. Espera un momento y vuelve a intentarlo.';
   }
   if (
     message.includes('Network') ||
     message.includes('ECONNREFUSED') ||
     message.includes('ERR_NETWORK')
   ) {
-    return 'Sin conexión al servidor. Revisá tu internet.';
+    return 'Sin conexión al servidor. Comprueba tu conexión a internet.';
   }
   if (message.includes('500') || message.includes('Internal Server')) {
-    return 'Error interno del servidor. Intentá de nuevo en un momento.';
+    return 'Error interno del servidor. Inténtalo de nuevo en un momento.';
   }
 
-  return 'Algo salió mal. Intentá de nuevo.';
+  return 'Algo salió mal. Inténtalo de nuevo.';
 }
 
 export const AuthContainer = (): ReactElement => {

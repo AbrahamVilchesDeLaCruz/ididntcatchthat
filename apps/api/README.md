@@ -77,7 +77,8 @@ pnpm test:e2e:ci      # E2E + coverage --ci --forceExit
 | Método | Ruta       | Descripción                              |
 | ------ | ---------- | ---------------------------------------- |
 | `GET`  | `/health`  | Health check — responde `{ status: "ok" }` |
-| `GET`  | `/metrics` | Métricas Prometheus (prom-client)        |
+| `GET`  | `/metrics` | Métricas Prometheus (prom-client, scrape) |
+| `GET`  | `/v1/metrics/summary` | Snapshot JSON de métricas (admin JWT) |
 | `GET`  | `/docs`    | Swagger UI (solo en non-production)      |
 
 ---

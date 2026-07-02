@@ -3,21 +3,28 @@ import { type Translations } from '@/core/i18n/i18n.types';
 export const en: Translations = {
   landing: {
     hero: {
-      badge: 'Coming soon',
+      badge: 'Real English, real accents',
       headline: 'That moment when a native speaks…',
       headlineAccent: 'and you get nothing.',
       subheadline:
         'The app that teaches you how natives actually speak — real phonetics, connected speech, and 3 accents per expression.',
-      ctaPrimary: "Notify me when it's ready",
-      ctaSecondary: 'See how it works',
       ctaPlay: 'Play now',
+      ctaSignUp: 'Sign up free',
       ctaStudy: 'Study',
       ctaHowItWorks: 'See how it works',
+      ctaGetStarted: 'Get started',
       navBackoffice: 'Go to backoffice →',
       navStats: 'My stats →',
       navDashboard: 'Dashboard →',
       navLogin: 'Log in',
       navRegister: 'Sign up',
+    },
+    trustBar: {
+      items: [
+        '3 native accents per expression',
+        'Real phonetics & connected speech',
+        'Curated content — not AI-generated',
+      ],
     },
     authGate: {
       title: 'How do you want to play?',
@@ -31,7 +38,24 @@ export const en: Translations = {
     gameDemo: {
       title: 'See it in action',
       subtitle: 'Learn real pronunciation with interactive flashcards',
-      hoverHint: 'Hover to reveal →',
+      hoverHint: 'Hover to flip →',
+      tapHint: 'Tap to flip →',
+      cards: [
+        {
+          expression: 'think',
+          ipa: '/θɪŋk/',
+          meaning: 'Think — voiceless TH',
+          exampleEn: 'I think so.',
+          exampleEs: 'Creo que sí.',
+        },
+        {
+          expression: 'gonna',
+          ipa: '/ˈɡɒnə/',
+          meaning: 'Short form of “going to”',
+          exampleEn: "I'm gonna be late.",
+          exampleEs: "I'm going to be late.",
+        },
+      ],
     },
     problem: {
       sectionLabel: 'The problem',
@@ -43,8 +67,10 @@ export const en: Translations = {
         "Vocabulary. Grammar. Textbook phrases you'll never hear in real life.",
       weTeachLabel: 'What we teach',
       weTeachDescription:
-        'How sounds change when words connect. The 23 real phonemes. Expressions natives actually use.',
+        'How sounds change when words connect. 45 native sound topics in the catalog. Expressions natives actually use.',
       exampleLabel: 'Connected speech — example',
+      exampleWrittenLabel: 'Written',
+      exampleNativeLabel: 'How natives say it',
       exampleWritten: '"Red and green"',
       exampleNative: '"reh\u0072an green"',
       exampleTag: 'Soft T',
@@ -91,39 +117,51 @@ export const en: Translations = {
           title: 'Native Sounds',
           tag: 'Phonetics',
           description:
-            'Master the 23 phonemes of English. Focus on the ones that trip up Spanish speakers most.',
+            'Master 45 native sound topics — consonants, vowels, and patterns Spanish speakers miss most.',
+          examples: ['/θ/ vs /ð/', 'Soft T', 'schwa /ə/'],
         },
         {
           title: 'Connected Speech',
           tag: 'Linking & reduction',
           description:
             'Hear how sounds morph and merge when natives speak at full speed — gonna, linking, elision.',
+          examples: ['gonna', 'wanna', 'word linking'],
         },
         {
           title: 'Flow & Connectors',
           tag: 'Fluency',
           description:
             'Connectors and structures that make you sound fluent, not robotic.',
+          examples: ['however', 'furthermore', 'in short'],
         },
         {
           title: 'Real Talk',
           tag: 'Everyday English',
           description:
             'The casual vocabulary natives use every day — never taught in class.',
+          examples: ['stuff', 'you guys', "I'm good"],
         },
       ],
     },
-    notify: {
-      sectionLabel: 'Coming soon',
-      headline: 'Stop missing what natives say.',
+    finalCta: {
+      sectionLabel: 'Get started',
+      headline: 'Start hearing what natives actually say.',
       subheadline:
-        "Be the first to know when we launch. No spam — one email, when it's ready.",
-      inputPlaceholder: 'your@email.com',
-      ctaButton: 'Notify me',
-      disclaimer: 'No spam. Unsubscribe any time.',
+        'Play free as a guest or create an account to save progress and track your stats.',
+      ctaSignUp: 'Sign up free',
+      ctaPlay: 'Play now',
     },
     footer: {
-      tagline: 'Still in development',
+      tagline: 'Phonetics · Connected speech · Real talk',
+      navHowItWorks: 'How it works',
+      navGetStarted: 'Get started',
+      navLogin: 'Log in',
+      navRegister: 'Sign up',
+      accents: '🇺🇸 American · 🇬🇧 British · 🇦🇺 Australian',
+    },
+    header: {
+      explore: 'The method',
+      start: 'Try it',
     },
   },
   game: {
@@ -200,6 +238,7 @@ export const en: Translations = {
       ctaPlayAgain: 'Play again',
       ctaChooseModule: 'Choose another module',
       ctaViewStats: 'View my stats →',
+      ctaViewAchievements: 'View my achievements →',
       ctaRegister: 'Save my progress',
       registerTitle: 'Want to save your progress?',
       registerHint:
@@ -272,7 +311,8 @@ export const en: Translations = {
       emptyTitle: 'No guest stats yet',
       emptyBody: 'Play as a guest to see local session stats here.',
       registerTitle: 'Save your progress',
-      registerHint: 'Register to sync stats, streaks and achievements.',
+      registerHint:
+        'Register to sync stats, streaks and achievements on your profile.',
       registerCta: 'Create free account',
     },
     noModuleData: 'No module data yet',
@@ -308,6 +348,107 @@ export const en: Translations = {
   },
   achievements: {
     title: 'Achievements',
+    progress: '{unlocked}/{total} unlocked',
+    motivation: {
+      remaining:
+        'Only {remaining} left — keep going to complete your trophy case!',
+      complete: 'Trophy case complete — you unlocked every badge!',
+    },
+    tooltip: {
+      show: 'Show unlock details',
+      howToUnlock: 'How to unlock',
+      unlocked: 'Unlocked',
+      incentive: 'Why chase it',
+    },
+    categories: {
+      game: 'Game',
+      streak: 'Streaks',
+      module: 'Modules',
+      study: 'Study',
+    },
+    items: {
+      first_game: {
+        title: 'First steps',
+        description: 'Your journey starts with one game.',
+        unlockHint: 'Complete any game session in Play mode.',
+        incentive: 'Every legend starts with a single round.',
+      },
+      perfect_session_10: {
+        title: 'Flawless run',
+        description: 'Ten cards, zero mistakes.',
+        unlockHint: 'Finish a 10+ card game with 100% accuracy.',
+        incentive: 'Precision beats speed — nail a clean run.',
+      },
+      cards_100: {
+        title: 'Century club',
+        description: 'One hundred cards played.',
+        unlockHint: 'Reach 100 total flashcard plays in game mode.',
+        incentive: 'Volume builds real listening reflexes.',
+      },
+      weak_warrior: {
+        title: 'Weak warrior',
+        description: 'Face your hardest cards head-on.',
+        unlockHint: 'Complete a practice game from your weakest cards.',
+        incentive: 'Weak spots are where the biggest gains hide.',
+      },
+      games_10: {
+        title: 'Dedicated player',
+        description: 'Ten finished games.',
+        unlockHint: 'Complete 10 full game sessions.',
+        incentive: 'Consistency beats cramming every time.',
+      },
+      streak_7: {
+        title: 'Week warrior',
+        description: 'Seven days in a row.',
+        unlockHint: 'Play or study on 7 consecutive days.',
+        incentive: 'A week of momentum is hard to break.',
+      },
+      streak_30: {
+        title: 'Monthly master',
+        description: 'Thirty days of discipline.',
+        unlockHint: 'Maintain a 30-day activity streak.',
+        incentive: 'A month of habit rewires your ear.',
+      },
+      streak_100: {
+        title: 'Centurion',
+        description: 'One hundred days of showing up.',
+        unlockHint: 'Reach a 100-day activity streak.',
+        incentive: 'Elite learners play the long game.',
+      },
+      module_mastery_2: {
+        title: 'Solid foundation',
+        description: 'Level 2 mastery unlocked.',
+        unlockHint: 'Reach mastery level 2 in any module.',
+        incentive: 'Depth in one module beats skimming many.',
+      },
+      module_mastery_3: {
+        title: 'Module master',
+        description: 'Level 3 — top tier in a module.',
+        unlockHint: 'Reach mastery level 3 in any module.',
+        incentive: 'Own a module and the rest gets easier.',
+      },
+      module_all_touched: {
+        title: 'Explorer',
+        description: 'Every module sampled.',
+        unlockHint: 'Try at least one card in each content module.',
+        incentive: 'Broad exposure reveals your natural strengths.',
+      },
+      study_first: {
+        title: 'First study',
+        description: 'Your first low-pressure session.',
+        unlockHint: 'Complete your first Study mode session.',
+        incentive: 'Study mode is where patterns really sink in.',
+      },
+      study_sessions_10: {
+        title: 'Study habit',
+        description: 'Ten calm review sessions.',
+        unlockHint: 'Complete 10 Study mode sessions.',
+        incentive: 'Relaxed reps make game mode feel easier.',
+      },
+    },
+    toast: {
+      unlocked: '🏆 New achievement: {title}',
+    },
   },
   profileMenu: {
     title: 'Your player profile',
@@ -385,7 +526,9 @@ export const en: Translations = {
   profile: {
     title: 'Your profile',
     subtitle: 'Manage your account, ranking visibility, and preferences.',
+    tabsAriaLabel: 'Profile sections',
     sections: {
+      achievements: 'Achievements',
       ranking: 'Public identity',
       preferences: 'Settings',
     },
@@ -449,7 +592,7 @@ export const en: Translations = {
       },
       stats: {
         title: 'My progress',
-        description: 'Modules, achievements, and weak cards.',
+        description: 'Modules, KPIs, and weak cards.',
       },
       ranking: {
         title: 'Ranking',
@@ -457,7 +600,7 @@ export const en: Translations = {
       },
       profile: {
         title: 'Profile',
-        description: 'Nickname, visibility, and preferences.',
+        description: 'Achievements, nickname, visibility, and preferences.',
       },
       backofficeGames: {
         title: 'Backoffice',

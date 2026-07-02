@@ -20,6 +20,7 @@ import { GameComponent } from './GameComponent';
 import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
 import { useGameSession } from './hooks/useGameSession';
 import { useGameKeyboardShortcuts } from './hooks/useGameKeyboardShortcuts';
+import { useProgressSideEffects } from '@/core/progress/useProgressSideEffects';
 import { saveGameSummary } from './game-summary.storage';
 import type { FlashcardGameVM, GameSummaryVM } from './game.types';
 
@@ -54,6 +55,8 @@ export const GameContainer = (): ReactElement => {
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
+  const { pollRecentUnlocks, showOptimisticGameUnlocks, reconcileProgress } =
+    useProgressSideEffects();
 
   useEffect(() => {
     if (isResumeMode && isResumeError) {
@@ -107,8 +110,16 @@ export const GameContainer = (): ReactElement => {
       .filter((f): f is FlashcardGameVM => f !== undefined)
       .map((f) => ({ id: f.id, expression: f.expression }));
     setCompleteError(null);
+    const completeStartedAt = new Date();
     completeGame(gameId, {
-      onSuccess: navigateToSummary,
+      onSuccess: (summary) => {
+        if (userType !== 'guest') {
+          showOptimisticGameUnlocks();
+          void pollRecentUnlocks(completeStartedAt);
+          void reconcileProgress();
+        }
+        navigateToSummary(summary);
+      },
       onError: () => {
         setCompleteError(
           'No se pudo finalizar la partida. Reintenta o continúa jugando.',
@@ -119,8 +130,12 @@ export const GameContainer = (): ReactElement => {
     completeGame,
     gameId,
     navigateToSummary,
+    pollRecentUnlocks,
+    reconcileProgress,
     session.wrongFlashcardIds,
     sessionFlashcards,
+    showOptimisticGameUnlocks,
+    userType,
   ]);
 
   useEffect(() => {

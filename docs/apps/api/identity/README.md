@@ -1,75 +1,85 @@
-# Identity BC — Documentación
+# Identity BC
 
-> Bounded Context responsable de la autenticación y gestión de identidad de usuarios en ididntcatchthat.
+## Estructura
 
-## Flujos de negocio
-
-Cada flujo tiene 3 diagramas: secuencia, clases y casos de uso.
-
-| Flujo | Descripción | Diagramas |
-|---|---|---|
-| [Guest](./guest/) | Token temporal para usuarios no registrados | [Secuencia](./guest/sequence.md) · [Clases](./guest/classes.md) · [Casos de uso](./guest/usecases.md) |
-| [Register](./register/) | Registro con email + password | [Secuencia](./register/sequence.md) · [Clases](./register/classes.md) · [Casos de uso](./register/usecases.md) |
-| [Login](./login/) | Autenticación con email + password | [Secuencia](./login/sequence.md) · [Clases](./login/classes.md) · [Casos de uso](./login/usecases.md) |
-| [Refresh](./refresh/) | Renovación de access token con rotación y reuse detection | [Secuencia](./refresh/sequence.md) · [Clases](./refresh/classes.md) · [Casos de uso](./refresh/usecases.md) |
-| [Logout](./logout/) | Cierre de sesión — revoca refresh token del dispositivo | [Secuencia](./logout/sequence.md) · [Clases](./logout/classes.md) · [Casos de uso](./logout/usecases.md) |
-| [Google OAuth](./google-oauth/) | Login / registro mediante Google OAuth2 | [Secuencia](./google-oauth/sequence.md) · [Clases](./google-oauth/classes.md) · [Casos de uso](./google-oauth/usecases.md) |
-| [Migrate Guest](./migrate-guest/) | Migración del progreso guest a cuenta registrada | [Secuencia](./migrate-guest/sequence.md) · [Clases](./migrate-guest/classes.md) · [Casos de uso](./migrate-guest/usecases.md) |
-
----
-
-## Mapa de endpoints
-
-| Método | Ruta | Flujo | Auth |
-|---|---|---|---|
-| `POST` | `/auth/guest` | [Guest](./guest/) | — |
-| `POST` | `/auth/register` | [Register](./register/) | — |
-| `POST` | `/auth/login` | [Login](./login/) | — |
-| `POST` | `/auth/refresh` | [Refresh](./refresh/) | Cookie `userSession` |
-| `POST` | `/auth/logout` | [Logout](./logout/) | Bearer JWT |
-| `GET` | `/auth/google` | [Google OAuth](./google-oauth/) | — |
-| `GET` | `/auth/google/callback` | [Google OAuth](./google-oauth/) | Google OAuth2 |
-| `POST` | `/auth/migrate-guest` | [Migrate Guest](./migrate-guest/) | Bearer JWT |
-
----
-
-## Arquitectura general
-
-```mermaid
-graph LR
-    subgraph Infrastructure
-        C[Controllers]
-        E[TypeORM Entities]
-        R[Repositories]
-    end
-
-    subgraph Application
-        UC[Use Cases]
-        DS[Domain Services]
-    end
-
-    subgraph Domain
-        A[Aggregates / Value Objects]
-        RI[Repository Interfaces]
-        SI[Service Interfaces]
-        EV[Domain Events]
-    end
-
-    C --> UC
-    UC --> A
-    UC --> RI
-    UC --> SI
-    A --> EV
-    R --> E
-    R -.implements.-> RI
+```
+identity/
+├── user/       ← User aggregate, streak, stats, ranking profile, OAuth
+├── session/    ← UserSession, guest/refresh/logout
+└── shared/     ← JWT, bcrypt, IdentityModule, exception registry
 ```
 
-> **Regla de dependencias**: `Infrastructure` → `Application` → `Domain`. Nunca al revés.
+## Endpoints
 
----
+| Método | Ruta | Auth | Respuesta |
+|--------|------|------|-----------|
+| `POST` | `/auth/guest` | — | `{ accessToken, deviceId }` (sin envelope — contrato auth) |
+| `POST` | `/auth/register` | — | `{ accessToken }` + cookie refresh |
+| `POST` | `/auth/login` | — | `{ accessToken }` + cookie refresh |
+| `POST` | `/auth/refresh` | Cookie | `{ accessToken }` |
+| `POST` | `/auth/logout` | JWT | 204 void |
+| `GET` | `/auth/google` | — | redirect OAuth |
+| `GET` | `/auth/google/callback` | Google | redirect + cookie refresh |
+| `POST` | `/auth/migrate-guest` | JWT | 204 void |
+| `GET` | `/users/me/ranking-profile` | JWT | envelope |
+| `PATCH` | `/users/me/ranking-profile` | JWT | envelope |
+| `GET` | `/users/stats?period=` | JWT admin | envelope |
+
+## Eventos publicados
+
+| Evento | Exchange | Cuándo |
+|--------|----------|--------|
+| `UserRegistered` | `ididntcatchthat.identity.user.registered` | Registro email u OAuth nuevo |
+| `StreakUpdated` | `ididntcatchthat.identity.streak.updated` | Primera actividad del día |
+| `StreakBroken` | `ididntcatchthat.identity.streak.broken` | Cron detecta racha rota |
+| `RankingProfileUpdated` | `ididntcatchthat.identity.user.ranking_profile_updated` | PATCH ranking profile |
+| `GuestProgressMigrated` | `ididntcatchthat.identity.user.guest_progress_migrated` | Migrate guest tras registro |
+| `SessionStarted` | `ididntcatchthat.identity.session.started` | Login / register / OAuth / guest |
+| `SessionRevoked` | `ididntcatchthat.identity.session.revoked` | Logout |
+| `SessionRotated` | `ididntcatchthat.identity.session.rotated` | Refresh token |
+| `SessionCompromised` | `ididntcatchthat.identity.session.compromised` | Reuse detection |
+
+## Eventos consumidos
+
+| Evento | Handler | Cola | Efecto |
+|--------|---------|------|--------|
+| `GameCompleted` | `StreakUpdaterOnGameCompleted` | `identity.update_streak_on_game_completed` | Incrementa streak si primera actividad del día |
+| `FlashcardViewed` | `StreakUpdaterOnFlashcardViewed` | `identity.update_streak_on_flashcard_viewed` | Incrementa streak en study (userId no null) |
+
+## Tablas
+
+| Tabla | Propósito |
+|-------|-----------|
+| `users` | Agregado User (incl. streak, ranking prefs) |
+| `user_sessions` | Refresh tokens por dispositivo |
+
+## Cross-BC
+
+| Dependencia | Mecanismo |
+|-------------|-----------|
+| Ranking sync | `RankingProfileUpdated` → `UpdateRankingOnRankingProfileUpdated` |
+| Gaming guest games | `GuestProgressMigrated` → `MigrateGuestGamesOnGuestProgressMigrated` |
+| Progress guest stats | `GuestProgressMigrated` → `GuestProgressImporterOnGuestProgressMigrated` |
+| Gaming activity (admin stats) | Read port `GamingUserActivityQuery` exportado por GamingModule |
 
 ## Referencias
 
+- [Flujos de auth](./guest/) — guest, register, login, refresh, logout, OAuth, migrate-guest
+- [Ranking Profile](./ranking-profile/) — GET/PATCH `/users/me/ranking-profile`
+- [User Stats](./user-stats/) — GET `/users/stats?period=`
 - [Spec de autenticación](../../../spec/auth.md)
-- [Guía de testing](../../../testing.md)
-- [Tasks completados](../../../tasks/auth.md)
+- [Bounded contexts](../../../domain/bounded-contexts.md)
+
+## Flujos detallados
+
+| Flujo | Descripción | Diagramas |
+|-------|-------------|-----------|
+| [Guest](./guest/) | `POST /auth/guest` | [Clases](./guest/classes.md) · [Secuencia](./guest/sequence.md) · [Casos de uso](./guest/usecases.md) |
+| [Register](./register/) | `POST /auth/register` | [Clases](./register/classes.md) · [Secuencia](./register/sequence.md) · [Casos de uso](./register/usecases.md) |
+| [Login](./login/) | `POST /auth/login` | [Clases](./login/classes.md) · [Secuencia](./login/sequence.md) · [Casos de uso](./login/usecases.md) |
+| [Refresh](./refresh/) | `POST /auth/refresh` | [Clases](./refresh/classes.md) · [Secuencia](./refresh/sequence.md) · [Casos de uso](./refresh/usecases.md) |
+| [Logout](./logout/) | `POST /auth/logout` | [Clases](./logout/classes.md) · [Secuencia](./logout/sequence.md) · [Casos de uso](./logout/usecases.md) |
+| [Google OAuth](./google-oauth/) | `GET /auth/google`, callback | [Clases](./google-oauth/classes.md) · [Secuencia](./google-oauth/sequence.md) · [Casos de uso](./google-oauth/usecases.md) |
+| [Migrate Guest](./migrate-guest/) | `POST /auth/migrate-guest` | [Clases](./migrate-guest/classes.md) · [Secuencia](./migrate-guest/sequence.md) · [Casos de uso](./migrate-guest/usecases.md) |
+| [Ranking Profile](./ranking-profile/) | GET/PATCH ranking profile | [Clases](./ranking-profile/classes.md) · [Secuencia](./ranking-profile/sequence.md) · [Casos de uso](./ranking-profile/usecases.md) |
+| [User Stats](./user-stats/) | `GET /users/stats?period=` | [Clases](./user-stats/classes.md) · [Secuencia](./user-stats/sequence.md) · [Casos de uso](./user-stats/usecases.md) |

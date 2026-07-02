@@ -1,7 +1,7 @@
 # Spec: Gaming — Bounded Context Gaming
 
-**Estado**: Borrador  
-**Fecha**: 2026-05-25  
+**Estado**: Implementado  
+**Fecha**: 2026-05-25 (implementado 2026-07-02)  
 **BC**: Gaming  
 **Scope**: API (`apps/api/src/gaming/`)  
 **Tasks**: [docs/tasks/gaming.md](../tasks/gaming.md)
@@ -20,7 +20,7 @@
 | User               | Completar partida               | `POST /games/:id/complete`              |
 | User               | Pausar partida                  | `PATCH /games/:id` `{ status: paused }` |
 | User               | Listar partidas pausadas        | `GET /games?status=paused`              |
-| User               | Retomar partida                 | `GET /games/:id/resume`                 |
+| User               | Retomar partida                 | `POST /games/:id/resume`                |
 | User               | Abandonar partida               | `PATCH /games/:id` `{ status: abandoned }` |
 
 > Los guests pueden jugar hasta **3 partidas de máximo 10 cartas por día**. No pueden pausar.  
@@ -254,7 +254,7 @@ export const FLASHCARD_SELECTOR = Symbol('FlashcardSelector');
 | `GET`   | `/games/:id/summary`    | `GameSummaryFinder`  | Bearer (any)      |
 | `PATCH` | `/games/:id`            | `GamePauser` / `GameAbandoner` | Bearer (user) |
 | `GET`   | `/games`                | `PausedGamesLister`  | Bearer (user)     |
-| `GET`   | `/games/:id/resume`     | `GameResumer`        | Bearer (user)     |
+| `POST`  | `/games/:id/resume`     | `GameResumer`        | Bearer (user)     |
 
 > Los endpoints con Bearer (any) aceptan tanto tokens de tipo `user` como `guest`.  
 > `PATCH /games/:id` distingue la acción por el campo `status` del body: `paused` → `GamePauser`, `abandoned` → `GameAbandoner`.
@@ -315,16 +315,20 @@ apps/api/src/
         record-attempt-post.controller.ts
         record-attempt-post.payload.ts
         complete-game-post.controller.ts
-        pause-game-patch.controller.ts
-        pause-game-patch.payload.ts
-        list-paused-games-get.controller.ts
-        resume-game-get.controller.ts
-        abandon-game-patch.controller.ts   ← mismo endpoint PATCH /games/:id
+        patch-game-patch.controller.ts
+        patch-game.payload.ts
+        search-games-get.controller.ts
+        resume-game-post.controller.ts
+        find-game-summary-get.controller.ts
+        search-game-flashcards-get.controller.ts
+        search-games-stats-get.controller.ts
+        record-view-post.controller.ts
       persistence/
         game.entity.ts
-        attempt.entity.ts
         game-flashcard.entity.ts           ← join table
         typeorm-game.repository.ts
+        typeorm-attempt.repository.ts      ← SQL raw (sin entity)
+        typeorm-view.repository.ts         ← SQL raw (sin entity)
       selectors/
         typeorm-flashcard-selector.ts      ← implementa FlashcardSelector
       framework/
@@ -405,7 +409,7 @@ apps/api/test/
 
 ### Retomar partida
 
-- [ ] `GET /games/:id/resume` retorna las flashcards pendientes (sin attempt registrado) desde `lastFlashcardId`.
+- [ ] `POST /games/:id/resume` retorna las flashcards pendientes (sin attempt registrado) desde `lastFlashcardId`.
 - [ ] Game no `paused` → 409 `GameNotPaused`.
 - [ ] El game vuelve a estado `in_progress`.
 

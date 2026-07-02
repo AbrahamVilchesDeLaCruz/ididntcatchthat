@@ -44,21 +44,31 @@ export async function startGame(
   token: string,
   options?: {
     mode?: 'study' | 'game';
-    module?: string;
+    module?: string | null;
     cardCount?: number;
   },
 ): Promise<{ gameId: string; flashcardIds: string[] }> {
+  const payload: {
+    mode: 'study' | 'game';
+    cardCount: number;
+    module?: string | null;
+  } = {
+    mode: options?.mode ?? 'game',
+    cardCount: options?.cardCount ?? 10,
+  };
+
+  if (options?.module !== undefined) {
+    payload.module = options.module;
+  }
+
   const res = await request(app.getHttpServer())
     .post('/v1/games')
     .set('Authorization', `Bearer ${token}`)
-    .send({
-      mode: options?.mode ?? 'game',
-      module: options?.module,
-      cardCount: options?.cardCount ?? 10,
-    })
+    .send(payload)
     .expect(201);
 
-  return res.body as { gameId: string; flashcardIds: string[] };
+  return (res.body as { data: { gameId: string; flashcardIds: string[] } })
+    .data;
 }
 
 export async function recordAttempts(

@@ -23,7 +23,7 @@ Tres responsabilidades concretas:
 graph TD
     subgraph Progress ["📈 Progress"]
         UFS["UserFlashcardStats\n(Aggregate Root)\n─────────────────\nuserId + flashcardId\ntimesStudied\ntimesPlayed\ncorrectCount\naccuracyRate\nlastSeenAt"]
-        MP["ModuleProgress\n(Entity)\n─────────────────\nuserId + module\ntotalAttempts\ncorrectCount\naccuracy\nmasteryLevel 0–3\nlastPlayedAt"]
+        MP["ModuleProgress\n(AggregateRoot)\n─────────────────\nuserId + module\ntotalAttempts\ncorrectCount\naccuracy\nmasteryLevel 0–3\nlastPlayedAt"]
         MN["ModuleName\n(Value Object)\n─────────────────\nnative_sounds\nconnected_speech\nflow_connectors\nreal_talk"]
         MP --> MN
     end
@@ -121,12 +121,12 @@ graph LR
 
 | Evento consumido        | Origen   | Acción                                                     |
 | ----------------------- | -------- | ---------------------------------------------------------- |
-| `AttemptRecorded`       | Gaming   | Actualiza `UserFlashcardStats` del usuario y flashcard     |
-| `GameCompleted`         | Gaming   | Recalcula `ModuleProgress` del módulo jugado               |
+| `AttemptRecorded`       | Gaming   | Actualiza `UserFlashcardStats`; si partida random (`game.module` null) y `mode=game`, recalcula `ModuleProgress` del módulo de la flashcard |
+| `GameCompleted`         | Gaming   | Recalcula `ModuleProgress` del módulo jugado; si random (`module` null), recalcula todos los módulos tocados en la partida |
 | `GuestProgressMigrated` | Identity | Importa todos los intentos del guest al usuario registrado |
 
 > **Nota:** `AttemptRecorded` se ignora si `userId === null` (intentos de guests no se materializan en tiempo real — se importan al registrarse).  
-> **Nota:** `GameCompleted` se ignora si `module === null` (modo aleatorio sin módulo específico).
+> **Nota:** En partidas random (`games.module IS NULL`), cada `AttemptRecorded` en modo juego recalcula el `ModuleProgress` del módulo de la flashcard. Al completar la partida random, se recalculan todos los módulos tocados como red de seguridad.
 
 ---
 
@@ -136,8 +136,8 @@ graph LR
 
 | Use Case               | Trigger                 | Descripción                                                               |
 | ---------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| `UpdateFlashcardStats` | `AttemptRecorded`       | Busca o crea `UserFlashcardStats`, registra el intento                    |
-| `UpdateModuleProgress` | `GameCompleted`         | Agrega stats del módulo, recalcula mastery, emite evento si sube de nivel |
+| `UpdateFlashcardStats` | `AttemptRecorded`       | Busca o crea `UserFlashcardStats`, registra el intento; orquesta recálculo random vía `RandomModuleProgressUpdater` |
+| `UpdateModuleProgress` | `GameCompleted`         | Agrega stats del módulo (o módulos tocados si random), recalcula mastery, emite evento si sube de nivel |
 | `ImportGuestProgress`  | `GuestProgressMigrated` | Idempotente (inbox pattern). Importa todos los intentos del guest         |
 
 ### Queries (lectura)

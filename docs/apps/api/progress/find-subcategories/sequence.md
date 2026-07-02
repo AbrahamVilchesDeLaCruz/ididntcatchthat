@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
     actor U as Usuario
-    participant C as GetSubcategoriesProgressGetController
+    participant C as SearchSubcategoriesProgressGetController
     participant UC as SubcategoryProgressFinder
     participant Q as SubcategoryProgressQuery
     participant DB as PostgreSQL

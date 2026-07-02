@@ -25,12 +25,18 @@ export const GameShell = (): ReactElement => {
       void navigate(isAuthenticated ? DEFAULT_AUTHENTICATED_HOME : '/');
       return;
     }
+    if (isGameRoute && isAuthenticated) {
+      void navigate(DEFAULT_AUTHENTICATED_HOME);
+      return;
+    }
     if (window.history.length > 1) {
       void (navigate(-1) as unknown as Promise<void>);
     } else {
       void navigate('/game');
     }
   };
+
+  const homeLink = isAuthenticated ? DEFAULT_AUTHENTICATED_HOME : '/';
 
   const appLink = isAuthenticated
     ? {
@@ -58,7 +64,7 @@ export const GameShell = (): ReactElement => {
           </div>
 
           <Link
-            to="/"
+            to={homeLink}
             className="truncate text-center transition-opacity hover:opacity-90"
           >
             <BrandWordmark className="text-sm sm:text-base" />

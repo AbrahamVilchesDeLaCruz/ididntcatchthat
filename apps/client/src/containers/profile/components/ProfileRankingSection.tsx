@@ -10,7 +10,7 @@ import type { RankingProfileVM } from '@/containers/ranking/ranking.types';
 import { UserAvatar } from '@/common/components/UserAvatar';
 import { Badge } from '@/common/components/ui/badge';
 import { Button } from '@/common/components/ui/button';
-import { Switch } from '@/common/components/ui/switch';
+import { RankingVisibilityToggle } from '@/common/components/RankingVisibilityToggle';
 import { cn } from '@/common/lib/utils';
 
 const NICKNAME_MIN = 3;
@@ -193,13 +193,14 @@ export const ProfileRankingSection = (): ReactElement => {
                 </p>
               </div>
             </div>
-            <Switch
-              checked={form.showInRanking}
-              onCheckedChange={(checked) =>
-                updateForm({ ...form, showInRanking: checked })
-              }
-              aria-label={labels.showInRankingLabel}
-            />
+            <div className="profile-pill-toggle shrink-0">
+              <RankingVisibilityToggle
+                checked={form.showInRanking}
+                onCheckedChange={(checked) =>
+                  updateForm({ ...form, showInRanking: checked })
+                }
+              />
+            </div>
           </div>
         </div>
       </div>

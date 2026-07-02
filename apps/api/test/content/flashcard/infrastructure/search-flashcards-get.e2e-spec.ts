@@ -56,14 +56,18 @@ describe('content/flashcard SearchFlashcardsGetController (e2e)', () => {
 
       const body = res.body as {
         data: unknown[];
-        total: number;
-        page: number;
-        pageSize: number;
+        pagination: {
+          page: number;
+          limit: number;
+          total_items: number;
+        };
+        meta: { timestamp: string; request_id: string };
       };
       expect(Array.isArray(body.data)).toBe(true);
-      expect(typeof body.total).toBe('number');
-      expect(body.page).toBe(1);
-      expect(body.pageSize).toBe(10);
+      expect(typeof body.pagination.total_items).toBe('number');
+      expect(body.pagination.page).toBe(1);
+      expect(body.pagination.limit).toBe(10);
+      expect(body.meta.request_id).toBeDefined();
     });
   });
 });

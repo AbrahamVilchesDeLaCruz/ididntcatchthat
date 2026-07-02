@@ -1,22 +1,27 @@
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
 import { type GameRepository } from '@/gaming/domain/game.repository';
+import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
 import { GamePauser } from '@/gaming/application/pause/game-pauser';
 import { GameNotFound } from '@/gaming/domain/exceptions/game-not-found';
 import { GameAccessDenied } from '@/gaming/domain/exceptions/game-access-denied';
 import { GameNotInProgress } from '@/gaming/domain/exceptions/game-not-in-progress';
+import { GamePausedEvent } from '@/gaming/domain/events/game-paused.event';
 import { GameMother } from '@test/gaming/domain/game-mother';
 import { RequestGamePauserMother } from './request-game-pauser-mother';
 
 describe('gaming/application/pause GamePauser', () => {
   const repository = mock<GameRepository>();
+  const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
   let pauser: GamePauser;
 
   beforeEach(() => {
     repository.search.mockReset();
     repository.save.mockReset();
-    pauser = new GamePauser(repository, logger);
+    publisher.publish.mockReset();
+    publisher.publish.mockResolvedValue(undefined);
+    pauser = new GamePauser(repository, publisher, logger);
   });
 
   it('should pause an in-progress game', async () => {
@@ -36,6 +41,8 @@ describe('gaming/application/pause GamePauser', () => {
     const savedGame = repository.save.mock.calls[0][0];
     expect(savedGame.toPrimitives().status).toBe('paused');
     expect(savedGame.toPrimitives().lastFlashcardId).toBe('fc-1');
+    const events = publisher.publish.mock.calls[0][0];
+    expect(events[0]).toBeInstanceOf(GamePausedEvent);
   });
 
   it('should throw GameNotFound when game does not exist', async () => {

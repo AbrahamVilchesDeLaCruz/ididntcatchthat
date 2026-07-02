@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  type ProgressSummaryDto,
+  type ProgressSummary,
   type ProgressSummaryQuery,
   PROGRESS_SUMMARY_QUERY,
 } from '@/progress/domain/progress-summary.query';
@@ -18,7 +18,7 @@ export class ProgressSummaryFinder {
 
   async execute({
     userId,
-  }: RequestProgressSummaryFinder): Promise<ProgressSummaryDto> {
+  }: RequestProgressSummaryFinder): Promise<ProgressSummary> {
     return this.query.findByUserId(new UserId(userId));
   }
 }

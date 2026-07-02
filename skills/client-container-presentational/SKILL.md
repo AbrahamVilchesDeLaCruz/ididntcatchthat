@@ -1,18 +1,17 @@
 ---
 name: client-container-presentational
-description: >
-  Contrato Container/Component, responsabilidades, prohibiciones en apps/client/.
-  Trigger: Al crear o modificar Containers y Components en pods, definir el contrato de props, o separar lógica de UI.
+description: "Contrato Container/Component, responsabilidades, prohibiciones en apps/client/. Trigger: Al crear o modificar Containers y Components en pods, definir el contrato de props, o separar lógica de UI."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
   version: "1.0"
 ---
 
-# client-container-presentational
 
 El patrón central del cliente. Cada pod tiene dos piezas obligatorias: **Container** y **Component**.
 
+> Usa el template de `assets/container.template.md` al crear un Container + Component nuevo.
+> Lee `references/docs.md` para el rationale del patrón y docs externos.
 > Referencia completa: [docs/frontend-architecture.md](../../docs/frontend-architecture.md)
 
 ---

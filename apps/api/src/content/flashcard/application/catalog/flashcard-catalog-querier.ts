@@ -3,10 +3,8 @@ import {
   LEARNING_MODULE_LABELS,
   LEARNING_MODULES,
 } from '@/shared/domain/learning-module';
-import {
-  SUBCATEGORY_BY_CATEGORY,
-  SUBCATEGORY_META,
-} from '@/content/flashcard/domain/subcategory-catalog';
+import { SUBCATEGORY_BY_CATEGORY } from '@/shared/domain/subcategory-taxonomy';
+import { SUBCATEGORY_META } from '@/content/flashcard/domain/subcategory-catalog';
 import { type ResponseFlashcardCatalogQuerier } from './response-flashcard-catalog-querier';
 
 export type { ResponseFlashcardCatalogQuerier } from './response-flashcard-catalog-querier';

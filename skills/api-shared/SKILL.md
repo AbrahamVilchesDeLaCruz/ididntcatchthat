@@ -1,22 +1,22 @@
 ---
 name: api-shared
-description: >
-  SharedModule global, bounded context shared, env validation Joi en apps/api/.
-  Trigger: Al crear o modificar SharedModule, añadir validación de variables de entorno con Joi, o infraestructura transversal.
+description: "SharedModule global, bounded context shared, env validation Joi en apps/api/. Trigger: Al crear o modificar SharedModule, añadir validación de variables de entorno con Joi, o infraestructura transversal."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "2.1"
 ---
-
-# Skill: api-shared
 
 ## When to Use
 
 - Al crear o modificar el módulo `SharedModule` global
 - Al crear un shared interno de un bounded context
 - Al añadir validación de variables de entorno
-- Al registrar infraestructura transversal (DB, Criteria, filtros globales)
+- Al registrar infraestructura transversal (logger, event bus, filtros globales)
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
+
+> Lee `references/module-patterns.md` para los módulos completos (`SharedModule`, `AppModule`, `AchievementModule`) y el schema Joi de variables de entorno.
 
 ---
 
@@ -26,178 +26,122 @@ metadata:
 src/
 └── shared/
     ├── domain/
-    │   ├── criteria/               ← Criteria, Filters, Order, Pagination (pure domain)
-    │   └── value-objects/          ← UuidValueObject, StringValueObject, etc.
-    ├── application/                ← interfaces agnósticas (Logger, EventBus, etc.)
+    │   ├── criteria.ts                  ← Criteria (pure domain, un solo archivo)
+    │   ├── aggregate-root.ts
+    │   ├── domain-event.ts
+    │   ├── domain-event-publisher.ts    ← interface del EventBus (port)
+    │   ├── logger.ts                    ← interface del Logger (port)
+    │   ├── value-object.ts
+    │   ├── string-value-object.ts
+    │   ├── uuid-value-object.ts
+    │   ├── user-id.ts
+    │   ├── flashcard-id.ts
+    │   └── exceptions/                  ← excepciones de dominio transversales
+    ├── application/
+    │   ├── subscriber.ts                ← abstract Subscriber
+    │   └── domain-event-consumer.ts     ← interface del consumer
     └── infrastructure/
         ├── persistence/
-        │   ├── typeorm/
-        │   │   ├── typeorm.config.ts
-        │   │   └── criteria/       ← TypeOrmCriteriaConverter, QueryCriteria
-        │   └── migrations/
+        │   ├── inbox/                   ← ProcessedEventEntity, TypeOrmProcessedEventsRepository
+        │   ├── migrations/
+        │   └── typeorm/
+        │       ├── typeorm-data-source-options.ts  ← buildTypeOrmDataSourceOptions()
+        │       └── typeorm.config.cli.ts
         ├── config/
-        │   └── env.validation.ts   ← Joi schema
-        └── shared.module.ts        ← @Global() — se importa UNA vez en AppModule
+        │   ├── env.validation.ts        ← Joi schema
+        │   └── use-stub-adapters.ts
+        ├── framework/
+        │   └── shared.module.ts         ← @Global() — se importa UNA vez en AppModule
+        ├── auth/
+        │   └── auth.module.ts           ← JWT + Google + Guest strategies
+        ├── event-bus/
+        │   ├── amqp-message-bus.ts      ← implements DOMAIN_EVENT_PUBLISHER + DOMAIN_EVENT_CONSUMER
+        │   └── subscribers-bootstrapper.ts
+        ├── exceptions/
+        │   ├── global-exception-registry.ts
+        │   └── http-exception.filter.ts
+        └── logger/
+            └── pino-logger.ts           ← implements LOGGER_SERVICE
 ```
 
 ### Shared interno por bounded context
 
-Cada bounded context que necesite exportar algo entre sus propios módulos usa un shared interno:
+Los bounded contexts con múltiples submódulos tienen un `shared/` propio que contiene:
+- **`domain/`** — value objects, interfaces o constantes que cruzan submódulos dentro del BC
+- **`infrastructure/framework/`** — el módulo NestJS del BC completo (wiring), exception registry del BC
 
 ```
 src/
-└── flashcards/
+└── achievement/
     └── shared/
         ├── domain/
-        │   └── flashcard.repository.ts   ← interface del repositorio
+        │   ├── achievement-key.ts          ← VO compartido entre submódulos
+        │   ├── achievement-category.ts     ← VO compartido
+        │   └── exceptions/                 ← errores de dominio del BC
         └── infrastructure/
-            └── flashcards-shared.module.ts
-```
-
-El `FlashcardsSharedModule` exporta solo lo que otros módulos del mismo bounded context necesitan. El `SharedModule` global exporta infraestructura transversal (DB, Criteria, Logger, EventBus).
-
----
-
-## SharedModule — Global
-
-```typescript
-// src/shared/infrastructure/shared.module.ts
-import { Global, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { envValidationSchema } from './config/env.validation';
-
-@Global()
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validationSchema: envValidationSchema,
-      validationOptions: {
-        abortEarly: false,  // muestra TODOS los errores, no solo el primero
-      },
-    }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get('DB_USER'),
-        password: config.get('DB_PASS'),
-        database: config.get('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: false,   // NUNCA true en producción — usar migrations
-        migrationsRun: false, // correr migrations manualmente o en bootstrap
-      }),
-    }),
-  ],
-  exports: [ConfigModule, TypeOrmModule],
-})
-export class SharedModule {}
+            └── framework/
+                ├── achievement.module.ts           ← NestJS module del BC completo
+                └── achievement-exception-registry.ts
 ```
 
 ---
 
-## Env Validation — Joi
+## Env Validation — Joi (esencial)
 
 ```typescript
 // src/shared/infrastructure/config/env.validation.ts
-import * as Joi from 'joi';
-
 export const envValidationSchema = Joi.object({
-  // App
   NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
   PORT: Joi.number().default(3000),
-
-  // Database
-  DB_HOST: Joi.string().required(),
-  DB_PORT: Joi.number().default(5432),
-  DB_USER: Joi.string().required(),
-  DB_PASS: Joi.string().required(),
-  DB_NAME: Joi.string().required(),
-
-  // Auth
-  JWT_SECRET: Joi.string().min(32).required(),
-  JWT_EXPIRES_IN: Joi.string().default('15m'),
-  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
-  JWT_REFRESH_EXPIRES_IN: Joi.string().default('30d'),
-
-  // Google OAuth
-  GOOGLE_CLIENT_ID: Joi.string().required(),
-  GOOGLE_CLIENT_SECRET: Joi.string().required(),
-  GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
-
-  // RabbitMQ
-  RABBITMQ_URL: Joi.string().uri().required(),
+  // ... ver references/module-patterns.md para schema completo
 });
 ```
 
-**Reglas:**
-- `abortEarly: false` — siempre, para ver todos los errores de una
-- Defaults explícitos para valores con fallback razonable
-- `.required()` en todo lo que no tiene default — falla rápido en arranque
+**Reglas de env:**
+- `abortEarly: false` siempre — ver todos los errores de una
+- `.required()` en todo lo que no tiene default — falla en bootstrap, no en runtime
 - **Joi para env** — no Zod. Es la integración nativa de `@nestjs/config`
+- La configuración vive en `ConfigModule.forRoot()` **en `AppModule`**, no en `SharedModule`
 
 ---
 
-## Bounded Context Shared Module
+## ConfigModule y TypeORM — van en AppModule
 
-```typescript
-// src/flashcards/shared/infrastructure/flashcards-shared.module.ts
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { FlashcardTypeOrmEntity } from './persistence/flashcard.typeorm-entity';
-import { FlashcardTypeOrmRepository } from './persistence/flashcard.typeorm-repository';
-import { FLASHCARD_REPOSITORY } from '../domain/flashcard.repository';
+`ConfigModule.forRoot()` y `TypeOrmModule.forRootAsync()` se configuran en **`AppModule`**, no en `SharedModule`.
 
-@Module({
-  imports: [TypeOrmModule.forFeature([FlashcardTypeOrmEntity])],
-  providers: [
-    {
-      provide: FLASHCARD_REPOSITORY,
-      useClass: FlashcardTypeOrmRepository,
-    },
-  ],
-  exports: [FLASHCARD_REPOSITORY],
-})
-export class FlashcardsSharedModule {}
-```
+- `ConfigModule` se declara `isGlobal: true` para que `ConfigService` esté disponible en todos los módulos
+- TypeORM se configura mediante `buildTypeOrmDataSourceOptions()` que parsea `DATABASE_URL`
+- `SharedModule` no importa ni re-exporta `ConfigModule` ni `TypeOrmModule`
 
-**Regla:** El shared interno exporta SOLO el token de DI (`FLASHCARD_REPOSITORY`), nunca la implementación concreta. Los use cases dependen de la interfaz, no de TypeORM.
+---
+
+## SharedModule — lo que exporta
+
+`SharedModule` provee infraestructura transversal que todos los módulos necesitan sin importarla explícitamente:
+
+| Token / clase | Implementación | Descripción |
+|---|---|---|
+| `LOGGER_SERVICE` | `PinoLogger` | Logger estructurado |
+| `DOMAIN_EVENT_PUBLISHER` | `AmqpMessageBus` | Publica eventos al bus |
+| `DOMAIN_EVENT_CONSUMER` | `AmqpMessageBus` | Consume eventos del bus |
+| `GlobalExceptionRegistry` | — | Registry central de excepciones |
+| `HttpExceptionFilter` | — | Filtro HTTP global (vía `APP_FILTER`) |
 
 ---
 
 ## Criteria + TypeORM
 
-El `SharedModule` registra el `TypeOrmCriteriaConverter` como provider global para que cualquier repositorio lo inyecte:
+El patrón Criteria se aplica **directamente en cada repositorio** con QueryBuilder — no hay un converter compartido. Cada repositorio aplica sus propios filtros porque puede tener relaciones y aliases distintos.
 
-```typescript
-// En SharedModule providers:
-providers: [TypeOrmCriteriaConverter],
-exports: [TypeOrmCriteriaConverter],
-```
-
-```typescript
-// src/shared/infrastructure/persistence/typeorm/criteria/typeorm-criteria.converter.ts
-import { Injectable } from '@nestjs/common';
-import { Criteria } from '@shared/domain/criteria/criteria';
-import { SelectQueryBuilder } from 'typeorm';
-
-@Injectable()
-export class TypeOrmCriteriaConverter {
-  apply<T>(qb: SelectQueryBuilder<T>, criteria: Criteria): SelectQueryBuilder<T> {
-    // aplicar filters, order, pagination al query builder
-    return qb;
-  }
-}
-```
+Ver implementación canónica en skill `api-criteria`.
 
 ---
 
-## Rules
+## Reglas
 
 - `SharedModule` se importa **una sola vez** en `AppModule` — es `@Global()`
-- Los bounded context shared modules **no son globales** — se importan explícitamente
+- `ConfigModule` y `TypeOrmModule` se configuran en `AppModule`, no en `SharedModule`
+- Los bounded context modules **no son globales** — se importan explícitamente en `AppModule`
 - `synchronize: false` **siempre** — las migraciones son la fuente de verdad del schema
-- La validación de env falla en bootstrap — nunca en runtime. Si falta una variable, la app no arranca
+- La validación de env falla en bootstrap — si falta una variable, la app no arranca
+- BC modules exportan solo lo que otros BCs necesitan (tokens de repositorio o domain services)

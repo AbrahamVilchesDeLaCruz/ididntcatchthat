@@ -25,11 +25,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should return rankings and current user position when opted in', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `rank${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'rankhero' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     const { gameId, flashcardIds } = await startGame(app, token, {
@@ -100,11 +101,12 @@ describe('ranking/search-rankings (e2e)', () => {
 
   it('should return viewer visible_unranked when opted in without playing', async () => {
     const token = await registerAndLogin(app);
+    const nickname = `visible${Date.now()}`.slice(0, 20);
 
     await request(app.getHttpServer())
       .patch('/v1/users/me/ranking-profile')
       .set('Authorization', `Bearer ${token}`)
-      .send({ showInRanking: true, nickname: 'visible-only' })
+      .send({ showInRanking: true, nickname })
       .expect(200);
 
     const res = await request(app.getHttpServer())
@@ -127,10 +129,88 @@ describe('ranking/search-rankings (e2e)', () => {
 
     expect(body.data.viewer.status).toBe('visible_unranked');
     expect(body.data.viewer.showInRanking).toBe(true);
-    expect(body.data.viewer.nickname).toBe('visible-only');
+    expect(body.data.viewer.nickname).toBe(nickname);
     expect(body.data.currentUser).toBeNull();
     expect(body.data.entries.every((entry) => entry.userId !== undefined)).toBe(
       true,
     );
+  });
+
+  it('should return viewer hidden when user opted out', async () => {
+    const token = await registerAndLogin(app);
+    const nickname = `hidden${Date.now()}`.slice(0, 20);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: false, nickname })
+      .expect(200);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({ type: 'most_active', period: 'all_time', limit: 10 })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const body = res.body as {
+      meta: { request_id: string };
+      data: {
+        viewer: {
+          showInRanking: boolean;
+          status: string;
+          rank: null;
+          score: null;
+        };
+      };
+    };
+
+    expect(body.meta.request_id).toBeDefined();
+    expect(body.data.viewer.status).toBe('hidden');
+    expect(body.data.viewer.showInRanking).toBe(false);
+    expect(body.data.viewer.rank).toBeNull();
+    expect(body.data.viewer.score).toBeNull();
+  });
+
+  it('should return 422 when module_master is requested without module', async () => {
+    const token = await registerAndLogin(app);
+
+    await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({ type: 'module_master', period: 'all_time', limit: 10 })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(422);
+  });
+
+  it('should accept module_master when module is provided', async () => {
+    const token = await registerAndLogin(app);
+    const nickname = `module${Date.now()}`.slice(0, 20);
+
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/ranking-profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ showInRanking: true, nickname })
+      .expect(200);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/rankings')
+      .query({
+        type: 'module_master',
+        period: 'all_time',
+        module: 'native_sounds',
+        limit: 10,
+      })
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const body = res.body as {
+      data: {
+        viewer: { status: string; showInRanking: boolean };
+        entries: unknown[];
+      };
+    };
+
+    expect(body.data.viewer.showInRanking).toBe(true);
+    expect(body.data.viewer.status).toBe('visible_unranked');
+    expect(Array.isArray(body.data.entries)).toBe(true);
   });
 });

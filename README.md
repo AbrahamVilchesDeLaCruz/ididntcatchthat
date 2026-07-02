@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="apps/client/public/logo.idct-removebg-preview.png" alt="ididntcatchthat logo" width="140" />
+  <img src="apps/client/public/og-image.png" alt="ididntcatchthat logo" width="140" />
 </p>
 
 <h1 align="center">ididntcatchthat.com</h1>
@@ -238,7 +238,6 @@ ididntcatchthat/
 ├── docs/                 ← 📖 Documentación, ADRs, specs y diagramas Mermaid
 ├── infra/                ← 📊 Configs de Prometheus, Grafana, Loki
 ├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
-├── prompts/              ← 💬 Prompts usados durante el desarrollo con IA
 ├── .github/              ← ⚙️ GitHub Actions (CI/CD)
 ├── Makefile              ← 🛠️ Comandos de desarrollo y despliegue
 └── README.md
@@ -337,7 +336,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 - **Problema real identificado**: la brecha entre el inglés de clase y el inglés hablado por nativos
 - **Propuesta de valor diferenciada** → [project-overview](./docs/project-overview.md)
 - **Modelo de dominio** previo a implementar → [domain-model](./docs/domain/domain-model.md) · [game-mechanics](./docs/domain/game-mechanics.md) · [auth-guest](./docs/domain/auth-guest.md)
-- **22 ADRs** con contexto, alternativas y consecuencias → [docs/adr/](./docs/adr/)
+- **28 ADRs** con contexto, alternativas y consecuencias → [docs/adr/](./docs/adr/)
 
 </details>
 
@@ -346,7 +345,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 <br/>
 
 - **Clean Architecture + DDD** con bounded contexts: `content`, `gaming`, `identity`, `progress`
-- **Frontend por pods** Container/Presentational → [frontend-architecture](./docs/frontend-architecture.md)
+- **Frontend por pods** Container/Presentational → [frontend-architecture](./docs/engineering/frontend-architecture.md)
 - **Diagramas Mermaid** embebidos en la documentación
 - **OpenAPI/Swagger** + validación dual Class Validator + Zod
 - **Entornos** local / dev / prod → [deployment](./docs/deployment.md)
@@ -429,7 +428,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 | 📚 **Producto (contenido)** | **DeepSeek** — ejemplos bilingües y fonética (IPA, native speech) al crear flashcards |
 | 🎙️ **Producto (audio)** | ElevenLabs al crear flashcards (offline, ×3 acentos) |
 | 🗣️ **Producto (voz)** | Azure Speech en tiempo real (bonus de puntos) |
-| 📝 **Metodología** | Prompts en `prompts/`, skills reutilizables en `skills/` |
+| 📝 **Metodología** | Skills reutilizables en `skills/`, decisiones en `docs/adr/` |
 
 > La IA no actúa en el flujo principal del juego: el contenido es **curado** en backoffice (DeepSeek + ElevenLabs), no generado dinámicamente durante la partida.
 

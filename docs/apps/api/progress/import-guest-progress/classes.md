@@ -41,7 +41,7 @@ classDiagram
 
     class GuestAttemptRepository {
         <<interface>>
-        +findByDeviceId(guestDeviceId: string): Promise~GuestAttempt[]~
+        +findByGameIds(gameIds: string[]): Promise~GuestAttempt[]~
     }
 
     class ProcessedEventsRepository {
@@ -58,7 +58,7 @@ classDiagram
 
     class TypeOrmGuestAttemptRepository {
         -dataSource: DataSource
-        +findByDeviceId(guestDeviceId: string): Promise~GuestAttempt[]~
+        +findByGameIds(gameIds: string[]): Promise~GuestAttempt[]~
     }
 
     ImportGuestProgressOnGuestProgressMigrated --> ImportGuestProgress

@@ -10,6 +10,7 @@ interface GameSummaryComponentProps {
   onViewPaused?: () => void;
   onRegister: () => void;
   onViewStats: () => void;
+  onViewAchievements?: () => void;
   onPracticeWeakest?: () => void;
 }
 
@@ -34,6 +35,7 @@ export const GameSummaryComponent = ({
   onViewPaused,
   onRegister,
   onViewStats,
+  onViewAchievements,
   onPracticeWeakest,
 }: GameSummaryComponentProps): ReactElement => {
   const { t } = useI18n();
@@ -131,10 +133,19 @@ export const GameSummaryComponent = ({
             </button>
             <button
               onClick={onViewStats}
-              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
+              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
             >
               {gs.ctaViewStats}
             </button>
+            {onViewAchievements ? (
+              <button
+                type="button"
+                onClick={onViewAchievements}
+                className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
+              >
+                {gs.ctaViewAchievements}
+              </button>
+            ) : null}
             {onPracticeWeakest ? (
               <button
                 type="button"

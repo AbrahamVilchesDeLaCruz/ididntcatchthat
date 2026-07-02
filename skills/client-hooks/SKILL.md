@@ -1,17 +1,17 @@
 ---
 name: client-hooks
-description: >
-  Hooks del pod [State, Handlers], hooks globales, cuándo extraer en apps/client/.
-  Trigger: Al crear hooks de estado o handlers en un pod, extraer lógica a hooks globales, o decidir cuándo crear un hook.
+description: "Hooks del pod [State, Handlers], hooks globales, cuándo extraer en apps/client/. Trigger: Al crear hooks de estado o handlers en un pod, extraer lógica a hooks globales, o decidir cuándo crear un hook."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
   version: "1.0"
 ---
 
-# client-hooks
 
 Hooks del pod y hooks globales en `apps/client/`.
+
+> Usa el template de `assets/use-state-handlers.template.md` al extraer `use{Pod}State` y `use{Pod}Handlers`.
+> Lee `references/docs.md` para el rationale del patrón tupla y docs externos.
 
 ---
 

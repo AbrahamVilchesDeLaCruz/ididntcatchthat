@@ -6,16 +6,19 @@ export interface LandingTranslations {
     headline: string;
     headlineAccent: string;
     subheadline: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
     ctaPlay: string;
+    ctaSignUp: string;
     ctaStudy: string;
     ctaHowItWorks: string;
+    ctaGetStarted: string;
     navBackoffice: string;
     navStats: string;
     navDashboard: string;
     navLogin: string;
     navRegister: string;
+  };
+  trustBar: {
+    items: [string, string, string];
   };
   authGate: {
     title: string;
@@ -30,6 +33,23 @@ export interface LandingTranslations {
     title: string;
     subtitle: string;
     hoverHint: string;
+    tapHint: string;
+    cards: [
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        exampleEn: string;
+        exampleEs: string;
+      },
+      {
+        expression: string;
+        ipa: string;
+        meaning: string;
+        exampleEn: string;
+        exampleEs: string;
+      },
+    ];
   };
   problem: {
     sectionLabel: string;
@@ -40,6 +60,8 @@ export interface LandingTranslations {
     weTeachLabel: string;
     weTeachDescription: string;
     exampleLabel: string;
+    exampleWrittenLabel: string;
+    exampleNativeLabel: string;
     exampleWritten: string;
     exampleNative: string;
     exampleTag: string;
@@ -60,22 +82,50 @@ export interface LandingTranslations {
     headline: string;
     subheadline: string;
     items: [
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
-      { title: string; tag: string; description: string },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
+      {
+        title: string;
+        tag: string;
+        description: string;
+        examples: [string, string, string];
+      },
     ];
   };
-  notify: {
+  finalCta: {
     sectionLabel: string;
     headline: string;
     subheadline: string;
-    inputPlaceholder: string;
-    ctaButton: string;
-    disclaimer: string;
+    ctaSignUp: string;
+    ctaPlay: string;
   };
   footer: {
     tagline: string;
+    navHowItWorks: string;
+    navGetStarted: string;
+    navLogin: string;
+    navRegister: string;
+    accents: string;
+  };
+  header: {
+    explore: string;
+    start: string;
   };
 }
 
@@ -153,6 +203,7 @@ export interface GameTranslations {
     ctaPlayAgain: string;
     ctaChooseModule: string;
     ctaViewStats: string;
+    ctaViewAchievements: string;
     ctaRegister: string;
     registerTitle: string;
     registerHint: string;
@@ -229,8 +280,51 @@ export interface StatsTranslations {
   };
 }
 
+export interface AchievementItemTranslation {
+  title: string;
+  description: string;
+  unlockHint: string;
+  incentive: string;
+}
+
 export interface AchievementsTranslations {
   title: string;
+  progress: string;
+  motivation: {
+    remaining: string;
+    complete: string;
+  };
+  tooltip: {
+    show: string;
+    howToUnlock: string;
+    unlocked: string;
+    incentive: string;
+  };
+  categories: {
+    game: string;
+    streak: string;
+    module: string;
+    study: string;
+  };
+  items: Record<
+    | 'first_game'
+    | 'perfect_session_10'
+    | 'cards_100'
+    | 'weak_warrior'
+    | 'games_10'
+    | 'streak_7'
+    | 'streak_30'
+    | 'streak_100'
+    | 'module_mastery_2'
+    | 'module_mastery_3'
+    | 'module_all_touched'
+    | 'study_first'
+    | 'study_sessions_10',
+    AchievementItemTranslation
+  >;
+  toast: {
+    unlocked: string;
+  };
 }
 
 export interface ProfileMenuTranslations {
@@ -370,7 +464,9 @@ export interface SidebarTranslations {
 export interface ProfileTranslations {
   title: string;
   subtitle: string;
+  tabsAriaLabel: string;
   sections: {
+    achievements: string;
     ranking: string;
     preferences: string;
   };

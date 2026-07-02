@@ -42,7 +42,9 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         .send({ mode: 'study', cardCount: 10 })
         .expect(201);
 
-      const body = res.body as { gameId: string; flashcardIds: string[] };
+      const body = (
+        res.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
       expect(typeof body.gameId).toBe('string');
       expect(Array.isArray(body.flashcardIds)).toBe(true);
       expect(body.flashcardIds.length).toBeGreaterThan(0);
@@ -61,7 +63,9 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         .send({ mode: 'game', cardCount: 10 })
         .expect(201);
 
-      const body = res.body as { gameId: string; flashcardIds: string[] };
+      const body = (
+        res.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
       expect(typeof body.gameId).toBe('string');
     });
 
@@ -161,14 +165,18 @@ describe('gaming/game StartGamePostController (e2e)', () => {
         })
         .expect(201);
 
-      const { gameId } = startRes.body as { gameId: string };
+      const { gameId } = (
+        startRes.body as { data: { gameId: string; flashcardIds: string[] } }
+      ).data;
 
       const flashcardsRes = await request(app.getHttpServer())
         .get(`/v1/games/${gameId}/flashcards`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200);
 
-      const flashcards = flashcardsRes.body as { subcategory: string }[];
+      const flashcards = (
+        flashcardsRes.body as { data: { subcategory: string }[] }
+      ).data;
       expect(flashcards.length).toBeGreaterThan(0);
       expect(
         flashcards.every((f) => f.subcategory === 't_soft_between_vowels'),

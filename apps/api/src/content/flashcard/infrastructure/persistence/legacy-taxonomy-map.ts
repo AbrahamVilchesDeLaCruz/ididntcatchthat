@@ -2,7 +2,7 @@ import {
   LEARNING_MODULES,
   LearningModule,
 } from '@/shared/domain/learning-module';
-import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
+import { SUBCATEGORY_BY_CATEGORY } from '@/shared/domain/subcategory-taxonomy';
 
 /** Categorías previas al ADR-024 → LearningModule actual. */
 export const LEGACY_CATEGORY_MAP: Record<string, LearningModule> = {

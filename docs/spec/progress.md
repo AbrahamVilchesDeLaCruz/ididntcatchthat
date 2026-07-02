@@ -32,26 +32,29 @@ Progress materializa el historial de aprendizaje del usuario. Recibe eventos de 
 
 ## Eventos consumidos
 
-| Exchange                                      | BC Emisor | Handler                                            | Idempotencia                                 |
-| --------------------------------------------- | --------- | -------------------------------------------------- | -------------------------------------------- |
-| `idct.gaming.attempts.attempt.recorded`       | Gaming    | `update_flashcard_stats_on_attempt_recorded`       | Natural — UPSERT por `(userId, flashcardId)` |
-| `idct.gaming.games.game.completed`            | Gaming    | `update_module_progress_on_game_completed`         | Natural — recálculo idempotente              |
-| `idct.identity.users.guest_progress.migrated` | Identity  | `import_guest_progress_on_guest_progress_migrated` | Inbox table — `processed_events`             |
+| Exchange | BC Emisor | Handler | Idempotencia |
+| -------- | --------- | ------- | ------------ |
+| `ididntcatchthat.gaming.attempts.attempt.recorded` | Gaming | `FlashcardStatsUpdaterOnAttemptRecorded` | Natural — UPSERT por `(userId, flashcardId)` |
+| `ididntcatchthat.gaming.views.flashcard.viewed` | Gaming | `FlashcardStatsUpdaterOnFlashcardViewed` | Natural — UPSERT por `(userId, flashcardId)` |
+| `ididntcatchthat.gaming.games.game.completed` | Gaming | `ModuleProgressUpdaterOnGameCompleted` | Natural — recálculo idempotente |
+| `ididntcatchthat.identity.user.guest_progress_migrated` | Identity | `GuestProgressImporterOnGuestProgressMigrated` | Inbox table — `processed_events` |
 
 ### Reglas de procesamiento
 
 - `AttemptRecorded` con `userId = null` → **ignorar** (guest — sin progreso persistido).
 - `AttemptRecorded` con `mode = study` → incrementa `times_studied`. Con `mode = game` → incrementa `times_played`.
-- `GameCompleted` con `module = null` (random) → **no** recalcula `ModuleProgress`. Sí habrán actualizado `user_flashcard_stats` individualmente por cada `AttemptRecorded`.
+- `AttemptRecorded` con `mode = game` y partida random (`games.module IS NULL`) → tras actualizar stats, recalcula `ModuleProgress` del módulo de la flashcard (`flashcards.category`).
+- `GameCompleted` con `module` definido → recalcula `ModuleProgress` de ese módulo (comportamiento existente).
+- `GameCompleted` con `module = null` (random) → recalcula `ModuleProgress` de **cada módulo** tocado en la partida (distinct categories de attempts **y** `game_views`).
 - `GuestProgressMigrated` → bulk UPSERT de `user_flashcard_stats` para el `userId` recién registrado, a partir de los attempts del `guestDeviceId`.
 
 ---
 
 ## Eventos publicados
 
-| Exchange                                        | Cuándo                                         |
-| ----------------------------------------------- | ---------------------------------------------- |
-| `idct.progress.module_progress.module_level.up` | Cuando `masteryLevel` sube en `ModuleProgress` |
+| Exchange | Cuándo |
+| -------- | ------ |
+| `idct.progress.module_progress.module_mastery_level.increased` | Cuando `masteryLevel` sube — `ModuleProgress.record()` |
 
 ---
 
@@ -169,7 +172,7 @@ ModuleProgress
 
 ```
 ModuleLevelUpEvent
-  eventName: 'idct.progress.module_progress.module_level.up'
+  eventName: 'idct.progress.module_progress.module_mastery_level.increased'
   attrs:
     userId: string
     module: string
@@ -181,8 +184,8 @@ ModuleLevelUpEvent
 ### Domain Exceptions
 
 ```
-UserFlashcardStatsNotFound
-  — cuando se busca stats de un usuario/flashcard que no existe
+ModuleNameInvalid
+  — cuando el slug de módulo no pertenece a LEARNING_MODULES
 ```
 
 ### Repository Interface

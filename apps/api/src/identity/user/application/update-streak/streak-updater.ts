@@ -9,6 +9,7 @@ import {
 } from '@/shared/domain/domain-event-publisher';
 import { UserId } from '@/shared/domain/user-id';
 import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-not-found.exception';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 
 export type RequestStreakUpdater = {
   userId: string;
@@ -21,6 +22,7 @@ export class StreakUpdater {
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(DOMAIN_EVENT_PUBLISHER)
     private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE) private readonly logger: Logger,
   ) {}
 
   async execute({ userId, activityDate }: RequestStreakUpdater): Promise<void> {
@@ -32,5 +34,10 @@ export class StreakUpdater {
 
     await this.userRepository.save(updated);
     await this.publisher.publish(updated.pullDomainEvents());
+
+    this.logger.info('User streak updated', {
+      userId,
+      currentStreak: updated.currentStreak,
+    });
   }
 }

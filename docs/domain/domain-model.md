@@ -32,8 +32,8 @@ graph TB
         ModuleProgress["ModuleProgress (Entity)\n─────────────────\nuserId: UserId\nmodule: ModuleName\ntotalAttempts: number\ncorrectCount: number\naccuracy: number\nmasteryLevel: 0|1|2|3\nlastPlayedAt: Date\nupdatedAt: Date"]
     end
 
-    subgraph Pronunciation ["🎤 Pronunciation"]
-        PronunciationAttempt["PronunciationAttempt (Entity)\n─────────────────\nid: uuid\nuserId: UserId\nflashcardId: FlashcardId\nscore: number\nphonemes: PhonemeResult[]\ncreatedAt: Date"]
+    subgraph Pronunciation ["🎤 Pronunciation ⚠️ Planned"]
+        PronunciationAttempt["PronunciationAttempt ⚠️ Planned\n─────────────────\nid: uuid\nuserId: UserId\nflashcardId: FlashcardId\nscore: number\nphonemes: PhonemeResult[]\ncreatedAt: Date"]
     end
 
     subgraph Ranking ["🏆 Ranking"]
@@ -101,7 +101,7 @@ graph TB
 | `GuestProgressMigrated`  | User                 | → importa games + attempts del guest           |
 | `StreakUpdated`          | User                 | → notificación si hito (7, 30, 100 días)       |
 | `StreakBroken`           | User                 | → email + push notification                    |
-| `PronunciationEvaluated` | PronunciationAttempt | → actualiza pronunciation stats                |
+| `PronunciationEvaluated` ⚠️ | PronunciationAttempt ⚠️ Planned | → actualiza pronunciation stats (BC no implementado) |
 
 ---
 

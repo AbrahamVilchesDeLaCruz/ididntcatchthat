@@ -2,24 +2,28 @@
 
 ```mermaid
 classDiagram
-    class RankingUpdater {
-        +recordGameCompleted(userId, mode, finishedAt)
-        +recordAttempt(userId, mode, correct, answeredAt)
-        +recordStreakUpdated(userId, newStreak)
-        +recordModuleMastery(userId, module, level)
-        +syncProfile(userId, showInRanking, nickname)
-        +backfillUser(userId, nickname)
+    class RankingScoreWriter {
+        +incrementScore(key, userId, nickname, delta)
+        +applyScore(key, userId, nickname, score)
+        +removeAllForUser(userId)
+        +renameAllForUser(userId, nickname)
     }
-    class Ranking {
-        +incrementScore(delta)
-        +applyScore(score)
-        +rename(nickname)
-        +toPrimitives() RankingPrimitives
+    class RecordRankingGameCompleted {
+        +execute(request)
     }
-    class RankingRepository {
+    class RecordRankingAttempt {
+        +execute(request)
+    }
+    class SyncRankingProfile {
+        +execute(request)
+    }
+    class RankingUpdaterOnGameCompleted {
+        +on(event)
+    }
+    class RankingScoreRepository {
         +save(ranking)
-        +search(id) Ranking
-        +match(criteria) Ranking[]
+        +search(id)
+        +match(criteria)
         +remove(id)
     }
     class RankingUserStatsQuery {
@@ -28,22 +32,20 @@ classDiagram
         +sumCorrectCount(userId, since)
         +moduleMasteryLevels(userId)
     }
-    class RankingUserReader {
-        +findEligibleUser(userId) RankingEligibleUser
+    class RankingProfileQuery {
+        <<port>>
+        +findEligibleUser(userId)
+        +findUserRankingPreferences(userId)
     }
-    class RankingKey {
-        +create(type, period, module?) RankingKey
-    }
-    class RankingId {
-        +fromKey(key, userId) RankingId
-    }
-    RankingUpdater --> RankingRepository
-    RankingUpdater --> RankingUserStatsQuery
-    RankingUpdater --> RankingUserReader
-    RankingUpdater --> Ranking
-    RankingUpdater --> RankingKey
-    RankingUpdater --> RankingId
-    RankingRepository --> Ranking
+    RankingUpdaterOnGameCompleted --> RecordRankingGameCompleted
+    RecordRankingGameCompleted --> RankingScoreWriter
+    RecordRankingAttempt --> RankingScoreWriter
+    SyncRankingProfile --> RankingScoreWriter
+    RankingScoreWriter --> RankingScoreRepository
+    RecordRankingGameCompleted --> RankingUserStatsQuery
+    RecordRankingGameCompleted --> RankingProfileQuery
 ```
 
-El repository expone solo los cuatro métodos estándar del dominio. Las queries cross-BC para recalcular scores viven en `RankingUserStatsQuery` — puerto separado, no métodos ad-hoc en el repository.
+Subscribers en `projection/application/update/` delegan a use cases con `execute()`.
+
+ACL: `IdentityRankingProfileAdapter` (search) implementa `RankingProfileQuery` vía `RankingEligibilityQuery` de Identity.

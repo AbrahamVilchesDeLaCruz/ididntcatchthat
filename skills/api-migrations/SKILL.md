@@ -1,21 +1,20 @@
 ---
 name: api-migrations
-description: >
-  TypeORM migrations formato, seeds idempotentes en apps/api/.
-  Trigger: Al crear una nueva migración TypeORM, añadir seeds de datos iniciales o de prueba.
+description: "TypeORM migrations formato, seeds idempotentes en apps/api/. Trigger: Al crear una nueva migración TypeORM, añadir seeds de datos iniciales o de prueba."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
   version: "1.0"
 ---
 
-# Skill: api-migrations
 
 ## When to Use
 
 - Al crear una nueva migración TypeORM
 - Al añadir seeds de datos iniciales o de prueba
 - Al entender cuándo correr migrations vs seeds
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
 
 ---
 
@@ -30,26 +29,26 @@ timestamp = YYYYMMDDHHmmss + epoch ms concatenados
 ```
 
 ```typescript
-// src/shared/infrastructure/persistence/migrations/Migration2025040217091743613792720.ts
-import { MigrationInterface, QueryRunner } from 'typeorm';
+// src/shared/infrastructure/persistence/migrations/Migration202605230526271779506787479.ts
+import { type MigrationInterface, type QueryRunner } from 'typeorm';
 
-export class Migration2025040217091743613792720 implements MigrationInterface {
-  name = 'Migration2025040217091743613792720';
+export class Migration202605230526271779506787479 implements MigrationInterface {
+  name = 'Migration202605230526271779506787479';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      CREATE TABLE "flashcard" (
-        "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-        "phrase" character varying NOT NULL,
-        "translation" character varying NOT NULL,
-        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_flashcard" PRIMARY KEY ("id")
+      CREATE TABLE "flashcards" (
+        "id"         UUID        NOT NULL,
+        "expression" VARCHAR     NOT NULL,
+        "created_at" TIMESTAMP   NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMP   NOT NULL DEFAULT now(),
+        CONSTRAINT "PK_flashcards" PRIMARY KEY ("id")
       )
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE "flashcard"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "flashcards"`);
   }
 }
 ```
@@ -65,25 +64,27 @@ export class Migration2025040217091743613792720 implements MigrationInterface {
 
 ```
 src/shared/infrastructure/persistence/migrations/
-└── Migration2025040217091743613792720.ts
-└── Migration2025040218103012345678901.ts
+└── Migration202605230526271779506787479.ts
+└── Migration202605241854361779641676650.ts
 ```
 
 ### Comandos
 
 ```bash
-# Generar migración a partir de cambios en entities
-pnpm typeorm migration:generate src/shared/infrastructure/persistence/migrations/MigrationName
-
-# Correr migraciones pendientes
-pnpm typeorm migration:run
+# Correr migraciones pendientes (requiere Doppler con credenciales de DB)
+pnpm migration:run
 
 # Revertir última migración
-pnpm typeorm migration:revert
+pnpm migration:revert
 
 # Ver estado de migraciones
-pnpm typeorm migration:show
+pnpm migration:show
+
+# Correr migraciones en local (sin Doppler, usa .env.local)
+pnpm migration:run:local
 ```
+
+> No existe script `migration:generate` en package.json — las migraciones se crean a mano con el template en `assets/migration.template.md`. El timestamp se compone de `YYYYMMDDHHmmss` + epoch en ms concatenados (ej: `202605230526271779506787479`).
 
 ---
 
@@ -94,50 +95,68 @@ Los seeds van al mismo nivel que `migrations/`:
 ```
 src/shared/infrastructure/persistence/
 ├── migrations/
-│   └── Migration2025040217091743613792720.ts
+│   └── Migration202605230526271779506787479.ts
 └── seeds/
-    ├── flashcard.seed.ts
-    └── run-seeds.ts
+    ├── local-demo.seed.ts   ← datos de prueba locales
+    └── run-local-seeds.ts   ← entry point del seed runner
 ```
 
 ### Seed structure
 
+Los seeds usan **SQL raw** vía `dataSource.query()` — no entity repositories. Eso los hace independientes del ORM y de los tipos de entidad.
+
 ```typescript
-// src/shared/infrastructure/persistence/seeds/flashcard.seed.ts
-import { DataSource } from 'typeorm';
-import { FlashcardTypeOrmEntity } from '@flashcards/shared/infrastructure/persistence/flashcard.typeorm-entity';
+// src/shared/infrastructure/persistence/seeds/local-demo.seed.ts
+import { type DataSource } from 'typeorm';
 
-export async function seedFlashcards(dataSource: DataSource): Promise<void> {
-  const repo = dataSource.getRepository(FlashcardTypeOrmEntity);
+export const DEMO_USER_ID = '00000000-0000-4000-a000-000000000001';
+export const DEMO_EMAIL = 'demo@local.dev';
 
-  const exists = await repo.count();
-  if (exists > 0) return; // idempotente — no duplicar si ya hay datos
+export async function seedLocalDemo(dataSource: DataSource): Promise<void> {
+  // idempotente — verificar antes de insertar
+  const existing = await dataSource.query<{ count: string }[]>(
+    `SELECT COUNT(*)::text AS count FROM users WHERE email = $1`,
+    [DEMO_EMAIL],
+  );
 
-  await repo.insert([
-    { id: 'uuid-1', phrase: "I didn't catch that", translation: 'No entendí eso' },
-    { id: 'uuid-2', phrase: "Could you say that again?", translation: '¿Podrías repetirlo?' },
-  ]);
+  if (parseInt(existing[0]?.count ?? '0', 10) > 0) {
+    process.stdout.write('Local demo seed already applied — skipping.\n');
+    return;
+  }
+
+  await dataSource.query(
+    `INSERT INTO users (id, email, nickname, role, show_in_ranking, current_streak, longest_streak, created_at, updated_at)
+     VALUES ($1, $2, 'demo', 'admin', true, 0, 0, NOW(), NOW())`,
+    [DEMO_USER_ID, DEMO_EMAIL],
+  );
+
+  process.stdout.write(`Local demo seed complete.\n`);
 }
 ```
 
 ```typescript
-// src/shared/infrastructure/persistence/seeds/run-seeds.ts
-import { AppDataSource } from '../typeorm/typeorm.config';
-import { seedFlashcards } from './flashcard.seed';
+// src/shared/infrastructure/persistence/seeds/run-local-seeds.ts
+import { AppDataSource } from '../typeorm/typeorm.config.cli';
+import { seedLocalDemo } from './local-demo.seed';
 
 async function run(): Promise<void> {
   await AppDataSource.initialize();
-  await seedFlashcards(AppDataSource);
+  await AppDataSource.runMigrations(); // asegura que el schema existe antes de seedear
+  await seedLocalDemo(AppDataSource);
   await AppDataSource.destroy();
-  console.log('Seeds completed');
 }
 
-run().catch(console.error);
+run().catch((error: unknown) => {
+  process.stderr.write(`Local seed failed: ${String(error)}\n`);
+  process.exit(1);
+});
 ```
 
 **Reglas:**
-- Los seeds son **idempotentes** — verificar antes de insertar
+- Los seeds son **idempotentes** — verificar con `SELECT COUNT(*)` antes de insertar
+- Usar **SQL raw** (`dataSource.query()`) — no entity repositories ni QueryBuilder
+- Llamar `AppDataSource.runMigrations()` antes de seedear — garantiza que el schema existe
 - Seeds de datos de prueba → solo en entornos `development` / `test`
 - Seeds de datos iniciales de producción (ej: roles, categorías base) → también en `production`
 - Guardar UUIDs fijos en seeds de producción para referencias cruzadas estables
-- Correr seeds manualmente: `pnpm ts-node src/shared/infrastructure/persistence/seeds/run-seeds.ts`
+- Correr seeds: `pnpm seed:local`

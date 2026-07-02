@@ -9,13 +9,20 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
 import { SessionRevoker } from '@/identity/session/application/logout/session-revoker';
 
-@ApiTags('auth')
+@ApiTags('identity')
+@ApiBearerAuth('access-token')
 @Controller('auth')
 export class LogoutAuthPostController {
   constructor(
@@ -26,8 +33,14 @@ export class LogoutAuthPostController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Logout — revoke refresh token' })
-  @ApiResponse({ status: 204, description: 'Logged out' })
+  @ApiOperation({
+    summary: 'Logout and revoke refresh token',
+    description:
+      'Revokes the current refresh token session and clears the httpOnly cookie. ' +
+      'Requires a valid JWT access token in the Authorization header.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNoContentResponse({ description: 'Session revoked and cookie cleared' })
   async handler(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

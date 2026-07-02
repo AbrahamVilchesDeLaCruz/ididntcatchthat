@@ -5,7 +5,7 @@ import {
   FlowConnectorsSubcategory,
   NativeSoundsSubcategory,
   RealTalkSubcategory,
-} from '@/content/flashcard/domain/subcategory-catalog';
+} from '@/shared/domain/subcategory-taxonomy';
 import { LearningModule } from '@/shared/domain/learning-module';
 
 export class SubcategoryMother {

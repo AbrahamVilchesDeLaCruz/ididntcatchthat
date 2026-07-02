@@ -102,7 +102,10 @@ export class UserRegistrar {
 
     await this.userRepository.save(user);
     await this.sessionRepository.save(session);
-    await this.publisher.publish(user.pullDomainEvents());
+    await this.publisher.publish([
+      ...user.pullDomainEvents(),
+      ...session.pullDomainEvents(),
+    ]);
 
     this.logger.info('User registered', {
       userId: user.id.value,

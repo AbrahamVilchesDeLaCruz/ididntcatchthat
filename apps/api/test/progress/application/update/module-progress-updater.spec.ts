@@ -1,4 +1,3 @@
-import { type RequestModuleProgressUpdater } from '@/progress/application/update/module-progress-updater';
 import { mock } from 'jest-mock-extended';
 import { type Logger } from '@/shared/domain/logger';
 import { type UserFlashcardStatsRepository } from '@/progress/domain/user-flashcard-stats.repository';
@@ -9,6 +8,7 @@ import { UserFlashcardStatsMother } from '@test/progress/domain/user-flashcard-s
 import { ModuleProgressMother } from '@test/progress/domain/module-progress-mother';
 import { ProgressUserIdMother } from '@test/progress/domain/progress-user-id-mother';
 import { ModuleMasteryLevelIncreasedEvent } from '@/progress/domain/events/module-mastery-level-increased.event';
+import { RequestModuleProgressUpdaterMother } from './request-module-progress-updater-mother';
 
 describe('progress/application/update ModuleProgressUpdater', () => {
   const statsRepository = mock<UserFlashcardStatsRepository>();
@@ -16,14 +16,6 @@ describe('progress/application/update ModuleProgressUpdater', () => {
   const publisher = mock<DomainEventPublisher>();
   const logger = mock<Logger>();
   let updater: ModuleProgressUpdater;
-
-  const makeRequest = (overrides?: {
-    userId?: string;
-    module?: string;
-  }): RequestModuleProgressUpdater => ({
-    userId: overrides?.userId ?? ProgressUserIdMother.random().value,
-    module: overrides?.module ?? 'native_sounds',
-  });
 
   beforeEach(() => {
     statsRepository.findByModule.mockReset();
@@ -46,7 +38,7 @@ describe('progress/application/update ModuleProgressUpdater', () => {
     ]);
     moduleRepository.findByModule.mockResolvedValue(null);
 
-    await updater.execute(makeRequest());
+    await updater.execute(RequestModuleProgressUpdaterMother.random());
 
     expect(moduleRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).not.toHaveBeenCalled();
@@ -62,7 +54,28 @@ describe('progress/application/update ModuleProgressUpdater', () => {
     const existing = ModuleProgressMother.random({ userId, masteryLevel: 0 });
     moduleRepository.findByModule.mockResolvedValue(existing);
 
-    await updater.execute(makeRequest({ userId }));
+    await updater.execute(
+      RequestModuleProgressUpdaterMother.random({ userId }),
+    );
+
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
+    expect(publisher.publish.mock.calls[0][0][0]).toBeInstanceOf(
+      ModuleMasteryLevelIncreasedEvent,
+    );
+  });
+
+  it('should publish ModuleMasteryLevelIncreasedEvent on first module progress save', async () => {
+    const userId = ProgressUserIdMother.random().value;
+    statsRepository.findByModule.mockResolvedValue(
+      Array.from({ length: 6 }, () =>
+        UserFlashcardStatsMother.withAccuracy(0.9),
+      ),
+    );
+    moduleRepository.findByModule.mockResolvedValue(null);
+
+    await updater.execute(
+      RequestModuleProgressUpdaterMother.random({ userId }),
+    );
 
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     expect(publisher.publish.mock.calls[0][0][0]).toBeInstanceOf(
@@ -78,7 +91,9 @@ describe('progress/application/update ModuleProgressUpdater', () => {
     const existing = ModuleProgressMother.random({ userId, masteryLevel: 0 });
     moduleRepository.findByModule.mockResolvedValue(existing);
 
-    await updater.execute(makeRequest({ userId }));
+    await updater.execute(
+      RequestModuleProgressUpdaterMother.random({ userId }),
+    );
 
     expect(moduleRepository.save).toHaveBeenCalledTimes(1);
     expect(publisher.publish).not.toHaveBeenCalled();

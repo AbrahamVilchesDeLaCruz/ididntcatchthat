@@ -1,6 +1,6 @@
 import { type UserId } from '@/shared/domain/user-id';
 
-export interface ProgressSummaryDto {
+export interface ProgressSummary {
   currentStreak: number;
   longestStreak: number;
   accuracy7d: number;
@@ -12,7 +12,7 @@ export interface ProgressSummaryDto {
 }
 
 export interface ProgressSummaryQuery {
-  findByUserId(userId: UserId): Promise<ProgressSummaryDto>;
+  findByUserId(userId: UserId): Promise<ProgressSummary>;
 }
 
 export const PROGRESS_SUMMARY_QUERY = Symbol('ProgressSummaryQuery');

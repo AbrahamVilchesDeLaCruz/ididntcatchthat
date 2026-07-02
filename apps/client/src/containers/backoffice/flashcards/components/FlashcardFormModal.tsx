@@ -148,7 +148,7 @@ export const FlashcardFormModal = ({
                 className={selectClass}
               >
                 <option value="" disabled>
-                  Seleccioná una categoría
+                  Selecciona una categoría
                 </option>
                 {catalog?.categories.map((c) => (
                   <option key={c.value} value={c.value}>
@@ -170,8 +170,8 @@ export const FlashcardFormModal = ({
               >
                 <option value="" disabled>
                   {values.category
-                    ? 'Seleccioná una subcategoría'
-                    : 'Primero elegí categoría'}
+                    ? 'Selecciona una subcategoría'
+                    : 'Primero elige categoría'}
                 </option>
                 {subcategories.map((s) => (
                   <option key={s.value} value={s.value}>

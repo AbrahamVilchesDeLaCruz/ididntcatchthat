@@ -80,9 +80,9 @@ export class GameMother {
       mode: overrides?.mode ?? GameModeMother.game().value,
     });
     if (game.mode.isStudy()) {
-      game.recordView(flashcardIds[0]);
+      game.recordView(flashcardIds[0], null);
     } else {
-      game.recordAttempt(flashcardIds[0], true);
+      game.recordAttempt(flashcardIds[0], true, null);
     }
     game.complete();
     game.pullDomainEvents();

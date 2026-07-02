@@ -25,11 +25,11 @@ OTEL_SERVICE_NAME=ididntcatchthat-api
 GRAFANA_ADMIN_PASSWORD=<doppler>
 ```
 
-## Puertos
+## Puertos (dev — host → container)
 
-| Servicio | Puerto |
-|---|---|
-| API `/metrics` | 3000 |
-| Prometheus | 9090 |
-| Loki | 3100 |
-| Grafana | 3000 (observabilidad stack) |
+| Servicio | Puerto host | Puerto container |
+|---|---|---|
+| API `/metrics` | 3001 | 3000 |
+| Grafana | 3002 | 3000 |
+| Prometheus | 9090 | 9090 |
+| Loki | 3100 | 3100 |

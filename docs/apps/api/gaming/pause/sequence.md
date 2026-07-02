@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
     actor U as Usuario Registrado
-    participant C as PatchGameController
+    participant C as PatchGamePatchController
     participant UC as GamePauser
     participant LUC as PausedGamesLister
     participant GR as GameRepository

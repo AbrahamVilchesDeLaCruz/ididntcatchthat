@@ -2,6 +2,7 @@ import { mock } from 'jest-mock-extended';
 import { StreakUpdater } from '@/identity/user/application/update-streak/streak-updater';
 import { type UserRepository } from '@/identity/user/domain/user.repository';
 import { type DomainEventPublisher } from '@/shared/domain/domain-event-publisher';
+import { type Logger } from '@/shared/domain/logger';
 import { UserNotFoundException } from '@/identity/user/domain/exceptions/user-not-found.exception';
 import { StreakUpdatedEvent } from '@/identity/user/domain/events/streak-updated.event';
 import { UserMother } from '@test/identity/user/domain/user-mother';
@@ -10,6 +11,7 @@ import { RequestStreakUpdaterMother } from './request-streak-updater-mother';
 describe('identity/user/application/update-streak StreakUpdater', () => {
   const userRepository = mock<UserRepository>();
   const publisher = mock<DomainEventPublisher>();
+  const logger = mock<Logger>();
   let updater: StreakUpdater;
 
   beforeEach(() => {
@@ -17,7 +19,7 @@ describe('identity/user/application/update-streak StreakUpdater', () => {
     userRepository.save.mockReset();
     publisher.publish.mockReset();
     publisher.publish.mockResolvedValue(undefined);
-    updater = new StreakUpdater(userRepository, publisher);
+    updater = new StreakUpdater(userRepository, publisher, logger);
   });
 
   it('should increment streak on consecutive days and publish StreakUpdated', async () => {
@@ -40,6 +42,7 @@ describe('identity/user/application/update-streak StreakUpdater', () => {
     expect(saved.currentStreak).toBe(3);
     const events = publisher.publish.mock.calls[0][0];
     expect(events[0]).toBeInstanceOf(StreakUpdatedEvent);
+    expect(logger.info).toHaveBeenCalled();
   });
 
   it('should not save or publish when activity is on the same day', async () => {

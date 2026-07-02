@@ -3,14 +3,14 @@ import { UserEntity } from '@/identity/user/infrastructure/persistence/user.enti
 import { UserSessionEntity } from '@/identity/session/infrastructure/persistence/user-session.entity';
 import { FlashcardEntity } from '@/content/flashcard/infrastructure/persistence/flashcard.entity';
 import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
-import { AttemptEntity } from '@/gaming/infrastructure/persistence/attempt.entity';
 import { GameFlashcardEntity } from '@/gaming/infrastructure/persistence/game-flashcard.entity';
 import { UserFlashcardStatsEntity } from '@/progress/infrastructure/persistence/typeorm/user-flashcard-stats.entity';
 import { ModuleProgressEntity } from '@/progress/infrastructure/persistence/typeorm/module-progress.entity';
-import { RankingUserScoreEntity } from '@/ranking/infrastructure/persistence/typeorm/ranking-user-score.entity';
+import { RankingUserScoreEntity } from '@/ranking/projection/infrastructure/persistence/typeorm/ranking-user-score.entity';
 import { ProcessedEventEntity } from '@/shared/infrastructure/persistence/inbox/processed-event.entity';
-import { UserAchievementEntity } from '@/achievement/infrastructure/persistence/typeorm/user-achievement.entity';
-import { PageViewEntity } from '@/analytics/infrastructure/persistence/page-view.entity';
+import { UserAchievementEntity } from '@/achievement/user-achievement/infrastructure/persistence/user-achievement.entity';
+import { UserAchievementProgressEntity } from '@/achievement/progress/infrastructure/persistence/user-achievement-progress.entity';
+import { PageViewEntity } from '@/analytics/page-view/infrastructure/persistence/page-view.entity';
 import { Migration202605230526271779506787479 } from '../migrations/Migration202605230526271779506787479';
 import { Migration202605241854361779641676650 } from '../migrations/Migration202605241854361779641676650';
 import { Migration202605251200001779720000000 } from '../migrations/Migration202605251200001779720000000';
@@ -25,6 +25,8 @@ import { Migration202606261200001779990000005 } from '../migrations/Migration202
 import { Migration202606271200001779990000006 } from '../migrations/Migration202606271200001779990000006';
 import { Migration202606291000001779990000007 } from '../migrations/Migration202606291000001779990000007';
 import { Migration202606291200001779990000008 } from '../migrations/Migration202606291200001779990000008';
+import { Migration202606301200001779990000009 } from '../migrations/Migration202606301200001779990000009';
+import { Migration202606301400001779990000010 } from '../migrations/Migration202606301400001779990000010';
 import { parseDatabaseUrl, resolveDbSsl } from './resolve-db-ssl';
 
 export const typeOrmEntities = [
@@ -32,13 +34,13 @@ export const typeOrmEntities = [
   UserSessionEntity,
   FlashcardEntity,
   GameEntity,
-  AttemptEntity,
   GameFlashcardEntity,
   UserFlashcardStatsEntity,
   ModuleProgressEntity,
   RankingUserScoreEntity,
   ProcessedEventEntity,
   UserAchievementEntity,
+  UserAchievementProgressEntity,
   PageViewEntity,
 ];
 
@@ -57,6 +59,8 @@ export const typeOrmMigrations = [
   Migration202606271200001779990000006,
   Migration202606291000001779990000007,
   Migration202606291200001779990000008,
+  Migration202606301200001779990000009,
+  Migration202606301400001779990000010,
 ];
 
 export function buildTypeOrmDataSourceOptions(options?: {

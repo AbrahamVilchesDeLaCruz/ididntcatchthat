@@ -1,26 +1,26 @@
 ---
 name: api-observability
-description: >
-  Logger interface, pino, métricas Prometheus, OTel traces en apps/api/.
-  Trigger: Al añadir logging en use cases, configurar métricas Prometheus, o setup de OpenTelemetry.
+description: "Logger interface, pino, métricas Prometheus, OTel traces en apps/api/. Trigger: Al añadir logging en use cases, configurar métricas Prometheus, o setup de OpenTelemetry."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
-  version: "1.0"
+  version: "2.0"
 ---
-
-# Skill: api-observability
 
 ## When to Use
 
 - Al añadir logging en un use case, subscriber o filter
 - Al decidir qué nivel de log usar (info/warn/error/debug)
 - Al añadir métricas de negocio custom
-- Setup e infraestructura → ver `resources/`
+
+> Lee `references/docs.md` para skills relacionadas, ADRs y documentación externa.
+
+> Lee `references/implementations.md` para `PinoLogger`, `MetricsService`, logging en subscribers y en `HttpExceptionFilter`.
+> Setup de infraestructura (Loki, Prometheus, Grafana, OTel): ver `resources/setup.md`.
 
 ---
 
-## Las 3 señales — resumen rápido
+## Las 3 señales
 
 | Signal | Qué captura | Storage | Consultado en |
 |---|---|---|---|
@@ -28,11 +28,11 @@ metadata:
 | Metrics | Cuánto y con qué frecuencia | Prometheus | Grafana |
 | Traces | Cómo viajó un request por dentro | Tempo | Grafana |
 
-OpenTelemetry es el SDK que instrumenta y exporta las 3 señales — no es un storage.
+OpenTelemetry es el SDK que instrumenta y exporta — no es un storage.
 
 ---
 
-## Logger Interface
+## `Logger` Interface (domain)
 
 ```typescript
 // src/shared/domain/logger.ts
@@ -48,180 +48,101 @@ export interface Logger {
 export const LOGGER_SERVICE = Symbol('Logger');
 ```
 
-| Método | Cuándo usarlo |
+| Método | Cuándo |
 |---|---|
 | `info` | Acción de negocio completada (flashcard creada, sesión iniciada) |
-| `warn` | Situación inesperada pero recuperable (retry de RabbitMQ, fallback) |
+| `warn` | Situación inesperada pero recuperable (retry, fallback) |
 | `error` | Error que impacta al usuario o rompe el flujo |
-| `debug` | Detalle técnico — solo útil en desarrollo |
+| `debug` | Detalle técnico — solo en desarrollo |
 
 ---
 
-## Dónde y cómo loguear
+## `AppMetrics` Interface (domain)
+
+```typescript
+// src/shared/domain/app-metrics.ts
+export interface AppMetrics {
+  increment(metric: string, labels?: Record<string, string>): void;
+}
+
+export const APP_METRICS = Symbol('AppMetrics');
+```
+
+Solo tiene `increment` — todos los contadores de negocio son `Counter` de Prometheus.
+No hay `gauge` ni `histogram` en la interfaz de dominio: el `MetricsInterceptor` gestiona los histogramas HTTP directamente.
+
+| Métrica | Labels | Dónde se incrementa |
+|---|---|---|
+| `app_flashcards_created_total` | — | `FlashcardCreator` |
+| `app_games_started_total` | — | `GameStarter` |
+| `app_games_completed_total` | — | `GameCompleter` |
+| `app_audio_generated_total` | `provider` | `FlashcardAudioGenerator` |
+| `app_auth_logins_total` | `provider` | `UserAuthenticator` |
+| `app_auth_registrations_total` | `provider` | `UserRegistrar` |
+
+### Inyección en use case
+
+```typescript
+constructor(
+  @Inject(LOGGER_SERVICE)
+  private readonly logger: Logger,
+  @Inject(APP_METRICS)
+  private readonly metrics: AppMetrics,
+) {}
+
+async execute(request: ...): Promise<...> {
+  // ... lógica ...
+  this.logger.info('Flashcard created', { flashcardId: id, expression, createdBy });
+  this.metrics.increment('app_flashcards_created_total');
+}
+
+// Con labels:
+this.metrics.increment('app_audio_generated_total', { provider: 'elevenlabs' });
+```
+
+> `APP_METRICS` se inyecta igual que `LOGGER_SERVICE` — el módulo `ObservabilityModule` lo exporta como global.
+
+---
+
+## Dónde loguear
 
 ### Use Case — eventos de negocio
 
 ```typescript
-@Injectable()
-export class CreateFlashcardUseCase {
-  constructor(
-    @Inject(FLASHCARD_REPOSITORY) private readonly repository: FlashcardRepository,
-    @Inject(EVENT_BUS) private readonly eventBus: EventBus,
-    @Inject(LOGGER_SERVICE) private readonly logger: Logger,
-  ) {}
+async execute(params: { id: string; phrase: string }): Promise<void> {
+  const flashcard = Flashcard.create(params);
+  await this.repository.save(flashcard);
+  await this.eventBus.publish(flashcard.pullDomainEvents());
 
-  async execute(params: { id: string; phrase: string }): Promise<void> {
-    const flashcard = Flashcard.create(params);
-    await this.repository.save(flashcard);
-    await this.eventBus.publish(flashcard.pullDomainEvents());
-
-    this.logger.info('Flashcard created', {
-      flashcardId: params.id,
-      phrase: params.phrase,
-    });
-  }
+  this.logger.info('Flashcard created', {
+    flashcardId: params.id,
+    phrase: params.phrase,
+  });
 }
 ```
 
-### Subscriber — eventos procesados y errores
+### Contexto siempre útil
 
 ```typescript
-async handle(event: DomainEvent): Promise<void> {
-  this.logger.info('Processing event', { queue: this.queueName, eventId: event.eventId });
-
-  try {
-    await this.useCase.execute({ ... });
-  } catch (error) {
-    this.logger.error('Handler failed', error as Error, {
-      queue: this.queueName,
-      eventId: event.eventId,
-    });
-    throw error; // re-throw — permite retry y DLQ
-  }
-}
-```
-
-### HttpExceptionFilter — errores HTTP (automático)
-
-```typescript
-catch(exception: unknown, host: ArgumentsHost): void {
-  // ...
-  if (status >= 500) {
-    this.logger.error('Internal server error', exception as Error, {
-      path: request.url,
-      method: request.method,
-      requestId: request.headers['x-request-id'],
-    });
-  } else {
-    this.logger.warn('Client error', { status, path: request.url });
-  }
-}
-```
-
-### Controllers — NO loguear manualmente
-
-El `HttpExceptionFilter` y el `MetricsInterceptor` lo hacen automáticamente. No añadir logs en controllers.
-
----
-
-## Contexto del log
-
-El contexto siempre incluye el **identificador del aggregate** afectado:
-
-```typescript
-// ✅ Correcto — contexto útil para debugging
+// ✅ Con identificador del aggregate
 this.logger.info('Flashcard updated', { flashcardId, userId, field: 'phrase' });
 this.logger.error('Audio generation failed', error, { flashcardId, provider: 'elevenlabs' });
 
-// ❌ Incorrecto — sin contexto
+// ❌ Sin contexto
 this.logger.info('Updated');
 this.logger.error(error.message);
 ```
 
 ---
 
-## Métricas HTTP — automáticas
+## Reglas
 
-El `MetricsInterceptor` registra automáticamente en cada request:
-
-- `http_requests_total{method, route, status}` — contador
-- `http_request_duration_seconds{method, route}` — histograma de latencia
-
-No añadir métricas HTTP manualmente en controllers.
-
-## Métricas de negocio — custom
-
-Para métricas específicas del dominio (ej: flashcards creadas por día):
-
-```typescript
-// src/shared/infrastructure/metrics/metrics.service.ts
-import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { Counter } from 'prom-client';
-
-@Injectable()
-export class MetricsService {
-  constructor(
-    @InjectMetric('flashcards_created_total') private readonly counter: Counter,
-  ) {}
-
-  incrementFlashcardsCreated(): void {
-    this.counter.inc();
-  }
-}
-```
-
----
-
-## PinoLogger — implementación concreta
-
-```typescript
-// src/shared/infrastructure/logger/pino-logger.ts
-import { Injectable } from '@nestjs/common';
-import pino from 'pino';
-import { Logger, LogContext } from '@shared/domain/logger';
-
-@Injectable()
-export class PinoLogger implements Logger {
-  private readonly logger = pino({
-    level: process.env.LOG_LEVEL ?? 'info',
-    formatters: { level: (label) => ({ level: label }) },
-    timestamp: pino.stdTimeFunctions.isoTime,
-  });
-
-  info(message: string, context?: LogContext): void {
-    this.logger.info(context ?? {}, message);
-  }
-
-  warn(message: string, context?: LogContext): void {
-    this.logger.warn(context ?? {}, message);
-  }
-
-  error(message: string, error?: Error, context?: LogContext): void {
-    this.logger.error({ ...context, err: error }, message);
-  }
-
-  debug(message: string, context?: LogContext): void {
-    this.logger.debug(context ?? {}, message);
-  }
-}
-```
-
-Registro en `SharedModule`:
-
-```typescript
-{ provide: LOGGER_SERVICE, useClass: PinoLogger }
-```
-
----
-
-## Rules
-
-- `Logger` interface vive en `shared/domain/` — nunca importar pino u OTel en domain/application
+- `Logger` y `AppMetrics` interfaces viven en `shared/domain/` — nunca importar pino, prom-client u OTel en domain/application
 - Loguear **eventos de negocio** en use cases (`info`)
-- Loguear **errores con el objeto `Error`** completo — no solo el mensaje (preserva stack trace)
+- Incrementar métricas de negocio en use cases con `this.metrics.increment('app_<metric>_total')`
+- Loguear **errores con el objeto `Error`** completo — preserva stack trace
 - **No loguear en controllers** — el filter e interceptor lo hacen automáticamente
-- Re-throw en subscribers después de loguear — para que RabbitMQ gestione retry y DLQ
-- El contexto siempre incluye el ID del aggregate afectado
+- Re-throw en subscribers después de loguear — para retry y DLQ
+- `APP_METRICS` se registra en `ObservabilityModule`, no en `SharedModule`
 
-> Setup de infraestructura (Loki, Prometheus, Grafana, OTel): ver `resources/setup.md`
-> Decisión arquitectónica: ver `resources/adr.md` o [ADR 020](../../docs/adr/020-observability-strategy.md)
+> ADR: [docs/adr/020-observability-strategy.md](../../docs/adr/020-observability-strategy.md)

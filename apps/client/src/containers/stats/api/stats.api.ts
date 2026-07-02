@@ -1,41 +1,46 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useShallow } from 'zustand/react/shallow';
 import { apiClient } from '@/core/api/apiClient';
+import {
+  mergeModuleProgressWithOptimistic,
+  mergeProgressSummaryWithOptimistic,
+  selectProgressOptimistic,
+  useProgressOptimisticStore,
+} from '@/core/progress/progressOptimistic.store';
 import {
   mapModuleProgress,
   mapSubcategoryProgress,
   mapWeakFlashcard,
   mapProgressSummary,
-  mapAchievement,
 } from '../stats.mapper';
 import type {
   ModuleProgressApiModel,
   SubcategoryProgressApiModel,
   WeakFlashcardApiModel,
   ProgressSummaryApiModel,
-  AchievementApiModel,
 } from './stats.api-model';
 import type {
   ModuleProgressVM,
   SubcategoryProgressVM,
   WeakFlashcardVM,
   ProgressSummaryVM,
-  AchievementVM,
 } from '../stats.types';
 
-// ─── Query Keys ───────────────────────────────────────────────────────────────
 export const statsKeys = {
   all: ['stats'] as const,
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
   subcategories: ['stats', 'subcategories'] as const,
   summary: ['stats', 'summary'] as const,
-  achievements: ['stats', 'achievements'] as const,
 };
 
-// ─── Queries ──────────────────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useModuleProgress = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
+  const query = useQuery({
     queryKey: statsKeys.modules,
     enabled,
     queryFn: async (): Promise<ModuleProgressVM[]> => {
@@ -45,6 +50,19 @@ export const useModuleProgress = (enabled = true) => {
       return res.data.data.map(mapModuleProgress);
     },
   });
+
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeModuleProgressWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
+  return {
+    ...query,
+    data,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -77,7 +95,10 @@ export const useSubcategoryProgress = (enabled = true) => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useProgressSummary = (enabled = true) => {
-  return useQuery({
+  const optimistic = useProgressOptimisticStore(
+    useShallow(selectProgressOptimistic),
+  );
+  const query = useQuery({
     queryKey: statsKeys.summary,
     enabled,
     queryFn: async (): Promise<ProgressSummaryVM> => {
@@ -87,19 +108,17 @@ export const useProgressSummary = (enabled = true) => {
       return mapProgressSummary(res.data.data);
     },
   });
-};
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useAchievements = (since?: string, enabled = true) => {
-  return useQuery({
-    queryKey: [...statsKeys.achievements, since ?? 'all'] as const,
-    enabled,
-    queryFn: async (): Promise<AchievementVM[]> => {
-      const res = await apiClient.get<{ data: AchievementApiModel[] }>(
-        '/achievements',
-        { params: since ? { since } : undefined },
-      );
-      return res.data.data.map(mapAchievement);
-    },
-  });
+  const data = useMemo(
+    () =>
+      query.data
+        ? mergeProgressSummaryWithOptimistic(query.data, optimistic)
+        : undefined,
+    [optimistic, query.data],
+  );
+
+  return {
+    ...query,
+    data,
+  };
 };

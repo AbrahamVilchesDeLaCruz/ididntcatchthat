@@ -31,8 +31,8 @@ describe('gaming/application/complete GameCompleter', () => {
   it('should complete a game and return summary', async () => {
     const flashcardIds = ['fc-1', 'fc-2'];
     const game = GameMother.random({ flashcardIds });
-    game.recordAttempt('fc-1', true);
-    game.recordAttempt('fc-2', false);
+    game.recordAttempt('fc-1', true, null);
+    game.recordAttempt('fc-2', false, null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);
@@ -76,7 +76,7 @@ describe('gaming/application/complete GameCompleter', () => {
 
   it('should throw GameNotFinished when there are pending flashcards', async () => {
     const game = GameMother.random({ flashcardIds: ['fc-1', 'fc-2'] });
-    game.recordAttempt('fc-1', true);
+    game.recordAttempt('fc-1', true, null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);
@@ -92,7 +92,7 @@ describe('gaming/application/complete GameCompleter', () => {
 
   it('should publish GameCompletedEvent', async () => {
     const game = GameMother.random({ flashcardIds: ['fc-1'] });
-    game.recordAttempt('fc-1', true);
+    game.recordAttempt('fc-1', true, null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);
@@ -110,8 +110,8 @@ describe('gaming/application/complete GameCompleter', () => {
   it('should return study summary without accuracy when mode is study', async () => {
     const flashcardIds = ['fc-1', 'fc-2'];
     const game = GameMother.inStudyProgress({ flashcardIds });
-    game.recordView('fc-1');
-    game.recordView('fc-2');
+    game.recordView('fc-1', null);
+    game.recordView('fc-2', null);
     game.pullDomainEvents();
     const primitives = game.toPrimitives();
     repository.search.mockResolvedValue(game);

@@ -7,7 +7,7 @@
 ## Objetivos
 
 - Hero KPI en `/stats` con métricas accionables (`GET /progress/summary`)
-- Galería de logros (`GET /achievements`, BC Achievement)
+- Galería de logros movida a `/profile#achievements` — ver [achievements.md](achievements.md)
 - Partida de débiles vía `POST /games { source: 'weakest' }`
 - Panel guest local (Zustand) + migración al registrarse
 - Puente post-partida con fallos de sesión y CTA débiles
@@ -35,26 +35,11 @@ Autenticado. Devuelve:
 - Si no hay débiles → 422 `InsufficientWeakFlashcards`
 - Si hay menos que `cardCount`, usa las disponibles
 
-### GET /achievements
-
-- Catálogo fijo v1 (8 logros)
-- Query opcional `since` (ISO8601) para desbloqueos recientes
-
 ## Cliente
 
 1. **StatsHero** — fila 4 KPIs (2×2 mobile)
-2. **StatsAchievements** — galería locked/unlocked
-3. **GuestStatsPanel** — Zustand persist `guest-stats`
-4. **CTA débiles** — stats + GameSummary
-5. **Invalidación** — `summary`, `achievements`, `statsKeys.all` tras complete
+2. **GuestStatsPanel** — Zustand persist `guest-stats`
+3. **CTA débiles** — stats + GameSummary
+4. **Invalidación** — `summary`, `statsKeys.all` tras complete
 
-## Logros v1
-
-| Key | Trigger |
-|-----|---------|
-| `first_game` | primera partida completada |
-| `streak_7` / `streak_30` | `StreakUpdated` |
-| `module_mastery_2` / `module_mastery_3` | `ModuleMasteryLevelIncreased` |
-| `perfect_session_10` | 100% y ≥10 cartas |
-| `cards_100` | ≥100 intentos totales |
-| `weak_warrior` | completar partida `source=weakest` |
+Logros: ver [achievements.md](achievements.md) (profile pod, no stats).

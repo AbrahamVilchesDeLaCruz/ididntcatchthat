@@ -35,8 +35,10 @@ sequenceDiagram
         Controller-->>Client: 204 No Content
     end
 
-    UC->>MigrationRepo: migrateGames(userId, guestGames[])
-    MigrationRepo->>DB: INSERT INTO game_progress<br/>(userId, gameId, phraseId, score, attempts…)
+    UC->>Publisher: publish(GuestProgressMigratedEvent)
+    Publisher-->>GamingHandler: GuestProgressMigrated
+    GamingHandler->>DB: UPDATE games SET user_id = userId WHERE id IN (gameIds)
+    Publisher-->>ProgressHandler: GuestProgressMigrated
     DB-->>MigrationRepo: OK
 
     UC->>Publisher: publish([GuestProgressMigratedEvent])

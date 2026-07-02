@@ -21,4 +21,12 @@ export class ModuleNameMother {
   static create(value: string): ModuleName {
     return ModuleName.create(value);
   }
+
+  static nativeSounds(): ModuleName {
+    return ModuleName.create('native_sounds');
+  }
+
+  static connectedSpeech(): ModuleName {
+    return ModuleName.create('connected_speech');
+  }
 }

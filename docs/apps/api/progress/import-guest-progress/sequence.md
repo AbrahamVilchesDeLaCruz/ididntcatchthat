@@ -22,7 +22,7 @@ sequenceDiagram
         UC-->>S: void — noop
         S-->>AMQP: ack
     else evento nuevo
-        UC->>GA: findByDeviceId(guestDeviceId)
+        UC->>GA: findByGameIds(gameIds)
         GA->>DB: SELECT a.flashcard_id, a.correct, 'game' as mode, a.answered_at FROM attempts a JOIN games g ON g.id = a.game_id WHERE g.user_id=$1
         DB-->>GA: GuestAttempt[]
         GA-->>UC: attempts[]

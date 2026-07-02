@@ -5,8 +5,12 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
 import { statsKeys } from '@/containers/stats/api/stats.api';
+import { achievementKeys } from '@/core/achievements/achievementKeys';
+import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
+import { reconcileProgressWithBackoff } from '@/core/progress/reconcileProgress';
 import {
   mapFlashcardForGame,
   mapGameSummary,
@@ -46,7 +50,7 @@ const invalidateGameAndStats = (
   void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
   void queryClient.invalidateQueries({ queryKey: statsKeys.all });
   void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
-  void queryClient.invalidateQueries({ queryKey: statsKeys.achievements });
+  void queryClient.invalidateQueries({ queryKey: achievementKeys.all });
 };
 
 // ─── Start game ───────────────────────────────────────────────────────────────
@@ -61,8 +65,11 @@ export const useStartGame = (): UseMutationResult<
     mutationFn: async (
       payload: StartGamePayload,
     ): Promise<StartGameApiResponse> => {
-      const res = await apiClient.post<StartGameApiResponse>('/games', payload);
-      return res.data;
+      const res = await apiClient.post<ApiEnvelope<StartGameApiResponse>>(
+        '/games',
+        payload,
+      );
+      return res.data.data;
     },
     onSuccess: () => {
       invalidateGameAndStats(queryClient);
@@ -74,9 +81,16 @@ export const useStartGame = (): UseMutationResult<
 export const useRecordAttempt = (
   gameId: string,
 ): UseMutationResult<void, Error, RecordAttemptPayload> => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: RecordAttemptPayload): Promise<void> => {
       await apiClient.post(`/games/${gameId}/attempts`, payload);
+    },
+    onSuccess: () => {
+      useProgressOptimisticStore.getState().recordGameAttempt();
+      void queryClient.invalidateQueries({ queryKey: statsKeys.modules });
+      void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
     },
   });
 };
@@ -91,13 +105,15 @@ export const useCompleteGame = (): UseMutationResult<
 
   return useMutation({
     mutationFn: async (gameId: string): Promise<GameSummaryVM> => {
-      const res = await apiClient.post<GameSummaryApiModel>(
+      const res = await apiClient.post<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${gameId}/complete`,
       );
-      return mapGameSummary(res.data);
+      return mapGameSummary(res.data.data);
     },
     onSuccess: () => {
+      useProgressOptimisticStore.getState().recordGameComplete();
       invalidateGameAndStats(queryClient);
+      void reconcileProgressWithBackoff(queryClient);
     },
   });
 };
@@ -110,10 +126,10 @@ export const useGameSummary = (
   return useQuery({
     queryKey: gameKeys.summary(gameId),
     queryFn: async (): Promise<GameSummaryVM> => {
-      const res = await apiClient.get<GameSummaryApiModel>(
+      const res = await apiClient.get<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${gameId}/summary`,
       );
-      return mapGameSummary(res.data);
+      return mapGameSummary(res.data.data);
     },
     enabled: !!gameId && enabled,
     retry: 1,
@@ -165,8 +181,13 @@ export const usePausedGames = (
   return useQuery({
     queryKey: gameKeys.paused,
     queryFn: async (): Promise<PausedGameVM[]> => {
-      const res = await apiClient.get<PausedGameApiModel[]>('/games');
-      return res.data.map(mapPausedGame);
+      const res = await apiClient.get<ApiEnvelope<PausedGameApiModel[]>>(
+        '/games',
+        {
+          params: { status: 'paused' },
+        },
+      );
+      return res.data.data.map(mapPausedGame);
     },
     enabled,
   });
@@ -179,10 +200,10 @@ export const useGameFlashcards = (
   return useQuery({
     queryKey: gameKeys.flashcards(gameId),
     queryFn: async (): Promise<FlashcardGameVM[]> => {
-      const res = await apiClient.get<FlashcardGameApiModel[]>(
+      const res = await apiClient.get<ApiEnvelope<FlashcardGameApiModel[]>>(
         `/games/${gameId}/flashcards`,
       );
-      return res.data.map(mapFlashcardForGame);
+      return res.data.data.map(mapFlashcardForGame);
     },
     enabled: !!gameId,
     staleTime: Infinity,
@@ -197,10 +218,10 @@ export const useResumeGame = (
   return useQuery({
     queryKey: gameKeys.resume(gameId),
     queryFn: async (): Promise<ResumeGameApiResponse> => {
-      const res = await apiClient.get<ResumeGameApiResponse>(
+      const res = await apiClient.post<ApiEnvelope<ResumeGameApiResponse>>(
         `/games/${gameId}/resume`,
       );
-      return res.data;
+      return res.data.data;
     },
     select: mapResumeGame,
     enabled: !!gameId && enabled,

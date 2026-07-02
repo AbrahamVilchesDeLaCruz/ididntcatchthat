@@ -27,11 +27,11 @@ describe('content/flashcard BulkCreateFlashcardPostController (e2e)', () => {
   });
 
   describe('POST /v1/flashcards/bulk', () => {
-    it('should return 201 with count when admin creates multiple flashcards', async () => {
+    it('should return 201 when admin creates multiple flashcards', async () => {
       const id1 = crypto.randomUUID();
       const id2 = crypto.randomUUID();
 
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/v1/flashcards/bulk')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
@@ -65,9 +65,6 @@ describe('content/flashcard BulkCreateFlashcardPostController (e2e)', () => {
           ],
         })
         .expect(201);
-
-      const body = res.body as { created: number };
-      expect(body.created).toBe(2);
     });
 
     it('should return 422 when flashcards list is empty', async () => {

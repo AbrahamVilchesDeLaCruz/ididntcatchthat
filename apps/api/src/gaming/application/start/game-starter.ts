@@ -3,7 +3,7 @@ import { Game } from '@/gaming/domain/game';
 import { GameModule } from '@/gaming/domain/game-module';
 import { GameSource, GameSourceValue } from '@/gaming/domain/game-source';
 import { LearningModule } from '@/shared/domain/learning-module';
-import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
+import { isValidSubcategoryForCategory } from '@/shared/domain/subcategory-taxonomy';
 import {
   type GameRepository,
   GAME_REPOSITORY,
@@ -155,8 +155,7 @@ export class GameStarter {
       return;
     }
 
-    const valid = SUBCATEGORY_BY_CATEGORY[module as LearningModule];
-    if (!valid?.has(subcategory)) {
+    if (!isValidSubcategoryForCategory(module as LearningModule, subcategory)) {
       throw new GameSubcategoryInvalid();
     }
   }

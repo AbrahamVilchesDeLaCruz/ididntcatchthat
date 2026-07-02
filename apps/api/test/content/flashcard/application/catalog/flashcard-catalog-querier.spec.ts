@@ -1,6 +1,7 @@
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { CategoryValue } from '@/content/flashcard/domain/category';
-import { SUBCATEGORY_BY_CATEGORY } from '@/content/flashcard/domain/subcategory-catalog';
+import { SUBCATEGORY_META } from '@/content/flashcard/domain/subcategory-catalog';
+import { SUBCATEGORY_BY_CATEGORY } from '@/shared/domain/subcategory-taxonomy';
 import { LearningModule } from '@/shared/domain/learning-module';
 
 describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => {
@@ -55,6 +56,25 @@ describe('content/flashcard/application/catalog FlashcardCatalogQuerier', () => 
 
     for (const category of catalog.categories) {
       expect(category.subcategories.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('should use fallback labels when subcategory meta is missing', () => {
+    const slug = Object.keys(SUBCATEGORY_META)[0];
+    const backup = SUBCATEGORY_META[slug];
+    delete (SUBCATEGORY_META as Record<string, unknown>)[slug];
+
+    try {
+      const catalog = querier.execute();
+      const found = catalog.categories
+        .flatMap((category) => category.subcategories)
+        .find((subcategory) => subcategory.value === slug);
+
+      expect(found?.label).toEqual({ es: slug, en: slug });
+      expect(found?.description).toEqual({ es: '', en: '' });
+      expect(found?.anchorExamples).toEqual([]);
+    } finally {
+      SUBCATEGORY_META[slug] = backup;
     }
   });
 });

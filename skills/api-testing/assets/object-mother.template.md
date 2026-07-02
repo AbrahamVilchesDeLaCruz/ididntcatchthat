@@ -8,7 +8,7 @@ La jerarquía es: `MotherCreator` → Mothers de primitivos → Mothers de VOs �
 ## MotherCreator (shared — ya existe, no recrear)
 
 ```typescript
-// test/contexts/shared/domain/mother-creator.ts
+// apps/api/test/shared/domain/mother-creator.ts
 import { faker, type Faker } from '@faker-js/faker';
 
 export class MotherCreator {
@@ -21,9 +21,9 @@ export class MotherCreator {
 ## Mother de VO
 
 ```typescript
-// test/contexts/__module__/domain/__entity-name__-id-mother.ts
-import { UuidMother } from '../../shared/domain/uuid-mother';
-import { __EntityName__Id } from 'src/contexts/__module__/domain/__entity-name__-id';
+// apps/api/test/__module__/domain/__entity-name__-id-mother.ts
+import { UuidMother } from '@test/shared/domain/uuid-mother';
+import { __EntityName__Id } from '@/__module__/domain/__entity-name__-id';
 
 export class __EntityName__IdMother {
   static random(): __EntityName__Id {
@@ -39,10 +39,10 @@ export class __EntityName__IdMother {
 ## Mother del Aggregate
 
 ```typescript
-// test/contexts/__module__/domain/__entity-name__-mother.ts
-import { __EntityName__ } from 'src/contexts/__module__/domain/__entity-name__';
+// apps/api/test/__module__/domain/__entity-name__-mother.ts
+import { __EntityName__ } from '@/__module__/domain/__entity-name__';
 import { __EntityName__IdMother } from './__entity-name__-id-mother';
-import { StringMother } from '../../shared/domain/string-mother';
+import { StringMother } from '@test/shared/domain/string-mother';
 
 type __EntityName__Primitives = {
   id: string;

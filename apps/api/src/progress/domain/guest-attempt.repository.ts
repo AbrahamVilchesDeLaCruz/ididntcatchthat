@@ -6,7 +6,7 @@ export interface GuestAttempt {
 }
 
 export interface GuestAttemptRepository {
-  findByDeviceId(guestDeviceId: string): Promise<GuestAttempt[]>;
+  findByGameIds(gameIds: string[]): Promise<GuestAttempt[]>;
 }
 
 export const GUEST_ATTEMPT_REPOSITORY = Symbol('GuestAttemptRepository');

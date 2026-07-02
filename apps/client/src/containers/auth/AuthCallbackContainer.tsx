@@ -22,7 +22,7 @@ export const AuthCallbackContainer = (): ReactElement => {
     if (errorParam === 'access_denied')
       return 'Cancelaste el acceso con Google.';
     if (errorParam)
-      return 'El inicio de sesión con Google falló. Intentá de nuevo.';
+      return 'El inicio de sesión con Google falló. Inténtalo de nuevo.';
     return 'No pudimos iniciar sesión con Google.';
   }, [token, errorParam]);
 

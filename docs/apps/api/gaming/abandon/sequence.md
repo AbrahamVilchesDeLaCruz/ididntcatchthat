@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
     actor U as Usuario Registrado
-    participant C as PatchGameController
+    participant C as PatchGamePatchController
     participant UC as GameAbandoner
     participant GR as GameRepository
     participant DB as PostgreSQL

@@ -22,24 +22,24 @@ Evento de dominio
       ↓
 Handler (Subscriber)
       ↓
-RankingUpdater  →  Ranking (aggregate)  →  RankingRepository.save()
+RankingScoreUpdater  →  RankingScore  →  RankingScoreRepository.save()
       ↓
-GET /rankings  →  RankingFinder  →  RankingSelector (RANK() OVER score)
+GET /rankings  →  RankingSearcher  →  RankingLeaderboardQuery (RANK() OVER score)
 ```
 
-La tabla `ranking_user_scores` guarda el **score por usuario**; el **rank** (posición relativa) se calcula en la lectura vía `RankingSelector`.
+La tabla `ranking_user_scores` guarda el **score por usuario**; el **rank** (posición relativa) se calcula en la lectura vía `RankingLeaderboardQuery`.
 
 ## Modelo de dominio
 
 | Elemento | Rol |
 | -------- | --- |
-| `Ranking` | Aggregate root — invariantes de score y nickname |
+| `RankingScore` | Aggregate — fila de proyección; `incrementScore`, `applyScore`, `rename` |
 | `RankingId` | Identidad compuesta `(userId, type, period, period_bucket, module)` |
 | `RankingKey` | Scope de lectura/escritura — periodo efectivo y módulo |
-| `RankingRepository` | `save`, `search`, `match`, `remove` |
-| `RankingSelector` | Leaderboard con `RANK()` — no es repository |
+| `RankingScoreRepository` | `save`, `search`, `match`, `remove` |
+| `RankingLeaderboardQuery` | Leaderboard con `RANK()` — no es repository |
 | `RankingUserStatsQuery` | Stats cross-BC para recalcular ventanas |
-| `RankingUserReader` | Usuario elegible (`show_in_ranking = true`) |
+| `RankingProfileQuery` | Usuario elegible (`show_in_ranking = true`) |
 
 ---
 
@@ -70,14 +70,14 @@ Solo aparecen usuarios con `show_in_ranking = true` (filas existentes en la proy
 | -------- | ------- | --------------------------- |
 | `ididntcatchthat.gaming.games.game.completed` | `update_ranking_on_game_completed` | `most_active` +1 (`all_time`); weekly/monthly recalculados para ese usuario |
 | `ididntcatchthat.gaming.attempts.attempt.recorded` | `update_ranking_on_attempt_recorded` | `top_scorer` +1 si acierto; `most_accurate` recalculado para ese usuario |
-| `idct.identity.streaks.streak.updated` | `update_ranking_on_streak_updated` | `best_streak` = `current_streak` |
+| `ididntcatchthat.identity.streak.updated` | `update_ranking_on_streak_updated` | `best_streak` = `current_streak` |
 | `idct.progress.module_progress.module_mastery_level.increased` | `update_ranking_on_module_mastery_level_increased` | `module_master` = `mastery_level` del módulo |
 
 **Sincrónico (sin evento):**
 
 | Acción | Servicio | Efecto |
 | ------ | -------- | ------ |
-| `PATCH /users/me/ranking-profile` | `RankingUpdater.syncProfile` | Opt-out → `match` + `remove` por usuario; opt-in → backfill histórico del usuario |
+| `PATCH /users/me/ranking-profile` | `RankingProfileUpdated` → `UpdateRankingOnRankingProfileUpdated` | Opt-out → remove; opt-in → backfill |
 
 ---
 

@@ -14,6 +14,8 @@ import { UserIdInvalid } from '@/shared/domain/exceptions/user-id-invalid';
 import { UserRoleInvalidException } from '@/identity/user/domain/exceptions/user-role-invalid.exception';
 import { OauthProviderInvalidException } from '@/identity/user/domain/exceptions/oauth-provider-invalid.exception';
 import { PasswordHashEmptyException } from '@/identity/user/domain/exceptions/password-hash-empty.exception';
+import { FingerprintEmptyException } from '@/identity/session/domain/exceptions/fingerprint-empty.exception';
+import { InvalidCriteriaFieldException } from '@/identity/session/domain/exceptions/invalid-criteria-field.exception';
 
 @Injectable()
 export class IdentityExceptionRegistry implements OnModuleInit {
@@ -36,6 +38,8 @@ export class IdentityExceptionRegistry implements OnModuleInit {
         [UserRoleInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [OauthProviderInvalidException.name, HttpStatus.UNPROCESSABLE_ENTITY],
         [PasswordHashEmptyException.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [FingerprintEmptyException.name, HttpStatus.UNPROCESSABLE_ENTITY],
+        [InvalidCriteriaFieldException.name, HttpStatus.BAD_REQUEST],
       ]),
     );
   }

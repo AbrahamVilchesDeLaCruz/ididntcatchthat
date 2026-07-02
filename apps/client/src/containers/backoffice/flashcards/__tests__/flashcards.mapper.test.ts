@@ -147,16 +147,37 @@ describe('flashcards.mapper', () => {
   });
 
   describe('mapFlashcardsPage', () => {
+    const paginatedEnvelope = (
+      data: FlashcardApiModel[],
+      pagination: {
+        page: number;
+        limit: number;
+        total_items: number;
+      },
+    ): FlashcardsListApiModel => ({
+      data,
+      pagination: {
+        ...pagination,
+        total_pages: Math.ceil(pagination.total_items / pagination.limit),
+        has_next_page:
+          pagination.page <
+          Math.ceil(pagination.total_items / pagination.limit),
+        has_prev_page: pagination.page > 1,
+      },
+      meta: {
+        timestamp: '2026-06-30T12:00:00.000Z',
+        request_id: 'req_test',
+      },
+    });
+
     it('mapea la paginación y los items correctamente', () => {
-      const raw: FlashcardsListApiModel = {
-        data: [
+      const raw = paginatedEnvelope(
+        [
           FlashcardApiModelMother.create({ id: 'fc-001' }),
           FlashcardApiModelMother.create({ id: 'fc-002' }),
         ],
-        total: 42,
-        page: 2,
-        pageSize: 20,
-      };
+        { page: 2, limit: 20, total_items: 42 },
+      );
 
       const page = mapFlashcardsPage(raw);
 
@@ -169,12 +190,7 @@ describe('flashcards.mapper', () => {
     });
 
     it('devuelve items vacío cuando data es un array vacío', () => {
-      const raw: FlashcardsListApiModel = {
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 20,
-      };
+      const raw = paginatedEnvelope([], { page: 1, limit: 20, total_items: 0 });
 
       const page = mapFlashcardsPage(raw);
 

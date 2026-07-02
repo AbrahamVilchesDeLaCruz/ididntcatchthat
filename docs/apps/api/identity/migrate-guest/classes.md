@@ -17,23 +17,8 @@ classDiagram
     }
 
     class GuestProgressMigrator {
-        -guestGameMigrationRepository: GuestGameMigrationRepository
         -publisher: DomainEventPublisher
         +execute(params): Promise~void~
-    }
-
-    class GuestGameMigrationRepository {
-        <<interface>>
-        +migrateGames(userId, guestGames): Promise~void~
-    }
-
-    class GuestGame {
-        <<type>>
-        +gameId: string
-        +phraseId: string
-        +completedAt: Date
-        +score: number
-        +attempts: GuestAttempt[]
     }
 
     class DomainEventPublisher {
@@ -45,13 +30,22 @@ classDiagram
         +userId: string
         +deviceId: string
         +guestDeviceId: string
+        +gameIds: string[]
+    }
+
+    class MigrateGuestGamesOnGuestProgressMigrated {
+        +on(event): Promise~void~
+    }
+
+    class GuestGamesMigrator {
+        +execute(userId, gameIds): Promise~void~
     }
 
     MigrateGuestAuthPostController --> GuestProgressMigrator
     MigrateGuestAuthPostController ..> JwtAuthGuard
     MigrateGuestAuthPostController --> MigrateGuestAuthPostPayload
-    GuestProgressMigrator --> GuestGameMigrationRepository
     GuestProgressMigrator --> DomainEventPublisher
     GuestProgressMigrator ..> GuestProgressMigratedEvent
-    GuestGameMigrationRepository --> GuestGame
+    MigrateGuestGamesOnGuestProgressMigrated ..> GuestProgressMigratedEvent
+    MigrateGuestGamesOnGuestProgressMigrated --> GuestGamesMigrator
 ```

@@ -1,9 +1,9 @@
 import { useState, type ReactElement } from 'react';
-import { PeriodSelector, type StatPeriod } from './PeriodSelector';
+import { PeriodSelector, type SummaryPeriod } from './PeriodSelector';
 import { DailyTrendChart } from './DailyTrendChart';
 import { DistributionChart } from './DistributionChart';
 import { InsightCard, InsightCardSkeleton } from './InsightCard';
-import { useDbStats } from '../api/observability.api';
+import { useAnalyticsSummary } from '../api/observability.api';
 
 const ChartCard = ({
   title,
@@ -32,8 +32,8 @@ const Skeleton = (): ReactElement => (
 );
 
 export const ContenidoTab = (): ReactElement => {
-  const [period, setPeriod] = useState<StatPeriod>('7d');
-  const { data, isLoading, isError } = useDbStats(period);
+  const [period, setPeriod] = useState<SummaryPeriod>('7d');
+  const { data, isLoading, isError } = useAnalyticsSummary(period);
   const fc = data?.flashcards;
 
   const audioErrorVariant =

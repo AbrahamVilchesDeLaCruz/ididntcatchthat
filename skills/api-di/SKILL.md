@@ -1,21 +1,21 @@
 ---
 name: api-di
-description: >
-  Tokens Symbol, registro de providers, inyección sin acoplamiento en apps/api/.
-  Trigger: Al definir tokens de inyección, registrar providers en módulos, o inyectar dependencias en use cases o controllers.
+description: "Tokens Symbol, registro de providers, inyección sin acoplamiento en apps/api/. Trigger: Al definir tokens de inyección, registrar providers en módulos, o inyectar dependencias en use cases o controllers."
 license: Apache-2.0
 metadata:
   author: AbrahamVilchesDeLaCruz
   version: "1.0"
 ---
 
-# Skill: api-di
 
 ## When to Use
 
 - Al definir el token de inyección para un repositorio, servicio o cualquier abstracción
 - Al registrar providers en un módulo
 - Al inyectar dependencias en use cases o controllers
+
+> Usa el template de `assets/di-tokens.template.md` al añadir tokens y módulos a un nuevo BC.
+> Lee `references/docs.md` para el rationale de Symbol vs string y docs externos.
 
 ---
 
@@ -38,57 +38,105 @@ Injection (use case)     → @Inject(TOKEN) — único punto de contacto con Nes
 Los tokens son `Symbol` — no strings (colisiones), no clases de NestJS (acoplamiento).
 
 ```typescript
-// src/flashcards/shared/domain/flashcard.repository.ts
-import { Criteria } from '@shared/domain/criteria/criteria';
-import { Flashcard } from './flashcard';
-import { FlashcardId } from './value-objects/flashcard-id';
+// src/gaming/domain/game.repository.ts
+import { type Criteria } from '@/shared/domain/criteria';
+import { type Game } from './game';
+import { type GameId } from './game-id';
 
-export interface FlashcardRepository {
-  match(criteria: Criteria): Promise<Flashcard[]>;
-  search(id: FlashcardId): Promise<Flashcard | null>;
-  save(flashcard: Flashcard): Promise<void>;
-  remove(id: FlashcardId): Promise<void>;
+export interface GameRepository {
+  save(game: Game): Promise<void>;
+  search(id: GameId): Promise<Game | null>;
+  match(criteria: Criteria): Promise<Game[]>;
 }
 
 // El token vive junto a la interface — en domain
-export const FLASHCARD_REPOSITORY = Symbol('FlashcardRepository');
+export const GAME_REPOSITORY = Symbol('GameRepository');
 ```
 
 El patrón se replica para cualquier abstracción:
 
 ```typescript
-// src/shared/domain/event-bus.ts
-export interface EventBus { ... }
-export const EVENT_BUS = Symbol('EventBus');
+// src/shared/domain/domain-event-publisher.ts
+export interface DomainEventPublisher {
+  publish(events: DomainEvent[]): Promise<void>;
+}
+export const DOMAIN_EVENT_PUBLISHER = Symbol('DomainEventPublisher');
+
+// src/shared/application/domain-event-consumer.ts
+export interface DomainEventConsumer { ... }
+export const DOMAIN_EVENT_CONSUMER = Symbol('DomainEventConsumer');
 
 // src/shared/domain/logger.ts
 export interface Logger { ... }
 export const LOGGER_SERVICE = Symbol('Logger');
+
+// src/shared/domain/app-metrics.ts
+export interface AppMetrics { ... }
+export const APP_METRICS = Symbol('AppMetrics');
 ```
 
 ---
 
 ## Registration in Module
 
+### `useClass` — caso más común (repositorios, servicios)
+
 ```typescript
-// src/flashcards/shared/infrastructure/flashcards-shared.module.ts
+// src/gaming/infrastructure/framework/gaming.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FlashcardTypeOrmRepository } from './persistence/flashcard.typeorm-repository';
-import { FlashcardTypeOrmEntity } from './persistence/flashcard.typeorm-entity';
-import { FLASHCARD_REPOSITORY } from '../domain/flashcard.repository';
+import { GAME_REPOSITORY } from '@/gaming/domain/game.repository';
+import { TypeOrmGameRepository } from '@/gaming/infrastructure/persistence/typeorm-game.repository';
+import { GameEntity } from '@/gaming/infrastructure/persistence/game.entity';
+import { GameStarter } from '@/gaming/application/start/game-starter';
+import { StartGamePostController } from '@/gaming/infrastructure/controllers/start-game-post.controller';
+import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FlashcardTypeOrmEntity])],
+  imports: [SharedModule, TypeOrmModule.forFeature([GameEntity])],
+  controllers: [StartGamePostController],
   providers: [
-    {
-      provide: FLASHCARD_REPOSITORY,
-      useClass: FlashcardTypeOrmRepository,
-    },
+    // Ports
+    { provide: GAME_REPOSITORY, useClass: TypeOrmGameRepository },
+    // Use cases
+    GameStarter,
   ],
-  exports: [FLASHCARD_REPOSITORY],
+  // Solo exportar tokens que otros módulos necesitan
+  exports: [],
 })
-export class FlashcardsSharedModule {}
+export class GamingModule {}
+```
+
+### `useExisting` — singleton compartido bajo múltiples tokens
+
+```typescript
+// src/shared/infrastructure/framework/shared.module.ts
+@Global()
+@Module({
+  providers: [
+    AmqpMessageBus,
+    // Un singleton, dos contratos distintos
+    { provide: DOMAIN_EVENT_PUBLISHER, useExisting: AmqpMessageBus },
+    { provide: DOMAIN_EVENT_CONSUMER, useExisting: AmqpMessageBus },
+    { provide: LOGGER_SERVICE, useClass: PinoLogger },
+  ],
+  exports: [LOGGER_SERVICE, DOMAIN_EVENT_PUBLISHER, DOMAIN_EVENT_CONSUMER],
+})
+export class SharedModule {}
+```
+
+### `useFactory` — providers que dependen de múltiples instancias
+
+```typescript
+// Registrar una lista de subscribers tipados
+{
+  provide: SUBSCRIBERS,
+  useFactory: (
+    onGameCompleted: StreakUpdaterOnGameCompleted,
+  ): Subscriber[] => [onGameCompleted],
+  inject: [StreakUpdaterOnGameCompleted],
+},
+SubscribersBootstrapper,
 ```
 
 ---
@@ -96,16 +144,26 @@ export class FlashcardsSharedModule {}
 ## Injection in Use Case
 
 ```typescript
-// src/flashcards/application/create-flashcard.use-case.ts
+// src/gaming/application/complete/game-completer.ts
 import { Inject, Injectable } from '@nestjs/common';
-import { FlashcardRepository, FLASHCARD_REPOSITORY } from '@flashcards/shared/domain/flashcard.repository';
-import { EventBus, EVENT_BUS } from '@shared/domain/event-bus';
+import {
+  type GameRepository,
+  GAME_REPOSITORY,
+} from '@/gaming/domain/game.repository';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 
 @Injectable()
-export class CreateFlashcardUseCase {
+export class GameCompleter {
   constructor(
-    @Inject(FLASHCARD_REPOSITORY) private readonly repository: FlashcardRepository,
-    @Inject(EVENT_BUS) private readonly eventBus: EventBus,
+    @Inject(GAME_REPOSITORY) private readonly repository: GameRepository,
+    @Inject(DOMAIN_EVENT_PUBLISHER) private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE) private readonly logger: Logger,
+    @Inject(APP_METRICS) private readonly metrics: AppMetrics,
   ) {}
 }
 ```
@@ -116,12 +174,19 @@ export class CreateFlashcardUseCase {
 
 ## Naming Conventions
 
-| Abstracción | Token | Formato |
+| Abstracción | Token | Ejemplo |
 |---|---|---|
-| Repositorio | `FLASHCARD_REPOSITORY` | `SCREAMING_SNAKE_CASE` sin sufijo |
-| EventBus | `EVENT_BUS` | igual |
-| Logger | `LOGGER_SERVICE` | igual |
-| Config | `CONFIG_SERVICE` | igual |
+| Repositorio | `{ENTITY}_REPOSITORY` | `GAME_REPOSITORY`, `USER_REPOSITORY` |
+| Query de solo lectura | `{ENTITY}_QUERY` | `GAME_STATS_QUERY`, `USER_STATS_QUERY` |
+| Selector de dominio | `{ENTITY}_SELECTOR` | `FLASHCARD_SELECTOR` |
+| Provider de dominio | `{ENTITY}_PROVIDER` | `WEAKEST_FLASHCARD_IDS_PROVIDER` |
+| Servicio externo | `{ENTITY}_SERVICE` | `AUDIO_SERVICE` |
+| Publisher de eventos | `DOMAIN_EVENT_PUBLISHER` | shared — publica eventos de dominio |
+| Consumer de eventos | `DOMAIN_EVENT_CONSUMER` | shared — consume colas AMQP |
+| Logger | `LOGGER_SERVICE` | shared — interface Logger |
+| Métricas | `APP_METRICS` | shared — interface AppMetrics |
+
+Formato siempre `SCREAMING_SNAKE_CASE`.
 
 ---
 

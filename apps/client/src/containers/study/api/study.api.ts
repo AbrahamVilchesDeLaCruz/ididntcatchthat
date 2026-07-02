@@ -4,6 +4,8 @@ import {
   type UseMutationResult,
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
+import type { ApiEnvelope } from '@/core/api/api-envelope';
+import { achievementKeys } from '@/core/achievements/achievementKeys';
 import { statsKeys } from '@/containers/stats/api/stats.api';
 import {
   gameKeys,
@@ -14,6 +16,8 @@ import {
   useGameFlashcards,
 } from '@/containers/game/api/game.api';
 import { mapGameSummary } from '@/containers/game/game.mapper';
+import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
+import { reconcileProgressWithBackoff } from '@/core/progress/reconcileProgress';
 import type {
   GameSummaryApiModel,
   StartGameApiResponse,
@@ -30,12 +34,13 @@ export const studyKeys = {
   all: ['study'] as const,
 };
 
-const invalidateStudyAndStats = (
+const invalidateStudyQueries = (
   queryClient: ReturnType<typeof useQueryClient>,
 ): void => {
   void queryClient.invalidateQueries({ queryKey: gameKeys.paused });
   void queryClient.invalidateQueries({ queryKey: statsKeys.all });
   void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
+  void queryClient.invalidateQueries({ queryKey: achievementKeys.all });
 };
 
 export const useCreateStudySession = (): UseMutationResult<
@@ -49,11 +54,18 @@ export const useCreateStudySession = (): UseMutationResult<
     mutationFn: async (
       payload: StartStudyPayload,
     ): Promise<StartGameApiResponse> => {
-      const res = await apiClient.post<StartGameApiResponse>('/games', payload);
-      return res.data;
+      const res = await apiClient.post<ApiEnvelope<StartGameApiResponse>>(
+        '/games',
+        payload,
+      );
+      return res.data.data;
     },
-    onSuccess: () => {
-      invalidateStudyAndStats(queryClient);
+    onSuccess: (_data, variables) => {
+      useProgressOptimisticStore.getState().beginStudySession({
+        module: variables.module ?? null,
+        cardCount: variables.cardCount,
+      });
+      invalidateStudyQueries(queryClient);
     },
   });
 };
@@ -61,9 +73,18 @@ export const useCreateStudySession = (): UseMutationResult<
 export const useRecordView = (
   sessionId: string,
 ): UseMutationResult<void, Error, RecordViewPayload> => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: RecordViewPayload): Promise<void> => {
       await apiClient.post(`/games/${sessionId}/views`, payload);
+    },
+    onSuccess: (_data, variables) => {
+      useProgressOptimisticStore
+        .getState()
+        .recordStudyView(variables.flashcardId);
+      void queryClient.invalidateQueries({ queryKey: statsKeys.modules });
+      void queryClient.invalidateQueries({ queryKey: statsKeys.summary });
     },
   });
 };
@@ -77,10 +98,10 @@ export const useCompleteStudy = (): UseMutationResult<
 
   return useMutation({
     mutationFn: async (sessionId: string): Promise<StudySummaryVM> => {
-      const res = await apiClient.post<GameSummaryApiModel>(
+      const res = await apiClient.post<ApiEnvelope<GameSummaryApiModel>>(
         `/games/${sessionId}/complete`,
       );
-      const mapped = mapGameSummary(res.data);
+      const mapped = mapGameSummary(res.data.data);
       return {
         cardsViewed: mapped.cardsViewed,
         totalCount: mapped.totalCount,
@@ -88,7 +109,9 @@ export const useCompleteStudy = (): UseMutationResult<
       };
     },
     onSuccess: () => {
-      invalidateStudyAndStats(queryClient);
+      useProgressOptimisticStore.getState().recordStudyComplete();
+      invalidateStudyQueries(queryClient);
+      void reconcileProgressWithBackoff(queryClient);
     },
   });
 };

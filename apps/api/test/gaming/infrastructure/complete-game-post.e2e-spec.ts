@@ -32,7 +32,8 @@ async function startGame(
     .set('Authorization', `Bearer ${token}`)
     .send({ mode: 'game', cardCount })
     .expect(201);
-  return res.body as { gameId: string; flashcardIds: string[] };
+  return (res.body as { data: { gameId: string; flashcardIds: string[] } })
+    .data;
 }
 
 describe('gaming/game CompleteGamePostController (e2e)', () => {
@@ -66,12 +67,16 @@ describe('gaming/game CompleteGamePostController (e2e)', () => {
         .send({})
         .expect(200);
 
-      const body = res.body as {
-        correctCount: number;
-        totalCount: number;
-        accuracy: number;
-        duration: number;
-      };
+      const body = (
+        res.body as {
+          data: {
+            correctCount: number;
+            totalCount: number;
+            accuracy: number;
+            duration: number;
+          };
+        }
+      ).data;
 
       expect(body.totalCount).toBe(10);
       expect(body.correctCount).toBe(7);

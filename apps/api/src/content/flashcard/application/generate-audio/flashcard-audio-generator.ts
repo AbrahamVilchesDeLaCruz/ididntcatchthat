@@ -18,6 +18,7 @@ import {
   AUDIO_STORAGE,
 } from '@/content/flashcard/domain/audio-storage';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
 import { type Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
@@ -51,6 +52,8 @@ export class FlashcardAudioGenerator {
     private readonly audioStorage: AudioStorage,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
+    @Inject(APP_METRICS)
+    private readonly metrics: AppMetrics,
   ) {}
 
   async execute(request: RequestFlashcardAudioGenerator): Promise<void> {
@@ -115,6 +118,9 @@ export class FlashcardAudioGenerator {
           examples: { us: examplesUsUrl },
         }),
       );
+      this.metrics.increment('app_audio_generated_total', {
+        provider: 'elevenlabs',
+      });
     } catch (e: unknown) {
       this.logger.error(
         'FlashcardAudioGenerator failed',
@@ -122,6 +128,9 @@ export class FlashcardAudioGenerator {
         { flashcardId },
       );
       flashcard.markAudioFailed();
+      this.metrics.increment('app_audio_errors_total', {
+        provider: 'elevenlabs',
+      });
     }
 
     await this.repository.save(flashcard);

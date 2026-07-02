@@ -22,7 +22,6 @@ export const StatsContainer = (): ReactElement => {
     subcategoryProgress,
     weakestFlashcards,
     progressSummary,
-    achievements,
   } = useStatsState({ enabled: !isGuest });
 
   const { mutate: startGame, isPending: isStartingWeakest } = useStartGame();
@@ -118,8 +117,6 @@ export const StatsContainer = (): ReactElement => {
       summary={progressSummary.data ?? null}
       summaryLoading={progressSummary.isLoading || isStartingWeakest}
       summaryError={progressSummary.isError}
-      achievements={achievements.data ?? []}
-      achievementsLoading={achievements.isLoading}
       modules={modules}
       subcategories={subcategories}
       weakFlashcards={weakFlashcards}

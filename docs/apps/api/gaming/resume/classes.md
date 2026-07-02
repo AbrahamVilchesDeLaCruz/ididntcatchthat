@@ -2,7 +2,7 @@
 
 ```mermaid
 classDiagram
-    class ResumeGameGetController {
+    class ResumeGamePostController {
         -gameResumer: GameResumer
         +handle(id: string, user: UserContext): Promise~ResumeGameResponse~
     }
@@ -30,7 +30,7 @@ classDiagram
         +attempts: Attempt[]
     }
 
-    ResumeGameGetController --> GameResumer
+    ResumeGamePostController --> GameResumer
     GameResumer --> GameRepository
     GameResumer --> Game
     GameResumer --> ResumeGameResult

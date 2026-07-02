@@ -10,6 +10,7 @@ import {
   type AttemptRecordedAttributes,
 } from '@/gaming/domain/events/attempt-recorded.event';
 import { FlashcardStatsUpdater } from './flashcard-stats-updater';
+import { RandomModuleProgressUpdater } from './random-module-progress-updater';
 
 @Injectable()
 export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
@@ -21,7 +22,9 @@ export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,
     @Inject(FlashcardStatsUpdater)
-    private readonly updater: FlashcardStatsUpdater,
+    private readonly flashcardStatsUpdater: FlashcardStatsUpdater,
+    @Inject(RandomModuleProgressUpdater)
+    private readonly randomModuleProgressUpdater: RandomModuleProgressUpdater,
   ) {
     super(consumer);
   }
@@ -29,11 +32,20 @@ export class FlashcardStatsUpdaterOnAttemptRecorded extends Subscriber {
   async on(event: DomainEvent): Promise<void> {
     const attrs = event.attributes as AttemptRecordedAttributes;
     if (attrs.userId === null) return;
-    await this.updater.execute({
+
+    await this.flashcardStatsUpdater.execute({
       userId: attrs.userId,
       flashcardId: attrs.flashcardId,
       correct: attrs.correct,
       mode: attrs.mode,
     });
+
+    if (attrs.mode === 'game') {
+      await this.randomModuleProgressUpdater.executeForRandomAttempt({
+        userId: attrs.userId,
+        gameId: attrs.gameId,
+        flashcardId: attrs.flashcardId,
+      });
+    }
   }
 }

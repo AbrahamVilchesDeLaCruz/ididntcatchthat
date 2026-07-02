@@ -37,7 +37,7 @@ export const mapFlashcardsPage = (
   raw: FlashcardsListApiModel,
 ): FlashcardsPageVM => ({
   items: raw.data.map(mapFlashcard),
-  total: raw.total,
-  page: raw.page,
-  pageSize: raw.pageSize,
+  total: raw.pagination.total_items,
+  page: raw.pagination.page,
+  pageSize: raw.pagination.limit,
 });

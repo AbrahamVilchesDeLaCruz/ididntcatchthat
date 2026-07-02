@@ -18,6 +18,8 @@ export interface GameCompletedAttributes extends DomainEventAttributes {
 }
 
 export class GameCompletedEvent extends DomainEvent {
+  static readonly EVENT_NAME = 'ididntcatchthat.gaming.games.game.completed';
+
   constructor(
     aggregateId: string,
     readonly attrs: GameCompletedAttributes,
@@ -28,6 +30,6 @@ export class GameCompletedEvent extends DomainEvent {
   }
 
   eventName(): string {
-    return 'ididntcatchthat.gaming.games.game.completed';
+    return GameCompletedEvent.EVENT_NAME;
   }
 }

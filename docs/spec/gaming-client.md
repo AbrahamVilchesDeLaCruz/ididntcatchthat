@@ -1,5 +1,10 @@
 # Spec: Gaming — Cliente
 
+**Estado**: En progreso  
+**Tasks**: [docs/tasks/gaming-client.md](../tasks/gaming-client.md)  
+**API**: [docs/spec/gaming.md](./gaming.md)  
+**Pod**: `apps/client/src/containers/game/`
+
 ## Visión de producto
 
 La feature de Gaming es el núcleo interactivo de la plataforma. Permite a los usuarios (invitados o registrados) enfrentarse a _flashcards_ con un enfoque en fonética real, _connected speech_ y expresiones nativas.
@@ -130,7 +135,7 @@ Ubicadas en `apps/client/src/pods/gaming/api/`:
 ## Restricciones y reglas de negocio
 
 1. **Invitados**:
-   - Saltan la configuración. Payload forzado: `{ mode: 'random', cardCount: 10 }`.
+   - Saltan la configuración. Payload forzado: `{ mode: 'game', module: null, cardCount: 10 }`.
    - No pueden pausar la partida (no se muestra botón "Pausar").
    - No guardan historial a largo plazo (el backend no los asocia a un user).
 2. **Logged Users**:

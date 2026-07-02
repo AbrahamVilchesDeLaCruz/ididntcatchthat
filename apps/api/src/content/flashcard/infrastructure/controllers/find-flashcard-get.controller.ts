@@ -1,12 +1,24 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { RolesGuard } from '@/shared/infrastructure/auth/roles.guard';
 import { Roles } from '@/shared/infrastructure/auth/roles.decorator';
+import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
+import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { FlashcardFinder } from '@/content/flashcard/application/find/flashcard-finder';
 import { type FlashcardPrimitives } from '@/content/flashcard/domain/flashcard';
 
-@ApiTags('flashcards')
+@ApiTags('content')
+@ApiBearerAuth('access-token')
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class FindFlashcardGetController {
@@ -14,10 +26,19 @@ export class FindFlashcardGetController {
 
   @Get(':id')
   @Roles('admin')
-  @ApiOperation({ summary: 'Find a flashcard by id' })
-  @ApiResponse({ status: 200, description: 'Flashcard found' })
-  @ApiResponse({ status: 404, description: 'Flashcard not found' })
-  async handler(@Param('id') id: string): Promise<FlashcardPrimitives> {
-    return this.finder.execute(id);
+  @ApiOperation({
+    summary: 'Find a flashcard by id',
+    description: 'Returns a single flashcard by UUID. Requires admin JWT.',
+  })
+  @ApiOkResponse({ description: 'Flashcard found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Admin role required' })
+  @ApiNotFoundResponse({ description: 'Flashcard not found' })
+  async handler(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ): Promise<ApiResponse<FlashcardPrimitives>> {
+    const data = await this.finder.execute(id);
+    return ApiResponse.of(data, resolveRequestId(req));
   }
 }

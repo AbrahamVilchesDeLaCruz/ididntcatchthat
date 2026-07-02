@@ -1,6 +1,6 @@
 import { type UserId } from '@/shared/domain/user-id';
 
-export interface SubcategoryProgressDto {
+export interface SubcategoryProgress {
   category: string;
   subcategory: string;
   totalAttempts: number;
@@ -9,7 +9,7 @@ export interface SubcategoryProgressDto {
 }
 
 export interface SubcategoryProgressQuery {
-  findByUser(userId: UserId): Promise<SubcategoryProgressDto[]>;
+  findByUser(userId: UserId): Promise<SubcategoryProgress[]>;
 }
 
 export const SUBCATEGORY_PROGRESS_QUERY = Symbol('SubcategoryProgressQuery');
