@@ -24,16 +24,16 @@ metadata:
 
 ```typescript
 // shared/domain/user-context.ts
-export type UserType = "guest" | "registered" | "admin";
+export type UserType = 'guest' | 'user' | 'teacher' | 'admin';
 
 export type UserContext = {
   type: UserType;
-  deviceId: string; // UUID generado por el backend — no falsificable
-  fingerprint: string; // hash(userAgent + acceptLanguage + ip)
+  deviceId: string;    // UUID generado por el backend — no falsificable
+  fingerprint?: string; // hash(userAgent + acceptLanguage + ip) — opcional
   ip: string;
-  userId?: string;  // solo registered / admin
-  email?: string;   // solo registered / admin
-  roles?: string[]; // solo registered / admin
+  userId?: string;     // solo user / teacher / admin
+  email?: string;      // solo user / teacher / admin
+  roles?: string[];    // solo user / teacher / admin
 };
 ```
 
@@ -42,10 +42,12 @@ export type UserContext = {
 ## Uso de guards en controllers
 
 ```typescript
-@UseGuards(JwtAuthGuard)           // solo usuarios registrados
-@UseGuards(GuestAuthGuard)         // solo guests
-@UseGuards(AnyAuthGuard)           // registrado o guest
+@UseGuards(JwtAuthGuard)                          // solo usuarios registrados (type: user/teacher/admin)
+@UseGuards(GuestAuthGuard)                        // solo guests
+@UseGuards(AnyAuthGuard)                          // registrado o guest (acepta ambos tokens)
 @UseGuards(JwtAuthGuard, RolesGuard) @Roles('admin')  // admin
+// Sin guard → endpoint público. Usa @Public() para dejar constancia explícita
+@Public()
 ```
 
 ```typescript
@@ -84,10 +86,11 @@ async handler(@Query() query: SearchFlashcardsGetQuery, @CurrentUser() user: Use
 **Permiso de negocio en use case:**
 
 ```typescript
-async execute(id: string, actor: UserContext): Promise<void> {
-  const flashcard = await this.finder.find(new FlashcardId(id));
-  if (flashcard.ownerId.value !== actor.userId) {
-    throw new FlashcardPublishNotAllowed(id);
+// El use case recibe userId del Request* (construido por el controller con user.userId)
+async execute(request: RequestFlashcardPublisher): Promise<void> {
+  const flashcard = await this.finder.findOrFail(new FlashcardId(request.id));
+  if (flashcard.ownerId.value !== request.userId) {
+    throw new FlashcardPublishNotAllowed(request.id);
   }
   flashcard.publish();
   await this.repository.save(flashcard);
