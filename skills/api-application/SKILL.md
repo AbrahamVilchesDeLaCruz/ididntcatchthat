@@ -53,26 +53,26 @@ export class FlashcardCreator {
     await this.repository.save(flashcard);
     await this.publisher.publish(flashcard.pullDomainEvents());
 
-    this.logger.info('Flashcard created', {
+    this.logger.info("Flashcard created", {
       flashcardId: request.id,
       expression: request.expression,
     });
 
-    this.metrics.increment('app_flashcards_created_total');
+    this.metrics.increment("app_flashcards_created_total");
 
     return flashcard.toPrimitives();
   }
 }
 ```
 
-Re-exportar el tipo de request en el mismo archivo del use case:
+Re-exportar `Request*` y `Response*` en el mismo archivo del use case:
 
 ```typescript
-// al final del archivo, o con export type en la importación:
-export type { RequestFlashcardCreator } from './request-flashcard-creator';
+// game-completer.ts — al inicio del archivo, tras los imports
+export type { RequestGameCompleter, ResponseGameCompleter };
 ```
 
-**Request* — tipo del input:**
+**Request\* — tipo del input:**
 
 ```typescript
 // content/flashcard/application/create/request-flashcard-creator.ts
@@ -89,22 +89,37 @@ export type RequestFlashcardCreator = {
 };
 ```
 
+**`Response*` — tipo del output cuando devuelve datos complejos:**
+
+```typescript
+// gaming/application/complete/response-game-completer.ts
+export type ResponseGameCompleter = {
+  correctCount: number;
+  totalCount: number;
+  accuracy: number;
+  duration: number;
+  cardsViewed: number;
+};
+```
+
+Crear `response-{entity}-{verb}er.ts` siempre que el use case devuelva más de un campo o el tipo no sea un primitivo simple. Re-exportarlo junto al `Request*` en el archivo del use case.
+
 **Reglas:**
 
 - Un caso de uso = una responsabilidad = un método público: `execute()`
-- Recibe un `Request*` type object — nunca primitivos sueltos, nunca clases DTO
-- `Request*` es un `type` alias — nunca una clase con decoradores
-- Retorna primitivos, un objeto con primitivos, o `void` — nunca entidades de dominio
-- Inyectar `LOGGER_SERVICE` y `APP_METRICS` en use cases que mutan estado relevante
-- Inyectar `DOMAIN_EVENT_PUBLISHER` cuando el aggregate genera domain events
+- Recibe un `Request*` type — nunca primitivos sueltos, nunca clases DTO
+- `Request*` y `Response*` son `type` alias — nunca clases con decoradores
+- Retorna primitivos, `Response*`, o `void` — nunca entidades de dominio
+- Los use cases de **write siempre inyectan `DOMAIN_EVENT_PUBLISHER`** — si el aggregate no emite eventos, es un bug en el aggregate, no una razón para omitirlo
+- Inyectar `LOGGER_SERVICE` y `APP_METRICS` en todos los use cases que mutan estado
 - Usar `toPrimitives()` para serializar la respuesta
 
 ### Domain Services
 
-Para lógica reutilizable que necesitan varios casos de uso. Viven en `domain/`.
+Cuando la **misma lógica de dominio** es necesaria en varios use cases, se extrae a un Domain Service en `domain/`. El criterio no es I/O vs no-I/O — es reutilización entre use cases.
 
 ```typescript
-// gaming/domain/guest-game-policy.ts  ← domain service como clase estática con reglas
+// gaming/domain/guest-game-policy.ts  ← política pura: varios UCs la consultan
 export class GuestGamePolicy {
   static readonly MAX_CARD_COUNT_FOR_GUEST = 10;
 
@@ -116,6 +131,7 @@ export class GuestGamePolicy {
 
 ```typescript
 // content/flashcard/domain/flashcard-finder.ts  ← domain service inyectable
+// UpdateFlashcard, DeleteFlashcard, etc. todos necesitan primero encontrar la entidad
 @Injectable()
 export class FlashcardFinder {
   constructor(
@@ -123,7 +139,7 @@ export class FlashcardFinder {
     private readonly repository: FlashcardRepository,
   ) {}
 
-  async find(id: FlashcardId): Promise<Flashcard> {
+  async findOrFail(id: FlashcardId): Promise<Flashcard> {
     const flashcard = await this.repository.search(id);
     if (!flashcard) throw new FlashcardNotFound(id.value);
     return flashcard;
@@ -135,19 +151,22 @@ export class FlashcardFinder {
 
 - Nombre: `{Feature}{Action}` — **sin sufijo `Service`**
 - Archivo: `{feature}-{action}.ts` — ej: `flashcard-finder.ts`, `guest-game-policy.ts`
-- Método con verbo descriptivo: `find()`, `validate()`, `assertCanX()`, `list()`
-- Reutilizable desde varios casos de uso — si solo lo usa uno, va directo en el use case
-- Puede tener `@Injectable()` cuando necesita inyectar repositorios u otros puertos
-- Las políticas puras (sin I/O) pueden ser clases estáticas o funciones
+- Método con verbo descriptivo: `findOrFail()`, `validate()`, `assertCanX()`
+- **Si la lógica solo la usa un use case → va en el use case, no se extrae**
+- **Si varios use cases comparten la lógica → Domain Service en `domain/`**
+- Puede tener `@Injectable()` cuando necesita repositorios u otros puertos
+- Clases estáticas para políticas puras (sin I/O): `GuestGamePolicy`, `PausedGamePolicy`
 
 ### UseCase vs Domain Service
 
-|                  | Use Case                    | Domain Service                            |
-| ---------------- | --------------------------- | ----------------------------------------- |
-| **Método**       | `execute()`                 | verbo descriptivo: `find()`, `validate()` |
-| **Reutilizable** | No — un flujo concreto      | Sí — lo llaman varios casos de uso        |
-| **Dónde**        | `application/{verb}/`       | `domain/`                                 |
-| **Ejemplo**      | `FlashcardCreator.execute()` | `FlashcardFinder.find()` en domain        |
+|                  | Use Case                       | Domain Service                                     |
+| ---------------- | ------------------------------ | -------------------------------------------------- |
+| **Qué es**       | Una transacción de aplicación  | Lógica de dominio reutilizada por varios use cases |
+| **Método**       | `execute()`                    | verbo descriptivo: `findOrFail()`, `assertCanX()`  |
+| **Reutilizable** | No — un flujo concreto         | Sí — varios UCs lo llaman                          |
+| **Dónde**        | `application/{verb}/`          | `domain/`                                          |
+| **Ejemplo**      | `FlashcardCreator.execute()`   | `FlashcardFinder` (usado por updater, deleter…)    |
+| **Criterio**     | Una sola acción de negocio     | Si extraes lógica de 2+ UCs, va aquí               |
 
 ### Inyección — nombre por ROL
 
