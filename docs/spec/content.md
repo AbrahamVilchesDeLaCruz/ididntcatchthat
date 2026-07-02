@@ -1,6 +1,6 @@
 # Spec: Content — Bounded Context Content
 
-**Estado**: Borrador  
+**Estado**: En progreso  
 **Fecha**: 2026-05-25  
 **BC**: Content  
 **Scope**: API (`apps/api/src/content/`)  
