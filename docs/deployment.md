@@ -121,80 +121,22 @@ doppler setup \
   --scope /opt/ididntcatchthat-dev
 ```
 
-### 5. Configurar nginx (HTTP primero)
+### 5. Configurar nginx
+
+Los configs de nginx están versionados en `infra/nginx/`. El Makefile crea symlinks desde `/etc/nginx/sites-available/` al repo — así cada `git pull` actualiza los configs automáticamente.
 
 ```bash
-# Prod client (puerto 8080 — nginx corre como non-root en el container)
-sudo tee /etc/nginx/sites-available/ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name ididntcatchthat.com www.ididntcatchthat.com;
+# Desde /opt/ididntcatchthat (ya clonado en el paso 3)
+make nginx-setup
+```
 
-    location / {
-        proxy_pass http://localhost:4000;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
+Esto crea los symlinks y hace `nginx -t && systemctl reload nginx`.
 
-# Prod API
-sudo tee /etc/nginx/sites-available/api.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name api.ididntcatchthat.com;
+> Los archivos fuente están en `infra/nginx/*.conf`. Para modificar un config de nginx, edita el archivo en el repo, abre un PR, haz merge a `main` y ejecuta `make nginx-reload` en el VPS.
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
-
-# Dev client (puerto 8080 — nginx corre como non-root en el container)
-sudo tee /etc/nginx/sites-available/dev.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name dev.ididntcatchthat.com;
-
-    location / {
-        proxy_pass http://localhost:4001;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
-
-# Dev API
-sudo tee /etc/nginx/sites-available/api.dev.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name api.dev.ididntcatchthat.com;
-
-    location / {
-        proxy_pass http://localhost:3001;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
-
-# Activar sites
-sudo ln -s /etc/nginx/sites-available/ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/api.ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/dev.ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/api.dev.ididntcatchthat.com /etc/nginx/sites-enabled/
-
-sudo nginx -t && sudo systemctl reload nginx
+```bash
+# Recargar nginx tras un deploy que cambie infra/nginx/
+make nginx-reload
 ```
 
 ### 6. HTTPS con Certbot
