@@ -81,4 +81,3 @@ volumes:
   prometheus_data_dev:
   grafana_data_dev:
   loki_data_dev:
-  rabbitmq_data_dev:

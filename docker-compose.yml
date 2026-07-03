@@ -17,6 +17,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   client:
     build:
@@ -34,6 +39,11 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
 
   # ─── Messaging ──────────────────────────────────────────────────────────────
 
@@ -52,6 +62,11 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
   # ─── Observability ───────────────────────────────────────────────────────────
 
@@ -66,6 +81,11 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --storage.tsdb.retention.time=15d
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
   grafana:
     image: grafana/grafana:12.0.1
@@ -80,6 +100,11 @@ services:
     depends_on:
       - prometheus
       - loki
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
 
   loki:
     image: grafana/loki:3.5.0
@@ -88,6 +113,11 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - loki_data:/loki
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
 
 volumes:
   rabbitmq_data:
