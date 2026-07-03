@@ -19,7 +19,7 @@ services:
       - ididntcatchthat-postgres-local:/var/lib/postgresql/data
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:4.1-management-alpine
     container_name: ididntcatchthat-rabbitmq-local
     environment:
       RABBITMQ_DEFAULT_USER: local
