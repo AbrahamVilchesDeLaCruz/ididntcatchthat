@@ -43,7 +43,7 @@ services:
     container_name: ididntcatchthat-client-prod
     image: ididntcatchthat-client:prod
     ports:
-      - "4000:80"
+      - "4000:8080"
     environment:
       NODE_ENV: ${NODE_ENV}
 
