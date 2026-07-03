@@ -298,4 +298,32 @@ vps-restart-prod: ## [VPS] Restart prod containers
 vps-restart-dev: ## [VPS] Restart dev containers
 	doppler run --config dev --project ididntcatchthat -- docker compose -f $(DEV_DIR)/docker-compose.yml -f $(DEV_DIR)/docker-compose.dev.yml restart
 
+# ─── nginx (host) ─────────────────────────────────────────────────────────────
+# Run nginx-setup once after cloning the repo on the VPS.
+# After that, nginx configs are updated automatically by git pull —
+# run nginx-reload after any deploy that changes infra/nginx/*.conf.
+
+NGINX_AVAILABLE = /etc/nginx/sites-available
+NGINX_ENABLED   = /etc/nginx/sites-enabled
+NGINX_SRC       = $(PROD_DIR)/infra/nginx
+
+nginx-setup: ## [VPS] Replace nginx site configs with symlinks to repo (run once)
+	@echo "→ Removing existing site files and creating symlinks to $(NGINX_SRC)..."
+	sudo rm -f $(NGINX_AVAILABLE)/ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/api.ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/ididntcatchthat.com.conf        $(NGINX_AVAILABLE)/ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/api.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/api.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/dev.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/api.dev.ididntcatchthat.com.conf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/ididntcatchthat.com        $(NGINX_ENABLED)/ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/api.ididntcatchthat.com    $(NGINX_ENABLED)/api.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/dev.ididntcatchthat.com    $(NGINX_ENABLED)/dev.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com $(NGINX_ENABLED)/api.dev.ididntcatchthat.com
+	$(MAKE) nginx-reload
+
+nginx-reload: ## [VPS] Validate nginx config and reload
+	sudo nginx -t && sudo systemctl reload nginx
+
 .DEFAULT_GOAL := help

@@ -11,13 +11,16 @@ Adicionalmente, las branch protection rules exigían que `ci / api` y `ci / clie
 
 ## Decision
 
-Dividir el CI en tres jobs:
+Dividir el CI en cuatro jobs:
 
 1. **`ci / detect changes`** — siempre corre, detecta qué paths cambiaron y expone outputs booleanos
 2. **`ci / api`** — solo corre si `apps/api/**` tiene cambios
 3. **`ci / client`** — solo corre si `apps/client/**` tiene cambios
+4. **`ci / docker build & scan`** — corre si `apps/api/**`, `apps/client/**` o `infra/**` (Dockerfiles, compose files, Makefile) tienen cambios; construye ambas imágenes y las escanea con Trivy buscando CVEs CRITICAL/HIGH
 
-El **único required status check** en las branch protection rules es `ci / detect changes`. Los jobs de `api` y `client` son opcionales — si no corren (`skipped`), no bloquean el merge.
+El filtro `infra` cubre: `apps/api/Dockerfile`, `apps/client/Dockerfile`, `docker-compose*.yml`, `infra/**`, `Makefile`.
+
+El **único required status check** en las branch protection rules es `ci / detect changes`. Los demás jobs son opcionales — si no corren (`skipped`), no bloquean el merge.
 
 ## Rationale
 
@@ -35,6 +38,6 @@ El **único required status check** en las branch protection rules es `ci / dete
 ## Consequences
 
 - Branch protection rules en `main` y `dev` exigen solo `ci / detect changes` como required check
-- `ci / api` y `ci / client` son informativos — si corren, deben pasar; si no corren, no bloquean
-- Cuando se scaffoldeen las apps reales, los jobs de `api` y `client` pasarán a tener steps reales (lint, test, build) sin cambiar la estructura del workflow
+- `ci / api`, `ci / client` y `ci / docker build & scan` son informativos — si corren, deben pasar; si no corren, no bloquean
+- Cambios en Dockerfiles, compose files o infra disparan el job de Docker aunque no haya cambios en el código de la app
 - Añadir una tercera app (`apps/xxx`) solo requiere agregar una entrada en `paths-filter` y un nuevo job
