@@ -6,6 +6,10 @@ on:
       - main
       - dev
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   changes:
     name: ci / detect changes
@@ -13,6 +17,7 @@ jobs:
     outputs:
       api: ${{ steps.filter.outputs.api }}
       client: ${{ steps.filter.outputs.client }}
+      infra: ${{ steps.filter.outputs.infra }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +31,12 @@ jobs:
               - 'apps/api/**'
             client:
               - 'apps/client/**'
+            infra:
+              - 'apps/api/Dockerfile'
+              - 'apps/client/Dockerfile'
+              - 'docker-compose*.yml'
+              - 'infra/**'
+              - 'Makefile'
 
   api:
     name: ci / api
@@ -144,3 +155,39 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  docker:
+    name: ci / docker build & scan
+    needs: changes
+    if: |
+      needs.changes.outputs.api == 'true' ||
+      needs.changes.outputs.client == 'true' ||
+      needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -f apps/api/Dockerfile -t ididntcatchthat-api:ci .
+
+      - name: Build client image
+        run: docker build -f apps/client/Dockerfile -t ididntcatchthat-client:ci .
+
+      - name: Scan API image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ididntcatchthat-api:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan client image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ididntcatchthat-client:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
