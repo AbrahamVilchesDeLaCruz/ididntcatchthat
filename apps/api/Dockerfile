@@ -29,6 +29,9 @@ COPY apps/api/package.json ./apps/api/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
+# Remove npm from the runtime image — not needed and reduces attack surface
+RUN npm uninstall -g npm
+
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY apps/api/docker-entrypoint.sh ./apps/api/docker-entrypoint.sh
 
