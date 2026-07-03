@@ -1,6 +1,10 @@
 packages:
   - 'apps/*'
 
+overrides:
+  multer: ^2.2.0
+  undici: ^6.27.0
+
 allowBuilds:
   '@nestjs/core': true
   '@scarf/scarf': true

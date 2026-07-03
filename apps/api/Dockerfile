@@ -1,7 +1,7 @@
 # ─── Stage 1: builder ────────────────────────────────────────────────────────
 FROM node:24-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@11.1.3 --activate
+RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN pnpm --filter @ididntcatchthat/api build
 # ─── Stage 2: runtime ────────────────────────────────────────────────────────
 FROM node:24-alpine AS runtime
 
-RUN corepack enable && corepack prepare pnpm@11.1.3 --activate
+RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
