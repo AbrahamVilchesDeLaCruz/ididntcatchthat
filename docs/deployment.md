@@ -124,7 +124,7 @@ doppler setup \
 ### 5. Configurar nginx (HTTP primero)
 
 ```bash
-# Prod client
+# Prod client (puerto 8080 — nginx corre como non-root en el container)
 sudo tee /etc/nginx/sites-available/ididntcatchthat.com > /dev/null <<'EOF'
 server {
     listen 80;
@@ -132,9 +132,10 @@ server {
 
     location / {
         proxy_pass http://localhost:4000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 EOF
@@ -147,14 +148,15 @@ server {
 
     location / {
         proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 EOF
 
-# Dev client
+# Dev client (puerto 8080 — nginx corre como non-root en el container)
 sudo tee /etc/nginx/sites-available/dev.ididntcatchthat.com > /dev/null <<'EOF'
 server {
     listen 80;
@@ -162,9 +164,10 @@ server {
 
     location / {
         proxy_pass http://localhost:4001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 EOF
@@ -177,9 +180,10 @@ server {
 
     location / {
         proxy_pass http://localhost:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 EOF
@@ -338,15 +342,24 @@ doppler secrets --project ididntcatchthat --config prd
 doppler secrets --project ididntcatchthat --config dev
 ```
 
-Variables mínimas requeridas:
+Variables mínimas requeridas (fuente de verdad: `apps/api/src/shared/infrastructure/config/env.validation.ts`):
 
-| Variable            | Descripción                                          |
-| ------------------- | ---------------------------------------------------- |
-| `NODE_ENV`          | `production` o `development`                         |
-| `PORT`              | Puerto interno de la API (3000)                      |
-| `DATABASE_URL`      | Connection string PostgreSQL                         |
-| `GRAFANA_PASSWORD`  | Password del admin de Grafana — valor fuerte en prod |
-| `VPS_HOST`          | `ubuntu@<IP>` — usado por `make tunnel-*`            |
+| Variable                     | Descripción                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `NODE_ENV`                   | `production`                                             |
+| `PORT`                       | Puerto interno de la API (`3000`)                        |
+| `DATABASE_URL`               | Connection string PostgreSQL (Aiven prod)                |
+| `DATABASE_CA_CERT`           | Certificado CA de Aiven para TLS verificado              |
+| `JWT_SECRET`                 | Mínimo 32 caracteres                                     |
+| `FRONTEND_URL`               | `https://ididntcatchthat.com` — URL de destino OAuth     |
+| `CORS_ORIGIN`                | `https://ididntcatchthat.com` — origen CORS permitido    |
+| `LOKI_URL`                   | URL interna del contenedor Loki (`http://loki:3100`)     |
+| `LOG_LEVEL`                  | `info` en prod                                           |
+| `GOOGLE_CLIENT_ID/SECRET`    | Credenciales OAuth Google                                |
+| `GOOGLE_CALLBACK_URL`        | `https://api.ididntcatchthat.com/v1/auth/google/callback`|
+| `AMQP_URI`                   | Connection string RabbitMQ                               |
+| `GRAFANA_PASSWORD`           | Password del admin de Grafana — valor fuerte en prod     |
+| `VPS_HOST`                   | `ubuntu@<IP>` — usado por `make tunnel-*`                |
 
 ---
 
