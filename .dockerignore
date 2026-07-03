@@ -1,0 +1,32 @@
+# ─── Version control ─────────────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+
+# ─── Dependencies (never copy into build context) ────────────────────────────
+**/node_modules
+
+# ─── Build artifacts (rebuilt inside Docker) ─────────────────────────────────
+**/dist
+**/coverage
+
+# ─── Documentation & tooling (not needed in images) ─────────────────────────
+docs/
+prompts/
+skills/
+infra/
+.github/
+.husky/
+.atl/
+*.md
+
+# ─── Local env files (secrets must come from Doppler at runtime) ─────────────
+.env
+.env.*
+!apps/api/.env.test
+
+# ─── Editor & OS noise ───────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.log
