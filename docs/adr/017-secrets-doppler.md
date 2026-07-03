@@ -25,10 +25,12 @@ El proyecto maneja secrets sensibles: credenciales de Aiven (PostgreSQL), API ke
 
 ```
 Proyecto: ididntcatchthat
-├── dev   → desarrollo local (Aiven dev, keys de test de ElevenLabs/Azure)
+├── dev   → desarrollo local (Aiven dev, keys de test de ElevenLabs)
 ├── test  → CI — GitHub Actions (DB local Docker, keys de test)
-└── prod  → VPS producción (Aiven prod, keys de prod)
+└── prd   → VPS producción (Aiven prod, keys de prod)
 ```
+
+> Los nombres de config en Doppler son `dev`, `test` y `prd` (no `prod`).
 
 ### Uso por entorno
 
@@ -43,35 +45,44 @@ doppler run -- pnpm --filter @ididntcatchthat/client dev
 
 **CI — GitHub Actions**
 
-Doppler Service Token almacenado en GitHub Secrets (`DOPPLER_TOKEN_TEST`). El workflow usa la GitHub Action oficial de Doppler para inyectar variables antes de correr los tests.
+Doppler Service Token almacenado en GitHub Secrets como `DOPPLER_TOKEN`. El workflow usa la GitHub Action oficial de Doppler para inyectar variables en los unit tests. Los tests E2E usan `.env.test` directamente y no necesitan Doppler.
 
 ```yaml
 - uses: dopplerhq/cli-action@v3
-- run: doppler run -- pnpm test
+- run: doppler run -- pnpm test:ci
   env:
-    DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_TEST }}
+    DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 ```
 
 **Prod — VPS**
 
-Doppler CLI instalado en el VPS. El entrypoint del contenedor inyecta secrets en runtime:
+Doppler CLI instalado en el VPS. Los secrets se inyectan via `doppler run --` en el comando de deploy del Makefile. El compose recibe las variables interpoladas en `environment:` — no se usa `CMD doppler run` en el Dockerfile.
 
-```dockerfile
-CMD ["doppler", "run", "--", "node", "dist/main"]
+```bash
+# Makefile deploy-prod
+doppler run --config prd --project ididntcatchthat -- \
+  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
-O via variables de entorno en el deploy script — el token de prod está en el VPS como variable de sistema, nunca en el repo.
+El token de prod está configurado en el VPS via `doppler setup --scope /opt/ididntcatchthat`, nunca en el repo.
 
 ### Variables requeridas por entorno
 
-| Variable | dev | test | prod |
+La fuente de verdad para las variables requeridas es `apps/api/src/shared/infrastructure/config/env.validation.ts` (Joi schema). Las más relevantes:
+
+| Variable | dev | test (`.env.test`) | prd |
 |---|---|---|---|
-| `DATABASE_URL` | Aiven dev connection string | `postgresql://test:test@localhost:5432/ididntcatchthat_test` | Aiven prod connection string |
-| `PORT` | `3000` | `3000` | `3000` |
 | `NODE_ENV` | `development` | `test` | `production` |
-| `ELEVENLABS_API_KEY` | key de test | key de test | key de prod |
-| `AZURE_SPEECH_KEY` | key de test | key de test | key de prod |
-| `VITE_API_URL` | `http://localhost:3000` | `http://localhost:3000` | `https://api.ididntcatchthat.com` |
+| `PORT` | `3000` | `3000` | `3000` |
+| `DATABASE_URL` | Aiven dev | `postgres://test:test@localhost:5433/...` | Aiven prod |
+| `DATABASE_CA_CERT` | opcional | — | certificado CA de Aiven |
+| `JWT_SECRET` | min 32 chars | fake (test only) | min 32 chars |
+| `FRONTEND_URL` | `http://localhost:4001` | default Joi | `https://ididntcatchthat.com` |
+| `CORS_ORIGIN` | `http://localhost:4001,...` | `http://localhost:5173` | dominio prod |
+| `LOKI_URL` | opcional | — | URL interna Loki |
+| `LOG_LEVEL` | `debug` | — | `info` |
+| `ELEVEN_LABS_API_KEY` | key de test | fake | key de prod |
+| `AMQP_URI` | RabbitMQ Doppler dev | `amqp://test:test@localhost:5673` | RabbitMQ prod |
 
 ### Lo que NUNCA va en el repo
 

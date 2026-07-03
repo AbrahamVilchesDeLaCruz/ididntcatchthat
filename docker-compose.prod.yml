@@ -25,6 +25,11 @@ services:
       CLOUD_STORAGE_ACCESS_KEY_ID: ${CLOUD_STORAGE_ACCESS_KEY_ID}
       CLOUD_STORAGE_SECRET_ACCESS_KEY: ${CLOUD_STORAGE_SECRET_ACCESS_KEY}
       CLOUD_STORAGE_BUCKET: ${CLOUD_STORAGE_BUCKET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      FRONTEND_URL: ${FRONTEND_URL}
+      DATABASE_CA_CERT: ${DATABASE_CA_CERT}
+      LOKI_URL: ${LOKI_URL}
+      LOG_LEVEL: ${LOG_LEVEL}
 
   rabbitmq:
     container_name: ididntcatchthat-rabbitmq-prod
@@ -38,25 +43,23 @@ services:
     container_name: ididntcatchthat-client-prod
     image: ididntcatchthat-client:prod
     ports:
-      - "4000:80"
+      - "4000:8080"
     environment:
       NODE_ENV: ${NODE_ENV}
 
-  # ─── Observability — internal only, nginx proxies from outside ───────────────
+  # ─── Observability — bound to localhost only; access via SSH tunnel ──────────
 
   prometheus:
     container_name: ididntcatchthat-prometheus-prod
     ports:
-      - "9091:9090"
-    environment:
-      GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
+      - "127.0.0.1:9091:9090"
     volumes:
       - prometheus_data_prod:/prometheus
 
   grafana:
     container_name: ididntcatchthat-grafana-prod
     ports:
-      - "3003:3000"
+      - "127.0.0.1:3003:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
@@ -65,7 +68,7 @@ services:
   loki:
     container_name: ididntcatchthat-loki-prod
     ports:
-      - "3101:3100"
+      - "127.0.0.1:3101:3100"
     volumes:
       - loki_data_prod:/loki
 

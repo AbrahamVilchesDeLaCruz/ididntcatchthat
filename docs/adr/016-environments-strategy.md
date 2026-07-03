@@ -53,16 +53,18 @@ make up
 
 ### CI — test
 
-GitHub Actions levanta un contenedor PostgreSQL efímero en el runner para cada ejecución. Las variables de entorno vienen de Doppler `test` via GitHub Actions integration. La DB se crea en caliente, se usan para tests de integración/e2e, y se destruye al terminar el job — sin riesgo de contaminar dev ni prod.
+GitHub Actions levanta contenedores efímeros de PostgreSQL y RabbitMQ en el runner para cada ejecución. Los secrets de unit tests vienen de Doppler via `DOPPLER_TOKEN` (GitHub Secret). Los tests E2E usan `.env.test` directamente — sin Doppler — para aislar completamente el entorno. La DB se crea en caliente y se destruye al terminar el job.
 
 ```yaml
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:16-alpine
     env:
       POSTGRES_DB: ididntcatchthat_test
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
+  rabbitmq:
+    image: rabbitmq:4.1-alpine
 ```
 
 ### Prod — VPS

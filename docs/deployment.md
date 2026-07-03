@@ -121,76 +121,22 @@ doppler setup \
   --scope /opt/ididntcatchthat-dev
 ```
 
-### 5. Configurar nginx (HTTP primero)
+### 5. Configurar nginx
+
+Los configs de nginx están versionados en `infra/nginx/`. El Makefile crea symlinks desde `/etc/nginx/sites-available/` al repo — así cada `git pull` actualiza los configs automáticamente.
 
 ```bash
-# Prod client
-sudo tee /etc/nginx/sites-available/ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name ididntcatchthat.com www.ididntcatchthat.com;
+# Desde /opt/ididntcatchthat (ya clonado en el paso 3)
+make nginx-setup
+```
 
-    location / {
-        proxy_pass http://localhost:4000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
+Esto crea los symlinks y hace `nginx -t && systemctl reload nginx`.
 
-# Prod API
-sudo tee /etc/nginx/sites-available/api.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name api.ididntcatchthat.com;
+> Los archivos fuente están en `infra/nginx/*.conf`. Para modificar un config de nginx, edita el archivo en el repo, abre un PR, haz merge a `main` y ejecuta `make nginx-reload` en el VPS.
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
-
-# Dev client
-sudo tee /etc/nginx/sites-available/dev.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name dev.ididntcatchthat.com;
-
-    location / {
-        proxy_pass http://localhost:4001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
-
-# Dev API
-sudo tee /etc/nginx/sites-available/api.dev.ididntcatchthat.com > /dev/null <<'EOF'
-server {
-    listen 80;
-    server_name api.dev.ididntcatchthat.com;
-
-    location / {
-        proxy_pass http://localhost:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
-
-# Activar sites
-sudo ln -s /etc/nginx/sites-available/ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/api.ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/dev.ididntcatchthat.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/api.dev.ididntcatchthat.com /etc/nginx/sites-enabled/
-
-sudo nginx -t && sudo systemctl reload nginx
+```bash
+# Recargar nginx tras un deploy que cambie infra/nginx/
+make nginx-reload
 ```
 
 ### 6. HTTPS con Certbot
@@ -338,15 +284,24 @@ doppler secrets --project ididntcatchthat --config prd
 doppler secrets --project ididntcatchthat --config dev
 ```
 
-Variables mínimas requeridas:
+Variables mínimas requeridas (fuente de verdad: `apps/api/src/shared/infrastructure/config/env.validation.ts`):
 
-| Variable            | Descripción                                          |
-| ------------------- | ---------------------------------------------------- |
-| `NODE_ENV`          | `production` o `development`                         |
-| `PORT`              | Puerto interno de la API (3000)                      |
-| `DATABASE_URL`      | Connection string PostgreSQL                         |
-| `GRAFANA_PASSWORD`  | Password del admin de Grafana — valor fuerte en prod |
-| `VPS_HOST`          | `ubuntu@<IP>` — usado por `make tunnel-*`            |
+| Variable                     | Descripción                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `NODE_ENV`                   | `production`                                             |
+| `PORT`                       | Puerto interno de la API (`3000`)                        |
+| `DATABASE_URL`               | Connection string PostgreSQL (Aiven prod)                |
+| `DATABASE_CA_CERT`           | Certificado CA de Aiven para TLS verificado              |
+| `JWT_SECRET`                 | Mínimo 32 caracteres                                     |
+| `FRONTEND_URL`               | `https://ididntcatchthat.com` — URL de destino OAuth     |
+| `CORS_ORIGIN`                | `https://ididntcatchthat.com` — origen CORS permitido    |
+| `LOKI_URL`                   | URL interna del contenedor Loki (`http://loki:3100`)     |
+| `LOG_LEVEL`                  | `info` en prod                                           |
+| `GOOGLE_CLIENT_ID/SECRET`    | Credenciales OAuth Google                                |
+| `GOOGLE_CALLBACK_URL`        | `https://api.ididntcatchthat.com/v1/auth/google/callback`|
+| `AMQP_URI`                   | Connection string RabbitMQ                               |
+| `GRAFANA_PASSWORD`           | Password del admin de Grafana — valor fuerte en prod     |
+| `VPS_HOST`                   | `ubuntu@<IP>` — usado por `make tunnel-*`                |
 
 ---
 

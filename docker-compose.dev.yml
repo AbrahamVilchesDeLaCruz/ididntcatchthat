@@ -35,7 +35,7 @@ services:
     container_name: ididntcatchthat-client-dev
     image: ididntcatchthat-client:dev
     ports:
-      - "4001:80"
+      - "4001:8080"
     environment:
       NODE_ENV: ${NODE_ENV}
 
@@ -81,4 +81,3 @@ volumes:
   prometheus_data_dev:
   grafana_data_dev:
   loki_data_dev:
-  rabbitmq_data_dev:
