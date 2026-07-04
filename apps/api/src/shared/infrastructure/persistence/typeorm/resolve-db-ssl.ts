@@ -16,17 +16,22 @@ function isLocalHost(hostname: string): boolean {
 /**
  * SSL for PostgreSQL (Aiven in prod/dev remote).
  *
- * - Local / test: disabled.
+ * - test env: disabled.
+ * - localhost / 127.0.0.1: disabled.
+ * - ?sslmode=disable in the URL (e.g. local Docker with plain Postgres): disabled.
  * - Remote + DATABASE_CA_CERT (Aiven ca.pem): verify chain with custom CA.
- * - Remote without CA: encrypted connection, no chain verification (Aiven default
- *   until ca.pem is configured in Doppler as DATABASE_CA_CERT).
+ * - Remote without CA: encrypted, no chain verification (Aiven default).
  */
-export function resolveDbSsl(hostname: string): DbSslConfig {
+export function resolveDbSsl(url: URL): DbSslConfig {
   if (process.env.NODE_ENV === 'test') {
     return false;
   }
 
-  if (isLocalHost(hostname)) {
+  if (isLocalHost(url.hostname)) {
+    return false;
+  }
+
+  if (url.searchParams.get('sslmode') === 'disable') {
     return false;
   }
 

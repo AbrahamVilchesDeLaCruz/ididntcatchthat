@@ -6,14 +6,31 @@ Pensado para evaluación del TFM, onboarding de revisores y desarrollo offline.
 
 ---
 
-## Quick start
+## Modos disponibles
+
+| Modo | Comando principal | Hot-reload | Cuándo usarlo |
+|------|-------------------|------------|---------------|
+| **Docker completo** | `make local-up` | No | Onboarding rápido, QA, revisores |
+| **Host (dev)** | `make local-dev` | Sí | Desarrollo activo, iterar código |
+
+---
+
+## Quick start — Docker completo (sin hot-reload)
 
 ```bash
 pnpm install
-make local-setup
-make local-up
-make local-seed
-make local-dev
+make local-up    # env setup + infra + api + client en Docker
+make local-seed  # migraciones + usuario demo + flashcards
+```
+
+Abre http://localhost:4001
+
+## Quick start — Host con hot-reload
+
+```bash
+pnpm install
+make local-dev   # env setup + infra en Docker + api & client en host
+make local-seed  # migraciones + usuario demo + flashcards
 ```
 
 Abre http://localhost:5173
@@ -22,14 +39,16 @@ Abre http://localhost:5173
 
 ## Qué incluye
 
-| Componente | Local | Dev (Doppler) |
-|------------|-------|-----------------|
-| Secrets | `.env.local` (gitignored) | Doppler `dev` |
-| PostgreSQL | Docker `:5434` | Aiven dev |
-| RabbitMQ | Docker `:5674` | Docker / remoto |
-| Object storage | MinIO `:9000` (S3-compatible) | Cloudflare R2 |
-| ElevenLabs / DeepSeek | Stubs (`USE_STUB_ADAPTERS=true`) | APIs reales |
-| Google OAuth | Dummy (no funciona) | OAuth real |
+| Componente | Local Docker (`make local-up`) | Local Dev (`make local-dev`) | Dev (Doppler) |
+|------------|-------------------------------|------------------------------|----------------|
+| Secrets | `.env.local` (gitignored) | `.env.local` (gitignored) | Doppler `dev` |
+| PostgreSQL | Docker `:5434` | Docker `:5434` | Aiven dev |
+| RabbitMQ | Docker `:5674` | Docker `:5674` | Docker / remoto |
+| Object storage | MinIO `:9000` (S3-compatible) | MinIO `:9000` | Cloudflare R2 |
+| ElevenLabs / DeepSeek | Stubs (`USE_STUB_ADAPTERS=true`) | Stubs | APIs reales |
+| Google OAuth | Dummy (no funciona) | Dummy | OAuth real |
+| API | Docker `:3000` | Host `:3000` | Docker `:3001` |
+| Client | Docker `:4001` | Vite `:5173` | Docker `:4001` |
 
 ---
 
@@ -37,20 +56,19 @@ Abre http://localhost:5173
 
 | Comando | Descripción |
 |---------|-------------|
-| `make local-setup` | Copia `apps/api/.env.local.example` y `apps/client/.env.local.example` → `.env.local` |
-| `make local-up` | Levanta `docker-compose.local.yml` |
-| `make local-down` | Para infra local |
+| `make local-setup` | Copia `apps/api/.env.example` y `apps/client/.env.example` → `.env.local` |
+| `make local-up` | Levanta stack completo en Docker (api, client, postgres, rabbitmq, minio) |
+| `make local-down` | Para todo el stack local |
 | `make local-seed` | Migraciones + seed demo (idempotente) |
-| `make local-dev` | Infra + API + Client en paralelo |
-| `make local-dev-api` | Solo API |
-| `make local-dev-client` | Solo Client |
+| `make local-dev` | Infra en Docker + API y Client en host (hot-reload) |
+| `make local-dev-api` | Solo API en host (hot-reload) |
 
-Equivalente sin Make:
+Equivalente sin Make (modo host):
 
 ```bash
-docker compose -f docker-compose.local.yml up -d --wait
-cp apps/api/.env.local.example apps/api/.env.local
-cp apps/client/.env.local.example apps/client/.env.local
+docker compose --project-directory . -f infra/docker-compose.local.yml up -d postgres rabbitmq minio --wait
+cp apps/api/.env.example apps/api/.env.local
+cp apps/client/.env.example apps/client/.env.local
 pnpm --filter @ididntcatchthat/api seed:local
 pnpm --filter @ididntcatchthat/api start:dev
 pnpm --filter @ididntcatchthat/client dev
@@ -74,15 +92,15 @@ También puedes jugar como **guest** sin registrarte.
 
 ## Puertos
 
-| Servicio | Puerto host |
-|----------|-------------|
-| API | 3000 |
-| Client (Vite) | 5173 |
-| PostgreSQL | 5434 |
-| RabbitMQ AMQP | 5674 |
-| RabbitMQ UI | 15674 |
-| MinIO API | 9000 |
-| MinIO Console | 9001 |
+| Servicio | Docker (`make local-up`) | Host (`make local-dev`) |
+|----------|--------------------------|-------------------------|
+| API | 3000 | 3000 |
+| Client | 4001 | 5173 (Vite) |
+| PostgreSQL | 5434 | 5434 |
+| RabbitMQ AMQP | 5674 | 5674 |
+| RabbitMQ UI | 15674 | 15674 |
+| MinIO API | 9000 | 9000 |
+| MinIO Console | 9001 | 9001 |
 
 MinIO console: usuario `localminio`, password `localminio`.
 
@@ -92,8 +110,8 @@ MinIO console: usuario `localminio`, password `localminio`.
 
 Plantillas commiteadas (copiar a `.env.local`):
 
-- [`apps/api/.env.local.example`](../apps/api/.env.local.example)
-- [`apps/client/.env.local.example`](../apps/client/.env.local.example)
+- [`apps/api/.env.example`](../apps/api/.env.example)
+- [`apps/client/.env.example`](../apps/client/.env.example)
 
 Flag principal:
 
@@ -107,13 +125,28 @@ Cuando está activo, la API usa stubs para DeepSeek (generación de borradores y
 
 ## Arquitectura
 
+### Docker completo (`make local-up`)
+
 ```mermaid
 flowchart LR
-  Client["Client :5173"] --> API["API :3000"]
+  Browser["Browser :4001"] --> Client["Client nginx :4001"]
+  Client --> API["API :3000"]
   API --> PG["Postgres :5434"]
   API --> RMQ["RabbitMQ :5674"]
   API --> Stubs["Stub AI adapters"]
   API --> MinIO["MinIO :9000"]
+```
+
+### Host con hot-reload (`make local-dev`)
+
+```mermaid
+flowchart LR
+  Browser["Browser :5173"] --> Vite["Vite dev server :5173"]
+  Vite --> API["API :3000 (host)"]
+  API --> PG["Postgres :5434 (Docker)"]
+  API --> RMQ["RabbitMQ :5674 (Docker)"]
+  API --> Stubs["Stub AI adapters"]
+  API --> MinIO["MinIO :9000 (Docker)"]
 ```
 
 ---
@@ -135,7 +168,7 @@ Script: `pnpm --filter @ididntcatchthat/api seed:local`
 
 1. **Google OAuth** — requiere credenciales reales; en local usa email/password o guest.
 2. **Audio de flashcards seed** — URLs de demo públicas (requieren internet para reproducir).
-3. **Nuevos audios generados** — suben a MinIO local; el bucket debe existir (`minio-init` lo crea).
+3. **Nuevos audios generados** — suben a MinIO local; el bucket debe existir (`minio-init` lo crea automáticamente en `make local-up`/`make local-dev`).
 4. **Demo completa** — para experiencia 100% producción, usar [ididntcatchthat.com](https://ididntcatchthat.com).
 
 ---
@@ -150,7 +183,7 @@ Comprueba que `:5434`, `:5674`, `:9000` estén libres. El perfil E2E usa `:5433`
 
 ```bash
 make local-up
-docker compose -f docker-compose.local.yml ps
+docker compose --project-directory . -f infra/docker-compose.local.yml ps
 ```
 
 Espera a que Postgres esté healthy antes de `make local-seed`.
@@ -158,8 +191,8 @@ Espera a que Postgres esté healthy antes de `make local-seed`.
 ### MinIO bucket no existe
 
 ```bash
-docker compose -f docker-compose.local.yml logs minio-init
-docker compose -f docker-compose.local.yml up minio-init
+docker compose --project-directory . -f infra/docker-compose.local.yml logs minio-init
+docker compose --project-directory . -f infra/docker-compose.local.yml --profile init up minio-init
 ```
 
 ### API no carga `.env.local`

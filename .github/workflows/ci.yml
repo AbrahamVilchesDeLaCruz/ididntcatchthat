@@ -34,7 +34,6 @@ jobs:
             infra:
               - 'apps/api/Dockerfile'
               - 'apps/client/Dockerfile'
-              - 'docker-compose*.yml'
               - 'infra/**'
               - 'Makefile'
 

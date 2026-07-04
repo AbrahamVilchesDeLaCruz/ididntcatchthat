@@ -3,6 +3,8 @@ import {
   resolveDbSsl,
 } from '@/shared/infrastructure/persistence/typeorm/resolve-db-ssl';
 
+const url = (raw: string): URL => parseDatabaseUrl(raw);
+
 describe('shared/infrastructure/persistence/typeorm resolveDbSsl', () => {
   const env = process.env;
 
@@ -17,13 +19,20 @@ describe('shared/infrastructure/persistence/typeorm resolveDbSsl', () => {
 
   it('should disable ssl in test', () => {
     process.env.NODE_ENV = 'test';
-    expect(resolveDbSsl('aiven.example.com')).toBe(false);
+    expect(resolveDbSsl(url('postgres://aiven.example.com/db'))).toBe(false);
   });
 
   it('should disable ssl for localhost outside test', () => {
     process.env.NODE_ENV = 'production';
-    expect(resolveDbSsl('localhost')).toBe(false);
-    expect(resolveDbSsl('127.0.0.1')).toBe(false);
+    expect(resolveDbSsl(url('postgres://localhost/db'))).toBe(false);
+    expect(resolveDbSsl(url('postgres://127.0.0.1/db'))).toBe(false);
+  });
+
+  it('should disable ssl when ?sslmode=disable is set in the URL', () => {
+    process.env.NODE_ENV = 'production';
+    expect(
+      resolveDbSsl(url('postgres://postgres:5432/db?sslmode=disable')),
+    ).toBe(false);
   });
 
   it('should use custom CA when DATABASE_CA_CERT is set', () => {
@@ -31,7 +40,7 @@ describe('shared/infrastructure/persistence/typeorm resolveDbSsl', () => {
     process.env.DATABASE_CA_CERT =
       '-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----';
 
-    expect(resolveDbSsl('aiven.example.com')).toEqual({
+    expect(resolveDbSsl(url('postgres://aiven.example.com/db'))).toEqual({
       rejectUnauthorized: true,
       ca: process.env.DATABASE_CA_CERT,
     });
@@ -40,7 +49,7 @@ describe('shared/infrastructure/persistence/typeorm resolveDbSsl', () => {
   it('should allow remote ssl without strict verification when no CA is configured', () => {
     process.env.NODE_ENV = 'production';
 
-    expect(resolveDbSsl('aiven.example.com')).toEqual({
+    expect(resolveDbSsl(url('postgres://aiven.example.com/db'))).toEqual({
       rejectUnauthorized: false,
     });
   });
