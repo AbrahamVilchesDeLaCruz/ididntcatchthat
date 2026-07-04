@@ -164,7 +164,7 @@ sudo certbot renew --dry-run
 
 ```bash
 # Desde /opt/ididntcatchthat
-make deploy-prod
+make vps-deploy-prod
 ```
 
 Esto ejecuta internamente:
@@ -179,7 +179,7 @@ Esto ejecuta internamente:
 
 ```bash
 # Desde /opt/ididntcatchthat-dev
-make deploy-dev
+make vps-deploy-dev
 ```
 
 Esto ejecuta internamente:
