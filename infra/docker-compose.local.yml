@@ -13,7 +13,8 @@ services:
     env_file: apps/api/.env.local
     environment:
       # Override localhost URLs from .env.local with Docker-internal service names
-      DATABASE_URL: postgres://local:local@postgres:5432/ididntcatchthat_local
+      # sslmode=disable: local Postgres has no SSL; pg enables it for non-localhost hosts
+      DATABASE_URL: postgres://local:local@postgres:5432/ididntcatchthat_local?sslmode=disable
       AMQP_URI: amqp://local:local@rabbitmq:5672
       CLOUD_STORAGE: http://minio:9000
     ports:
