@@ -100,11 +100,6 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:9000/minio/health/live"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
     volumes:
       - ididntcatchthat-minio-local:/data
 
