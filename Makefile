@@ -18,10 +18,10 @@
 VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
 
 COMPOSE       = docker compose --project-directory .
-COMPOSE_LOCAL = $(COMPOSE) -f infra/docker-compose.local.yml
-COMPOSE_DEV   = doppler run --config dev  -- $(COMPOSE) -f infra/docker-compose.yml -f infra/docker-compose.dev.yml
-COMPOSE_PROD  = doppler run --config prd  -- $(COMPOSE) -f infra/docker-compose.yml -f infra/docker-compose.prod.yml
-COMPOSE_TEST  = $(COMPOSE) -f infra/docker-compose.test.yml
+COMPOSE_LOCAL = $(COMPOSE) -p ididntcatchthat-local -f infra/docker-compose.local.yml
+COMPOSE_DEV   = doppler run --config dev  -- $(COMPOSE) -p ididntcatchthat-dev  -f infra/docker-compose.yml -f infra/docker-compose.dev.yml
+COMPOSE_PROD  = doppler run --config prd  -- $(COMPOSE) -p ididntcatchthat-prod -f infra/docker-compose.yml -f infra/docker-compose.prod.yml
+COMPOSE_TEST  = $(COMPOSE) -p ididntcatchthat-test -f infra/docker-compose.test.yml
 
 API_DIR    = apps/api
 CLIENT_DIR = apps/client
