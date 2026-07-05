@@ -14,7 +14,13 @@ import { LOGGER_SERVICE } from '@/shared/domain/logger';
 import { InvalidEventPayload } from '@/shared/domain/exceptions/invalid-event-payload';
 
 const RETRY_DELAYS = [1000, 5000, 10000];
+const CONNECT_RETRY_DELAYS_MS = [1000, 2000, 5000, 10000, 10000];
 const RECONNECT_DELAY_MS = 5000;
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 type ConsumerRegistration = {
   queueName: string;
@@ -213,31 +219,59 @@ export class AmqpMessageBus
 
   // ── Connection ────────────────────────────────────────────────────────────────
 
-  private async getModel(): Promise<ChannelModel> {
-    if (!this.modelPromise) {
-      const uri = this.config.getOrThrow<string>('AMQP_URI');
-      this.modelPromise = connect(uri)
-        .then((model) => {
-          this.model = model;
-          model.on('close', () => {
-            this.logger.warn('AMQP connection closed — scheduling reconnect');
-            this.model = null;
-            this.modelPromise = null;
-            this.channel = null;
-            setTimeout(() => {
-              void this.reconnect();
-            }, RECONNECT_DELAY_MS);
-          });
-          model.on('error', (err: Error) => {
-            this.logger.error('AMQP connection error', err, {});
-          });
-          return model;
-        })
-        .catch((err: Error) => {
-          this.modelPromise = null;
-          throw err;
+  private attachModelListeners(model: ChannelModel): void {
+    model.on('close', () => {
+      this.logger.warn('AMQP connection closed — scheduling reconnect');
+      this.model = null;
+      this.modelPromise = null;
+      this.channel = null;
+      setTimeout(() => {
+        void this.reconnect();
+      }, RECONNECT_DELAY_MS);
+    });
+    model.on('error', (err: Error) => {
+      this.logger.error('AMQP connection error', err, {});
+    });
+  }
+
+  private async connectWithRetry(): Promise<ChannelModel> {
+    const uri = this.config.getOrThrow<string>('AMQP_URI');
+    let lastError: Error | undefined;
+
+    for (
+      let attempt = 0;
+      attempt <= CONNECT_RETRY_DELAYS_MS.length;
+      attempt++
+    ) {
+      try {
+        const model = await connect(uri);
+        this.attachModelListeners(model);
+        return model;
+      } catch (err) {
+        lastError = err as Error;
+        const delay = CONNECT_RETRY_DELAYS_MS[attempt];
+        if (delay === undefined) break;
+        this.logger.warn('AMQP connect failed — retrying', {
+          attempt: attempt + 1,
+          delayMs: delay,
         });
+        await sleep(delay);
+      }
     }
+
+    throw lastError ?? new Error('AMQP connect failed');
+  }
+
+  private async getModel(): Promise<ChannelModel> {
+    this.modelPromise ??= this.connectWithRetry()
+      .then((model) => {
+        this.model = model;
+        return model;
+      })
+      .catch((err: Error) => {
+        this.modelPromise = null;
+        throw err;
+      });
     return this.modelPromise;
   }
 

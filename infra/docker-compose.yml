@@ -59,11 +59,11 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
       interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
     deploy:
       resources:
         limits:
@@ -90,7 +90,7 @@ services:
           memory: 256M
 
   grafana:
-    image: grafana/grafana:12.0.1
+    image: grafana/grafana:12.1.3
     container_name: ididntcatchthat-grafana
     restart: unless-stopped
     volumes:
