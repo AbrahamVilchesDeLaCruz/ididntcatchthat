@@ -162,6 +162,7 @@ export const en: Translations = {
     header: {
       explore: 'The method',
       start: 'Try it',
+      backToTop: 'Back to top',
     },
   },
   game: {
@@ -247,6 +248,14 @@ export const en: Translations = {
       hudVictoryLabel: 'Run complete',
       failedCardsTitle: 'Cards you missed this session',
       ctaPracticeWeakest: 'Practice my weak cards globally',
+      loadError: 'Could not load the game summary.',
+      retryPlay: 'Play again',
+    },
+    errors: {
+      completeFailed: 'Could not finish the game. Retry or keep playing.',
+      recordFailed: 'Could not record your answer. Retry.',
+      pauseFailed: 'Could not pause the game. Retry.',
+      retry: 'Retry',
     },
   },
   study: {
@@ -513,6 +522,10 @@ export const en: Translations = {
       best_streak: 'days',
       module_master: 'level',
     },
+    scoreLabels: {
+      streakSuffix: 'd',
+      levelPrefix: 'Lv.',
+    },
     loading: 'Loading ranking...',
     error: 'Failed to load ranking. Please try again.',
     empty: 'No players in this ranking yet.',
@@ -578,6 +591,7 @@ export const en: Translations = {
     navApp: 'Go to app →',
     roles: {
       user: 'Player',
+      guest: 'Guest',
       teacher: 'Teacher',
       admin: 'Administrator',
     },
@@ -673,6 +687,14 @@ export const en: Translations = {
     },
   },
   common: {
+    dismiss: 'Dismiss',
+    retry: 'Retry',
+    timeAgo: {
+      justNow: 'just now',
+      seconds: '{count}s ago',
+      minutes: '{count}m ago',
+      hours: '{count}h ago',
+    },
     theme: {
       lightMode: 'Light mode',
       darkMode: 'Dark mode',

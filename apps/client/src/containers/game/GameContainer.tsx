@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useI18n } from '@/core/i18n';
 import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import {
   useGameFlashcards,
@@ -35,6 +36,8 @@ export const GameContainer = (): ReactElement => {
   const location = useLocation();
   const state = (location.state as LocationState | null) ?? {};
   const userType = useAuthStore((s) => s.userType);
+  const { t } = useI18n();
+  const ge = t.game.errors;
 
   const hasFlashcardIds = (state.flashcardIds ?? []).length > 0;
   const isResumeMode = state.mode === 'resume' || !hasFlashcardIds;
@@ -121,9 +124,7 @@ export const GameContainer = (): ReactElement => {
         navigateToSummary(summary);
       },
       onError: () => {
-        setCompleteError(
-          'No se pudo finalizar la partida. Reintenta o continúa jugando.',
-        );
+        setCompleteError(ge.completeFailed);
       },
     });
   }, [
@@ -136,6 +137,7 @@ export const GameContainer = (): ReactElement => {
     sessionFlashcards,
     showOptimisticGameUnlocks,
     userType,
+    ge.completeFailed,
   ]);
 
   useEffect(() => {
@@ -156,10 +158,10 @@ export const GameContainer = (): ReactElement => {
       void recordAttempt({ flashcardId: flashcard.id, correct })
         .then(() => session.recordAnswer(correct))
         .catch(() => {
-          setCompleteError('No se pudo registrar la respuesta. Reintenta.');
+          setCompleteError(ge.recordFailed);
         });
     },
-    [recordAttempt, session],
+    [recordAttempt, session, ge.recordFailed],
   );
 
   const handlePause = useCallback((): void => {
@@ -178,11 +180,18 @@ export const GameContainer = (): ReactElement => {
           void navigate('/game', { state: { pausedSaved: true } });
         },
         onError: () => {
-          setPauseError('No se pudo pausar la partida. Reintenta.');
+          setPauseError(ge.pauseFailed);
         },
       },
     );
-  }, [canPause, gameId, navigate, patchGame, session.currentFlashcard]);
+  }, [
+    canPause,
+    gameId,
+    navigate,
+    patchGame,
+    session.currentFlashcard,
+    ge.pauseFailed,
+  ]);
 
   const shortcutsEnabled =
     !isLoading && !!session.currentFlashcard && session.phase === 'playing';
@@ -226,7 +235,7 @@ export const GameContainer = (): ReactElement => {
           }}
           className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
         >
-          Reintentar
+          {ge.retry}
         </button>
       </div>
     );

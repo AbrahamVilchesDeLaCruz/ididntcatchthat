@@ -10,6 +10,7 @@ export const HomeContainer = (): ReactElement => {
   const { t } = useI18n();
   const h = t.home;
   const {
+    isGuest,
     isTeacher,
     isAdmin,
     canStudy,
@@ -29,7 +30,9 @@ export const HomeContainer = (): ReactElement => {
     ? h.roles.admin
     : isTeacher
       ? h.roles.teacher
-      : h.roles.user;
+      : isGuest
+        ? h.roles.guest
+        : h.roles.user;
 
   const welcomeName = profileQuery.data?.nickname.trim()
     ? profileQuery.data.nickname

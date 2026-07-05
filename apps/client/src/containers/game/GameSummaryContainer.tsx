@@ -1,5 +1,6 @@
 import { type ReactElement, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useGameSummary, usePausedGames, useStartGame } from './api/game.api';
 import { GameSummaryComponent } from './GameSummaryComponent';
@@ -19,6 +20,8 @@ export const GameSummaryContainer = (): ReactElement => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useI18n();
+  const gs = t.game.summary;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const userType = useAuthStore((s) => s.userType);
   const guestDeviceId = useAuthStore((s) => s.guestDeviceId);
@@ -112,15 +115,13 @@ export const GameSummaryContainer = (): ReactElement => {
   if (shouldFetch && (isError || !summary)) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5">
-        <p className="text-[var(--color-accent-red)]">
-          No se pudo cargar el resumen de la partida.
-        </p>
+        <p className="text-[var(--color-accent-red)]">{gs.loadError}</p>
         <button
           type="button"
           onClick={handlePlayAgain}
           className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
         >
-          Volver a jugar
+          {gs.retryPlay}
         </button>
       </div>
     );

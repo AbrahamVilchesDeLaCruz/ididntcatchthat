@@ -47,9 +47,10 @@ export const RankingComponent = ({
   onPeriodChange,
   onModuleChange,
 }: RankingComponentProps): ReactElement => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const r = t.ranking;
+  const scoreLabels = r.scoreLabels;
 
   const isRankedInList = entries.some((entry) => entry.isMe);
   const showOutsideTopBanner =
@@ -135,7 +136,8 @@ export const RankingComponent = ({
               {r.yourPosition}: #{currentUser.rank}
             </span>
             <span className="text-[var(--color-text-secondary)]">
-              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+              {formatRankingScore(type, currentUser.score, locale, scoreLabels)}{' '}
+              {r.scoreUnits[type]}
             </span>
           </CardContent>
         </Card>
@@ -148,7 +150,8 @@ export const RankingComponent = ({
               {r.yourPosition}: #{currentUser.rank}
             </span>
             <span className="text-[var(--color-text-secondary)]">
-              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+              {formatRankingScore(type, currentUser.score, locale, scoreLabels)}{' '}
+              {r.scoreUnits[type]}
             </span>
           </CardContent>
         </Card>
