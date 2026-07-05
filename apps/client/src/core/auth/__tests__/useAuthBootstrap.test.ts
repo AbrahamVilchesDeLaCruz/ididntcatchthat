@@ -8,12 +8,14 @@ import { useAuthStore } from '@/core/store/auth.store';
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios);
 
-// Helper para manipular el store directamente entre tests
 const resetStore = (): void => {
   useAuthStore.setState({
     accessToken: null,
     isAuthenticated: false,
     guestDeviceId: null,
+    userType: null,
+    userId: null,
+    roles: [],
   });
 };
 
@@ -28,7 +30,6 @@ describe('useAuthBootstrap', () => {
   });
 
   it('devuelve ready=true inmediatamente si el usuario no está autenticado', () => {
-    // isAuthenticated=false → no necesita refresh
     useAuthStore.setState({ isAuthenticated: false, accessToken: null });
 
     const { result } = renderHook(() => useAuthBootstrap());
@@ -38,7 +39,6 @@ describe('useAuthBootstrap', () => {
   });
 
   it('devuelve ready=true inmediatamente si ya hay accessToken en memoria', () => {
-    // isAuthenticated=true y accessToken presente → SPA activa, no recargó
     useAuthStore.setState({
       isAuthenticated: true,
       accessToken: 'existing-token',
@@ -51,7 +51,6 @@ describe('useAuthBootstrap', () => {
   });
 
   it('intenta refresh cuando isAuthenticated=true pero no hay accessToken (recarga)', async () => {
-    // Simula recarga: isAuthenticated persistido pero accessToken efímero perdido
     useAuthStore.setState({ isAuthenticated: true, accessToken: null });
     mockedAxios.post = vi.fn().mockResolvedValue({
       data: { accessToken: 'new-token' },
@@ -59,7 +58,6 @@ describe('useAuthBootstrap', () => {
 
     const { result } = renderHook(() => useAuthBootstrap());
 
-    // Durante el refresh, ready es false
     expect(result.current).toBe(false);
 
     await waitFor(() => {
@@ -85,17 +83,48 @@ describe('useAuthBootstrap', () => {
     expect(useAuthStore.getState().accessToken).toBeNull();
   });
 
-  it('hace logout del guest cuando recarga (tiene guestDeviceId pero no accessToken)', () => {
+  it('restaura sesión guest al recargar (guestDeviceId sin accessToken)', async () => {
     useAuthStore.setState({
       isAuthenticated: true,
       accessToken: null,
       guestDeviceId: 'device-abc',
     });
+    mockedAxios.post = vi.fn().mockResolvedValue({
+      data: { accessToken: 'guest-token', deviceId: 'device-abc' },
+    });
 
-    renderHook(() => useAuthBootstrap());
+    const { result } = renderHook(() => useAuthBootstrap());
+
+    expect(result.current).toBe(false);
+
+    await waitFor(() => {
+      expect(result.current).toBe(true);
+    });
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/guest'),
+      { guestDeviceId: 'device-abc' },
+    );
+    expect(useAuthStore.getState().accessToken).toBe('guest-token');
+    expect(useAuthStore.getState().guestDeviceId).toBe('device-abc');
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+  });
+
+  it('hace logout del guest si la re-autenticación guest falla', async () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      accessToken: null,
+      guestDeviceId: 'device-abc',
+    });
+    mockedAxios.post = vi.fn().mockRejectedValue(new Error('401'));
+
+    const { result } = renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(result.current).toBe(true);
+    });
 
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().guestDeviceId).toBe('device-abc');
-    expect(mockedAxios.post).not.toHaveBeenCalled();
   });
 });

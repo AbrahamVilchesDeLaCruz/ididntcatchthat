@@ -9,9 +9,8 @@ import { useAuthStore } from '@/core/store/auth.store';
  * - Usuario registrado: si `isAuthenticated = true` pero no hay `accessToken`
  *   (recarga de página), hace un refresh con la cookie httpOnly. Si falla, logout.
  *
- * - Guest: no tiene cookie de refresh. Al recargar se limpia `isAuthenticated`
- *   para que `GameConfigContainer` lo trate como no autenticado y pida un nuevo
- *   token guest. El `guestDeviceId` se conserva para reutilizarlo.
+ * - Guest: si hay `guestDeviceId` persistido pero no hay `accessToken`, solicita
+ *   un nuevo token guest reutilizando el device id.
  *
  * Devuelve `ready = true` una vez que el bootstrap terminó.
  */
@@ -20,31 +19,46 @@ export const useAuthBootstrap = (): boolean => {
   const accessToken = useAuthStore((s) => s.accessToken);
   const guestDeviceId = useAuthStore((s) => s.guestDeviceId);
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
+  const setGuestDeviceId = useAuthStore((s) => s.setGuestDeviceId);
   const logout = useAuthStore((s) => s.logout);
 
-  const isGuest = isAuthenticated && guestDeviceId !== null;
-  // Guests don't have a refreshToken cookie — clear auth state so
-  // GameConfigContainer re-authenticates them as guest
-  const needsRefresh = isAuthenticated && !accessToken && !isGuest;
+  const needsGuestRefresh = guestDeviceId !== null && !accessToken;
+  const needsRegisteredRefresh =
+    isAuthenticated && !accessToken && guestDeviceId === null;
+  const needsBootstrap = needsGuestRefresh || needsRegisteredRefresh;
 
-  // Si el guest recarga, limpiar isAuthenticated (mantener guestDeviceId)
-  if (isGuest && !accessToken) {
-    logout();
-  }
+  const [ready, setReady] = useState(!needsBootstrap);
 
-  // Si no hace falta refresh, arrancamos ready directamente
-  const [ready, setReady] = useState(!needsRefresh);
-
-  // Ref para evitar doble-llamada en Strict Mode
   const attempted = useRef(false);
 
   useEffect(() => {
-    if (!needsRefresh || attempted.current) return;
+    if (!needsBootstrap || attempted.current) return;
     attempted.current = true;
+
+    const apiBase = resolveApiBaseUrl();
+
+    if (needsGuestRefresh) {
+      axios
+        .post<{ accessToken: string; deviceId: string }>(
+          `${apiBase}/auth/guest`,
+          { guestDeviceId: guestDeviceId ?? undefined },
+        )
+        .then((res) => {
+          setAccessToken(res.data.accessToken);
+          setGuestDeviceId(res.data.deviceId);
+        })
+        .catch(() => {
+          logout();
+        })
+        .finally(() => {
+          setReady(true);
+        });
+      return;
+    }
 
     axios
       .post<{ accessToken: string }>(
-        `${resolveApiBaseUrl()}/auth/refresh`,
+        `${apiBase}/auth/refresh`,
         {},
         { withCredentials: true },
       )
@@ -57,7 +71,14 @@ export const useAuthBootstrap = (): boolean => {
       .finally(() => {
         setReady(true);
       });
-  }, [needsRefresh, setAccessToken, logout]);
+  }, [
+    needsBootstrap,
+    needsGuestRefresh,
+    guestDeviceId,
+    setAccessToken,
+    setGuestDeviceId,
+    logout,
+  ]);
 
   return ready;
 };

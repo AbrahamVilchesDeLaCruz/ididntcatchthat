@@ -54,9 +54,24 @@ export const GameSummaryContainer = (): ReactElement => {
       ? storedSummary
       : (fetchedSummary ?? null);
 
-  const handlePlayAgain = (): void => {
+  const handleChooseModule = (): void => {
     if (gameId) clearGameSummary(gameId);
     void navigate('/game');
+  };
+
+  const handlePlayAgain = (): void => {
+    if (gameId) clearGameSummary(gameId);
+    startGame(
+      { mode: 'game', module: null, cardCount: 10 },
+      {
+        onSuccess: ({ gameId: newGameId, flashcardIds }) => {
+          void navigate(`/game/${newGameId}`, { state: { flashcardIds } });
+        },
+        onError: () => {
+          void navigate('/game');
+        },
+      },
+    );
   };
 
   const handleViewPaused = (): void => {
@@ -117,6 +132,7 @@ export const GameSummaryContainer = (): ReactElement => {
       isGuest={isGuest}
       pausedGamesCount={canSeePaused ? pausedGames.length : 0}
       onPlayAgain={handlePlayAgain}
+      onChooseModule={handleChooseModule}
       onViewPaused={handleViewPaused}
       onViewStats={handleViewStats}
       onViewAchievements={isGuest ? undefined : handleViewAchievements}

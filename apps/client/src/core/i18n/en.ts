@@ -706,4 +706,8 @@ export const en: Translations = {
     },
     logout: 'Log out',
   },
+  gameShell: {
+    back: 'Back',
+    login: 'Log in',
+  },
 };

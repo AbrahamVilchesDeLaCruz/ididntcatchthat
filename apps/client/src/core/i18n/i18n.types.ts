@@ -425,6 +425,11 @@ export interface StudyTranslations {
   };
 }
 
+export interface GameShellTranslations {
+  back: string;
+  login: string;
+}
+
 export interface CommonTranslations {
   theme: {
     lightMode: string;
@@ -597,4 +602,5 @@ export interface Translations {
   auth: AuthTranslations;
   common: CommonTranslations;
   sidebar: SidebarTranslations;
+  gameShell: GameShellTranslations;
 }

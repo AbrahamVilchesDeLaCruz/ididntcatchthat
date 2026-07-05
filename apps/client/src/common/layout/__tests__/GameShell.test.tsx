@@ -66,7 +66,7 @@ describe('GameShell', () => {
       </MemoryRouter>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
     expect(screen.getByText('Home page')).toBeInTheDocument();
   });
