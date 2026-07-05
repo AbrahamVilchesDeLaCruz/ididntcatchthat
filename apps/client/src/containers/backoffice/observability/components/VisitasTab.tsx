@@ -119,6 +119,7 @@ export const VisitasTab = (): ReactElement => {
                     color: 'var(--color-accent-yellow)',
                   },
                 ]}
+                ariaLabel={t.backoffice.observability.visits.visitsByPeriod}
               />
             </ChartCard>
           )}
@@ -132,6 +133,7 @@ export const VisitasTab = (): ReactElement => {
                   .map((p) => ({ name: p.path, value: p.views }))}
                 height={Math.max(200, pv.topPages.slice(0, 8).length * 36)}
                 horizontal
+                ariaLabel={t.backoffice.observability.visits.topVisitedPages}
               />
             </ChartCard>
           )}

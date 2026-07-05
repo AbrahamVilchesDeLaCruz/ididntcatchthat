@@ -60,7 +60,7 @@ export const GamePlayToolbar = ({
             <button
               type="button"
               onClick={onPause}
-              className="rounded-lg border border-[var(--color-border)] p-1.5 text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand-light)]"
+              className="rounded-lg border border-[var(--color-border)] p-2.5 min-h-11 min-w-11 inline-flex items-center justify-center text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand-light)]"
               aria-label={isStudy ? studyLabels.pause : labels.pause}
               title={isStudy ? studyLabels.pause : labels.pause}
             >

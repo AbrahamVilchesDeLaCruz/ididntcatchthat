@@ -146,7 +146,11 @@ export const SubcategoryProgressPanel = ({
                     {Math.round(row.accuracy)}%
                   </span>
                 </div>
-                <AccuracyProgressBar value={row.accuracy} className="mt-3" />
+                <AccuracyProgressBar
+                  value={row.accuracy}
+                  className="mt-3"
+                  ariaLabel={`${st.accuracy}: ${Math.round(row.accuracy)}%`}
+                />
                 <button
                   type="button"
                   onClick={() => onPractice(row.subcategory)}

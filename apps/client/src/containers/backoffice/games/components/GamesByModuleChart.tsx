@@ -54,6 +54,8 @@ export const GamesByModuleChart = ({
 
   return (
     <div
+      role="img"
+      aria-label={t.backoffice.games.charts.qualityByModuleTitle}
       style={{ width: '100%', height: Math.max(240, chartData.length * 52) }}
     >
       <ResponsiveContainer width="100%" height="100%">
