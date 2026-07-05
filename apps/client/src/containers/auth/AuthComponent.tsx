@@ -1,4 +1,6 @@
 import { type ReactElement } from 'react';
+import { LocaleToggle } from '@/common/components/LocaleToggle';
+import { useI18n } from '@/core/i18n';
 import { useAuthForm } from './hooks';
 import { AuthLoginForm } from './components/AuthLoginForm';
 import { AuthRegisterForm } from './components/AuthRegisterForm';
@@ -32,6 +34,7 @@ export const AuthComponent = ({
   onGoogleLogin,
   onClearError,
 }: AuthComponentProps): ReactElement => {
+  const { t } = useI18n();
   const [formState, formHandlers] = useAuthForm(mode, onClearError);
 
   const handleLoginSubmit = (): void => {
@@ -45,23 +48,24 @@ export const AuthComponent = ({
   };
 
   return (
-    <div className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center px-4">
+    <div className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center px-4 relative">
+      <div className="absolute top-4 right-4">
+        <LocaleToggle variant="icon" />
+      </div>
+
       <div className="w-full max-w-md">
-        {/* Logo / Header */}
         <div className="text-center mb-8">
           <h1 className="mb-2">
             <BrandWordmark className="text-3xl" />
           </h1>
           <p className="text-[var(--color-text-secondary)] text-sm">
             {mode === 'login'
-              ? 'Accede a tu cuenta'
-              : 'Crea tu cuenta y empieza a aprender'}
+              ? t.auth.login.subtitle
+              : t.auth.register.subtitle}
           </p>
         </div>
 
-        {/* Card */}
         <div className="bg-[var(--color-bg-surface)] rounded-2xl p-8 shadow-xl border border-[var(--color-border)]">
-          {/* Mode tabs */}
           <div className="flex rounded-lg bg-[var(--color-bg-elevated)] p-1 mb-6">
             <button
               type="button"
@@ -72,7 +76,7 @@ export const AuthComponent = ({
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
-              Iniciar sesión
+              {t.auth.login.tab}
             </button>
             <button
               type="button"
@@ -83,11 +87,10 @@ export const AuthComponent = ({
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
-              Registrarse
+              {t.auth.register.tab}
             </button>
           </div>
 
-          {/* Server error */}
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-[var(--color-accent-green-dim)] border border-[var(--color-accent-red)]/20 text-[var(--color-accent-red)] text-sm flex items-start gap-2">
               <svg
@@ -108,7 +111,6 @@ export const AuthComponent = ({
             </div>
           )}
 
-          {/* Form */}
           {mode === 'login' ? (
             <AuthLoginForm
               values={formState.loginValues}
@@ -127,16 +129,14 @@ export const AuthComponent = ({
             />
           )}
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--color-border)]" />
             <span className="text-xs text-[var(--color-text-muted)]">
-              o continúa con
+              {t.auth.oauth.divider}
             </span>
             <div className="flex-1 h-px bg-[var(--color-border)]" />
           </div>
 
-          {/* Google OAuth */}
           <button
             type="button"
             onClick={onGoogleLogin}
@@ -146,7 +146,7 @@ export const AuthComponent = ({
             {isGoogleLoading ? (
               <>
                 <span className="w-4 h-4 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
-                Redirigiendo…
+                {t.auth.oauth.redirecting}
               </>
             ) : (
               <>
@@ -173,7 +173,7 @@ export const AuthComponent = ({
                     fill="#EA4335"
                   />
                 </svg>
-                Continuar con Google
+                {t.auth.oauth.google}
               </>
             )}
           </button>

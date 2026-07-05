@@ -2,6 +2,7 @@ import { useEffect, useMemo, type ReactElement } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { getPostAuthPath } from '@/core/navigation/sessionNav';
+import { useI18n } from '@/core/i18n';
 
 /**
  * Landing page after Google OAuth redirect.
@@ -9,6 +10,7 @@ import { getPostAuthPath } from '@/core/navigation/sessionNav';
  * or ?error=<reason> on failure.
  */
 export const AuthCallbackContainer = (): ReactElement => {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
@@ -16,15 +18,12 @@ export const AuthCallbackContainer = (): ReactElement => {
   const token = searchParams.get('token');
   const errorParam = searchParams.get('error');
 
-  // Derive error message from URL params — no state needed
   const errorMessage = useMemo((): string | null => {
     if (token) return null;
-    if (errorParam === 'access_denied')
-      return 'Cancelaste el acceso con Google.';
-    if (errorParam)
-      return 'El inicio de sesión con Google falló. Inténtalo de nuevo.';
-    return 'No pudimos iniciar sesión con Google.';
-  }, [token, errorParam]);
+    if (errorParam === 'access_denied') return t.auth.callback.accessDenied;
+    if (errorParam) return t.auth.callback.failed;
+    return t.auth.callback.generic;
+  }, [token, errorParam, t.auth.callback]);
 
   useEffect(() => {
     if (token) {
@@ -33,7 +32,6 @@ export const AuthCallbackContainer = (): ReactElement => {
       return;
     }
 
-    // Show error briefly then redirect to login
     const timer = setTimeout(() => {
       void navigate('/auth/login', { replace: true });
     }, 2500);
@@ -65,7 +63,7 @@ export const AuthCallbackContainer = (): ReactElement => {
             {errorMessage}
           </p>
           <p className="text-[var(--color-text-muted)] text-sm">
-            Redirigiendo al login…
+            {t.auth.callback.redirectingToLogin}
           </p>
         </div>
       </div>
@@ -77,7 +75,7 @@ export const AuthCallbackContainer = (): ReactElement => {
       <div className="text-center">
         <div className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin mx-auto mb-3" />
         <p className="text-[var(--color-text-secondary)] text-sm">
-          Iniciando sesión con Google…
+          {t.auth.callback.loading}
         </p>
       </div>
     </div>

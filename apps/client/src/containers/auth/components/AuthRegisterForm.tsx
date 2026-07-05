@@ -1,4 +1,5 @@
 import { useState, type ReactElement } from 'react';
+import { useI18n } from '@/core/i18n';
 import type { RegisterFormValues, RegisterFieldErrors } from '../auth.types';
 
 interface AuthRegisterFormProps {
@@ -16,6 +17,7 @@ export const AuthRegisterForm = ({
   onFieldChange,
   onSubmit,
 }: AuthRegisterFormProps): ReactElement => {
+  const { t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent): void => {
@@ -28,13 +30,12 @@ export const AuthRegisterForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Nickname */}
       <div>
         <label
           htmlFor="nickname"
           className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
-          Nickname
+          {t.auth.fields.nickname}
         </label>
         <input
           id="nickname"
@@ -48,7 +49,7 @@ export const AuthRegisterForm = ({
               ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
               : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
           }`}
-          placeholder="tu_nickname"
+          placeholder={t.auth.fields.nicknamePlaceholder}
         />
         {fieldErrors.nickname ? (
           <p className="mt-1 text-xs text-[var(--color-accent-red)]">
@@ -56,18 +57,17 @@ export const AuthRegisterForm = ({
           </p>
         ) : (
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            3–30 caracteres. Solo letras, números y guiones bajos.
+            {t.auth.register.nicknameHint}
           </p>
         )}
       </div>
 
-      {/* Email */}
       <div>
         <label
           htmlFor="reg-email"
           className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
-          Email
+          {t.auth.fields.email}
         </label>
         <input
           id="reg-email"
@@ -80,20 +80,19 @@ export const AuthRegisterForm = ({
               ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
               : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
           }`}
-          placeholder="tu@email.com"
+          placeholder={t.auth.fields.emailPlaceholder}
         />
         {fieldErrors.email && (
           <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
         )}
       </div>
 
-      {/* Password */}
       <div>
         <label
           htmlFor="reg-password"
           className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
-          Contraseña
+          {t.auth.fields.password}
         </label>
         <div className="relative">
           <input
@@ -107,13 +106,17 @@ export const AuthRegisterForm = ({
                 ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
                 : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
             }`}
-            placeholder="Mínimo 8 caracteres"
+            placeholder={t.auth.fields.passwordMinPlaceholder}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
-            aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
+            aria-label={
+              showPassword
+                ? t.auth.fields.hidePassword
+                : t.auth.fields.showPassword
+            }
           >
             {showPassword ? (
               <svg
@@ -166,10 +169,10 @@ export const AuthRegisterForm = ({
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-            Creando cuenta…
+            {t.auth.register.submitting}
           </span>
         ) : (
-          'Crear cuenta'
+          t.auth.register.submit
         )}
       </button>
     </form>

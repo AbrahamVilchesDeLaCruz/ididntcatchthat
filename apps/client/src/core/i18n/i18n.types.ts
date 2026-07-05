@@ -527,6 +527,63 @@ export interface HomeTranslations {
   };
 }
 
+export interface AuthTranslations {
+  login: {
+    subtitle: string;
+    tab: string;
+    submit: string;
+    submitting: string;
+  };
+  register: {
+    subtitle: string;
+    tab: string;
+    submit: string;
+    submitting: string;
+    nicknameHint: string;
+  };
+  fields: {
+    email: string;
+    password: string;
+    nickname: string;
+    emailPlaceholder: string;
+    passwordPlaceholder: string;
+    passwordMinPlaceholder: string;
+    nicknamePlaceholder: string;
+    showPassword: string;
+    hidePassword: string;
+  };
+  oauth: {
+    divider: string;
+    google: string;
+    redirecting: string;
+  };
+  callback: {
+    loading: string;
+    redirectingToLogin: string;
+    accessDenied: string;
+    failed: string;
+    generic: string;
+  };
+  errors: {
+    unknown: string;
+    invalidCredentials: string;
+    conflict: string;
+    validation: string;
+    rateLimit: string;
+    network: string;
+    server: string;
+    generic: string;
+  };
+  validation: {
+    invalidEmail: string;
+    passwordRequired: string;
+    nicknameMin: string;
+    nicknameMax: string;
+    nicknamePattern: string;
+    passwordMin: string;
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
@@ -537,6 +594,7 @@ export interface Translations {
   profile: ProfileTranslations;
   home: HomeTranslations;
   ranking: RankingTranslations;
+  auth: AuthTranslations;
   common: CommonTranslations;
   sidebar: SidebarTranslations;
 }
