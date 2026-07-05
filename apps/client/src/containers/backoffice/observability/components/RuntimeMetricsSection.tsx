@@ -5,6 +5,7 @@ import {
   InsightCardSkeleton,
   type InsightVariant,
 } from './InsightCard';
+import { useI18n } from '@/core/i18n';
 
 interface RuntimeMetricsSectionProps {
   runtime: RuntimeMetrics | null;
@@ -32,6 +33,8 @@ export const RuntimeMetricsSection = ({
   runtime,
   isLoading,
 }: RuntimeMetricsSectionProps): ReactElement => {
+  const { t } = useI18n();
+
   if (isLoading || !runtime) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -53,12 +56,18 @@ export const RuntimeMetricsSection = ({
           : 'success';
   const heapInsight =
     heapPct === null
-      ? 'Sin datos de heap disponibles'
+      ? t.backoffice.observability.runtime.noHeapData
       : heapPct > 85
-        ? `Memoria alta — considera aumentar el límite de Node.js`
+        ? t.backoffice.observability.runtime.highMemoryHint
         : heapPct > 70
-          ? `Heap en zona de atención (${heapPct.toFixed(0)}%)`
-          : `Memoria en niveles saludables (${heapPct.toFixed(0)}%)`;
+          ? t.backoffice.observability.runtime.warningHeapHint.replace(
+              '{percent}',
+              heapPct.toFixed(0),
+            )
+          : t.backoffice.observability.runtime.healthyMemoryHint.replace(
+              '{percent}',
+              heapPct.toFixed(0),
+            );
 
   const lagMs = runtime.eventLoopLagP95Ms;
   const lagVariant: InsightVariant =
@@ -71,34 +80,49 @@ export const RuntimeMetricsSection = ({
           : 'success';
   const lagInsight =
     lagMs === null
-      ? 'Sin datos de event loop — activa collectDefaultMetrics()'
+      ? t.backoffice.observability.runtime.noEventLoopData
       : lagMs > 50
-        ? `Event loop bloqueado — revisar tareas síncronas pesadas`
+        ? t.backoffice.observability.runtime.blockedEventLoopHint
         : lagMs > 10
-          ? `Cola de eventos con algo de latencia (${lagMs.toFixed(1)}ms)`
-          : `Cola de eventos fluida — sin bloqueos detectados`;
+          ? t.backoffice.observability.runtime.warningEventLoopHint.replace(
+              '{ms}',
+              lagMs.toFixed(1),
+            )
+          : t.backoffice.observability.runtime.healthyEventLoopHint;
 
   const uptimeSec = runtime.uptimeSeconds;
   const uptimeVariant: InsightVariant =
     uptimeSec !== null && uptimeSec > 86_400 ? 'success' : 'neutral';
   const uptimeInsight =
     uptimeSec === null
-      ? 'Sin datos de uptime'
+      ? t.backoffice.observability.runtime.noUptimeData
       : uptimeSec > 86_400 * 3
-        ? `El servidor lleva ${fmtUptime(uptimeSec)} sin reinicios — estable`
+        ? t.backoffice.observability.runtime.stableServerHint.replace(
+            '{value}',
+            fmtUptime(uptimeSec),
+          )
         : uptimeSec > 3_600
-          ? `El servidor lleva ${fmtUptime(uptimeSec)} activo`
-          : `Servidor arrancado recientemente (${fmtUptime(uptimeSec)})`;
+          ? t.backoffice.observability.runtime.activeServerHint.replace(
+              '{value}',
+              fmtUptime(uptimeSec),
+            )
+          : t.backoffice.observability.runtime.recentServerHint.replace(
+              '{value}',
+              fmtUptime(uptimeSec),
+            );
 
   const gcSec = runtime.gcDurationTotalSeconds;
   const gcVariant: InsightVariant =
     gcSec !== null && gcSec > 60 ? 'warning' : 'success';
   const gcInsight =
     gcSec === null
-      ? 'Sin datos de GC'
+      ? t.backoffice.observability.runtime.noGcData
       : gcSec > 60
-        ? `GC acumulado elevado — revisar retención de objetos`
-        : `Pausas de GC normales (${gcSec.toFixed(2)}s total)`;
+        ? t.backoffice.observability.runtime.highGcHint
+        : t.backoffice.observability.runtime.normalGcHint.replace(
+            '{value}',
+            gcSec.toFixed(2),
+          );
 
   const noRuntimeData =
     runtime.heapUsedBytes === null &&
@@ -109,9 +133,7 @@ export const RuntimeMetricsSection = ({
     return (
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] px-6 py-12 text-center">
         <p className="text-[var(--color-text-secondary)] text-sm">
-          Sin métricas de runtime —{' '}
-          <code className="font-mono text-xs">collectDefaultMetrics()</code> aún
-          no ha registrado datos.
+          {t.backoffice.observability.runtime.noRuntimeMetrics}
         </p>
       </div>
     );
@@ -121,7 +143,7 @@ export const RuntimeMetricsSection = ({
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <InsightCard
-          label="Heap usado"
+          label={t.backoffice.observability.runtime.heapUsed}
           value={
             heapPct !== null
               ? `${heapPct.toFixed(1)}%`
@@ -138,21 +160,21 @@ export const RuntimeMetricsSection = ({
         />
 
         <InsightCard
-          label="Event loop lag p95"
+          label={t.backoffice.observability.runtime.eventLoopLagP95}
           value={lagMs !== null ? `${lagMs.toFixed(1)} ms` : '—'}
           insight={lagInsight}
           variant={lagVariant}
         />
 
         <InsightCard
-          label="Uptime"
+          label={t.backoffice.observability.runtime.uptime}
           value={fmtUptime(uptimeSec)}
           insight={uptimeInsight}
           variant={uptimeVariant}
         />
 
         <InsightCard
-          label="GC acumulado"
+          label={t.backoffice.observability.runtime.gcTotal}
           value={gcSec !== null ? `${gcSec.toFixed(2)} s` : '—'}
           insight={gcInsight}
           variant={gcVariant}
@@ -160,18 +182,21 @@ export const RuntimeMetricsSection = ({
 
         {runtime.activeHandles !== null && (
           <InsightCard
-            label="Handles activos"
+            label={t.backoffice.observability.runtime.activeHandles}
             value={String(runtime.activeHandles)}
-            insight={`${runtime.activeHandles} handles abiertos (sockets, timers, etc.)`}
+            insight={t.backoffice.observability.runtime.activeHandlesHint.replace(
+              '{count}',
+              String(runtime.activeHandles),
+            )}
             variant="neutral"
           />
         )}
 
         {runtime.residentMemoryBytes !== null && (
           <InsightCard
-            label="Memoria RSS"
+            label={t.backoffice.observability.runtime.rssMemory}
             value={fmtBytes(runtime.residentMemoryBytes)}
-            insight="Memoria física total usada por el proceso Node.js"
+            insight={t.backoffice.observability.runtime.rssMemoryHint}
             variant="neutral"
           />
         )}
