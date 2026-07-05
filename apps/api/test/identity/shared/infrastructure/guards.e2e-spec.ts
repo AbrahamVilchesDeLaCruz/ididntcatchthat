@@ -57,7 +57,7 @@ async function createGuardsTestApp(): Promise<INestApplication<App>> {
   app.useLogger(false);
 
   app.setGlobalPrefix('v1', {
-    exclude: ['/health', '/metrics'],
+    exclude: ['/health', '/metrics', '/auth/google', '/auth/google/callback'],
   });
   app.use(cookieParser());
   app.useGlobalPipes(
