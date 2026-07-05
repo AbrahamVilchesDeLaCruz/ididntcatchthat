@@ -54,18 +54,13 @@ export const GameContainer = (): ReactElement => {
     data: resumeData,
     isLoading: isLoadingResume,
     isError: isResumeError,
+    refetch: refetchResume,
   } = useResumeGame(gameId ?? '', isResumeMode && !!gameId);
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
   const { pollRecentUnlocks, showOptimisticGameUnlocks, reconcileProgress } =
     useProgressSideEffects();
-
-  useEffect(() => {
-    if (isResumeMode && isResumeError) {
-      void navigate('/game', { replace: true });
-    }
-  }, [isResumeMode, isResumeError, navigate]);
 
   const sessionFlashcards = useMemo((): FlashcardGameVM[] => {
     if (!isResumeMode || !resumeData) {
@@ -220,6 +215,36 @@ export const GameContainer = (): ReactElement => {
     onIncorrect: onIncorrectShortcut,
     onPause: canPause ? onPauseShortcut : undefined,
   });
+
+  if (isResumeMode && isResumeError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5 py-16">
+        <p className="max-w-md text-center text-[var(--color-accent-red)]">
+          {ge.resumeFailed}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              void refetchResume();
+            }}
+            className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
+          >
+            {ge.retry}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void navigate('/game', { replace: true });
+            }}
+            className="rounded-full border border-[var(--color-border-strong)] px-6 py-3 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          >
+            {ge.startNewGame}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (completeError) {
     return (

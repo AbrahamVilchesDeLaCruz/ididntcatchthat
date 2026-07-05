@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { useI18n } from '@/core/i18n';
+import { en } from '@/core/i18n/en';
 import { GameComponent } from '../GameComponent';
 import type { FlashcardGameVM } from '../game.types';
 
@@ -40,6 +42,7 @@ const defaultProps = {
 
 describe('GameComponent', () => {
   beforeEach(() => {
+    useI18n.setState({ locale: 'en', t: en });
     vi.clearAllMocks();
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(playMock);
     vi.stubGlobal(
@@ -53,11 +56,11 @@ describe('GameComponent', () => {
   });
 
   it('shows a loading spinner while loading', () => {
-    const { container } = render(
-      <GameComponent {...defaultProps} isLoading flashcard={null} />,
-    );
+    render(<GameComponent {...defaultProps} isLoading flashcard={null} />);
 
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: en.common.loading }),
+    ).toBeInTheDocument();
   });
 
   it('flips the card when the front is clicked', () => {

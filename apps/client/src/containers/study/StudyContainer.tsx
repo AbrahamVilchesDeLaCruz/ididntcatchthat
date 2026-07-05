@@ -21,6 +21,7 @@ import type { FlashcardGameVM } from '@/containers/game/game.types';
 import { useProgressSideEffects } from '@/core/progress/useProgressSideEffects';
 import { useProgressOptimisticStore } from '@/core/progress/progressOptimistic.store';
 import { useStudyAuthGuard } from './hooks/useStudyAuthGuard';
+import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 
 interface LocationState {
   flashcardIds?: string[];
@@ -175,7 +176,7 @@ export const StudyContainer = (): ReactElement => {
   if (!isReady || !canStudy) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-[var(--color-bg-base)]">
-        <div className="size-8 animate-spin rounded-full border-2 border-[var(--color-brand)] border-t-transparent" />
+        <LoadingSpinner />
       </div>
     );
   }

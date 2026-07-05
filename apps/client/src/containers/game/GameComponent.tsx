@@ -17,6 +17,7 @@ import { useGamePlayLabels } from './hooks/useGamePlayLabels';
 import { useFlashcardAudio } from './hooks/useFlashcardAudio';
 import { useCardFlipTransition } from './hooks/useCardFlipTransition';
 import { capitalizeFirst } from './game.text';
+import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 import type { FlashcardGameVM } from './game.types';
 
 interface GameComponentProps {
@@ -88,7 +89,7 @@ export const GameComponent = ({
   if (isLoading || !flashcard) {
     return (
       <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-base)]">
-        <div className="size-8 animate-spin rounded-full border-2 border-[var(--color-brand)] border-t-transparent" />
+        <LoadingSpinner />
       </div>
     );
   }
