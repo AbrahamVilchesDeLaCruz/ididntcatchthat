@@ -207,7 +207,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
   }
 
   body {
@@ -275,5 +275,21 @@
 
   .app-scroll::-webkit-scrollbar-corner {
     background: transparent;
+  }
+}
+
+/* ─── Safe area (notched devices, PWA standalone) ───────────────────────────── */
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 }
