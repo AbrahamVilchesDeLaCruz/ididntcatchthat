@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
 import { usePageView } from '@/core/analytics/usePageView';
 import { useI18n } from '@/core/i18n';
+import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 import { AppShell } from '@/common/layout/AppShell';
 import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
@@ -30,14 +31,10 @@ const AppRoutes = (): ReactElement => {
   if (!ready) {
     return (
       <div
-        className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center"
+        className="flex min-h-svh items-center justify-center bg-[var(--color-bg-base)]"
         aria-busy="true"
       >
-        <div
-          className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin"
-          role="status"
-          aria-label={t.common.loading}
-        />
+        <LoadingSpinner label={t.common.loading} />
       </div>
     );
   }

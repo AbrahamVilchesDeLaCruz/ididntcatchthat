@@ -10,6 +10,7 @@ import {
   getNativeAudioUrl,
 } from '@/containers/game/game.audio';
 import { capitalizeFirst } from '@/containers/game/game.text';
+import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 import { useGamePlayLabels } from '@/containers/game/hooks/useGamePlayLabels';
 import { useFlashcardAudio } from '@/containers/game/hooks/useFlashcardAudio';
 import { useCardFlipTransition } from '@/containers/game/hooks/useCardFlipTransition';
@@ -77,7 +78,7 @@ export const StudyComponent = ({
   if (isLoading || !flashcard) {
     return (
       <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-base)]">
-        <div className="size-8 animate-spin rounded-full border-2 border-[var(--color-brand)] border-t-transparent" />
+        <LoadingSpinner />
       </div>
     );
   }
