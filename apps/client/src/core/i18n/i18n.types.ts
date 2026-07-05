@@ -228,8 +228,8 @@ export interface GameTranslations {
 export interface StatsTranslations {
   title: string;
   subtitle: string;
-  moduleChartTitle: string;
-  moduleChartHint: string;
+  moduleListTitle: string;
+  moduleListHint: string;
   attemptsLabel: string;
   studyCoverageLabel: string;
   accuracy: string;
@@ -714,6 +714,7 @@ export interface BackofficeTranslations {
     activeUsersInsight: string;
     engagementRate: string;
     engagementRateInsight: string;
+    engagementRateThresholdHint: string;
     charts: {
       registrationsByPeriod: string;
       newUsers: string;

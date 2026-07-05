@@ -34,7 +34,7 @@ export const ModuleProgressChart = ({
   );
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-3" aria-label={st.moduleListTitle}>
       {rows.map((row) => (
         <li key={row.module}>
           <button

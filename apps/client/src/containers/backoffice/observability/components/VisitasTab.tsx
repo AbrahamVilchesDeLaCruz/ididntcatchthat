@@ -116,7 +116,7 @@ export const VisitasTab = (): ReactElement => {
                     key: 'unique',
                     label: t.backoffice.observability.visits.unique,
                     type: 'line',
-                    color: 'var(--color-accent-yellow)',
+                    color: 'var(--color-chart-3)',
                   },
                 ]}
                 ariaLabel={t.backoffice.observability.visits.visitsByPeriod}

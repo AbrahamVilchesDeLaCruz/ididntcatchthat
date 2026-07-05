@@ -10,17 +10,7 @@ import {
   Cell,
 } from 'recharts';
 import { useI18n } from '@/core/i18n';
-
-const COLORS = [
-  'var(--color-brand)',
-  'var(--color-accent-green)',
-  'var(--color-accent-yellow)',
-  '#a78bfa',
-  '#f472b6',
-  '#34d399',
-  '#fb923c',
-  '#60a5fa',
-];
+import { chartSeriesColor } from '@/common/charts/chartPalette';
 
 interface DistributionChartProps {
   data: { name: string; value: number }[];
@@ -92,11 +82,7 @@ export const DistributionChart = ({
             />
             <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
               {data.map((_, i) => (
-                <Cell
-                  key={i}
-                  fill={COLORS[i % COLORS.length]}
-                  fillOpacity={0.85}
-                />
+                <Cell key={i} fill={chartSeriesColor(i)} fillOpacity={0.85} />
               ))}
             </Bar>
           </BarChart>
@@ -140,11 +126,7 @@ export const DistributionChart = ({
           />
           <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
             {data.map((_, i) => (
-              <Cell
-                key={i}
-                fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.85}
-              />
+              <Cell key={i} fill={chartSeriesColor(i)} fillOpacity={0.85} />
             ))}
           </Bar>
         </BarChart>
