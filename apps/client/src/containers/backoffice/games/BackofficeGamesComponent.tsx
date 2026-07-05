@@ -104,6 +104,7 @@ export const BackofficeGamesComponent = ({
               },
             ]}
             height={240}
+            ariaLabel={t.backoffice.games.charts.trendTitle}
           />
         ) : (
           <p className="text-[var(--color-text-secondary)] text-sm text-center py-12">
@@ -125,6 +126,7 @@ export const BackofficeGamesComponent = ({
                   value: m.count,
                 }))}
                 height={176}
+                ariaLabel={t.backoffice.games.charts.modeDistributionTitle}
               />
             )}
           </ChartCard>
@@ -147,6 +149,7 @@ export const BackofficeGamesComponent = ({
                     (stats?.byModule.slice(0, 6).length ?? 0) * 32,
                   )}
                   horizontal
+                  ariaLabel={t.backoffice.games.charts.topModulesTitle}
                 />
               )}
             </ChartCard>

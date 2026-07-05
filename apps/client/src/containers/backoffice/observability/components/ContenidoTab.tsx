@@ -120,6 +120,7 @@ export const ContenidoTab = (): ReactElement => {
                     color: '#a78bfa',
                   },
                 ]}
+                ariaLabel={t.backoffice.observability.content.createdByPeriod}
               />
             </ChartCard>
           )}
@@ -132,6 +133,7 @@ export const ContenidoTab = (): ReactElement => {
                 }))}
                 height={160}
                 horizontal
+                ariaLabel={t.backoffice.observability.content.byCategory}
               />
             </ChartCard>
           )}

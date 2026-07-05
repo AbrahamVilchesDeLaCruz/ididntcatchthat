@@ -73,7 +73,11 @@ export const ModuleProgressChart = ({
                 />
               </div>
             </div>
-            <AccuracyProgressBar value={row.accuracy} className="mt-3" />
+            <AccuracyProgressBar
+              value={row.accuracy}
+              className="mt-3"
+              ariaLabel={`${st.accuracy}: ${Math.round(row.accuracy)}%`}
+            />
           </button>
         </li>
       ))}

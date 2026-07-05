@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { BrandWordmark } from '@/common/components/BrandWordmark';
+import { SkipToContentLink } from '@/common/components/SkipToContentLink';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
@@ -47,6 +48,7 @@ export const GameShell = (): ReactElement => {
 
   return (
     <div className="flex min-h-svh flex-col bg-[var(--color-bg-base)]">
+      <SkipToContentLink targetId="main-content" />
       <header className="game-shell-accent sticky top-0 z-40 shrink-0 border-b bg-[var(--color-bg-base)]/90 backdrop-blur-sm">
         <nav
           className="mx-auto grid h-12 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 text-sm"
@@ -107,9 +109,13 @@ export const GameShell = (): ReactElement => {
         </nav>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/common/lib/utils';
+import { useFocusTrap } from '@/common/hooks/useFocusTrap';
 
 interface SheetContextValue {
   open: boolean;
@@ -57,25 +58,42 @@ const SheetTrigger = ({
 
 interface SheetContentProps extends React.HTMLAttributes<HTMLDivElement> {
   side?: 'left' | 'right' | 'top' | 'bottom';
+  'aria-label'?: string;
 }
 
 const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
-  ({ className, children, side = 'right', ...props }, ref) => {
+  (
+    { className, children, side = 'right', 'aria-label': ariaLabel, ...props },
+    ref,
+  ) => {
     const { open, setOpen } = React.useContext(SheetContext);
+    const contentRef = useFocusTrap(open, () => {
+      setOpen(false);
+    });
+
+    const setRefs = (node: HTMLDivElement | null): void => {
+      contentRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    };
 
     if (!open) return null;
 
     return (
       <>
-        {/* Overlay */}
         <div
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
           aria-hidden
         />
-        {/* Panel */}
         <div
-          ref={ref}
+          ref={setRefs}
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel}
           className={cn(
             'fixed inset-y-0 z-50 flex flex-col bg-[var(--color-bg-surface)] shadow-xl',
             side === 'left' ? 'left-0' : 'right-0',

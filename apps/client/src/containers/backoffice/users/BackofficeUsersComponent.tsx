@@ -201,6 +201,7 @@ export const BackofficeUsersComponent = ({
                     },
                   ]}
                   height={240}
+                  ariaLabel={t.backoffice.users.charts.registrationsByPeriod}
                 />
               </ChartCard>
             )}
@@ -218,6 +219,7 @@ export const BackofficeUsersComponent = ({
                   }))}
                   height={90}
                   horizontal
+                  ariaLabel={t.backoffice.users.charts.registrationChannel}
                 />
               </ChartCard>
             )}

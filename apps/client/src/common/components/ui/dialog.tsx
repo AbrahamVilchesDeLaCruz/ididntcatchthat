@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/common/lib/utils';
+import { useFocusTrap } from '@/common/hooks/useFocusTrap';
 
 interface DialogContextValue {
   open: boolean;
@@ -53,36 +54,54 @@ const DialogTrigger = ({
   return <button onClick={() => setOpen(true)}>{children}</button>;
 };
 
-const DialogContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {
-  const { open, setOpen } = React.useContext(DialogContext);
+const DIALOG_TITLE_ID = 'dialog-title';
 
-  if (!open) return null;
+interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  'aria-describedby'?: string;
+}
 
-  return (
-    <>
-      <div
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-        onClick={() => setOpen(false)}
-        aria-hidden
-      />
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    </>
-  );
-});
+const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
+  ({ className, children, ...props }, ref) => {
+    const { open, setOpen } = React.useContext(DialogContext);
+    const contentRef = useFocusTrap(open, () => {
+      setOpen(false);
+    });
+
+    const setRefs = (node: HTMLDivElement | null): void => {
+      contentRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    };
+
+    if (!open) return null;
+
+    return (
+      <>
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+          aria-hidden
+        />
+        <div
+          ref={setRefs}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={DIALOG_TITLE_ID}
+          className={cn(
+            'fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl',
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </>
+    );
+  },
+);
 DialogContent.displayName = 'DialogContent';
 
 const DialogHeader = ({
@@ -94,9 +113,11 @@ const DialogHeader = ({
 
 const DialogTitle = ({
   className,
+  id = DIALOG_TITLE_ID,
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>): React.ReactElement => (
   <h2
+    id={id}
     className={cn(
       'text-lg font-semibold text-[var(--color-text-primary)]',
       className,
@@ -107,9 +128,11 @@ const DialogTitle = ({
 
 const DialogDescription = ({
   className,
+  id,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>): React.ReactElement => (
   <p
+    id={id}
     className={cn('text-sm text-[var(--color-text-secondary)]', className)}
     {...props}
   />

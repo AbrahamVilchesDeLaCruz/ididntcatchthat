@@ -299,6 +299,7 @@ export const es: Translations = {
     moduleChartHint: 'Toca un módulo para ver el detalle por subcategoría',
     attemptsLabel: '{count} intentos',
     studyCoverageLabel: '{percent}% visto',
+    accuracy: 'Precisión',
     subcategoryHint: 'Desglose de precisión por subcategoría',
     practiceSubcategory: 'Practicar {name}',
     weakTableTitle: 'Flashcards más difíciles',
@@ -694,6 +695,8 @@ export const es: Translations = {
   common: {
     dismiss: 'Cerrar',
     retry: 'Reintentar',
+    loading: 'Cargando…',
+    skipToContent: 'Saltar al contenido principal',
     timeAgo: {
       justNow: 'ahora mismo',
       seconds: 'hace {count}s',
@@ -1021,6 +1024,7 @@ export const es: Translations = {
       observability: 'Observabilidad',
     },
     logout: 'Cerrar sesión',
+    openMenu: 'Abrir menú de navegación',
   },
   gameShell: {
     back: 'Volver',

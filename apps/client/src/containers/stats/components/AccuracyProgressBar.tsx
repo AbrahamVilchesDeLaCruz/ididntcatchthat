@@ -3,6 +3,7 @@ import { type ReactElement } from 'react';
 interface AccuracyProgressBarProps {
   value: number;
   className?: string;
+  ariaLabel: string;
 }
 
 function fillTone(value: number): string {
@@ -14,6 +15,7 @@ function fillTone(value: number): string {
 export const AccuracyProgressBar = ({
   value,
   className = '',
+  ariaLabel,
 }: AccuracyProgressBarProps): ReactElement => {
   const clamped = Math.max(0, Math.min(100, value));
 
@@ -24,6 +26,7 @@ export const AccuracyProgressBar = ({
         className,
       ].join(' ')}
       role="progressbar"
+      aria-label={ariaLabel}
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}
       aria-valuemax={100}

@@ -230,6 +230,7 @@ export interface StatsTranslations {
   moduleChartHint: string;
   attemptsLabel: string;
   studyCoverageLabel: string;
+  accuracy: string;
   subcategoryHint: string;
   practiceSubcategory: string;
   weakTableTitle: string;
@@ -446,6 +447,8 @@ export interface GameShellTranslations {
 export interface CommonTranslations {
   dismiss: string;
   retry: string;
+  loading: string;
+  skipToContent: string;
   timeAgo: {
     justNow: string;
     seconds: string;
@@ -484,6 +487,7 @@ export interface SidebarTranslations {
     flashcards: string;
     observability: string;
   };
+  openMenu: string;
   logout: string;
 }
 

@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useAuthBootstrap } from '@/core/auth/useAuthBootstrap';
 import { usePageView } from '@/core/analytics/usePageView';
+import { useI18n } from '@/core/i18n';
 import { AppShell } from '@/common/layout/AppShell';
 import { GameShell } from '@/common/layout/GameShell';
 import { LandingView } from '@/views/LandingView';
@@ -22,12 +23,20 @@ import { FallbackRedirect } from '@/core/router/FallbackRedirect';
 
 const AppRoutes = (): ReactElement => {
   const ready = useAuthBootstrap();
+  const { t } = useI18n();
   usePageView();
 
   if (!ready) {
     return (
-      <div className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
+      <div
+        className="min-h-svh bg-[var(--color-bg-base)] flex items-center justify-center"
+        aria-busy="true"
+      >
+        <div
+          className="w-6 h-6 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin"
+          role="status"
+          aria-label={t.common.loading}
+        />
       </div>
     );
   }
