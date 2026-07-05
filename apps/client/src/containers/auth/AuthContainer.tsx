@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { getPostAuthPath, persistReturnTo } from '@/core/navigation/sessionNav';
+import { useI18n } from '@/core/i18n';
+import type { Translations } from '@/core/i18n/i18n.types';
 import { useLogin, useRegister, useGuestAuth, useMigrateGuest } from './api';
 import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import type {
@@ -12,45 +14,48 @@ import type {
 import { AuthComponent } from './AuthComponent';
 
 /**
- * Maps raw API/network errors to user-friendly Spanish messages.
+ * Maps raw API/network errors to user-friendly messages.
  */
-function mapAuthError(error: unknown): string {
-  if (!error) return 'Error desconocido. Inténtalo de nuevo.';
+function mapAuthError(
+  error: unknown,
+  errors: Translations['auth']['errors'],
+): string {
+  if (!error) return errors.unknown;
 
-  const message = error instanceof Error ? error.message : 'Error desconocido';
+  const message = error instanceof Error ? error.message : errors.unknown;
 
-  // HTTP status codes embedded in axios error messages
   if (message.includes('401') || message.includes('Invalid credentials')) {
-    return 'Email o contraseña incorrectos.';
+    return errors.invalidCredentials;
   }
   if (
     message.includes('409') ||
     message.includes('already taken') ||
     message.includes('already exists')
   ) {
-    return 'El email o nickname ya está en uso. Prueba con otro.';
+    return errors.conflict;
   }
   if (message.includes('422') || message.includes('Unprocessable')) {
-    return 'Comprueba que los datos introducidos sean correctos.';
+    return errors.validation;
   }
   if (message.includes('429') || message.includes('Too Many')) {
-    return 'Demasiados intentos. Espera un momento y vuelve a intentarlo.';
+    return errors.rateLimit;
   }
   if (
     message.includes('Network') ||
     message.includes('ECONNREFUSED') ||
     message.includes('ERR_NETWORK')
   ) {
-    return 'Sin conexión al servidor. Comprueba tu conexión a internet.';
+    return errors.network;
   }
   if (message.includes('500') || message.includes('Internal Server')) {
-    return 'Error interno del servidor. Inténtalo de nuevo en un momento.';
+    return errors.server;
   }
 
-  return 'Algo salió mal. Inténtalo de nuevo.';
+  return errors.generic;
 }
 
 export const AuthContainer = (): ReactElement => {
+  const { t } = useI18n();
   const { mode } = useParams<{ mode: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -139,7 +144,7 @@ export const AuthContainer = (): ReactElement => {
           finishAuth(accessToken, previousGuestDeviceId);
         },
         onError: (error) => {
-          setServerError(mapAuthError(error));
+          setServerError(mapAuthError(error, t.auth.errors));
         },
       },
     );
@@ -157,7 +162,7 @@ export const AuthContainer = (): ReactElement => {
           finishAuth(accessToken, previousGuestDeviceId);
         },
         onError: (error) => {
-          setServerError(mapAuthError(error));
+          setServerError(mapAuthError(error, t.auth.errors));
         },
       },
     );
@@ -179,7 +184,7 @@ export const AuthContainer = (): ReactElement => {
       persistReturnTo(authRedirectState.returnTo);
     }
     // OAuth Google es un redirect de servidor — salimos de la SPA
-    window.location.href = '/api/v1/auth/google';
+    window.location.href = '/api/auth/google';
   };
 
   return (

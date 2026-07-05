@@ -1,4 +1,5 @@
 import { useState, type ReactElement } from 'react';
+import { useI18n } from '@/core/i18n';
 import type { LoginFormValues, LoginFieldErrors } from '../auth.types';
 
 interface AuthLoginFormProps {
@@ -16,6 +17,7 @@ export const AuthLoginForm = ({
   onFieldChange,
   onSubmit,
 }: AuthLoginFormProps): ReactElement => {
+  const { t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent): void => {
@@ -27,13 +29,12 @@ export const AuthLoginForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Email */}
       <div>
         <label
           htmlFor="email"
           className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
-          Email
+          {t.auth.fields.email}
         </label>
         <input
           id="email"
@@ -47,20 +48,19 @@ export const AuthLoginForm = ({
               ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
               : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
           }`}
-          placeholder="tu@email.com"
+          placeholder={t.auth.fields.emailPlaceholder}
         />
         {fieldErrors.email && (
           <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
         )}
       </div>
 
-      {/* Password */}
       <div>
         <label
           htmlFor="password"
           className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
         >
-          Contraseña
+          {t.auth.fields.password}
         </label>
         <div className="relative">
           <input
@@ -74,13 +74,17 @@ export const AuthLoginForm = ({
                 ? 'border-[var(--color-accent-red)]/60 focus:ring-[var(--color-accent-red)]/30'
                 : 'border-[var(--color-border)] focus:ring-[var(--color-brand-dim)]'
             }`}
-            placeholder="••••••••"
+            placeholder={t.auth.fields.passwordPlaceholder}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
-            aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
+            aria-label={
+              showPassword
+                ? t.auth.fields.hidePassword
+                : t.auth.fields.showPassword
+            }
           >
             {showPassword ? (
               <svg
@@ -133,10 +137,10 @@ export const AuthLoginForm = ({
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-            Ingresando…
+            {t.auth.login.submitting}
           </span>
         ) : (
-          'Iniciar sesión'
+          t.auth.login.submit
         )}
       </button>
     </form>

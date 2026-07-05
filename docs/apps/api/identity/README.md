@@ -11,6 +11,8 @@ identity/
 
 ## Endpoints
 
+> Rutas OAuth (`GET /auth/google*`) sin prefijo `/v1` — excluidas del global prefix en `main.ts`. Resto de auth: `/v1/auth/*`.
+
 | Método | Ruta | Auth | Respuesta |
 |--------|------|------|-----------|
 | `POST` | `/auth/guest` | — | `{ accessToken, deviceId }` (sin envelope — contrato auth) |

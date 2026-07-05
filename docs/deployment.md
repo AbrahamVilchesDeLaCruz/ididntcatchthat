@@ -298,10 +298,26 @@ Variables mínimas requeridas (fuente de verdad: `apps/api/src/shared/infrastruc
 | `LOKI_URL`                   | URL interna del contenedor Loki (`http://loki:3100`)     |
 | `LOG_LEVEL`                  | `info` en prod                                           |
 | `GOOGLE_CLIENT_ID/SECRET`    | Credenciales OAuth Google                                |
-| `GOOGLE_CALLBACK_URL`        | `https://api.ididntcatchthat.com/v1/auth/google/callback`|
+| `GOOGLE_CALLBACK_URL`        | `https://api.ididntcatchthat.com/auth/google/callback`   |
 | `AMQP_URI`                   | Connection string RabbitMQ                               |
 | `GRAFANA_PASSWORD`           | Password del admin de Grafana — valor fuerte en prod     |
 | `VPS_HOST`                   | `ubuntu@<IP>` — usado por `make tunnel-*`                |
+
+### Google OAuth — verificación post-deploy
+
+Tras desplegar cambios en auth OAuth:
+
+1. **Doppler (`prd`)** — confirmar:
+   ```
+   GOOGLE_CALLBACK_URL=https://api.ididntcatchthat.com/auth/google/callback
+   ```
+   (sin `/v1`). Corregir y redeploy API si difiere.
+
+2. **Google Cloud Console** → OAuth 2.0 Client → Authorized redirect URIs:
+   - Debe incluir: `https://api.ididntcatchthat.com/auth/google/callback`
+   - Eliminar URI obsoleta con `/v1` si existe duplicada.
+
+3. **Smoke test:** login en `https://ididntcatchthat.com/auth/login` → Continuar con Google → redirect a `/auth/callback?token=...`.
 
 ---
 

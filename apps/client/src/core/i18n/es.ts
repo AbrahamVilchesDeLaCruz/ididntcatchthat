@@ -619,6 +619,63 @@ export const es: Translations = {
       },
     },
   },
+  auth: {
+    login: {
+      subtitle: 'Accede a tu cuenta',
+      tab: 'Iniciar sesión',
+      submit: 'Iniciar sesión',
+      submitting: 'Ingresando…',
+    },
+    register: {
+      subtitle: 'Crea tu cuenta y empieza a aprender',
+      tab: 'Registrarse',
+      submit: 'Crear cuenta',
+      submitting: 'Creando cuenta…',
+      nicknameHint: '3–30 caracteres. Solo letras, números y guiones bajos.',
+    },
+    fields: {
+      email: 'Email',
+      password: 'Contraseña',
+      nickname: 'Nickname',
+      emailPlaceholder: 'tu@email.com',
+      passwordPlaceholder: '••••••••',
+      passwordMinPlaceholder: 'Mínimo 8 caracteres',
+      nicknamePlaceholder: 'tu_nickname',
+      showPassword: 'Mostrar',
+      hidePassword: 'Ocultar',
+    },
+    oauth: {
+      divider: 'o continúa con',
+      google: 'Continuar con Google',
+      redirecting: 'Redirigiendo…',
+    },
+    callback: {
+      loading: 'Iniciando sesión con Google…',
+      redirectingToLogin: 'Redirigiendo al login…',
+      accessDenied: 'Cancelaste el acceso con Google.',
+      failed: 'El inicio de sesión con Google falló. Inténtalo de nuevo.',
+      generic: 'No pudimos iniciar sesión con Google.',
+    },
+    errors: {
+      unknown: 'Error desconocido. Inténtalo de nuevo.',
+      invalidCredentials: 'Email o contraseña incorrectos.',
+      conflict: 'El email o nickname ya está en uso. Prueba con otro.',
+      validation: 'Comprueba que los datos introducidos sean correctos.',
+      rateLimit:
+        'Demasiados intentos. Espera un momento y vuelve a intentarlo.',
+      network: 'Sin conexión al servidor. Comprueba tu conexión a internet.',
+      server: 'Error interno del servidor. Inténtalo de nuevo en un momento.',
+      generic: 'Algo salió mal. Inténtalo de nuevo.',
+    },
+    validation: {
+      invalidEmail: 'Introduce un email válido',
+      passwordRequired: 'La contraseña es obligatoria',
+      nicknameMin: 'El nickname debe tener al menos 3 caracteres',
+      nicknameMax: 'El nickname no puede superar los 30 caracteres',
+      nicknamePattern: 'Solo letras, números y guiones bajos',
+      passwordMin: 'La contraseña debe tener al menos 8 caracteres',
+    },
+  },
   common: {
     theme: {
       lightMode: 'Modo claro',
