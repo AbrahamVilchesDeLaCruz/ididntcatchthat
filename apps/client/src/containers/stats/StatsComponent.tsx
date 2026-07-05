@@ -159,10 +159,10 @@ export const StatsComponent = ({
           ) : selectedCategory === null ? (
             <>
               <h2 className="mb-1 text-base font-semibold text-[var(--color-text-primary)]">
-                {st.moduleChartTitle}
+                {st.moduleListTitle}
               </h2>
               <p className="mb-4 text-xs text-[var(--color-text-muted)]">
-                {st.moduleChartHint}
+                {st.moduleListHint}
               </p>
               {modules.length === 0 ? (
                 <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">

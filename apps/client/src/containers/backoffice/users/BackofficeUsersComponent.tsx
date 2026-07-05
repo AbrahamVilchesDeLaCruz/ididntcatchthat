@@ -9,6 +9,7 @@ import { DailyTrendChart } from '@/containers/backoffice/observability/component
 import { DistributionChart } from '@/containers/backoffice/observability/components/DistributionChart';
 import type { UserStatsVM, UserStatsPeriod } from './backoffice-users.types';
 import { useI18n } from '@/core/i18n';
+import { engagementVariant } from './engagementThresholds';
 
 interface BackofficeUsersComponentProps {
   stats: UserStatsVM | null;
@@ -63,12 +64,7 @@ export const BackofficeUsersComponent = ({
   const { locale, t } = useI18n();
   const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
 
-  const engagementVariant =
-    (stats?.engagementRate ?? 0) >= 30
-      ? 'success'
-      : (stats?.engagementRate ?? 0) >= 10
-        ? 'warning'
-        : 'neutral';
+  const engagementVariantValue = engagementVariant(stats?.engagementRate ?? 0);
 
   return (
     <BackofficePageShell
@@ -179,8 +175,9 @@ export const BackofficeUsersComponent = ({
                     '{percent}',
                     stats.engagementRate.toFixed(1),
                   )}
-                  variant={engagementVariant}
+                  variant={engagementVariantValue}
                   progress={Math.min(stats.engagementRate * 2, 100)}
+                  sub={t.backoffice.users.engagementRateThresholdHint}
                 />
               </div>
             </div>

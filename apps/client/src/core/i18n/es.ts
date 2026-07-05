@@ -297,8 +297,8 @@ export const es: Translations = {
   stats: {
     title: 'Mi progreso',
     subtitle: 'Resumen de tu avance por módulo',
-    moduleChartTitle: 'Precisión por módulo',
-    moduleChartHint: 'Toca un módulo para ver el detalle por subcategoría',
+    moduleListTitle: 'Lista de progreso por módulo',
+    moduleListHint: 'Toca un módulo para ver el detalle por subcategoría',
     attemptsLabel: '{count} intentos',
     studyCoverageLabel: '{percent}% visto',
     accuracy: 'Precisión',
@@ -799,6 +799,8 @@ export const es: Translations = {
       activeUsersInsight: '{count} con al menos una partida en el período',
       engagementRate: 'Tasa de actividad',
       engagementRateInsight: '{percent}% del total de usuarios ha jugado',
+      engagementRateThresholdHint:
+        'Saludable ≥30% · moderada ≥10% · por debajo de 10% requiere atención',
       charts: {
         registrationsByPeriod: 'Registros por período',
         newUsers: 'Nuevos usuarios',

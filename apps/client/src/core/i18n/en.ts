@@ -294,8 +294,8 @@ export const en: Translations = {
   stats: {
     title: 'My progress',
     subtitle: 'Overview of your progress by module',
-    moduleChartTitle: 'Accuracy by module',
-    moduleChartHint: 'Tap a module to drill into subcategories',
+    moduleListTitle: 'Module progress list',
+    moduleListHint: 'Tap a module to drill into subcategories',
     attemptsLabel: '{count} attempts',
     studyCoverageLabel: '{percent}% seen',
     accuracy: 'Accuracy',
@@ -793,6 +793,8 @@ export const en: Translations = {
       activeUsersInsight: '{count} with at least one game in this period',
       engagementRate: 'Engagement rate',
       engagementRateInsight: '{percent}% of total users played',
+      engagementRateThresholdHint:
+        'Healthy ≥30% · moderate ≥10% · below 10% needs attention',
       charts: {
         registrationsByPeriod: 'Registrations by period',
         newUsers: 'New users',
