@@ -1,12 +1,6 @@
 import { type ReactElement } from 'react';
 import type { FlashcardVM } from '../flashcards.types';
-
-const AUDIO_STATUS_LABELS: Record<FlashcardVM['audioStatus'], string> = {
-  pending: 'Pendiente',
-  generating: 'Generando',
-  ready: 'Listo',
-  failed: 'Error',
-};
+import { useI18n } from '@/core/i18n';
 
 const AUDIO_STATUS_COLORS: Record<FlashcardVM['audioStatus'], string> = {
   pending: 'text-yellow-600 bg-yellow-400/10',
@@ -30,6 +24,8 @@ export const FlashcardsTable = ({
   onEdit,
   onDelete,
 }: FlashcardsTableProps): ReactElement => {
+  const { t } = useI18n();
+  const audioStatusLabels = t.backoffice.flashcards.table.audioStatuses;
   if (isLoading) {
     return (
       <div className="rounded-xl border border-[var(--color-border)] overflow-hidden">
@@ -46,7 +42,7 @@ export const FlashcardsTable = ({
   if (flashcards.length === 0) {
     return (
       <div className="rounded-xl border border-[var(--color-border)] py-16 text-center text-[var(--color-text-secondary)]">
-        No hay flashcards. ¡Crea la primera!
+        {t.backoffice.flashcards.table.empty}
       </div>
     );
   }
@@ -57,16 +53,16 @@ export const FlashcardsTable = ({
         <thead>
           <tr className="border-b border-[var(--color-border)] bg-[var(--color-bg-elevated)]">
             <th className="text-left px-4 py-3 text-[var(--color-text-secondary)] font-medium">
-              Expresión
+              {t.backoffice.flashcards.table.expression}
             </th>
             <th className="text-left px-4 py-3 text-[var(--color-text-secondary)] font-medium hidden md:table-cell">
-              Categoría
+              {t.backoffice.flashcards.table.category}
             </th>
             <th className="text-left px-4 py-3 text-[var(--color-text-secondary)] font-medium hidden lg:table-cell">
-              Subcategoría
+              {t.backoffice.flashcards.table.subcategory}
             </th>
             <th className="text-left px-4 py-3 text-[var(--color-text-secondary)] font-medium hidden lg:table-cell">
-              Audio
+              {t.backoffice.flashcards.table.audio}
             </th>
             <th className="px-4 py-3" />
           </tr>
@@ -95,7 +91,7 @@ export const FlashcardsTable = ({
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${AUDIO_STATUS_COLORS[fc.audioStatus]}`}
                 >
-                  {AUDIO_STATUS_LABELS[fc.audioStatus]}
+                  {audioStatusLabels[fc.audioStatus]}
                 </span>
               </td>
               <td className="px-4 py-3">
@@ -105,21 +101,21 @@ export const FlashcardsTable = ({
                     onClick={() => onView(fc)}
                     className="text-xs text-[var(--color-brand)] hover:opacity-80 transition px-2 py-1 rounded hover:bg-[var(--color-brand-dim)]"
                   >
-                    Ver
+                    {t.backoffice.flashcards.table.view}
                   </button>
                   <button
                     type="button"
                     onClick={() => onEdit(fc)}
                     className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition px-2 py-1 rounded hover:bg-[var(--color-bg-elevated)]"
                   >
-                    Editar
+                    {t.backoffice.flashcards.table.edit}
                   </button>
                   <button
                     type="button"
                     onClick={() => onDelete(fc.id)}
                     className="text-xs text-[var(--color-accent-red)] hover:opacity-80 transition px-2 py-1 rounded hover:bg-[var(--color-accent-red)]/10"
                   >
-                    Eliminar
+                    {t.backoffice.flashcards.table.delete}
                   </button>
                 </div>
               </td>

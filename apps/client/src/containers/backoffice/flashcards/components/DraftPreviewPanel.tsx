@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import type { FlashcardDraftApiModel } from '../api/flashcards.api-model';
+import { useI18n } from '@/core/i18n';
 
 interface DraftPreviewPanelProps {
   drafts: FlashcardDraftApiModel[];
@@ -8,6 +9,8 @@ interface DraftPreviewPanelProps {
 export const DraftPreviewPanel = ({
   drafts,
 }: DraftPreviewPanelProps): ReactElement => {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-3">
       {drafts.map((draft, idx) => (
@@ -42,7 +45,7 @@ export const DraftPreviewPanel = ({
 
           <div>
             <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-2 font-medium">
-              Ejemplos
+              {t.backoffice.flashcards.ai.examplesLabel}
             </p>
             {draft.examples.length > 0 ? (
               <ul className="space-y-2">
@@ -62,7 +65,7 @@ export const DraftPreviewPanel = ({
               </ul>
             ) : (
               <p className="text-[var(--color-text-muted)] text-xs">
-                Sin ejemplos generados.
+                {t.backoffice.flashcards.detail.noGeneratedExamples}
               </p>
             )}
           </div>

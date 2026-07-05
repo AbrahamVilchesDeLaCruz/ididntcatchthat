@@ -4,6 +4,7 @@ import type {
   FlashcardDraftApiModel,
 } from '../api/flashcards.api-model';
 import { DraftPreviewPanel } from './DraftPreviewPanel';
+import { useI18n } from '@/core/i18n';
 
 type Step = 'configure' | 'preview';
 
@@ -36,6 +37,7 @@ export const AiGenerateModal = ({
   onConfirm,
   onClose,
 }: AiGenerateModalProps): ReactElement => {
+  const { locale, t } = useI18n();
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
   const [count, setCount] = useState<number>(10);
@@ -69,12 +71,15 @@ export const AiGenerateModal = ({
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div>
             <h2 className="text-[var(--color-text-primary)] font-semibold text-lg">
-              Generar con IA
+              {t.backoffice.flashcards.ai.title}
             </h2>
             <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
               {step === 'configure'
-                ? 'Elige categoría, subcategoría y cantidad'
-                : `${String(drafts?.length ?? 0)} borradores — revisá y confirmá`}
+                ? t.backoffice.flashcards.ai.configureSubtitle
+                : t.backoffice.flashcards.ai.previewSubtitle.replace(
+                    '{count}',
+                    String(drafts?.length ?? 0),
+                  )}
             </p>
           </div>
           <button
@@ -92,7 +97,7 @@ export const AiGenerateModal = ({
             <>
               <div>
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
-                  Categoría
+                  {t.backoffice.flashcards.ai.category}
                 </label>
                 <select
                   value={category}
@@ -102,10 +107,12 @@ export const AiGenerateModal = ({
                   }}
                   className={selectClass}
                 >
-                  <option value="">Selecciona categoría</option>
+                  <option value="">
+                    {t.backoffice.flashcards.ai.selectCategory}
+                  </option>
                   {catalog?.categories.map((c) => (
                     <option key={c.value} value={c.value}>
-                      {c.label.es}
+                      {c.label[locale]}
                     </option>
                   ))}
                 </select>
@@ -113,7 +120,7 @@ export const AiGenerateModal = ({
 
               <div>
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
-                  Subcategoría
+                  {t.backoffice.flashcards.ai.subcategory}
                 </label>
                 <select
                   value={subcategory}
@@ -123,12 +130,12 @@ export const AiGenerateModal = ({
                 >
                   <option value="">
                     {category
-                      ? 'Selecciona subcategoría'
-                      : 'Elige categoría primero'}
+                      ? t.backoffice.flashcards.ai.selectSubcategory
+                      : t.backoffice.flashcards.ai.chooseCategoryFirst}
                   </option>
                   {selectedCategory?.subcategories.map((s) => (
                     <option key={s.value} value={s.value}>
-                      {s.label.es}
+                      {s.label[locale]}
                     </option>
                   ))}
                 </select>
@@ -136,10 +143,10 @@ export const AiGenerateModal = ({
 
               {selectedSubcategoryMeta && (
                 <div className="rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] p-3 text-xs text-[var(--color-text-secondary)] space-y-1">
-                  <p>{selectedSubcategoryMeta.description.es}</p>
+                  <p>{selectedSubcategoryMeta.description[locale]}</p>
                   {selectedSubcategoryMeta.anchorExamples.length > 0 && (
                     <p>
-                      Ejemplos tipo:{' '}
+                      {t.backoffice.flashcards.ai.anchorExamples}{' '}
                       {selectedSubcategoryMeta.anchorExamples.join(', ')}
                     </p>
                   )}
@@ -148,7 +155,7 @@ export const AiGenerateModal = ({
 
               <div>
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
-                  Cantidad
+                  {t.backoffice.flashcards.ai.count}
                 </label>
                 <div className="flex gap-2">
                   {COUNT_OPTIONS.map((n) => (
@@ -171,13 +178,15 @@ export const AiGenerateModal = ({
 
               <div>
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
-                  Instrucciones extra (opcional)
+                  {t.backoffice.flashcards.ai.extraInstructions}
                 </label>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   rows={3}
-                  placeholder="Ej: expresiones cortas, nivel intermedio…"
+                  placeholder={
+                    t.backoffice.flashcards.ai.extraInstructionsPlaceholder
+                  }
                   className={`${selectClass} resize-none placeholder-[var(--color-text-muted)]`}
                 />
               </div>
@@ -196,7 +205,7 @@ export const AiGenerateModal = ({
                 disabled={isGenerating}
                 className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition disabled:opacity-50"
               >
-                Cancelar
+                {t.backoffice.flashcards.cancel}
               </button>
               <button
                 type="button"
@@ -204,7 +213,9 @@ export const AiGenerateModal = ({
                 disabled={isGenerating || !category || !subcategory}
                 className="px-5 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
-                {isGenerating ? 'Generando…' : 'Generar borradores'}
+                {isGenerating
+                  ? t.backoffice.flashcards.ai.generating
+                  : t.backoffice.flashcards.ai.generateDrafts}
               </button>
             </>
           ) : (
@@ -215,7 +226,7 @@ export const AiGenerateModal = ({
                 disabled={isImporting}
                 className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition disabled:opacity-50"
               >
-                Cancelar
+                {t.backoffice.flashcards.cancel}
               </button>
               <button
                 type="button"
@@ -224,8 +235,11 @@ export const AiGenerateModal = ({
                 className="px-5 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {isImporting
-                  ? 'Guardando…'
-                  : `Confirmar ${String(drafts?.length ?? 0)} flashcards`}
+                  ? t.backoffice.flashcards.ai.importing
+                  : t.backoffice.flashcards.ai.confirmDrafts.replace(
+                      '{count}',
+                      String(drafts?.length ?? 0),
+                    )}
               </button>
             </>
           )}
