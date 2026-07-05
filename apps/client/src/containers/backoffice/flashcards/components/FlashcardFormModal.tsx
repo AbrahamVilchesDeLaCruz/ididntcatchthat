@@ -4,6 +4,7 @@ import type {
   FlashcardExampleVM,
   FlashcardFormValues,
 } from '../flashcards.types';
+import { useI18n } from '@/core/i18n';
 
 interface FlashcardFormModalProps {
   title: string;
@@ -36,6 +37,7 @@ export const FlashcardFormModal = ({
   onSubmit,
   onClose,
 }: FlashcardFormModalProps): ReactElement => {
+  const { locale, t } = useI18n();
   const [values, setValues] = useState<FlashcardFormValues>(initialValues);
 
   const setField = <K extends keyof FlashcardFormValues>(
@@ -100,6 +102,7 @@ export const FlashcardFormModal = ({
             type="button"
             onClick={onClose}
             className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition text-xl leading-none"
+            aria-label={t.backoffice.flashcards.form.closeAriaLabel}
           >
             ×
           </button>
@@ -111,7 +114,7 @@ export const FlashcardFormModal = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-                Expresión *
+                {t.backoffice.flashcards.form.expression}
               </label>
               <input
                 type="text"
@@ -123,7 +126,7 @@ export const FlashcardFormModal = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-                Significado *
+                {t.backoffice.flashcards.form.meaning}
               </label>
               <input
                 type="text"
@@ -139,7 +142,7 @@ export const FlashcardFormModal = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-                Categoría *
+                {t.backoffice.flashcards.form.category}
               </label>
               <select
                 required
@@ -148,18 +151,18 @@ export const FlashcardFormModal = ({
                 className={selectClass}
               >
                 <option value="" disabled>
-                  Selecciona una categoría
+                  {t.backoffice.flashcards.form.selectCategory}
                 </option>
                 {catalog?.categories.map((c) => (
                   <option key={c.value} value={c.value}>
-                    {c.label.es}
+                    {c.label[locale]}
                   </option>
                 ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-                Subcategoría *
+                {t.backoffice.flashcards.form.subcategory}
               </label>
               <select
                 required
@@ -170,12 +173,12 @@ export const FlashcardFormModal = ({
               >
                 <option value="" disabled>
                   {values.category
-                    ? 'Selecciona una subcategoría'
-                    : 'Primero elige categoría'}
+                    ? t.backoffice.flashcards.form.selectSubcategory
+                    : t.backoffice.flashcards.form.chooseCategoryFirst}
                 </option>
                 {subcategories.map((s) => (
                   <option key={s.value} value={s.value}>
-                    {s.label.es}
+                    {s.label[locale]}
                   </option>
                 ))}
               </select>
@@ -186,14 +189,14 @@ export const FlashcardFormModal = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-[var(--color-text-secondary)]">
-                Ejemplos
+                {t.backoffice.flashcards.form.examples}
               </label>
               <button
                 type="button"
                 onClick={addExample}
                 className="text-xs text-[var(--color-text-primary)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] px-2 py-1 rounded transition"
               >
-                + Agregar ejemplo
+                {t.backoffice.flashcards.form.addExample}
               </button>
             </div>
             <div className="space-y-2">
@@ -208,7 +211,9 @@ export const FlashcardFormModal = ({
                   <div className="flex-1 grid grid-cols-2 gap-2">
                     <input
                       type="text"
-                      placeholder="Inglés"
+                      placeholder={
+                        t.backoffice.flashcards.form.englishPlaceholder
+                      }
                       value={ex.textEn}
                       onChange={(e) =>
                         updateExample(idx, 'textEn', e.target.value)
@@ -217,7 +222,9 @@ export const FlashcardFormModal = ({
                     />
                     <input
                       type="text"
-                      placeholder="Español"
+                      placeholder={
+                        t.backoffice.flashcards.form.spanishPlaceholder
+                      }
                       value={ex.textEs}
                       onChange={(e) =>
                         updateExample(idx, 'textEs', e.target.value)
@@ -244,14 +251,16 @@ export const FlashcardFormModal = ({
               onClick={onClose}
               className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             >
-              Cancelar
+              {t.backoffice.flashcards.cancel}
             </button>
             <button
               type="submit"
               disabled={isLoading}
               className="px-5 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {isLoading ? 'Guardando...' : 'Guardar'}
+              {isLoading
+                ? t.backoffice.flashcards.form.saving
+                : t.backoffice.flashcards.form.save}
             </button>
           </div>
         </form>

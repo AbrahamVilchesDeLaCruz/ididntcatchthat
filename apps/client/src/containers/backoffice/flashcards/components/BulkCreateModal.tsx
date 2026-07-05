@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from 'react';
 import type { CreateFlashcardApiPayload } from '../api/flashcards.api-model';
+import { useI18n } from '@/core/i18n';
 
 interface BulkCreateModalProps {
   isLoading: boolean;
@@ -36,6 +37,7 @@ export const BulkCreateModal = ({
   onSubmit,
   onClose,
 }: BulkCreateModalProps): ReactElement => {
+  const { t } = useI18n();
   const [jsonText, setJsonText] = useState('');
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -46,12 +48,12 @@ export const BulkCreateModal = ({
     try {
       parsed = JSON.parse(jsonText) as unknown;
     } catch {
-      setParseError('JSON inválido. Revisa la sintaxis.');
+      setParseError(t.backoffice.flashcards.bulk.invalidJson);
       return;
     }
 
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      setParseError('El JSON debe ser un array no vacío de flashcards.');
+      setParseError(t.backoffice.flashcards.bulk.invalidArray);
       return;
     }
 
@@ -65,10 +67,10 @@ export const BulkCreateModal = ({
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div>
             <h2 className="text-[var(--color-text-primary)] font-semibold text-lg">
-              Crear flashcards en bloque
+              {t.backoffice.flashcards.bulk.title}
             </h2>
             <p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
-              Pega un array JSON con las flashcards a crear
+              {t.backoffice.flashcards.bulk.subtitle}
             </p>
           </div>
           <button
@@ -93,7 +95,7 @@ export const BulkCreateModal = ({
               htmlFor="bulk-json"
               className="block text-sm text-[var(--color-text-secondary)] mb-2"
             >
-              JSON array de flashcards
+              {t.backoffice.flashcards.bulk.jsonArrayLabel}
             </label>
             <textarea
               id="bulk-json"
@@ -114,7 +116,7 @@ export const BulkCreateModal = ({
             disabled={isLoading}
             className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition disabled:opacity-50"
           >
-            Cancelar
+            {t.backoffice.flashcards.cancel}
           </button>
           <button
             type="button"
@@ -122,7 +124,9 @@ export const BulkCreateModal = ({
             disabled={isLoading || !jsonText.trim()}
             className="px-4 py-2 text-sm bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {isLoading ? 'Creando…' : 'Crear flashcards'}
+            {isLoading
+              ? t.backoffice.flashcards.bulk.creating
+              : t.backoffice.flashcards.bulk.create}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { type ReactElement, useRef, useState } from 'react';
 import type { FlashcardVM } from '../flashcards.types';
+import { useI18n } from '@/core/i18n';
 
 interface AudioPlayerButtonProps {
   label: string;
@@ -12,6 +13,7 @@ const AudioPlayerButton = ({
   flag,
   url,
 }: AudioPlayerButtonProps): ReactElement => {
+  const { t } = useI18n();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -45,7 +47,10 @@ const AudioPlayerButton = ({
             ? 'border-[var(--color-brand)] bg-[var(--color-brand)] text-white scale-95'
             : 'border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] hover:border-[var(--color-brand)]'
         }`}
-        aria-label={`Play ${label} accent`}
+        aria-label={t.backoffice.flashcards.detail.playAccentAriaLabel.replace(
+          '{label}',
+          label,
+        )}
       >
         {isPlaying ? '⏹' : flag}
       </button>
@@ -63,6 +68,7 @@ export const FlashcardDetailModal = ({
   flashcard,
   onClose,
 }: FlashcardDetailModalProps): ReactElement => {
+  const { t } = useI18n();
   const hasAudio =
     flashcard.audioStatus === 'ready' && flashcard.audioUrls !== null;
 
@@ -90,7 +96,7 @@ export const FlashcardDetailModal = ({
             type="button"
             onClick={onClose}
             className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition text-xl leading-none ml-4 mt-1"
-            aria-label="Cerrar"
+            aria-label={t.backoffice.flashcards.detail.closeAriaLabel}
           >
             ✕
           </button>
@@ -112,25 +118,25 @@ export const FlashcardDetailModal = ({
           {/* Audio section */}
           <div>
             <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-3 font-medium">
-              Pronunciación
+              {t.backoffice.flashcards.detail.pronunciation}
             </p>
 
             {flashcard.audioStatus === 'pending' && (
               <p className="text-[var(--color-text-muted)] text-sm">
-                Audio pendiente de generar.
+                {t.backoffice.flashcards.detail.pendingAudio}
               </p>
             )}
 
             {flashcard.audioStatus === 'generating' && (
               <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                 <span className="w-3 h-3 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
-                Generando audio...
+                {t.backoffice.flashcards.detail.generatingAudio}
               </div>
             )}
 
             {flashcard.audioStatus === 'failed' && (
               <p className="text-[var(--color-accent-red)] text-sm">
-                Error al generar el audio.
+                {t.backoffice.flashcards.detail.failedAudio}
               </p>
             )}
 
@@ -138,17 +144,17 @@ export const FlashcardDetailModal = ({
               <div className="space-y-4">
                 <div className="flex items-center gap-6">
                   <AudioPlayerButton
-                    label="American"
+                    label={t.backoffice.flashcards.detail.american}
                     flag="🇺🇸"
                     url={flashcard.audioUrls.expression.us}
                   />
                   <AudioPlayerButton
-                    label="British"
+                    label={t.backoffice.flashcards.detail.british}
                     flag="🇬🇧"
                     url={flashcard.audioUrls.expression.uk}
                   />
                   <AudioPlayerButton
-                    label="Australian"
+                    label={t.backoffice.flashcards.detail.australian}
                     flag="🇦🇺"
                     url={flashcard.audioUrls.expression.au}
                   />
@@ -156,10 +162,10 @@ export const FlashcardDetailModal = ({
 
                 <div>
                   <p className="text-xs text-[var(--color-text-muted)] mb-2">
-                    Audio de ejemplos
+                    {t.backoffice.flashcards.detail.examplesAudio}
                   </p>
                   <AudioPlayerButton
-                    label="Ejemplos"
+                    label={t.backoffice.flashcards.detail.examplesLabel}
                     flag="🎧"
                     url={flashcard.audioUrls.examples.us}
                   />
@@ -172,7 +178,7 @@ export const FlashcardDetailModal = ({
           {flashcard.examples.length > 0 && (
             <div>
               <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest mb-3 font-medium">
-                Ejemplos
+                {t.backoffice.flashcards.detail.examplesLabel}
               </p>
               <ul className="space-y-3">
                 {flashcard.examples

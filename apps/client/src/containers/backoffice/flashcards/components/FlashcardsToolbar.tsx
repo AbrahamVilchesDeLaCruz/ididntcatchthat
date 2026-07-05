@@ -1,15 +1,8 @@
 import { type ReactElement } from 'react';
 import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
+import { useI18n } from '@/core/i18n';
 
 const AUDIO_STATUSES = ['pending', 'generating', 'ready', 'failed'] as const;
-type AudioStatus = (typeof AUDIO_STATUSES)[number];
-
-const AUDIO_STATUS_LABELS: Record<AudioStatus, string> = {
-  pending: 'Pendiente',
-  generating: 'Generando',
-  ready: 'Listo',
-  failed: 'Fallido',
-};
 
 const selectClass =
   'px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] disabled:opacity-40 disabled:cursor-not-allowed';
@@ -33,6 +26,9 @@ export const FlashcardsToolbar = ({
   onSubcategoryFilter,
   onAudioStatusFilter,
 }: FlashcardsToolbarProps): ReactElement => {
+  const { locale, t } = useI18n();
+  const audioStatusLabels = t.backoffice.flashcards.toolbar.audioStatuses;
+
   const subcategories =
     catalog?.categories.find((c) => c.value === categoryFilter)
       ?.subcategories ?? [];
@@ -59,7 +55,7 @@ export const FlashcardsToolbar = ({
       {/* Category */}
       <div>
         <label htmlFor="category-filter" className="sr-only">
-          Filtrar por categoría
+          {t.backoffice.flashcards.toolbar.filterByCategory}
         </label>
         <select
           id="category-filter"
@@ -67,10 +63,12 @@ export const FlashcardsToolbar = ({
           onChange={(e) => handleCategoryChange(e.target.value)}
           className={selectClass}
         >
-          <option value="">Todas las categorías</option>
+          <option value="">
+            {t.backoffice.flashcards.toolbar.allCategories}
+          </option>
           {catalog?.categories.map((c) => (
             <option key={c.value} value={c.value}>
-              {c.label.es}
+              {c.label[locale]}
             </option>
           ))}
         </select>
@@ -79,7 +77,7 @@ export const FlashcardsToolbar = ({
       {/* Subcategory */}
       <div>
         <label htmlFor="subcategory-filter" className="sr-only">
-          Filtrar por subcategoría
+          {t.backoffice.flashcards.toolbar.filterBySubcategory}
         </label>
         <select
           id="subcategory-filter"
@@ -90,12 +88,12 @@ export const FlashcardsToolbar = ({
         >
           <option value="">
             {categoryFilter
-              ? 'Todas las subcategorías'
-              : 'Elige categoría primero'}
+              ? t.backoffice.flashcards.toolbar.allSubcategories
+              : t.backoffice.flashcards.toolbar.chooseCategoryFirst}
           </option>
           {subcategories.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label.es}
+              {s.label[locale]}
             </option>
           ))}
         </select>
@@ -104,7 +102,7 @@ export const FlashcardsToolbar = ({
       {/* Audio status */}
       <div>
         <label htmlFor="audio-status-filter" className="sr-only">
-          Filtrar por estado de audio
+          {t.backoffice.flashcards.toolbar.filterByAudioStatus}
         </label>
         <select
           id="audio-status-filter"
@@ -112,10 +110,12 @@ export const FlashcardsToolbar = ({
           onChange={(e) => onAudioStatusFilter(e.target.value || undefined)}
           className={selectClass}
         >
-          <option value="">Todos los estados</option>
+          <option value="">
+            {t.backoffice.flashcards.toolbar.allAudioStatuses}
+          </option>
           {AUDIO_STATUSES.map((status) => (
             <option key={status} value={status}>
-              {AUDIO_STATUS_LABELS[status]}
+              {audioStatusLabels[status]}
             </option>
           ))}
         </select>
@@ -127,7 +127,7 @@ export const FlashcardsToolbar = ({
           onClick={handleClearFilters}
           className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
         >
-          Limpiar filtros
+          {t.backoffice.flashcards.toolbar.clearFilters}
         </button>
       )}
     </div>

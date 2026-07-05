@@ -11,16 +11,11 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { GamesByModuleVM } from '../backoffice-games.types';
+import { useI18n } from '@/core/i18n';
 
 interface GamesByModuleChartProps {
   data: GamesByModuleVM[];
 }
-
-const EmptyChart = (): ReactElement => (
-  <div className="flex items-center justify-center h-64 text-xs text-[var(--color-text-muted)]">
-    Sin datos de módulos para este período
-  </div>
-);
 
 const tooltipStyle = {
   backgroundColor: 'var(--color-bg-surface)',
@@ -39,11 +34,22 @@ function formatModuleName(name: string): string {
 export const GamesByModuleChart = ({
   data,
 }: GamesByModuleChartProps): ReactElement => {
-  if (data.length === 0) return <EmptyChart />;
+  const { locale, t } = useI18n();
+  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 text-xs text-[var(--color-text-muted)]">
+        {t.backoffice.games.charts.noModulePeriodData}
+      </div>
+    );
+  }
 
   const chartData = data.map((d) => ({
     ...d,
-    module: formatModuleName(d.module),
+    module:
+      t.game.config.modules[d.module as keyof typeof t.game.config.modules] ??
+      formatModuleName(d.module),
   }));
 
   return (
@@ -96,9 +102,9 @@ export const GamesByModuleChart = ({
             formatter={(value, name) => {
               const n = typeof value === 'number' ? value : Number(value ?? 0);
               const label = String(name ?? '');
-              return label === 'Precisión %'
+              return label === t.backoffice.games.charts.accuracyLegend
                 ? [`${n.toFixed(1)}%`, label]
-                : [n.toLocaleString('es-ES'), label];
+                : [n.toLocaleString(numberLocale), label];
             }}
           />
           <Legend
@@ -110,7 +116,7 @@ export const GamesByModuleChart = ({
           <Bar
             xAxisId="count"
             dataKey="totalGames"
-            name="Partidas"
+            name={t.backoffice.games.charts.gamesLegend}
             fill="var(--color-brand)"
             fillOpacity={0.8}
             radius={[0, 4, 4, 0]}
@@ -120,7 +126,7 @@ export const GamesByModuleChart = ({
             xAxisId="accuracy"
             type="monotone"
             dataKey="avgAccuracy"
-            name="Precisión %"
+            name={t.backoffice.games.charts.accuracyLegend}
             stroke="var(--color-accent-red)"
             strokeWidth={2}
             dot={{ fill: 'var(--color-accent-red)', r: 4, strokeWidth: 0 }}

@@ -10,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { useI18n } from '@/core/i18n';
 
 export interface TrendSeries {
   key: string;
@@ -25,24 +26,25 @@ interface DailyTrendChartProps {
   height?: number;
 }
 
-const EmptyChart = ({ height }: { height: number }): ReactElement => (
-  <div
-    className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
-    style={{ height }}
-  >
-    Sin actividad en este período
-  </div>
-);
-
 export const DailyTrendChart = ({
   data,
   series,
   height = 220,
 }: DailyTrendChartProps): ReactElement => {
+  const { t } = useI18n();
   const hasData = (data as { [k: string]: unknown }[]).some((row) =>
     series.some((s) => Number(row[s.key] ?? 0) > 0),
   );
-  if (!hasData) return <EmptyChart height={height} />;
+  if (!hasData) {
+    return (
+      <div
+        className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
+        style={{ height }}
+      >
+        {t.backoffice.charts.noActivityInPeriod}
+      </div>
+    );
+  }
 
   return (
     <ResponsiveContainer width="100%" height={height}>

@@ -1,6 +1,7 @@
 import { type ReactElement, type ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useTimeAgo } from '@/common/hooks/useTimeAgo';
+import { useI18n } from '@/core/i18n';
 
 interface BackofficePageShellProps {
   title: string;
@@ -23,6 +24,7 @@ export const BackofficePageShell = ({
   headerExtra,
   children,
 }: BackofficePageShellProps): ReactElement => {
+  const { t } = useI18n();
   const timeAgo = useTimeAgo(lastUpdatedAt);
 
   return (
@@ -51,7 +53,7 @@ export const BackofficePageShell = ({
             <button
               type="button"
               onClick={onRetry}
-              aria-label="Actualizar datos"
+              aria-label={t.backoffice.shell.refreshAriaLabel}
               className="p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] transition"
             >
               <RefreshCw className="w-4 h-4" />
@@ -64,7 +66,7 @@ export const BackofficePageShell = ({
       {isError ? (
         <div className="rounded-xl border border-[var(--color-accent-red)]/20 bg-[var(--color-accent-red)]/5 px-6 py-16 text-center">
           <p className="text-[var(--color-accent-red)] text-sm font-medium mb-4">
-            Error al cargar los datos
+            {t.backoffice.shell.loadError}
           </p>
           {onRetry && (
             <button
@@ -72,7 +74,7 @@ export const BackofficePageShell = ({
               onClick={onRetry}
               className="text-sm px-4 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-card)] transition"
             >
-              Reintentar
+              {t.backoffice.shell.retry}
             </button>
           )}
         </div>
