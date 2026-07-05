@@ -446,6 +446,8 @@ export interface GameShellTranslations {
 export interface CommonTranslations {
   dismiss: string;
   retry: string;
+  loading: string;
+  skipToContent: string;
   timeAgo: {
     justNow: string;
     seconds: string;
@@ -484,6 +486,7 @@ export interface SidebarTranslations {
     flashcards: string;
     observability: string;
   };
+  openMenu: string;
   logout: string;
 }
 

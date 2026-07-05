@@ -694,6 +694,8 @@ export const es: Translations = {
   common: {
     dismiss: 'Cerrar',
     retry: 'Reintentar',
+    loading: 'Cargando…',
+    skipToContent: 'Saltar al contenido principal',
     timeAgo: {
       justNow: 'ahora mismo',
       seconds: 'hace {count}s',
@@ -1021,6 +1023,7 @@ export const es: Translations = {
       observability: 'Observabilidad',
     },
     logout: 'Cerrar sesión',
+    openMenu: 'Abrir menú de navegación',
   },
   gameShell: {
     back: 'Volver',

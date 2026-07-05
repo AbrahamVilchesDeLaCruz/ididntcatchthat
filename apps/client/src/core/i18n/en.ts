@@ -689,6 +689,8 @@ export const en: Translations = {
   common: {
     dismiss: 'Dismiss',
     retry: 'Retry',
+    loading: 'Loading…',
+    skipToContent: 'Skip to main content',
     timeAgo: {
       justNow: 'just now',
       seconds: '{count}s ago',
@@ -1010,6 +1012,7 @@ export const en: Translations = {
       observability: 'Observability',
     },
     logout: 'Log out',
+    openMenu: 'Open navigation menu',
   },
   gameShell: {
     back: 'Back',
