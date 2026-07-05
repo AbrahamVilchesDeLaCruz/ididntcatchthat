@@ -258,6 +258,8 @@ export const es: Translations = {
         'No se pudo finalizar la partida. Reintenta o continúa jugando.',
       recordFailed: 'No se pudo registrar la respuesta. Reintenta.',
       pauseFailed: 'No se pudo pausar la partida. Reintenta.',
+      resumeFailed: 'No se pudo reanudar esta partida. Puede haber expirado.',
+      startNewGame: 'Empezar partida nueva',
       retry: 'Reintentar',
     },
   },
@@ -323,6 +325,7 @@ export const es: Translations = {
       failed: 'Fallos únicos',
       emptyTitle: 'Sin estadísticas de invitado',
       emptyBody: 'Juega como invitado para ver estadísticas locales aquí.',
+      emptyPlayCta: 'Jugar ahora',
       registerTitle: 'Guarda tu progreso',
       registerHint:
         'Regístrate para sincronizar estadísticas, rachas y logros en tu perfil.',
@@ -532,6 +535,7 @@ export const es: Translations = {
     },
     loading: 'Cargando ranking...',
     error: 'Error al cargar el ranking. Inténtalo de nuevo.',
+    retry: 'Reintentar',
     empty: 'Todavía no hay jugadores en este ranking.',
     emptyMostActiveHint:
       'Cuentan partidas en modo Juego completadas (no Estudio).',
@@ -713,6 +717,12 @@ export const es: Translations = {
       switchLanguage: 'Cambiar idioma',
       english: 'EN',
       spanish: 'ES',
+    },
+    notFound: {
+      title: 'Página no encontrada',
+      body: 'La página que buscas no existe o fue movida.',
+      goHome: 'Volver al inicio',
+      goApp: 'Ir a la app',
     },
   },
   backoffice: {

@@ -219,6 +219,8 @@ export interface GameTranslations {
     completeFailed: string;
     recordFailed: string;
     pauseFailed: string;
+    resumeFailed: string;
+    startNewGame: string;
     retry: string;
   };
 }
@@ -266,6 +268,7 @@ export interface StatsTranslations {
     failed: string;
     emptyTitle: string;
     emptyBody: string;
+    emptyPlayCta: string;
     registerTitle: string;
     registerHint: string;
     registerCta: string;
@@ -400,6 +403,7 @@ export interface RankingTranslations {
   };
   loading: string;
   error: string;
+  retry: string;
   empty: string;
   emptyMostActiveHint: string;
   outsideTopHint: string;
@@ -491,6 +495,12 @@ export interface CommonTranslations {
     switchLanguage: string;
     english: string;
     spanish: string;
+  };
+  notFound: {
+    title: string;
+    body: string;
+    goHome: string;
+    goApp: string;
   };
 }
 

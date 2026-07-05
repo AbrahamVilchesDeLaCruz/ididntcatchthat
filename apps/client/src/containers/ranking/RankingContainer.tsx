@@ -10,8 +10,17 @@ export const RankingContainer = (): ReactElement => {
 
   if (rankingsQuery.isError) {
     return (
-      <div className="text-[var(--color-accent-red)] text-center py-16">
-        {t.ranking.error}
+      <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+        <p className="text-[var(--color-accent-red)]">{t.ranking.error}</p>
+        <button
+          type="button"
+          onClick={() => {
+            void rankingsQuery.refetch();
+          }}
+          className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          {t.ranking.retry}
+        </button>
       </div>
     );
   }

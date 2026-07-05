@@ -255,6 +255,8 @@ export const en: Translations = {
       completeFailed: 'Could not finish the game. Retry or keep playing.',
       recordFailed: 'Could not record your answer. Retry.',
       pauseFailed: 'Could not pause the game. Retry.',
+      resumeFailed: 'Could not resume this game. It may have expired.',
+      startNewGame: 'Start a new game',
       retry: 'Retry',
     },
   },
@@ -320,6 +322,7 @@ export const en: Translations = {
       failed: 'Unique misses',
       emptyTitle: 'No guest stats yet',
       emptyBody: 'Play as a guest to see local session stats here.',
+      emptyPlayCta: 'Play now',
       registerTitle: 'Save your progress',
       registerHint:
         'Register to sync stats, streaks and achievements on your profile.',
@@ -529,6 +532,7 @@ export const en: Translations = {
     },
     loading: 'Loading ranking...',
     error: 'Failed to load ranking. Please try again.',
+    retry: 'Retry',
     empty: 'No players in this ranking yet.',
     emptyMostActiveHint: 'Only completed Game-mode sessions count (not Study).',
     outsideTopHint:
@@ -708,6 +712,12 @@ export const en: Translations = {
       switchLanguage: 'Switch language',
       english: 'EN',
       spanish: 'ES',
+    },
+    notFound: {
+      title: 'Page not found',
+      body: 'The page you are looking for does not exist or was moved.',
+      goHome: 'Back to home',
+      goApp: 'Go to app',
     },
   },
   backoffice: {
