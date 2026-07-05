@@ -6,8 +6,8 @@ describe('ranking/formatRankingScore', () => {
     expect(formatRankingScore('most_accurate', 0.85)).toBe('85%');
   });
 
-  it('formats module master as level', () => {
-    expect(formatRankingScore('module_master', 2)).toBe('Nv. 2');
+  it('formats module master as level in English', () => {
+    expect(formatRankingScore('module_master', 2, 'en')).toBe('Lv. 2');
   });
 
   it('formats game count as integer', () => {

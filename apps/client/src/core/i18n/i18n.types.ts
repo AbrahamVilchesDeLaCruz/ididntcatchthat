@@ -126,6 +126,7 @@ export interface LandingTranslations {
   header: {
     explore: string;
     start: string;
+    backToTop: string;
   };
 }
 
@@ -211,6 +212,14 @@ export interface GameTranslations {
     hudVictoryLabel: string;
     failedCardsTitle: string;
     ctaPracticeWeakest: string;
+    loadError: string;
+    retryPlay: string;
+  };
+  errors: {
+    completeFailed: string;
+    recordFailed: string;
+    pauseFailed: string;
+    retry: string;
   };
 }
 
@@ -384,6 +393,10 @@ export interface RankingTranslations {
     best_streak: string;
     module_master: string;
   };
+  scoreLabels: {
+    streakSuffix: string;
+    levelPrefix: string;
+  };
   loading: string;
   error: string;
   empty: string;
@@ -431,6 +444,14 @@ export interface GameShellTranslations {
 }
 
 export interface CommonTranslations {
+  dismiss: string;
+  retry: string;
+  timeAgo: {
+    justNow: string;
+    seconds: string;
+    minutes: string;
+    hours: string;
+  };
   theme: {
     lightMode: string;
     darkMode: string;
@@ -517,6 +538,7 @@ export interface HomeTranslations {
   navApp: string;
   roles: {
     user: string;
+    guest: string;
     teacher: string;
     admin: string;
   };

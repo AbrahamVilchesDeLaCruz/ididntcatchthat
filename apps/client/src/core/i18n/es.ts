@@ -163,6 +163,7 @@ export const es: Translations = {
     header: {
       explore: 'El método',
       start: 'Pruébalo',
+      backToTop: 'Volver arriba',
     },
   },
   game: {
@@ -249,6 +250,15 @@ export const es: Translations = {
       hudVictoryLabel: 'Run completado',
       failedCardsTitle: 'Cartas que fallaste en esta sesión',
       ctaPracticeWeakest: 'Practicar mis débiles globales',
+      loadError: 'No se pudo cargar el resumen de la partida.',
+      retryPlay: 'Volver a jugar',
+    },
+    errors: {
+      completeFailed:
+        'No se pudo finalizar la partida. Reintenta o continúa jugando.',
+      recordFailed: 'No se pudo registrar la respuesta. Reintenta.',
+      pauseFailed: 'No se pudo pausar la partida. Reintenta.',
+      retry: 'Reintentar',
     },
   },
   study: {
@@ -515,6 +525,10 @@ export const es: Translations = {
       best_streak: 'días',
       module_master: 'nivel',
     },
+    scoreLabels: {
+      streakSuffix: 'd',
+      levelPrefix: 'Nv.',
+    },
     loading: 'Cargando ranking...',
     error: 'Error al cargar el ranking. Inténtalo de nuevo.',
     empty: 'Todavía no hay jugadores en este ranking.',
@@ -581,6 +595,7 @@ export const es: Translations = {
     navApp: 'Ir a la app →',
     roles: {
       user: 'Jugador',
+      guest: 'Invitado',
       teacher: 'Profesor',
       admin: 'Administrador',
     },
@@ -677,6 +692,14 @@ export const es: Translations = {
     },
   },
   common: {
+    dismiss: 'Cerrar',
+    retry: 'Reintentar',
+    timeAgo: {
+      justNow: 'ahora mismo',
+      seconds: 'hace {count}s',
+      minutes: 'hace {count}m',
+      hours: 'hace {count}h',
+    },
     theme: {
       lightMode: 'Modo claro',
       darkMode: 'Modo oscuro',

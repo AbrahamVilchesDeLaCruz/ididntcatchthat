@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import { BookOpen, Flame, Gamepad2, Layers, Trophy, X } from 'lucide-react';
 import type { AchievementCategory } from '@/core/achievements/achievement.types';
+import { useI18n } from '@/core/i18n';
 import { useToastStore } from './toast.store';
 
 const categoryIcon: Record<AchievementCategory, typeof Gamepad2> = {
@@ -11,6 +12,7 @@ const categoryIcon: Record<AchievementCategory, typeof Gamepad2> = {
 };
 
 export const ToastHost = (): ReactElement | null => {
+  const { t } = useI18n();
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
 
@@ -40,7 +42,7 @@ export const ToastHost = (): ReactElement | null => {
             </p>
             <button
               type="button"
-              aria-label="Dismiss"
+              aria-label={t.common.dismiss}
               className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
               onClick={() => {
                 dismiss(toast.id);

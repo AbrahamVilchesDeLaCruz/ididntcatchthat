@@ -32,7 +32,7 @@ export const LandingHeader = (): ReactElement => {
           href="#top"
           onClick={handleSectionNav('top')}
           className="min-w-0 justify-self-start transition-opacity hover:opacity-90"
-          aria-label="Back to top"
+          aria-label={nav.backToTop}
         >
           <BrandWordmark className="block truncate text-sm leading-tight sm:text-base md:text-lg" />
         </a>

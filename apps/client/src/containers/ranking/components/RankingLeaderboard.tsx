@@ -25,9 +25,10 @@ export const RankingLeaderboard = ({
   entries,
   isFetching,
 }: RankingLeaderboardProps): ReactElement => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const r = t.ranking;
   const scoreLabel = r.scoreUnits[type];
+  const scoreLabels = r.scoreLabels;
 
   if (entries.length === 0) {
     return (
@@ -84,7 +85,7 @@ export const RankingLeaderboard = ({
                   </div>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {formatRankingScore(type, entry.score)}
+                  {formatRankingScore(type, entry.score, locale, scoreLabels)}
                   <span className="ml-1 text-xs text-[var(--color-text-muted)]">
                     {scoreLabel}
                   </span>
