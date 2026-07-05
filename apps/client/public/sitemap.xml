@@ -4,23 +4,52 @@
 
   <url>
     <loc>https://ididntcatchthat.com/</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ididntcatchthat.com/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ididntcatchthat.com/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ididntcatchthat.com/" />
   </url>
 
   <url>
     <loc>https://ididntcatchthat.com/auth/login</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ididntcatchthat.com/auth/login" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ididntcatchthat.com/auth/login" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ididntcatchthat.com/auth/login" />
   </url>
 
   <url>
     <loc>https://ididntcatchthat.com/auth/register</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ididntcatchthat.com/auth/register" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ididntcatchthat.com/auth/register" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ididntcatchthat.com/auth/register" />
+  </url>
+
+  <url>
+    <loc>https://ididntcatchthat.com/game</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ididntcatchthat.com/game" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ididntcatchthat.com/game" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ididntcatchthat.com/game" />
+  </url>
+
+  <url>
+    <loc>https://ididntcatchthat.com/study</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ididntcatchthat.com/study" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ididntcatchthat.com/study" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ididntcatchthat.com/study" />
   </url>
 
 </urlset>

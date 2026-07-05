@@ -1019,4 +1019,84 @@ export const en: Translations = {
     back: 'Back',
     login: 'Log in',
   },
+  seo: {
+    siteName: 'ididntcatchthat',
+    pages: {
+      landing: {
+        title: 'ididntcatchthat — English pronunciation for real conversations',
+        description:
+          'Learn the English you actually hear. Real connected speech, native expressions, and phonetics — gamified.',
+        robots: 'index, follow',
+      },
+      authLogin: {
+        title: 'Log in — ididntcatchthat',
+        description:
+          'Sign in to save your progress, streaks, and achievements across devices.',
+        robots: 'index, follow',
+      },
+      authRegister: {
+        title: 'Create account — ididntcatchthat',
+        description:
+          'Create a free account and start learning real English pronunciation with gamified flashcards.',
+        robots: 'index, follow',
+      },
+      authCallback: {
+        title: 'Signing in — ididntcatchthat',
+        description: 'Completing your sign-in.',
+        robots: 'noindex, nofollow',
+      },
+      gameConfig: {
+        title: 'Play — ididntcatchthat',
+        description:
+          'Choose a module and start a pronunciation game with real connected speech flashcards.',
+        robots: 'index, follow',
+      },
+      gameSession: {
+        title: 'Game session — ididntcatchthat',
+        description: 'Active pronunciation game session.',
+        robots: 'noindex, nofollow',
+      },
+      studyConfig: {
+        title: 'Study mode — ididntcatchthat',
+        description:
+          'Review flashcards at your own pace with native audio and phonetic hints.',
+        robots: 'index, follow',
+      },
+      studySession: {
+        title: 'Study session — ididntcatchthat',
+        description: 'Active study session.',
+        robots: 'noindex, nofollow',
+      },
+      home: {
+        title: 'Home — ididntcatchthat',
+        description: 'Your learning hub for play, study, stats, and ranking.',
+        robots: 'noindex, nofollow',
+      },
+      profile: {
+        title: 'Profile — ididntcatchthat',
+        description: 'Manage your account, achievements, and preferences.',
+        robots: 'noindex, nofollow',
+      },
+      stats: {
+        title: 'My progress — ididntcatchthat',
+        description: 'Track accuracy, modules, and weak cards.',
+        robots: 'noindex, nofollow',
+      },
+      ranking: {
+        title: 'Ranking — ididntcatchthat',
+        description: 'See your position against other players.',
+        robots: 'noindex, nofollow',
+      },
+      backoffice: {
+        title: 'Backoffice — ididntcatchthat',
+        description: 'Internal admin dashboard.',
+        robots: 'noindex, nofollow',
+      },
+      notFound: {
+        title: 'Page not found — ididntcatchthat',
+        description: 'The page you requested could not be found.',
+        robots: 'noindex, nofollow',
+      },
+    },
+  },
 };

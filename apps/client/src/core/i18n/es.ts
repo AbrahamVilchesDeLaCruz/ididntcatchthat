@@ -1030,4 +1030,85 @@ export const es: Translations = {
     back: 'Volver',
     login: 'Iniciar sesión',
   },
+  seo: {
+    siteName: 'ididntcatchthat',
+    pages: {
+      landing: {
+        title:
+          'ididntcatchthat — Pronunciación inglesa para conversaciones reales',
+        description:
+          'Aprende el inglés que realmente escuchas. Connected speech, expresiones nativas y fonética — gamificado.',
+        robots: 'index, follow',
+      },
+      authLogin: {
+        title: 'Iniciar sesión — ididntcatchthat',
+        description:
+          'Inicia sesión para guardar progreso, rachas y logros en todos tus dispositivos.',
+        robots: 'index, follow',
+      },
+      authRegister: {
+        title: 'Crear cuenta — ididntcatchthat',
+        description:
+          'Crea una cuenta gratis y empieza a practicar pronunciación inglesa con flashcards gamificadas.',
+        robots: 'index, follow',
+      },
+      authCallback: {
+        title: 'Iniciando sesión — ididntcatchthat',
+        description: 'Completando tu inicio de sesión.',
+        robots: 'noindex, nofollow',
+      },
+      gameConfig: {
+        title: 'Jugar — ididntcatchthat',
+        description:
+          'Elige un módulo y empieza un juego de pronunciación con flashcards de connected speech.',
+        robots: 'index, follow',
+      },
+      gameSession: {
+        title: 'Partida — ididntcatchthat',
+        description: 'Sesión de juego activa.',
+        robots: 'noindex, nofollow',
+      },
+      studyConfig: {
+        title: 'Modo estudio — ididntcatchthat',
+        description:
+          'Repasa flashcards a tu ritmo con audio nativo y pistas fonéticas.',
+        robots: 'index, follow',
+      },
+      studySession: {
+        title: 'Sesión de estudio — ididntcatchthat',
+        description: 'Sesión de estudio activa.',
+        robots: 'noindex, nofollow',
+      },
+      home: {
+        title: 'Inicio — ididntcatchthat',
+        description: 'Tu hub de juego, estudio, estadísticas y ranking.',
+        robots: 'noindex, nofollow',
+      },
+      profile: {
+        title: 'Perfil — ididntcatchthat',
+        description: 'Gestiona tu cuenta, logros y preferencias.',
+        robots: 'noindex, nofollow',
+      },
+      stats: {
+        title: 'Mi progreso — ididntcatchthat',
+        description: 'Sigue tu precisión, módulos y cartas débiles.',
+        robots: 'noindex, nofollow',
+      },
+      ranking: {
+        title: 'Ranking — ididntcatchthat',
+        description: 'Consulta tu posición frente a otros jugadores.',
+        robots: 'noindex, nofollow',
+      },
+      backoffice: {
+        title: 'Backoffice — ididntcatchthat',
+        description: 'Panel de administración interno.',
+        robots: 'noindex, nofollow',
+      },
+      notFound: {
+        title: 'Página no encontrada — ididntcatchthat',
+        description: 'No encontramos la página solicitada.',
+        robots: 'noindex, nofollow',
+      },
+    },
+  },
 };
