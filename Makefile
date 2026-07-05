@@ -211,6 +211,9 @@ vps-deploy-dev: ## [VPS] Sync dev + build + recreate dev containers
 		-f $(DEV_DIR)/infra/docker-compose.dev.yml \
 		up -d --build
 
+deploy-dev: vps-deploy-dev ## Alias for vps-deploy-dev
+deploy-prod: vps-deploy-prod ## Alias for vps-deploy-prod
+
 vps-ps-prod: ## [VPS] Status of prod containers
 	doppler run --config prd --project ididntcatchthat -- \
 		docker compose --project-directory $(PROD_DIR) \
