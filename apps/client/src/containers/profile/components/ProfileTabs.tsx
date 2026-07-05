@@ -1,4 +1,4 @@
-import { type ReactElement, type ReactNode } from 'react';
+import { type KeyboardEvent, type ReactElement, type ReactNode } from 'react';
 
 export type ProfileTabId = 'achievements' | 'ranking' | 'preferences';
 
@@ -26,6 +26,22 @@ export const ProfileTabs = ({
     return <div>{children}</div>;
   }
 
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ): void => {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+
+    event.preventDefault();
+    const nextIndex =
+      event.key === 'ArrowRight'
+        ? (index + 1) % tabs.length
+        : (index - 1 + tabs.length) % tabs.length;
+    const nextTab = tabs[nextIndex];
+    onTabChange(nextTab.id);
+    document.getElementById(`profile-tab-${nextTab.id}`)?.focus();
+  };
+
   return (
     <div className="space-y-6">
       <div
@@ -33,7 +49,7 @@ export const ProfileTabs = ({
         role="tablist"
         aria-label={ariaLabel}
       >
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const selected = activeTab === tab.id;
           return (
             <button
@@ -46,6 +62,9 @@ export const ProfileTabs = ({
               tabIndex={selected ? 0 : -1}
               onClick={() => {
                 onTabChange(tab.id);
+              }}
+              onKeyDown={(event) => {
+                handleKeyDown(event, index);
               }}
               className={[
                 'profile-tab-btn shrink-0 rounded-t-lg border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
