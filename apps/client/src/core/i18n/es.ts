@@ -299,6 +299,7 @@ export const es: Translations = {
     moduleChartHint: 'Toca un módulo para ver el detalle por subcategoría',
     attemptsLabel: '{count} intentos',
     studyCoverageLabel: '{percent}% visto',
+    accuracy: 'Precisión',
     subcategoryHint: 'Desglose de precisión por subcategoría',
     practiceSubcategory: 'Practicar {name}',
     weakTableTitle: 'Flashcards más difíciles',

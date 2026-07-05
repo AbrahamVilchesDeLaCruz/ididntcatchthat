@@ -230,6 +230,7 @@ export interface StatsTranslations {
   moduleChartHint: string;
   attemptsLabel: string;
   studyCoverageLabel: string;
+  accuracy: string;
   subcategoryHint: string;
   practiceSubcategory: string;
   weakTableTitle: string;

@@ -296,6 +296,7 @@ export const en: Translations = {
     moduleChartHint: 'Tap a module to drill into subcategories',
     attemptsLabel: '{count} attempts',
     studyCoverageLabel: '{percent}% seen',
+    accuracy: 'Accuracy',
     subcategoryHint: 'Accuracy breakdown by subcategory',
     practiceSubcategory: 'Practice {name}',
     weakTableTitle: 'Hardest flashcards',
