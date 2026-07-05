@@ -103,6 +103,33 @@ export const LandingHeader = (): ReactElement => {
           <LocaleToggle variant="icon" />
         </div>
       </div>
+
+      <nav
+        className="flex gap-2 overflow-x-auto border-t border-[var(--color-border)]/70 px-4 py-2 md:hidden [&::-webkit-scrollbar]:hidden"
+        aria-label="Landing sections"
+      >
+        <a
+          href="#how-it-works"
+          onClick={handleSectionNav('how-it-works')}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]"
+        >
+          <Route
+            size={14}
+            strokeWidth={2}
+            className="text-[var(--color-brand-light)]"
+            aria-hidden
+          />
+          {nav.explore}
+        </a>
+        <a
+          href="#get-started"
+          onClick={handleSectionNav('get-started')}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--color-brand-dim)] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-light)]"
+        >
+          <Link2 size={14} strokeWidth={2} aria-hidden />
+          {nav.start}
+        </a>
+      </nav>
     </header>
   );
 };
