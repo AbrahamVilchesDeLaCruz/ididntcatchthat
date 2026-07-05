@@ -13,6 +13,7 @@ import { en } from '@/core/i18n/en';
 import { useAuthStore } from '@/core/store/auth.store';
 import * as gameApi from '../api/game.api';
 import * as useGameSessionModule from '../hooks/useGameSession';
+import type { GameSessionPhase } from '../hooks/useGameSession';
 import { GameContainer } from '../GameContainer';
 
 const refetchResume = vi.fn();
@@ -45,16 +46,18 @@ const flashcard = {
   examples: [],
 };
 
-const defaultSession = {
+const defaultSession: ReturnType<typeof useGameSessionModule.useGameSession> = {
   currentFlashcard: flashcard,
-  phase: 'playing' as const,
+  activeFlashcards: [flashcard],
+  phase: 'playing',
   isFlipped: false,
   currentIndex: 0,
   totalCount: 1,
   correctCount: 0,
   incorrectCount: 0,
-  wrongFlashcardIds: [] as string[],
+  wrongFlashcardIds: [],
   wrongCount: 0,
+  setIsFlipped: vi.fn(),
   toggleFlip: vi.fn(),
   recordAnswer: vi.fn(),
   acceptRepeatWrong: vi.fn(),
@@ -115,13 +118,13 @@ function mockNonResumeGame(): void {
     isLoading: false,
     isError: false,
     refetch: refetchResume,
-  } as ReturnType<typeof gameApi.useResumeGame>);
+  } as unknown as ReturnType<typeof gameApi.useResumeGame>);
 }
 
 describe('GameContainer', () => {
   beforeEach(() => {
     useI18n.setState({ locale: 'en', t: en });
-    useAuthStore.setState({ userType: 'registered' });
+    useAuthStore.setState({ userType: 'user' });
     refetchResume.mockClear();
     completeGame.mockReset();
     patchGame.mockReset();
@@ -130,12 +133,13 @@ describe('GameContainer', () => {
     triggerOriginalQueueComplete = undefined;
     Object.assign(defaultSession, {
       currentFlashcard: flashcard,
-      phase: 'playing',
+      activeFlashcards: [flashcard],
+      phase: 'playing' satisfies GameSessionPhase,
       isFlipped: false,
       wrongCount: 0,
     });
     vi.mocked(useGameSessionModule.useGameSession).mockImplementation(
-      (args: { onOriginalQueueComplete?: () => void }) => {
+      (args) => {
         triggerOriginalQueueComplete = args.onOriginalQueueComplete;
         return defaultSession;
       },
@@ -145,7 +149,7 @@ describe('GameContainer', () => {
       isLoading: false,
       isError: true,
       refetch: refetchResume,
-    } as ReturnType<typeof gameApi.useResumeGame>);
+    } as unknown as ReturnType<typeof gameApi.useResumeGame>);
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
     vi.stubGlobal(
       'matchMedia',

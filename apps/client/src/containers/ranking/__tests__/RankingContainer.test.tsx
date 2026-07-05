@@ -15,7 +15,7 @@ vi.mock('../hooks', () => ({
     setType: vi.fn(),
     period: 'weekly',
     setPeriod: vi.fn(),
-    module: 'all',
+    module: 'native_sounds',
     setModule: vi.fn(),
     rankingsQuery: {
       isError: true,
@@ -40,14 +40,14 @@ describe('RankingContainer', () => {
       setType: vi.fn(),
       period: 'weekly',
       setPeriod: vi.fn(),
-      module: 'all',
+      module: 'native_sounds',
       setModule: vi.fn(),
       rankingsQuery: {
         isError: true,
         refetch,
         data: undefined,
       },
-    } as ReturnType<typeof useRankingState>);
+    } as unknown as ReturnType<typeof useRankingState>);
   });
 
   it('shows retry when rankings fail to load', async () => {
@@ -72,7 +72,7 @@ describe('RankingContainer', () => {
       setType: vi.fn(),
       period: 'weekly',
       setPeriod: vi.fn(),
-      module: 'all',
+      module: 'native_sounds',
       setModule: vi.fn(),
       rankingsQuery: {
         isError: false,
@@ -91,7 +91,7 @@ describe('RankingContainer', () => {
           },
         },
       },
-    } as ReturnType<typeof useRankingState>);
+    } as unknown as ReturnType<typeof useRankingState>);
 
     render(
       <MemoryRouter>
