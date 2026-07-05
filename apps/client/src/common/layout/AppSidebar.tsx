@@ -173,7 +173,7 @@ export const AppSidebar = (): ReactElement => {
         <SidebarContent />
       </aside>
 
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-[max(1rem,env(safe-area-inset-top,0px))] left-[max(1rem,env(safe-area-inset-left,0px))] z-50">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button

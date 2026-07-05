@@ -21,7 +21,7 @@ export const ToastHost = (): ReactElement | null => {
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2"
+      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-50 flex max-w-sm flex-col gap-2"
     >
       {toasts.map((toast) => {
         const CategoryIcon = toast.category
