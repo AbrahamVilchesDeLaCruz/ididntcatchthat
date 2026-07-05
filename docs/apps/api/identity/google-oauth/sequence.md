@@ -1,8 +1,10 @@
 # Google OAuth — Sequence Diagram
 
-Flujo de autenticación con Google. Dos controladores participan:
-- `GET /auth/google` → inicia el redirect a Google
+Flujo de autenticación con Google. Dos controladores participan (sin prefijo `/v1`):
+- `GET /auth/google` → inicia el redirect a Google (cliente: `GET /api/auth/google` vía proxy)
 - `GET /auth/google/callback` → recibe el callback con el perfil del usuario
+
+`GOOGLE_CALLBACK_URL` debe apuntar a la URL pública del callback **sin** `/v1`, p. ej. `https://api.ididntcatchthat.com/auth/google/callback`.
 
 ```mermaid
 sequenceDiagram
@@ -21,7 +23,7 @@ sequenceDiagram
     participant Publisher as DomainEventPublisher
     participant DB as PostgreSQL
 
-    Client->>InitController: GET /auth/google
+    Client->>InitController: GET /api/auth/google (proxy → /auth/google)
     InitController->>Guard: GoogleAuthGuard redirects
     Guard->>Google: Redirect to accounts.google.com/o/oauth2/auth
     Google-->>Client: Consent screen
