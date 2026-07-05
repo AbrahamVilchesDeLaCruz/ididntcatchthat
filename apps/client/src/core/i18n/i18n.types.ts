@@ -444,6 +444,32 @@ export interface GameShellTranslations {
   login: string;
 }
 
+export interface SeoPageMeta {
+  title: string;
+  description: string;
+  robots: 'index, follow' | 'noindex, nofollow';
+}
+
+export interface SeoTranslations {
+  siteName: string;
+  pages: {
+    landing: SeoPageMeta;
+    authLogin: SeoPageMeta;
+    authRegister: SeoPageMeta;
+    authCallback: SeoPageMeta;
+    gameConfig: SeoPageMeta;
+    gameSession: SeoPageMeta;
+    studyConfig: SeoPageMeta;
+    studySession: SeoPageMeta;
+    home: SeoPageMeta;
+    profile: SeoPageMeta;
+    stats: SeoPageMeta;
+    ranking: SeoPageMeta;
+    backoffice: SeoPageMeta;
+    notFound: SeoPageMeta;
+  };
+}
+
 export interface CommonTranslations {
   dismiss: string;
   retry: string;
@@ -897,4 +923,5 @@ export interface Translations {
   sidebar: SidebarTranslations;
   gameShell: GameShellTranslations;
   backoffice: BackofficeTranslations;
+  seo: SeoTranslations;
 }
