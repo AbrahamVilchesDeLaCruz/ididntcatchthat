@@ -140,6 +140,21 @@ describe('AuthComponent', () => {
 
       expect(screen.queryByText(/incorrect/i)).not.toBeInTheDocument();
     });
+
+    it('uses error surface colors instead of success dim background', () => {
+      render(
+        <AuthComponent
+          {...defaultProps}
+          error="Incorrect email or password."
+        />,
+      );
+
+      const alert = screen
+        .getByText('Incorrect email or password.')
+        .closest('div');
+      expect(alert?.className).toContain('color-accent-red');
+      expect(alert?.className).not.toContain('color-accent-green-dim');
+    });
   });
 
   describe('submit de login', () => {

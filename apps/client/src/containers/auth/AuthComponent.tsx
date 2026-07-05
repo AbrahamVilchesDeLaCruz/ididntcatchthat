@@ -92,7 +92,7 @@ export const AuthComponent = ({
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-[var(--color-accent-green-dim)] border border-[var(--color-accent-red)]/20 text-[var(--color-accent-red)] text-sm flex items-start gap-2">
+            <div className="mb-4 flex items-start gap-2 rounded-lg border border-[var(--color-accent-red)]/30 bg-[var(--color-accent-red)]/10 p-3 text-sm text-[var(--color-accent-red)]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4 mt-0.5 shrink-0"
