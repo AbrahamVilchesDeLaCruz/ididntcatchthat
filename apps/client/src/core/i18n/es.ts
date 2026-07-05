@@ -710,4 +710,8 @@ export const es: Translations = {
     },
     logout: 'Cerrar sesión',
   },
+  gameShell: {
+    back: 'Volver',
+    login: 'Iniciar sesión',
+  },
 };

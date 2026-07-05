@@ -56,10 +56,11 @@ export const GameShell = (): ReactElement => {
             <button
               type="button"
               onClick={handleBack}
+              aria-label={t.gameShell.back}
               className="inline-flex items-center gap-0.5 rounded-lg px-2 py-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--color-text-primary)]"
             >
               <ChevronLeft size={16} strokeWidth={2} aria-hidden />
-              <span className="hidden sm:inline">Volver</span>
+              <span className="hidden sm:inline">{t.gameShell.back}</span>
             </button>
           </div>
 
@@ -99,7 +100,7 @@ export const GameShell = (): ReactElement => {
                 to="/auth/login"
                 className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
               >
-                Iniciar sesión
+                {t.gameShell.login}
               </Link>
             )}
           </div>
