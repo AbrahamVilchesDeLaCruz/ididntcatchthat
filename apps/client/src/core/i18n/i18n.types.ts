@@ -611,6 +611,273 @@ export interface AuthTranslations {
   };
 }
 
+export interface BackofficeTranslations {
+  shell: {
+    refreshAriaLabel: string;
+    loadError: string;
+    retry: string;
+  };
+  period: Record<'24h' | '7d' | '15d' | '30d' | '6m' | 'all', string>;
+  charts: {
+    noActivityInPeriod: string;
+    noDataInPeriod: string;
+  };
+  games: {
+    title: string;
+    subtitle: string;
+    kpi: {
+      totalGames: string;
+      completedGames: string;
+      completionRate: string;
+      avgAccuracy: string;
+      avgAccuracyHint: string;
+      totalAttempts: string;
+      attemptsPerGame: string;
+      abandonedGames: string;
+      totalPercent: string;
+    };
+    charts: {
+      trendTitle: string;
+      started: string;
+      completed: string;
+      noTrendData: string;
+      modeDistributionTitle: string;
+      topModulesTitle: string;
+      qualityByModuleTitle: string;
+      qualityByModuleHint: string;
+      noModuleData: string;
+      noModulePeriodData: string;
+      gamesLegend: string;
+      accuracyLegend: string;
+    };
+    modes: Record<string, string>;
+  };
+  users: {
+    title: string;
+    subtitle: string;
+    snapshotAllTime: string;
+    selectedPeriod: string;
+    totalUsers: string;
+    totalUsersInsight: string;
+    neverPlayed: string;
+    neverPlayedInsight: string;
+    noRegisteredUsers: string;
+    usersWithStreak: string;
+    usersWithStreakInsight: string;
+    averageLongestStreak: string;
+    averageLongestStreakInsight: string;
+    googleVsEmail: string;
+    googleVsEmailInsight: string;
+    newRegistrations: string;
+    newRegistrationsInsight: string;
+    activeUsers: string;
+    activeUsersInsight: string;
+    engagementRate: string;
+    engagementRateInsight: string;
+    charts: {
+      registrationsByPeriod: string;
+      newUsers: string;
+      registrationChannel: string;
+      google: string;
+      email: string;
+    };
+  };
+  observability: {
+    title: string;
+    subtitle: string;
+    liveBadge: string;
+    serverSincePrefix: string;
+    serverScopeLabel: string;
+    noHttpData: string;
+    requestsByEndpoint: string;
+    totalRequestsSuffix: string;
+    noHttpRequestData: string;
+    tabs: {
+      http: string;
+      runtime: string;
+      visits: string;
+      content: string;
+    };
+    httpSummary: {
+      totalRequests: string;
+      successRate: string;
+      successRateHint: string;
+      errorRate: string;
+      errorRateHint: string;
+      latencyP95: string;
+      latencyDetail: string;
+    };
+    httpTable: {
+      noData: string;
+      endpoint: string;
+      method: string;
+      status: string;
+      requests: string;
+      previousPageAriaLabel: string;
+      nextPageAriaLabel: string;
+      endpointsRange: string;
+    };
+    visits: {
+      loadError: string;
+      totalVisits: string;
+      totalVisitsInsight: string;
+      uniqueVisitors: string;
+      uniqueVisitorsInsight: string;
+      conversion: string;
+      conversionInsight: string;
+      topPage: string;
+      topPageInsight: string;
+      visitsByPeriod: string;
+      views: string;
+      unique: string;
+      topVisitedPages: string;
+    };
+    content: {
+      loadError: string;
+      totalFlashcards: string;
+      totalFlashcardsInsight: string;
+      createdInPeriod: string;
+      createdInPeriodInsight: string;
+      audioReady: string;
+      audioReadyInsight: string;
+      audioErrorInsight: string;
+      audioSub: string;
+      createdByPeriod: string;
+      flashcardsSeriesLabel: string;
+      byCategory: string;
+    };
+    runtime: {
+      noHeapData: string;
+      highMemoryHint: string;
+      warningHeapHint: string;
+      healthyMemoryHint: string;
+      noEventLoopData: string;
+      blockedEventLoopHint: string;
+      warningEventLoopHint: string;
+      healthyEventLoopHint: string;
+      noUptimeData: string;
+      stableServerHint: string;
+      activeServerHint: string;
+      recentServerHint: string;
+      noGcData: string;
+      highGcHint: string;
+      normalGcHint: string;
+      noRuntimeMetrics: string;
+      heapUsed: string;
+      eventLoopLagP95: string;
+      uptime: string;
+      gcTotal: string;
+      activeHandles: string;
+      activeHandlesHint: string;
+      rssMemory: string;
+      rssMemoryHint: string;
+    };
+  };
+  flashcards: {
+    title: string;
+    subtitle: string;
+    loadError: string;
+    aiGenerate: string;
+    bulkCreate: string;
+    newFlashcard: string;
+    pageOf: string;
+    previous: string;
+    next: string;
+    createTitle: string;
+    editTitle: string;
+    deleteConfirmTitle: string;
+    deleteConfirmBody: string;
+    cancel: string;
+    delete: string;
+    toolbar: {
+      filterByCategory: string;
+      allCategories: string;
+      filterBySubcategory: string;
+      allSubcategories: string;
+      chooseCategoryFirst: string;
+      filterByAudioStatus: string;
+      allAudioStatuses: string;
+      clearFilters: string;
+      audioStatuses: Record<
+        'pending' | 'generating' | 'ready' | 'failed',
+        string
+      >;
+    };
+    table: {
+      empty: string;
+      expression: string;
+      category: string;
+      subcategory: string;
+      audio: string;
+      view: string;
+      edit: string;
+      delete: string;
+      audioStatuses: Record<
+        'pending' | 'generating' | 'ready' | 'failed',
+        string
+      >;
+    };
+    form: {
+      expression: string;
+      meaning: string;
+      category: string;
+      subcategory: string;
+      selectCategory: string;
+      selectSubcategory: string;
+      chooseCategoryFirst: string;
+      examples: string;
+      addExample: string;
+      englishPlaceholder: string;
+      spanishPlaceholder: string;
+      saving: string;
+      save: string;
+      closeAriaLabel: string;
+    };
+    detail: {
+      closeAriaLabel: string;
+      pronunciation: string;
+      pendingAudio: string;
+      generatingAudio: string;
+      failedAudio: string;
+      american: string;
+      british: string;
+      australian: string;
+      examplesAudio: string;
+      examplesLabel: string;
+      noGeneratedExamples: string;
+      playAccentAriaLabel: string;
+    };
+    bulk: {
+      title: string;
+      subtitle: string;
+      invalidJson: string;
+      invalidArray: string;
+      jsonArrayLabel: string;
+      creating: string;
+      create: string;
+    };
+    ai: {
+      title: string;
+      configureSubtitle: string;
+      previewSubtitle: string;
+      category: string;
+      selectCategory: string;
+      subcategory: string;
+      selectSubcategory: string;
+      chooseCategoryFirst: string;
+      anchorExamples: string;
+      count: string;
+      extraInstructions: string;
+      extraInstructionsPlaceholder: string;
+      generateDrafts: string;
+      generating: string;
+      confirmDrafts: string;
+      importing: string;
+      examplesLabel: string;
+    };
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
@@ -625,4 +892,5 @@ export interface Translations {
   common: CommonTranslations;
   sidebar: SidebarTranslations;
   gameShell: GameShellTranslations;
+  backoffice: BackofficeTranslations;
 }
