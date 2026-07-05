@@ -70,4 +70,23 @@ describe('GameShell', () => {
 
     expect(screen.getByText('Home page')).toBeInTheDocument();
   });
+
+  it('allows horizontal scroll on narrow header actions without layout overflow', () => {
+    render(
+      <MemoryRouter initialEntries={['/game']}>
+        <Routes>
+          <Route element={<GameShell />}>
+            <Route path="/game" element={<div>Game page</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByLabelText('Game navigation')).toHaveClass(
+      'grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]',
+    );
+    expect(screen.getByRole('link', { name: en.gameShell.login })).toHaveClass(
+      'shrink-0',
+    );
+  });
 });

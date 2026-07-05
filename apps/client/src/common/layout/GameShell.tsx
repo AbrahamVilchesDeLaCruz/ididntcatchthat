@@ -49,12 +49,12 @@ export const GameShell = (): ReactElement => {
   return (
     <div className="flex min-h-svh flex-col bg-[var(--color-bg-base)]">
       <SkipToContentLink targetId="main-content" />
-      <header className="game-shell-accent sticky top-0 z-40 shrink-0 border-b bg-[var(--color-bg-base)]/90 backdrop-blur-sm">
+      <header className="game-shell-accent safe-top sticky top-0 z-40 shrink-0 border-b bg-[var(--color-bg-base)]/90 backdrop-blur-sm">
         <nav
-          className="mx-auto grid h-12 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 text-sm"
+          className="mx-auto grid h-12 min-w-0 max-w-6xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 px-2 text-sm sm:gap-2 sm:px-4"
           aria-label="Game navigation"
         >
-          <div className="flex justify-start">
+          <div className="flex min-w-0 justify-start">
             <button
               type="button"
               onClick={handleBack}
@@ -68,16 +68,16 @@ export const GameShell = (): ReactElement => {
 
           <Link
             to={homeLink}
-            className="truncate text-center transition-opacity hover:opacity-90"
+            className="min-w-0 truncate text-center transition-opacity hover:opacity-90"
           >
             <BrandWordmark className="text-sm sm:text-base" />
           </Link>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex min-w-0 max-w-full justify-end gap-1 overflow-x-auto sm:gap-2 [&::-webkit-scrollbar]:hidden">
             {canStudy && isGameRoute ? (
               <Link
                 to="/study"
-                className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+                className="shrink-0 rounded-full border border-[var(--color-border)] px-2 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3"
               >
                 {t.landing.hero.ctaStudy}
               </Link>
@@ -85,7 +85,7 @@ export const GameShell = (): ReactElement => {
             {isStudyRoute ? (
               <Link
                 to="/game"
-                className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+                className="shrink-0 rounded-full border border-[var(--color-border)] px-2 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3"
               >
                 {t.landing.hero.ctaPlay}
               </Link>
@@ -93,14 +93,14 @@ export const GameShell = (): ReactElement => {
             {appLink ? (
               <Link
                 to={appLink.to}
-                className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+                className="shrink-0 rounded-full border border-[var(--color-border)] px-2 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3"
               >
                 {appLink.label}
               </Link>
             ) : (
               <Link
                 to="/auth/login"
-                className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+                className="shrink-0 rounded-full border border-[var(--color-border)] px-2 py-1 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3"
               >
                 {t.gameShell.login}
               </Link>
