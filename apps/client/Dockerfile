@@ -20,7 +20,7 @@ COPY tsconfig.json ./
 RUN VITE_API_URL= VITE_API_PROXY_TARGET= pnpm --filter @ididntcatchthat/client build
 
 # ─── Stage 2: runtime (nginx) ────────────────────────────────────────────────
-FROM nginx:alpine AS runtime
+FROM nginx:1.27-alpine AS runtime
 
 COPY --from=builder /app/apps/client/dist /usr/share/nginx/html
 

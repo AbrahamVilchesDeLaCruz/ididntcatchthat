@@ -1,0 +1,8 @@
+# Dev host override — RabbitMQ on loopback for `make dev` / `make dev-api`
+# (API runs on the host and connects via AMQP_URI localhost:5672)
+# NOT used by vps-deploy-dev — VPS API runs in Docker and uses the internal network.
+services:
+  rabbitmq:
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"

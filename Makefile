@@ -12,6 +12,9 @@
         vps-logs-prod vps-logs-dev \
         vps-restart-prod vps-restart-dev \
         nginx-setup nginx-reload \
+        security-audit security-audit-ports security-audit-rabbitmq security-audit-ssh \
+        security-probe-external security-verify security-hotfix-iptables \
+        security-scan-images security-rotate-rabbitmq \
         rebuild clean purge prune \
         help
 
@@ -19,7 +22,8 @@ VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
 
 COMPOSE       = docker compose --project-directory .
 COMPOSE_LOCAL = $(COMPOSE) -p ididntcatchthat-local -f infra/docker-compose.local.yml
-COMPOSE_DEV   = doppler run --config dev  -- $(COMPOSE) -p ididntcatchthat-dev  -f infra/docker-compose.yml -f infra/docker-compose.dev.yml
+COMPOSE_DEV        = doppler run --config dev  -- $(COMPOSE) -p ididntcatchthat-dev  -f infra/docker-compose.yml -f infra/docker-compose.dev.yml
+COMPOSE_DEV_HOST   = $(COMPOSE_DEV) -f infra/docker-compose.dev-host.yml
 COMPOSE_PROD  = doppler run --config prd  -- $(COMPOSE) -p ididntcatchthat-prod -f infra/docker-compose.yml -f infra/docker-compose.prod.yml
 COMPOSE_TEST  = $(COMPOSE) -p ididntcatchthat-test -f infra/docker-compose.test.yml
 
@@ -96,12 +100,12 @@ down: ## Stop dev stack
 
 dev: ## Start RabbitMQ in Docker + run api & client on host (Doppler, hot-reload)
 	$(ensure-docker)
-	$(COMPOSE_DEV) up -d rabbitmq --wait
+	$(COMPOSE_DEV_HOST) up -d rabbitmq --wait
 	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/api start:dev & pnpm --filter @ididntcatchthat/client dev'
 
 dev-api: ## Run api on host only (Doppler, hot-reload)
 	$(ensure-docker)
-	$(COMPOSE_DEV) up -d rabbitmq --wait
+	$(COMPOSE_DEV_HOST) up -d rabbitmq --wait
 	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; pnpm --filter @ididntcatchthat/api start:dev'
 
 dev-client: ## Run client Vite HMR (Doppler)
@@ -182,7 +186,8 @@ obs-down: ## Stop observability stack
 	$(COMPOSE_DEV) stop prometheus grafana loki
 
 tunnel-dev: ## Open SSH tunnel to dev observability (Prometheus :9090, Grafana :3002, Loki :3100)
-	@echo "🔭 Tunnel open → Prometheus: http://localhost:9090  Grafana: http://localhost:3002"
+	@echo "🔭 Tunnel open → Prometheus: http://localhost:9090  Grafana: http://localhost:3002  Loki: http://localhost:3100"
+	@echo "   (services bound to 127.0.0.1 on VPS — tunnel required)"
 	@echo "   Press Ctrl+C to close."
 	ssh -L 9090:localhost:9090 -L 3002:localhost:3002 -L 3100:localhost:3100 $(VPS_HOST) -N
 
@@ -276,6 +281,40 @@ nginx-setup: ## [VPS] Replace nginx site configs with symlinks to repo (run once
 
 nginx-reload: ## [VPS] Validate nginx config and reload
 	sudo nginx -t && sudo systemctl reload nginx
+
+# ─── SECURITY (VPS) ───────────────────────────────────────────────────────────
+# Run from repo root on the VPS (/opt/ididntcatchthat-dev or /opt/ididntcatchthat).
+# See docs/vps-security.md and docs/infra/docker-image-audit.md
+
+security-audit: ## [VPS] Full security audit (ports, rabbitmq dev+prod, ssh)
+	@bash infra/scripts/security/audit-ports.sh
+	@bash infra/scripts/security/audit-rabbitmq.sh all
+	@bash infra/scripts/security/audit-ssh.sh
+
+security-audit-ports: ## [VPS] Listening ports, Docker mappings, UFW, iptables
+	@bash infra/scripts/security/audit-ports.sh
+
+security-audit-rabbitmq: ## [VPS] RabbitMQ logs + rabbitmqctl (STACK=dev|prod|all)
+	@bash infra/scripts/security/audit-rabbitmq.sh $${STACK:-all}
+
+security-audit-ssh: ## [VPS] fail2ban status and recent SSH failures
+	@bash infra/scripts/security/audit-ssh.sh
+
+security-probe-external: ## [VPS] nc probe public IP for sensitive ports (exit 1 if leak)
+	@bash infra/scripts/security/probe-external.sh
+
+security-verify: ## [VPS] Post-deploy check — ports audit + external probe
+	@bash infra/scripts/security/audit-ports.sh
+	@bash infra/scripts/security/probe-external.sh
+
+security-hotfix-iptables: ## [VPS] Temporary DOCKER-USER block (confirm each rule)
+	@bash infra/scripts/security/hotfix-docker-user.sh
+
+security-scan-images: ## Scan infra Docker images with Trivy (CRITICAL/HIGH)
+	@bash infra/scripts/security/scan-images.sh
+
+security-rotate-rabbitmq: ## Rotate RABBITMQ_PASS in Doppler (ROTATE_CONFIRM=yes to apply)
+	@bash infra/scripts/security/rotate-rabbitmq-pass.sh
 
 # ─── CLEANUP ──────────────────────────────────────────────────────────────────
 
