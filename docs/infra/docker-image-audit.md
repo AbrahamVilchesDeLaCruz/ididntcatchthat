@@ -12,7 +12,7 @@ Inventario de imágenes del stack, política de versionado y escaneo con Trivy.
 | `nginx:1.27-alpine` | Client runtime | semver pin | vía build client |
 | `rabbitmq:4.1-management-alpine` | Compose base (local/dev tooling) | minor pin | CI infra job |
 | `rabbitmq:4.1-alpine` | CI / test | minor pin | CI infra job |
-| `prom/prometheus` | Observabilidad | `v3.4.0` | CI infra job |
+| `prom/prometheus` | Observabilidad | `v3.13.0` | CI infra job |
 | `grafana/grafana` | Observabilidad | `12.1.3` | CI infra job |
 | `grafana/loki` | Observabilidad | `3.5.0` | CI infra job |
 | `postgres:16-alpine` | Local / test | major pin | no (efímero) |

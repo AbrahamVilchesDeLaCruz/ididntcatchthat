@@ -12,7 +12,7 @@ require_command trivy
 IMAGES=(
   "rabbitmq:4.1-management-alpine"
   "rabbitmq:4.1-alpine"
-  "prom/prometheus:v3.4.0"
+  "prom/prometheus:v3.13.0"
   "grafana/grafana:12.1.3"
   "grafana/loki:3.5.0"
   "nginx:1.27-alpine"
