@@ -20,7 +20,8 @@ RUN pnpm --filter @ididntcatchthat/api build
 # ─── Stage 2: runtime ────────────────────────────────────────────────────────
 FROM node:24-alpine AS runtime
 
-RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+RUN apk upgrade --no-cache \
+    && corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 

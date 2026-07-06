@@ -195,7 +195,7 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 | Frontend | :4001 | :5173 (Vite) | :4001 | — |
 | API | :3000 | :3000 | :3001 | :3000 |
 | Postgres | :5434 | :5434 | Aiven (remoto) | :5433 |
-| RabbitMQ | :5674 | :5674 | :5672 | :5673 |
+| RabbitMQ | :5674 | :5674 | red interna Docker (VPS); `127.0.0.1:5672` solo `make dev` local | :5673 |
 | MinIO | :9000 / :9001 | :9000 / :9001 | — (R2 prod) | — |
 
 ### ⌨️ Comandos útiles
@@ -214,6 +214,8 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 | `make down` | Parar stack dev |
 | `make vps-deploy-dev` | Deploy a VPS — entorno dev |
 | `make vps-deploy-prod` | Deploy a VPS — entorno prod |
+| `make security-audit` | [VPS] Auditoría de puertos, RabbitMQ y SSH |
+| `make security-verify` | [VPS] Verificación post-deploy (sin leaks externos) |
 
 ---
 

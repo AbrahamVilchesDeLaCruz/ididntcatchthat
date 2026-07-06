@@ -198,3 +198,41 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+
+      - name: Scan RabbitMQ image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: rabbitmq:4.1-management-alpine
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan Prometheus image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: prom/prometheus:v3.13.0
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan Grafana image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: grafana/grafana:12.4.5
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+          # OS layer only — bundled go plugins still carry upstream CVEs we cannot patch
+          vuln-type: os
+
+      - name: Scan Loki image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: grafana/loki:3.6.12
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH

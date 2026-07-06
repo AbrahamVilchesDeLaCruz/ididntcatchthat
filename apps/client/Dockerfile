@@ -20,7 +20,7 @@ COPY tsconfig.json ./
 RUN VITE_API_URL= VITE_API_PROXY_TARGET= pnpm --filter @ididntcatchthat/client build
 
 # ─── Stage 2: runtime (nginx) ────────────────────────────────────────────────
-FROM nginx:alpine AS runtime
+FROM nginx:1.27-alpine AS runtime
 
 COPY --from=builder /app/apps/client/dist /usr/share/nginx/html
 
@@ -28,7 +28,8 @@ COPY --from=builder /app/apps/client/dist /usr/share/nginx/html
 COPY apps/client/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Allow the nginx user to write to required runtime dirs (port 8080 = no root needed)
-RUN chown -R nginx:nginx /usr/share/nginx/html \
+RUN apk upgrade --no-cache \
+    && chown -R nginx:nginx /usr/share/nginx/html \
     && chown -R nginx:nginx /var/cache/nginx \
     && chown -R nginx:nginx /var/log/nginx \
     && chown -R nginx:nginx /etc/nginx/conf.d \
