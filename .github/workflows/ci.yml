@@ -198,3 +198,39 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+
+      - name: Scan RabbitMQ image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: rabbitmq:4.1-management-alpine
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan Prometheus image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: prom/prometheus:v3.4.0
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan Grafana image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: grafana/grafana:12.1.3
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan Loki image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: grafana/loki:3.5.0
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
