@@ -57,6 +57,10 @@
   border-bottom-color: color-mix(in srgb, var(--color-brand) 16%, transparent);
 }
 
+.play-progress-rail {
+  border-bottom-color: color-mix(in srgb, var(--color-brand) 12%, transparent);
+}
+
 .flashcard-card-face {
   border: 1px solid color-mix(in srgb, var(--color-brand) 38%, transparent);
 }

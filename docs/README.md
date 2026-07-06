@@ -172,7 +172,8 @@ Trazabilidad completa de cada bounded context: secuencia, clases y casos de uso 
 | [deployment.md](./deployment.md) | VPS, nginx, HTTPS, Doppler, CI/CD |
 | [observability.md](./observability.md) | Setup de observabilidad: OTel, Prometheus, Grafana, Loki |
 | [grafana.md](./grafana.md) | Dashboards de Grafana: métricas técnicas y de negocio |
-| [vps-security.md](./vps-security.md) | Hardening del VPS |
+| [vps-security.md](./vps-security.md) | Hardening del VPS, incident response, `make security-*` |
+| [infra/docker-image-audit.md](./infra/docker-image-audit.md) | Inventario de imágenes Docker y Trivy |
 | [seo.md](./seo.md) | SEO y metadatos del cliente |
 
 ---

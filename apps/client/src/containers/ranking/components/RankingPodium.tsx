@@ -52,8 +52,9 @@ const PodiumSlot = ({
   elevationClass: string;
   slotClass: string;
 }): ReactElement => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const scoreLabel = t.ranking.scoreUnits[type];
+  const scoreLabels = t.ranking.scoreLabels;
 
   return (
     <div
@@ -81,7 +82,8 @@ const PodiumSlot = ({
           </Badge>
         ) : null}
         <p className="text-xs text-[var(--color-text-muted)]">
-          {formatRankingScore(type, entry.score)} {scoreLabel}
+          {formatRankingScore(type, entry.score, locale, scoreLabels)}{' '}
+          {scoreLabel}
         </p>
       </div>
     </div>

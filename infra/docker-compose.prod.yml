@@ -1,11 +1,12 @@
 # Prod override — VPS production
+# Port bindings use 127.0.0.1 so Docker does not bypass UFW on 0.0.0.0.
 # Variables injected by Doppler (config: prd) via Makefile
 services:
   api:
     container_name: ididntcatchthat-api-prod
     image: ididntcatchthat-api:prod
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
@@ -43,7 +44,7 @@ services:
     container_name: ididntcatchthat-client-prod
     image: ididntcatchthat-client:prod
     ports:
-      - "4000:8080"
+      - "127.0.0.1:4000:8080"
     environment:
       NODE_ENV: ${NODE_ENV}
 

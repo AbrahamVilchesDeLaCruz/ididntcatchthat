@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import type { HttpStats, LatencyPercentiles } from '../utils/parseMetrics';
+import { useI18n } from '@/core/i18n';
 
 interface SummaryCardProps {
   label: string;
@@ -56,34 +57,39 @@ export const HttpSummaryCards = ({
   http,
   latency,
 }: HttpSummaryCardsProps): ReactElement => {
+  const { locale, t } = useI18n();
+  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
+
   const fmtMs = (ms: number | null): string =>
     ms !== null ? `${ms.toFixed(0)} ms` : '—';
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <SummaryCard
-        label="Total requests"
-        value={http.totalRequests.toLocaleString('es-ES')}
+        label={t.backoffice.observability.httpSummary.totalRequests}
+        value={http.totalRequests.toLocaleString(numberLocale)}
         variant="default"
       />
       <SummaryCard
-        label="Tasa de éxito"
+        label={t.backoffice.observability.httpSummary.successRate}
         value={`${http.successRate.toFixed(1)}%`}
-        sub="respuestas 2xx"
+        sub={t.backoffice.observability.httpSummary.successRateHint}
         variant={http.successRate >= 95 ? 'success' : 'warning'}
       />
       <SummaryCard
-        label="Tasa de error"
+        label={t.backoffice.observability.httpSummary.errorRate}
         value={`${http.errorRate.toFixed(2)}%`}
-        sub="respuestas 5xx"
+        sub={t.backoffice.observability.httpSummary.errorRateHint}
         variant={http.errorRate > 1 ? 'danger' : 'success'}
       />
       <SummaryCard
-        label="Latencia p95"
+        label={t.backoffice.observability.httpSummary.latencyP95}
         value={fmtMs(latency?.p95Ms ?? null)}
         sub={
           latency
-            ? `p50: ${fmtMs(latency.p50Ms)} · p99: ${fmtMs(latency.p99Ms)}`
+            ? t.backoffice.observability.httpSummary.latencyDetail
+                .replace('{p50}', fmtMs(latency.p50Ms))
+                .replace('{p99}', fmtMs(latency.p99Ms))
             : undefined
         }
         variant={

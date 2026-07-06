@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/common/components/ui/table';
 import type { HttpBreakdownRow } from '../utils/parseMetrics';
+import { useI18n } from '@/core/i18n';
 
 const PAGE_SIZE = 10;
 
@@ -29,12 +30,14 @@ export const HttpBreakdownTable = ({
   rows,
   totalRequests,
 }: HttpBreakdownTableProps): ReactElement => {
+  const { locale, t } = useI18n();
+  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
   const [page, setPage] = useState(0);
 
   if (rows.length === 0) {
     return (
       <p className="text-[var(--color-text-secondary)] text-sm text-center py-8">
-        Sin datos de requests HTTP
+        {t.backoffice.observability.httpTable.noData}
       </p>
     );
   }
@@ -50,10 +53,18 @@ export const HttpBreakdownTable = ({
         <TableHeader>
           <TableRow>
             <TableHead className="w-10 text-center">#</TableHead>
-            <TableHead>Endpoint</TableHead>
-            <TableHead className="w-20">Método</TableHead>
-            <TableHead className="w-20">Status</TableHead>
-            <TableHead className="text-right w-28">Requests</TableHead>
+            <TableHead>
+              {t.backoffice.observability.httpTable.endpoint}
+            </TableHead>
+            <TableHead className="w-20">
+              {t.backoffice.observability.httpTable.method}
+            </TableHead>
+            <TableHead className="w-20">
+              {t.backoffice.observability.httpTable.status}
+            </TableHead>
+            <TableHead className="text-right w-28">
+              {t.backoffice.observability.httpTable.requests}
+            </TableHead>
             <TableHead className="text-right w-16">%</TableHead>
           </TableRow>
         </TableHeader>
@@ -79,7 +90,7 @@ export const HttpBreakdownTable = ({
                 </span>
               </TableCell>
               <TableCell className="text-right font-mono text-sm text-[var(--color-text-primary)]">
-                {row.count.toLocaleString('es-ES')}
+                {row.count.toLocaleString(numberLocale)}
               </TableCell>
               <TableCell className="text-right text-xs text-[var(--color-text-muted)]">
                 {totalRequests > 0
@@ -96,8 +107,13 @@ export const HttpBreakdownTable = ({
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-1">
           <span className="text-xs text-[var(--color-text-muted)]">
-            {startRank}–{Math.min(page * PAGE_SIZE + PAGE_SIZE, rows.length)} de{' '}
-            {rows.length} endpoints
+            {t.backoffice.observability.httpTable.endpointsRange
+              .replace('{start}', String(startRank))
+              .replace(
+                '{end}',
+                String(Math.min(page * PAGE_SIZE + PAGE_SIZE, rows.length)),
+              )
+              .replace('{total}', String(rows.length))}
           </span>
 
           <div className="flex items-center gap-1">
@@ -105,7 +121,9 @@ export const HttpBreakdownTable = ({
               type="button"
               onClick={() => setPage((p) => p - 1)}
               disabled={page === 0}
-              aria-label="Página anterior"
+              aria-label={
+                t.backoffice.observability.httpTable.previousPageAriaLabel
+              }
               className="p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -119,7 +137,9 @@ export const HttpBreakdownTable = ({
               type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= totalPages - 1}
-              aria-label="Página siguiente"
+              aria-label={
+                t.backoffice.observability.httpTable.nextPageAriaLabel
+              }
               className="p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
               <ChevronRight className="w-4 h-4" />

@@ -55,6 +55,18 @@ export const BackofficeView = (): ReactElement => {
 
   return (
     <Routes>
+      <Route
+        index
+        element={
+          isAdmin ? (
+            <Navigate to="/backoffice/flashcards" replace />
+          ) : canAccessBackoffice ? (
+            <Navigate to="/backoffice/games" replace />
+          ) : (
+            <Navigate to="/stats" replace />
+          )
+        }
+      />
       <Route path="flashcards" element={<AdminFlashcardsRoute />} />
       <Route path="games" element={<BackofficeGamesRoute />} />
       <Route path="users" element={<BackofficeUsersRoute />} />
@@ -63,9 +75,9 @@ export const BackofficeView = (): ReactElement => {
         path="*"
         element={
           isAdmin ? (
-            <Navigate to="flashcards" replace />
+            <Navigate to="/backoffice/flashcards" replace />
           ) : canAccessBackoffice ? (
-            <Navigate to="games" replace />
+            <Navigate to="/backoffice/games" replace />
           ) : (
             <Navigate to="/stats" replace />
           )

@@ -34,7 +34,7 @@ export const ModuleProgressChart = ({
   );
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-3" aria-label={st.moduleListTitle}>
       {rows.map((row) => (
         <li key={row.module}>
           <button
@@ -73,7 +73,11 @@ export const ModuleProgressChart = ({
                 />
               </div>
             </div>
-            <AccuracyProgressBar value={row.accuracy} className="mt-3" />
+            <AccuracyProgressBar
+              value={row.accuracy}
+              className="mt-3"
+              ariaLabel={`${st.accuracy}: ${Math.round(row.accuracy)}%`}
+            />
           </button>
         </li>
       ))}

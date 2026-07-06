@@ -66,8 +66,45 @@ describe('GameShell', () => {
       </MemoryRouter>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
     expect(screen.getByText('Home page')).toBeInTheDocument();
+  });
+
+  it('allows horizontal scroll on narrow header actions without layout overflow', () => {
+    render(
+      <MemoryRouter initialEntries={['/game']}>
+        <Routes>
+          <Route element={<GameShell />}>
+            <Route path="/game" element={<div>Game page</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByLabelText('Game navigation')).toHaveClass(
+      'grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]',
+    );
+    expect(screen.getByRole('link', { name: en.gameShell.login })).toHaveClass(
+      'shrink-0',
+    );
+  });
+
+  it('shows a floating back button on active mobile play routes', () => {
+    render(
+      <MemoryRouter initialEntries={['/game/test-id']}>
+        <Routes>
+          <Route element={<GameShell />}>
+            <Route path="/game/:gameId" element={<div>Active game</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId('mobile-floating-back')).toHaveAttribute(
+      'aria-label',
+      en.gameShell.back,
+    );
+    expect(screen.getByText('Active game')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import type { GamesStatsVM } from '../backoffice-games.types';
+import { useI18n } from '@/core/i18n';
 
 interface StatCardProps {
   label: string;
@@ -49,6 +50,9 @@ interface GamesStatsCardsProps {
 export const GamesStatsCards = ({
   stats,
 }: GamesStatsCardsProps): ReactElement => {
+  const { locale, t } = useI18n();
+  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
+
   const completionRate =
     stats.totalGames > 0 ? stats.completionRate.toFixed(1) : '—';
 
@@ -60,33 +64,33 @@ export const GamesStatsCards = ({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       <StatCard
-        label="Partidas totales"
-        value={stats.totalGames.toLocaleString('es-ES')}
-        sub={`${stats.completedGames.toLocaleString('es-ES')} completadas`}
+        label={t.backoffice.games.kpi.totalGames}
+        value={stats.totalGames.toLocaleString(numberLocale)}
+        sub={`${stats.completedGames.toLocaleString(numberLocale)} ${t.backoffice.games.kpi.completedGames}`}
       />
       <StatCard
-        label="Tasa de completado"
+        label={t.backoffice.games.kpi.completionRate}
         value={`${completionRate}%`}
-        sub={`${stats.completedGames.toLocaleString('es-ES')} / ${stats.totalGames.toLocaleString('es-ES')}`}
+        sub={`${stats.completedGames.toLocaleString(numberLocale)} / ${stats.totalGames.toLocaleString(numberLocale)}`}
         accent={Number(completionRate) >= 70}
       />
       <StatCard
-        label="Precisión media"
+        label={t.backoffice.games.kpi.avgAccuracy}
         value={`${stats.avgAccuracy.toFixed(1)}%`}
-        sub="sobre todas las partidas"
+        sub={t.backoffice.games.kpi.avgAccuracyHint}
         accent={stats.avgAccuracy >= 80}
       />
       <StatCard
-        label="Total intentos"
-        value={stats.totalAttempts.toLocaleString('es-ES')}
-        sub={`≈ ${attemptsPerGame} por partida`}
+        label={t.backoffice.games.kpi.totalAttempts}
+        value={stats.totalAttempts.toLocaleString(numberLocale)}
+        sub={`≈ ${attemptsPerGame} ${t.backoffice.games.kpi.attemptsPerGame}`}
       />
       <StatCard
-        label="Partidas abandonadas"
+        label={t.backoffice.games.kpi.abandonedGames}
         value={(stats.totalGames - stats.completedGames).toLocaleString(
-          'es-ES',
+          numberLocale,
         )}
-        sub={`${(100 - Number(completionRate)).toFixed(1)}% del total`}
+        sub={`${(100 - Number(completionRate)).toFixed(1)}% ${t.backoffice.games.kpi.totalPercent}`}
       />
     </div>
   );

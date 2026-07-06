@@ -126,6 +126,7 @@ export interface LandingTranslations {
   header: {
     explore: string;
     start: string;
+    backToTop: string;
   };
 }
 
@@ -191,6 +192,7 @@ export interface GameTranslations {
     sessionTimerLabel: string;
     touchSwipeIncorrect: string;
     touchSwipeCorrect: string;
+    controlsHelpAriaLabel: string;
   };
   summary: {
     title: string;
@@ -211,16 +213,27 @@ export interface GameTranslations {
     hudVictoryLabel: string;
     failedCardsTitle: string;
     ctaPracticeWeakest: string;
+    loadError: string;
+    retryPlay: string;
+  };
+  errors: {
+    completeFailed: string;
+    recordFailed: string;
+    pauseFailed: string;
+    resumeFailed: string;
+    startNewGame: string;
+    retry: string;
   };
 }
 
 export interface StatsTranslations {
   title: string;
   subtitle: string;
-  moduleChartTitle: string;
-  moduleChartHint: string;
+  moduleListTitle: string;
+  moduleListHint: string;
   attemptsLabel: string;
   studyCoverageLabel: string;
+  accuracy: string;
   subcategoryHint: string;
   practiceSubcategory: string;
   weakTableTitle: string;
@@ -256,6 +269,7 @@ export interface StatsTranslations {
     failed: string;
     emptyTitle: string;
     emptyBody: string;
+    emptyPlayCta: string;
     registerTitle: string;
     registerHint: string;
     registerCta: string;
@@ -384,8 +398,13 @@ export interface RankingTranslations {
     best_streak: string;
     module_master: string;
   };
+  scoreLabels: {
+    streakSuffix: string;
+    levelPrefix: string;
+  };
   loading: string;
   error: string;
+  retry: string;
   empty: string;
   emptyMostActiveHint: string;
   outsideTopHint: string;
@@ -425,7 +444,48 @@ export interface StudyTranslations {
   };
 }
 
+export interface GameShellTranslations {
+  back: string;
+  login: string;
+}
+
+export interface SeoPageMeta {
+  title: string;
+  description: string;
+  robots: 'index, follow' | 'noindex, nofollow';
+}
+
+export interface SeoTranslations {
+  siteName: string;
+  pages: {
+    landing: SeoPageMeta;
+    authLogin: SeoPageMeta;
+    authRegister: SeoPageMeta;
+    authCallback: SeoPageMeta;
+    gameConfig: SeoPageMeta;
+    gameSession: SeoPageMeta;
+    studyConfig: SeoPageMeta;
+    studySession: SeoPageMeta;
+    home: SeoPageMeta;
+    profile: SeoPageMeta;
+    stats: SeoPageMeta;
+    ranking: SeoPageMeta;
+    backoffice: SeoPageMeta;
+    notFound: SeoPageMeta;
+  };
+}
+
 export interface CommonTranslations {
+  dismiss: string;
+  retry: string;
+  loading: string;
+  skipToContent: string;
+  timeAgo: {
+    justNow: string;
+    seconds: string;
+    minutes: string;
+    hours: string;
+  };
   theme: {
     lightMode: string;
     darkMode: string;
@@ -436,6 +496,12 @@ export interface CommonTranslations {
     switchLanguage: string;
     english: string;
     spanish: string;
+  };
+  notFound: {
+    title: string;
+    body: string;
+    goHome: string;
+    goApp: string;
   };
 }
 
@@ -458,6 +524,7 @@ export interface SidebarTranslations {
     flashcards: string;
     observability: string;
   };
+  openMenu: string;
   logout: string;
 }
 
@@ -512,6 +579,7 @@ export interface HomeTranslations {
   navApp: string;
   roles: {
     user: string;
+    guest: string;
     teacher: string;
     admin: string;
   };
@@ -527,6 +595,331 @@ export interface HomeTranslations {
   };
 }
 
+export interface AuthTranslations {
+  login: {
+    subtitle: string;
+    tab: string;
+    submit: string;
+    submitting: string;
+  };
+  register: {
+    subtitle: string;
+    tab: string;
+    submit: string;
+    submitting: string;
+    nicknameHint: string;
+  };
+  fields: {
+    email: string;
+    password: string;
+    nickname: string;
+    emailPlaceholder: string;
+    passwordPlaceholder: string;
+    passwordMinPlaceholder: string;
+    nicknamePlaceholder: string;
+    showPassword: string;
+    hidePassword: string;
+  };
+  oauth: {
+    divider: string;
+    google: string;
+    redirecting: string;
+  };
+  callback: {
+    loading: string;
+    redirectingToLogin: string;
+    accessDenied: string;
+    failed: string;
+    generic: string;
+  };
+  errors: {
+    unknown: string;
+    invalidCredentials: string;
+    conflict: string;
+    validation: string;
+    rateLimit: string;
+    network: string;
+    server: string;
+    generic: string;
+  };
+  validation: {
+    invalidEmail: string;
+    passwordRequired: string;
+    nicknameMin: string;
+    nicknameMax: string;
+    nicknamePattern: string;
+    passwordMin: string;
+  };
+}
+
+export interface BackofficeTranslations {
+  shell: {
+    refreshAriaLabel: string;
+    loadError: string;
+    retry: string;
+  };
+  period: Record<'24h' | '7d' | '15d' | '30d' | '6m' | 'all', string>;
+  charts: {
+    noActivityInPeriod: string;
+    noDataInPeriod: string;
+  };
+  games: {
+    title: string;
+    subtitle: string;
+    kpi: {
+      totalGames: string;
+      completedGames: string;
+      completionRate: string;
+      avgAccuracy: string;
+      avgAccuracyHint: string;
+      totalAttempts: string;
+      attemptsPerGame: string;
+      abandonedGames: string;
+      totalPercent: string;
+    };
+    charts: {
+      trendTitle: string;
+      started: string;
+      completed: string;
+      noTrendData: string;
+      modeDistributionTitle: string;
+      topModulesTitle: string;
+      qualityByModuleTitle: string;
+      qualityByModuleHint: string;
+      noModuleData: string;
+      noModulePeriodData: string;
+      gamesLegend: string;
+      accuracyLegend: string;
+    };
+    modes: Record<string, string>;
+  };
+  users: {
+    title: string;
+    subtitle: string;
+    snapshotAllTime: string;
+    selectedPeriod: string;
+    totalUsers: string;
+    totalUsersInsight: string;
+    neverPlayed: string;
+    neverPlayedInsight: string;
+    noRegisteredUsers: string;
+    usersWithStreak: string;
+    usersWithStreakInsight: string;
+    averageLongestStreak: string;
+    averageLongestStreakInsight: string;
+    googleVsEmail: string;
+    googleVsEmailInsight: string;
+    newRegistrations: string;
+    newRegistrationsInsight: string;
+    activeUsers: string;
+    activeUsersInsight: string;
+    engagementRate: string;
+    engagementRateInsight: string;
+    engagementRateThresholdHint: string;
+    charts: {
+      registrationsByPeriod: string;
+      newUsers: string;
+      registrationChannel: string;
+      google: string;
+      email: string;
+    };
+  };
+  observability: {
+    title: string;
+    subtitle: string;
+    liveBadge: string;
+    serverSincePrefix: string;
+    serverScopeLabel: string;
+    noHttpData: string;
+    requestsByEndpoint: string;
+    totalRequestsSuffix: string;
+    noHttpRequestData: string;
+    tabs: {
+      http: string;
+      runtime: string;
+      visits: string;
+      content: string;
+    };
+    httpSummary: {
+      totalRequests: string;
+      successRate: string;
+      successRateHint: string;
+      errorRate: string;
+      errorRateHint: string;
+      latencyP95: string;
+      latencyDetail: string;
+    };
+    httpTable: {
+      noData: string;
+      endpoint: string;
+      method: string;
+      status: string;
+      requests: string;
+      previousPageAriaLabel: string;
+      nextPageAriaLabel: string;
+      endpointsRange: string;
+    };
+    visits: {
+      loadError: string;
+      totalVisits: string;
+      totalVisitsInsight: string;
+      uniqueVisitors: string;
+      uniqueVisitorsInsight: string;
+      conversion: string;
+      conversionInsight: string;
+      topPage: string;
+      topPageInsight: string;
+      visitsByPeriod: string;
+      views: string;
+      unique: string;
+      topVisitedPages: string;
+    };
+    content: {
+      loadError: string;
+      totalFlashcards: string;
+      totalFlashcardsInsight: string;
+      createdInPeriod: string;
+      createdInPeriodInsight: string;
+      audioReady: string;
+      audioReadyInsight: string;
+      audioErrorInsight: string;
+      audioSub: string;
+      createdByPeriod: string;
+      flashcardsSeriesLabel: string;
+      byCategory: string;
+    };
+    runtime: {
+      noHeapData: string;
+      highMemoryHint: string;
+      warningHeapHint: string;
+      healthyMemoryHint: string;
+      noEventLoopData: string;
+      blockedEventLoopHint: string;
+      warningEventLoopHint: string;
+      healthyEventLoopHint: string;
+      noUptimeData: string;
+      stableServerHint: string;
+      activeServerHint: string;
+      recentServerHint: string;
+      noGcData: string;
+      highGcHint: string;
+      normalGcHint: string;
+      noRuntimeMetrics: string;
+      heapUsed: string;
+      eventLoopLagP95: string;
+      uptime: string;
+      gcTotal: string;
+      activeHandles: string;
+      activeHandlesHint: string;
+      rssMemory: string;
+      rssMemoryHint: string;
+    };
+  };
+  flashcards: {
+    title: string;
+    subtitle: string;
+    loadError: string;
+    aiGenerate: string;
+    bulkCreate: string;
+    newFlashcard: string;
+    pageOf: string;
+    previous: string;
+    next: string;
+    createTitle: string;
+    editTitle: string;
+    deleteConfirmTitle: string;
+    deleteConfirmBody: string;
+    cancel: string;
+    delete: string;
+    toolbar: {
+      filterByCategory: string;
+      allCategories: string;
+      filterBySubcategory: string;
+      allSubcategories: string;
+      chooseCategoryFirst: string;
+      filterByAudioStatus: string;
+      allAudioStatuses: string;
+      clearFilters: string;
+      audioStatuses: Record<
+        'pending' | 'generating' | 'ready' | 'failed',
+        string
+      >;
+    };
+    table: {
+      empty: string;
+      expression: string;
+      category: string;
+      subcategory: string;
+      audio: string;
+      view: string;
+      edit: string;
+      delete: string;
+      audioStatuses: Record<
+        'pending' | 'generating' | 'ready' | 'failed',
+        string
+      >;
+    };
+    form: {
+      expression: string;
+      meaning: string;
+      category: string;
+      subcategory: string;
+      selectCategory: string;
+      selectSubcategory: string;
+      chooseCategoryFirst: string;
+      examples: string;
+      addExample: string;
+      englishPlaceholder: string;
+      spanishPlaceholder: string;
+      saving: string;
+      save: string;
+      closeAriaLabel: string;
+    };
+    detail: {
+      closeAriaLabel: string;
+      pronunciation: string;
+      pendingAudio: string;
+      generatingAudio: string;
+      failedAudio: string;
+      american: string;
+      british: string;
+      australian: string;
+      examplesAudio: string;
+      examplesLabel: string;
+      noGeneratedExamples: string;
+      playAccentAriaLabel: string;
+    };
+    bulk: {
+      title: string;
+      subtitle: string;
+      invalidJson: string;
+      invalidArray: string;
+      jsonArrayLabel: string;
+      creating: string;
+      create: string;
+    };
+    ai: {
+      title: string;
+      configureSubtitle: string;
+      previewSubtitle: string;
+      category: string;
+      selectCategory: string;
+      subcategory: string;
+      selectSubcategory: string;
+      chooseCategoryFirst: string;
+      anchorExamples: string;
+      count: string;
+      extraInstructions: string;
+      extraInstructionsPlaceholder: string;
+      generateDrafts: string;
+      generating: string;
+      confirmDrafts: string;
+      importing: string;
+      examplesLabel: string;
+    };
+  };
+}
+
 export interface Translations {
   landing: LandingTranslations;
   game: GameTranslations;
@@ -537,6 +930,10 @@ export interface Translations {
   profile: ProfileTranslations;
   home: HomeTranslations;
   ranking: RankingTranslations;
+  auth: AuthTranslations;
   common: CommonTranslations;
   sidebar: SidebarTranslations;
+  gameShell: GameShellTranslations;
+  backoffice: BackofficeTranslations;
+  seo: SeoTranslations;
 }

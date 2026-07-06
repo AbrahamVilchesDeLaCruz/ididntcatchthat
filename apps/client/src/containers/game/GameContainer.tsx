@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
+import { useI18n } from '@/core/i18n';
 import { useGuestStatsStore } from '@/core/store/guestStats.store';
 import {
   useGameFlashcards,
@@ -35,6 +36,8 @@ export const GameContainer = (): ReactElement => {
   const location = useLocation();
   const state = (location.state as LocationState | null) ?? {};
   const userType = useAuthStore((s) => s.userType);
+  const { t } = useI18n();
+  const ge = t.game.errors;
 
   const hasFlashcardIds = (state.flashcardIds ?? []).length > 0;
   const isResumeMode = state.mode === 'resume' || !hasFlashcardIds;
@@ -51,18 +54,13 @@ export const GameContainer = (): ReactElement => {
     data: resumeData,
     isLoading: isLoadingResume,
     isError: isResumeError,
+    refetch: refetchResume,
   } = useResumeGame(gameId ?? '', isResumeMode && !!gameId);
   const { mutateAsync: recordAttempt } = useRecordAttempt(gameId ?? '');
   const { mutate: completeGame, isPending: isCompleting } = useCompleteGame();
   const { mutate: patchGame, isPending: isPausing } = usePatchGame();
   const { pollRecentUnlocks, showOptimisticGameUnlocks, reconcileProgress } =
     useProgressSideEffects();
-
-  useEffect(() => {
-    if (isResumeMode && isResumeError) {
-      void navigate('/game', { replace: true });
-    }
-  }, [isResumeMode, isResumeError, navigate]);
 
   const sessionFlashcards = useMemo((): FlashcardGameVM[] => {
     if (!isResumeMode || !resumeData) {
@@ -121,9 +119,7 @@ export const GameContainer = (): ReactElement => {
         navigateToSummary(summary);
       },
       onError: () => {
-        setCompleteError(
-          'No se pudo finalizar la partida. Reintenta o continúa jugando.',
-        );
+        setCompleteError(ge.completeFailed);
       },
     });
   }, [
@@ -136,6 +132,7 @@ export const GameContainer = (): ReactElement => {
     sessionFlashcards,
     showOptimisticGameUnlocks,
     userType,
+    ge.completeFailed,
   ]);
 
   useEffect(() => {
@@ -156,10 +153,10 @@ export const GameContainer = (): ReactElement => {
       void recordAttempt({ flashcardId: flashcard.id, correct })
         .then(() => session.recordAnswer(correct))
         .catch(() => {
-          setCompleteError('No se pudo registrar la respuesta. Reintenta.');
+          setCompleteError(ge.recordFailed);
         });
     },
-    [recordAttempt, session],
+    [recordAttempt, session, ge.recordFailed],
   );
 
   const handlePause = useCallback((): void => {
@@ -178,11 +175,18 @@ export const GameContainer = (): ReactElement => {
           void navigate('/game', { state: { pausedSaved: true } });
         },
         onError: () => {
-          setPauseError('No se pudo pausar la partida. Reintenta.');
+          setPauseError(ge.pauseFailed);
         },
       },
     );
-  }, [canPause, gameId, navigate, patchGame, session.currentFlashcard]);
+  }, [
+    canPause,
+    gameId,
+    navigate,
+    patchGame,
+    session.currentFlashcard,
+    ge.pauseFailed,
+  ]);
 
   const shortcutsEnabled =
     !isLoading && !!session.currentFlashcard && session.phase === 'playing';
@@ -212,6 +216,36 @@ export const GameContainer = (): ReactElement => {
     onPause: canPause ? onPauseShortcut : undefined,
   });
 
+  if (isResumeMode && isResumeError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5 py-16">
+        <p className="max-w-md text-center text-[var(--color-accent-red)]">
+          {ge.resumeFailed}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              void refetchResume();
+            }}
+            className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
+          >
+            {ge.retry}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void navigate('/game', { replace: true });
+            }}
+            className="rounded-full border border-[var(--color-border-strong)] px-6 py-3 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
+          >
+            {ge.startNewGame}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (completeError) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] px-5 py-16">
@@ -226,7 +260,7 @@ export const GameContainer = (): ReactElement => {
           }}
           className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white"
         >
-          Reintentar
+          {ge.retry}
         </button>
       </div>
     );

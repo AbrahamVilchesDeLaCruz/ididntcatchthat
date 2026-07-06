@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import {
   guestSessionAccuracy,
@@ -28,6 +29,12 @@ export const GuestStatsPanel = ({
         <p className="max-w-md text-sm text-[var(--color-text-secondary)]">
           {g.emptyBody}
         </p>
+        <Link
+          to="/game"
+          className="rounded-full bg-[var(--color-brand)] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          {g.emptyPlayCta}
+        </Link>
       </div>
     );
   }

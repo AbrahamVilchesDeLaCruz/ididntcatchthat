@@ -1,15 +1,29 @@
+import type { Locale } from '@/core/i18n/i18n.types';
 import type { RankingType } from './ranking.types';
 
-export function formatRankingScore(type: RankingType, score: number): string {
+export interface RankingScoreLabels {
+  streakSuffix: string;
+  levelPrefix: string;
+}
+
+const localeTag = (locale: Locale): string =>
+  locale === 'es' ? 'es-ES' : 'en-US';
+
+export function formatRankingScore(
+  type: RankingType,
+  score: number,
+  locale: Locale = 'en',
+  labels: RankingScoreLabels = { streakSuffix: 'd', levelPrefix: 'Lv.' },
+): string {
   switch (type) {
     case 'most_accurate':
       return `${Math.round(score * 100)}%`;
     case 'best_streak':
-      return `${Math.round(score)} d`;
+      return `${Math.round(score)} ${labels.streakSuffix}`;
     case 'module_master':
-      return `Nv. ${Math.round(score)}`;
+      return `${labels.levelPrefix} ${Math.round(score)}`;
     default:
-      return Math.round(score).toLocaleString('es-ES');
+      return Math.round(score).toLocaleString(localeTag(locale));
   }
 }
 

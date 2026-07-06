@@ -4,6 +4,7 @@ import { DailyTrendChart } from './DailyTrendChart';
 import { DistributionChart } from './DistributionChart';
 import { InsightCard, InsightCardSkeleton } from './InsightCard';
 import { useAnalyticsSummary } from '../api/observability.api';
+import { useI18n } from '@/core/i18n';
 
 const ChartCard = ({
   title,
@@ -32,6 +33,8 @@ const Skeleton = (): ReactElement => (
 );
 
 export const VisitasTab = (): ReactElement => {
+  const { locale, t } = useI18n();
+  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
   const [period, setPeriod] = useState<SummaryPeriod>('7d');
   const { data, isLoading, isError } = useAnalyticsSummary(period);
   const pv = data?.pageViews;
@@ -52,69 +55,85 @@ export const VisitasTab = (): ReactElement => {
       {isLoading && <Skeleton />}
       {isError && (
         <p className="text-sm text-[var(--color-text-secondary)] text-center py-8">
-          Error cargando estadísticas de visitas.
+          {t.backoffice.observability.visits.loadError}
         </p>
       )}
       {!isLoading && !isError && pv && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <InsightCard
-              label="Visitas totales"
-              value={pv.total.toLocaleString('es-ES')}
-              insight={`${pv.total.toLocaleString('es-ES')} páginas vistas en el período`}
+              label={t.backoffice.observability.visits.totalVisits}
+              value={pv.total.toLocaleString(numberLocale)}
+              insight={t.backoffice.observability.visits.totalVisitsInsight.replace(
+                '{count}',
+                pv.total.toLocaleString(numberLocale),
+              )}
               variant="neutral"
             />
             <InsightCard
-              label="Visitantes únicos"
-              value={pv.uniqueVisitors.toLocaleString('es-ES')}
-              insight={`${pv.uniqueVisitors} visitantes únicos (por sesión de navegador)`}
+              label={t.backoffice.observability.visits.uniqueVisitors}
+              value={pv.uniqueVisitors.toLocaleString(numberLocale)}
+              insight={t.backoffice.observability.visits.uniqueVisitorsInsight.replace(
+                '{count}',
+                pv.uniqueVisitors.toLocaleString(numberLocale),
+              )}
               variant="neutral"
             />
             <InsightCard
-              label="Conversión"
+              label={t.backoffice.observability.visits.conversion}
               value={`${pv.conversionRate.toFixed(1)}%`}
-              insight={`${pv.registeredVisitors} visitantes tienen cuenta registrada`}
+              insight={t.backoffice.observability.visits.conversionInsight.replace(
+                '{count}',
+                pv.registeredVisitors.toLocaleString(numberLocale),
+              )}
               variant={conversionVariant}
               progress={Math.min(pv.conversionRate * 5, 100)}
             />
             {pv.topPages.length > 0 && (
               <InsightCard
-                label="Página top"
+                label={t.backoffice.observability.visits.topPage}
                 value={pv.topPages[0].path}
-                insight={`${pv.topPages[0].views} visitas a la ruta más popular`}
+                insight={t.backoffice.observability.visits.topPageInsight.replace(
+                  '{count}',
+                  pv.topPages[0].views.toLocaleString(numberLocale),
+                )}
                 variant="neutral"
               />
             )}
           </div>
           {pv.byPeriod.length > 0 && (
-            <ChartCard title="Visitas por período">
+            <ChartCard title={t.backoffice.observability.visits.visitsByPeriod}>
               <DailyTrendChart
                 data={pv.byPeriod}
                 series={[
                   {
                     key: 'views',
-                    label: 'Vistas',
+                    label: t.backoffice.observability.visits.views,
                     type: 'bar',
                     color: 'var(--color-brand)',
                   },
                   {
                     key: 'unique',
-                    label: 'Únicos',
+                    label: t.backoffice.observability.visits.unique,
                     type: 'line',
-                    color: 'var(--color-accent-yellow)',
+                    color: 'var(--color-chart-3)',
                   },
                 ]}
+                ariaLabel={t.backoffice.observability.visits.visitsByPeriod}
               />
             </ChartCard>
           )}
           {pv.topPages.length > 0 && (
-            <ChartCard title="Páginas más visitadas">
+            <ChartCard
+              title={t.backoffice.observability.visits.topVisitedPages}
+            >
               <DistributionChart
                 data={pv.topPages
                   .slice(0, 8)
                   .map((p) => ({ name: p.path, value: p.views }))}
                 height={Math.max(200, pv.topPages.slice(0, 8).length * 36)}
                 horizontal
+                ariaLabel={t.backoffice.observability.visits.topVisitedPages}
               />
             </ChartCard>
           )}

@@ -165,6 +165,7 @@ const SidebarContent = ({ onNavigate }: SidebarContentProps): ReactElement => {
 
 export const AppSidebar = (): ReactElement => {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
 
   return (
     <>
@@ -172,12 +173,13 @@ export const AppSidebar = (): ReactElement => {
         <SidebarContent />
       </aside>
 
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-[max(1rem,env(safe-area-inset-top,0px))] left-[max(1rem,env(safe-area-inset-left,0px))] z-50">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
+              aria-label={t.sidebar.openMenu}
               className="bg-[var(--color-bg-surface)] border border-[var(--color-border)]"
             >
               <Menu className="h-5 w-5 text-[var(--color-text-primary)]" />
@@ -185,6 +187,7 @@ export const AppSidebar = (): ReactElement => {
           </SheetTrigger>
           <SheetContent
             side="left"
+            aria-label={t.sidebar.openMenu}
             className="w-60 bg-[var(--color-bg-surface)] border-r border-[var(--color-border)] flex flex-col px-4 py-6 p-0"
           >
             <SidebarContent onNavigate={() => setOpen(false)} />

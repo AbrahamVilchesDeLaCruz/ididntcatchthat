@@ -7,6 +7,7 @@ interface GameSummaryComponentProps {
   isGuest: boolean;
   pausedGamesCount?: number;
   onPlayAgain: () => void;
+  onChooseModule: () => void;
   onViewPaused?: () => void;
   onRegister: () => void;
   onViewStats: () => void;
@@ -32,6 +33,7 @@ export const GameSummaryComponent = ({
   isGuest,
   pausedGamesCount = 0,
   onPlayAgain,
+  onChooseModule,
   onViewPaused,
   onRegister,
   onViewStats,
@@ -126,7 +128,7 @@ export const GameSummaryComponent = ({
               {gs.ctaPlayAgain}
             </button>
             <button
-              onClick={onPlayAgain}
+              onClick={onChooseModule}
               className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
             >
               {gs.ctaChooseModule}

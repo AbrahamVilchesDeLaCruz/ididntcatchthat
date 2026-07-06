@@ -1,10 +1,15 @@
 User-agent: *
 Allow: /
 
-# Block private/app routes from indexing
-Disallow: /app/
+# Private app and session routes
+Disallow: /home
+Disallow: /profile
+Disallow: /stats
+Disallow: /ranking
 Disallow: /backoffice/
 Disallow: /auth/callback
+Disallow: /game/
+Disallow: /study/
 Disallow: /api/
 
 Sitemap: https://ididntcatchthat.com/sitemap.xml

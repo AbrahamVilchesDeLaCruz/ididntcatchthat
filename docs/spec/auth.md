@@ -471,6 +471,8 @@ Naming: `{Entity}{Verb}` en forma de agente. Método siempre `execute()`. Recibe
 | `GET`  | `/auth/google/callback` | `GoogleOAuthHandler`    | Ninguna            |
 | `POST` | `/auth/migrate-guest`   | `GuestProgressMigrator` | Bearer (user)      |
 
+> **Prefijo de versión:** la API usa prefijo global `/v1`. Las rutas OAuth de Google (`GET /auth/google`, `GET /auth/google/callback`) están **excluidas** de ese prefijo para coincidir con la redirect URI registrada en Google Console. El resto de endpoints de auth viven en `/v1/auth/*` (p. ej. `POST /v1/auth/login`). El cliente inicia OAuth con `GET /api/auth/google` (proxy → `/auth/google`).
+
 ---
 
 ## Domain Errors

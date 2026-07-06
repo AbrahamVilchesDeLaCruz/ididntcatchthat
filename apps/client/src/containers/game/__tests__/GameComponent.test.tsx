@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import { useI18n } from '@/core/i18n';
+import { en } from '@/core/i18n/en';
 import { GameComponent } from '../GameComponent';
 import type { FlashcardGameVM } from '../game.types';
 
@@ -40,6 +42,7 @@ const defaultProps = {
 
 describe('GameComponent', () => {
   beforeEach(() => {
+    useI18n.setState({ locale: 'en', t: en });
     vi.clearAllMocks();
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(playMock);
     vi.stubGlobal(
@@ -53,11 +56,11 @@ describe('GameComponent', () => {
   });
 
   it('shows a loading spinner while loading', () => {
-    const { container } = render(
-      <GameComponent {...defaultProps} isLoading flashcard={null} />,
-    );
+    render(<GameComponent {...defaultProps} isLoading flashcard={null} />);
 
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: en.common.loading }),
+    ).toBeInTheDocument();
   });
 
   it('flips the card when the front is clicked', () => {
@@ -167,7 +170,11 @@ describe('GameComponent', () => {
   it('shows pause control in the toolbar when allowed', () => {
     render(<GameComponent {...defaultProps} canPause onPause={vi.fn()} />);
 
-    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('play-toolbar-desktop')).getByRole('button', {
+        name: 'Pause',
+      }),
+    ).toBeInTheDocument();
   });
 
   it('shows IPA and a single examples audio control on the back', () => {
@@ -202,9 +209,11 @@ describe('GameComponent', () => {
       />,
     );
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
-    expect(screen.getByText('1 of 5')).toBeInTheDocument();
-    expect(screen.getByText('Space')).toBeInTheDocument();
+    const desktop = screen.getByTestId('play-toolbar-desktop');
+
+    expect(within(desktop).getByRole('progressbar')).toBeInTheDocument();
+    expect(within(desktop).getByText('1 of 5')).toBeInTheDocument();
+    expect(within(desktop).getByText('Space')).toBeInTheDocument();
   });
 
   it('keeps the back face visible during answer feedback', () => {

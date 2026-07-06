@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import { BookOpen, Flame, Gamepad2, Layers, Trophy, X } from 'lucide-react';
 import type { AchievementCategory } from '@/core/achievements/achievement.types';
+import { useI18n } from '@/core/i18n';
 import { useToastStore } from './toast.store';
 
 const categoryIcon: Record<AchievementCategory, typeof Gamepad2> = {
@@ -11,6 +12,7 @@ const categoryIcon: Record<AchievementCategory, typeof Gamepad2> = {
 };
 
 export const ToastHost = (): ReactElement | null => {
+  const { t } = useI18n();
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
 
@@ -19,7 +21,7 @@ export const ToastHost = (): ReactElement | null => {
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2"
+      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-50 flex max-w-sm flex-col gap-2"
     >
       {toasts.map((toast) => {
         const CategoryIcon = toast.category
@@ -40,7 +42,7 @@ export const ToastHost = (): ReactElement | null => {
             </p>
             <button
               type="button"
-              aria-label="Dismiss"
+              aria-label={t.common.dismiss}
               className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
               onClick={() => {
                 dismiss(toast.id);

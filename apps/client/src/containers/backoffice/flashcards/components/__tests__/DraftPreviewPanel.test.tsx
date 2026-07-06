@@ -29,6 +29,8 @@ describe('DraftPreviewPanel', () => {
   it('indica cuando no hay ejemplos', () => {
     render(<DraftPreviewPanel drafts={[{ ...draft, examples: [] }]} />);
 
-    expect(screen.getByText('Sin ejemplos generados.')).toBeInTheDocument();
+    expect(
+      screen.getByText(/No generated examples\.|Sin ejemplos generados\./),
+    ).toBeInTheDocument();
   });
 });

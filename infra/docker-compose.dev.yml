@@ -1,11 +1,13 @@
-# Dev override — local development
-# Variables injected by Doppler (config: dev) via Makefile
+# Dev override — VPS dev stack + Doppler (config: dev) via Makefile
+# Port bindings use 127.0.0.1 so Docker does not bypass UFW on 0.0.0.0.
+# RabbitMQ has no host ports here — API container uses rabbitmq:5672 on the Docker network.
+# For local hot-reload (`make dev`), add infra/docker-compose.dev-host.yml.
 services:
   api:
     container_name: ididntcatchthat-api-dev
     image: ididntcatchthat-api:dev
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -35,45 +37,42 @@ services:
     container_name: ididntcatchthat-client-dev
     image: ididntcatchthat-client:dev
     ports:
-      - "4001:8080"
+      - "127.0.0.1:4001:8080"
     environment:
       NODE_ENV: ${NODE_ENV}
 
   rabbitmq:
     container_name: ididntcatchthat-rabbitmq-dev
-    ports:
-      - "5672:5672"
-      - "15672:15672"  # management UI
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
 
-  # ─── Observability ───────────────────────────────────────────────────────────
+  # ─── Observability — localhost only; access via SSH tunnel (make tunnel-dev) ─
 
   prometheus:
     container_name: ididntcatchthat-prometheus-dev
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - prometheus_data_dev:/prometheus
 
   grafana:
     container_name: ididntcatchthat-grafana-dev
     ports:
-      - "3002:3000"
+      - "127.0.0.1:3002:3000"
     volumes:
       - grafana_data_dev:/var/lib/grafana
 
   loki:
     container_name: ididntcatchthat-loki-dev
     ports:
-      - "3100:3100"
+      - "127.0.0.1:3100:3100"
     volumes:
       - loki_data_dev:/loki
 

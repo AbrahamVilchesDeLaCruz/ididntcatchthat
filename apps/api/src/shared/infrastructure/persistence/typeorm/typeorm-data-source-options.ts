@@ -78,7 +78,7 @@ export function buildTypeOrmDataSourceOptions(options?: {
     username: dbUrl.username,
     password: dbUrl.password,
     database: dbUrl.pathname.replace('/', ''),
-    ssl: resolveDbSsl(dbUrl.hostname),
+    ssl: resolveDbSsl(dbUrl),
     entities: typeOrmEntities,
     migrations: typeOrmMigrations,
     migrationsTableName: 'migrations',

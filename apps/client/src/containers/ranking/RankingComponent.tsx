@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { Button } from '@/common/components/ui/button';
+import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 import {
   Card,
   CardContent,
@@ -47,9 +48,10 @@ export const RankingComponent = ({
   onPeriodChange,
   onModuleChange,
 }: RankingComponentProps): ReactElement => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const r = t.ranking;
+  const scoreLabels = r.scoreLabels;
 
   const isRankedInList = entries.some((entry) => entry.isMe);
   const showOutsideTopBanner =
@@ -102,9 +104,9 @@ export const RankingComponent = ({
 
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
         {isRankingsLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-brand)] border-t-transparent" />
-            <span className="ml-3 text-sm text-[var(--color-text-secondary)]">
+          <div className="flex items-center justify-center gap-3 py-20">
+            <LoadingSpinner size="lg" label={r.loading} />
+            <span className="text-sm text-[var(--color-text-secondary)]">
               {r.loading}
             </span>
           </div>
@@ -135,7 +137,8 @@ export const RankingComponent = ({
               {r.yourPosition}: #{currentUser.rank}
             </span>
             <span className="text-[var(--color-text-secondary)]">
-              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+              {formatRankingScore(type, currentUser.score, locale, scoreLabels)}{' '}
+              {r.scoreUnits[type]}
             </span>
           </CardContent>
         </Card>
@@ -148,7 +151,8 @@ export const RankingComponent = ({
               {r.yourPosition}: #{currentUser.rank}
             </span>
             <span className="text-[var(--color-text-secondary)]">
-              {formatRankingScore(type, currentUser.score)} {r.scoreUnits[type]}
+              {formatRankingScore(type, currentUser.score, locale, scoreLabels)}{' '}
+              {r.scoreUnits[type]}
             </span>
           </CardContent>
         </Card>

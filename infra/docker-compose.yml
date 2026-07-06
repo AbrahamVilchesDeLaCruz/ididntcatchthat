@@ -1,5 +1,7 @@
 # Base — shared service definitions
-# Use with an override: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Use with an override:
+#   docker compose --project-directory . -p ididntcatchthat-dev \
+#     -f infra/docker-compose.yml -f infra/docker-compose.dev.yml up
 services:
   api:
     build:
@@ -57,11 +59,11 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
       interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
     deploy:
       resources:
         limits:
@@ -71,7 +73,7 @@ services:
   # ─── Observability ───────────────────────────────────────────────────────────
 
   prometheus:
-    image: prom/prometheus:v3.4.0
+    image: prom/prometheus:v3.13.0
     container_name: ididntcatchthat-prometheus
     restart: unless-stopped
     volumes:
@@ -88,7 +90,7 @@ services:
           memory: 256M
 
   grafana:
-    image: grafana/grafana:12.0.1
+    image: grafana/grafana:12.4.5
     container_name: ididntcatchthat-grafana
     restart: unless-stopped
     volumes:
@@ -107,7 +109,7 @@ services:
           memory: 256M
 
   loki:
-    image: grafana/loki:3.5.0
+    image: grafana/loki:3.6.12
     container_name: ididntcatchthat-loki
     restart: unless-stopped
     command: -config.file=/etc/loki/local-config.yaml

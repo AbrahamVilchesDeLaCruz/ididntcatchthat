@@ -9,73 +9,111 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-
-const COLORS = [
-  'var(--color-brand)',
-  'var(--color-accent-green)',
-  'var(--color-accent-yellow)',
-  '#a78bfa',
-  '#f472b6',
-  '#34d399',
-  '#fb923c',
-  '#60a5fa',
-];
+import { useI18n } from '@/core/i18n';
+import { chartSeriesColor } from '@/common/charts/chartPalette';
 
 interface DistributionChartProps {
   data: { name: string; value: number }[];
   height?: number;
   horizontal?: boolean;
+  ariaLabel?: string;
 }
-
-const EmptyChart = ({ height }: { height: number }): ReactElement => (
-  <div
-    className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
-    style={{ height }}
-  >
-    Sin datos para este período
-  </div>
-);
 
 export const DistributionChart = ({
   data,
   height = 180,
   horizontal = false,
+  ariaLabel,
 }: DistributionChartProps): ReactElement => {
+  const { t } = useI18n();
   if (data.length === 0 || data.every((d) => d.value === 0)) {
-    return <EmptyChart height={height} />;
+    return (
+      <div
+        className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
+        style={{ height }}
+      >
+        {t.backoffice.charts.noDataInPeriod}
+      </div>
+    );
   }
 
   if (horizontal) {
     return (
-      <ResponsiveContainer
-        width="100%"
-        height={Math.max(height, data.length * 36)}
+      <div
+        role="img"
+        aria-label={ariaLabel}
+        style={{ width: '100%', height: Math.max(height, data.length * 36) }}
       >
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            layout="vertical"
+            data={data}
+            margin={{ top: 4, right: 24, left: 8, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--color-border)"
+              strokeOpacity={0.5}
+              horizontal={false}
+            />
+            <XAxis
+              type="number"
+              tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+              tickLine={false}
+              axisLine={false}
+              allowDecimals={false}
+            />
+            <YAxis
+              type="category"
+              dataKey="name"
+              tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+              tickLine={false}
+              axisLine={false}
+              width={100}
+            />
+            <Tooltip
+              contentStyle={{
+                background: 'var(--color-bg-elevated)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+                fontSize: 12,
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
+              {data.map((_, i) => (
+                <Cell key={i} fill={chartSeriesColor(i)} fillOpacity={0.85} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  return (
+    <div role="img" aria-label={ariaLabel} style={{ width: '100%', height }}>
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          layout="vertical"
           data={data}
-          margin={{ top: 4, right: 24, left: 8, bottom: 0 }}
+          margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
             stroke="var(--color-border)"
             strokeOpacity={0.5}
-            horizontal={false}
           />
           <XAxis
-            type="number"
-            tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
-            tickLine={false}
-            axisLine={false}
-            allowDecimals={false}
-          />
-          <YAxis
-            type="category"
             dataKey="name"
             tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
             tickLine={false}
             axisLine={false}
-            width={100}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
           />
           <Tooltip
             contentStyle={{
@@ -86,55 +124,13 @@ export const DistributionChart = ({
               color: 'var(--color-text-primary)',
             }}
           />
-          <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
+          <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
             {data.map((_, i) => (
-              <Cell
-                key={i}
-                fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.85}
-              />
+              <Cell key={i} fill={chartSeriesColor(i)} fillOpacity={0.85} />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    );
-  }
-
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="var(--color-border)"
-          strokeOpacity={0.5}
-        />
-        <XAxis
-          dataKey="name"
-          tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis
-          tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
-          tickLine={false}
-          axisLine={false}
-          allowDecimals={false}
-        />
-        <Tooltip
-          contentStyle={{
-            background: 'var(--color-bg-elevated)',
-            border: '1px solid var(--color-border)',
-            borderRadius: '8px',
-            fontSize: 12,
-            color: 'var(--color-text-primary)',
-          }}
-        />
-        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
-          {data.map((_, i) => (
-            <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.85} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    </div>
   );
 };

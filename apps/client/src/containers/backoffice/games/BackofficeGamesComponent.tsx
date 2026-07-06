@@ -9,6 +9,7 @@ import { PeriodSelector } from '@/containers/backoffice/observability/components
 import { DailyTrendChart } from '@/containers/backoffice/observability/components/DailyTrendChart';
 import { DistributionChart } from '@/containers/backoffice/observability/components/DistributionChart';
 import type { GamesStatsVM, GameStatsPeriod } from './backoffice-games.types';
+import { useI18n } from '@/core/i18n';
 
 interface BackofficeGamesComponentProps {
   stats: GamesStatsVM | null;
@@ -59,10 +60,12 @@ export const BackofficeGamesComponent = ({
   lastUpdatedAt,
   onRetry,
 }: BackofficeGamesComponentProps): ReactElement => {
+  const { t } = useI18n();
+
   return (
     <BackofficePageShell
-      title="Métricas de partidas"
-      subtitle="Calidad, volumen y tendencias"
+      title={t.backoffice.games.title}
+      subtitle={t.backoffice.games.subtitle}
       isError={isError}
       onRetry={onRetry}
       lastUpdatedAt={lastUpdatedAt}
@@ -80,7 +83,7 @@ export const BackofficeGamesComponent = ({
       )}
 
       {/* ── Tendencia temporal ────────────────────────────────────────────── */}
-      <ChartCard title="Tendencia de partidas">
+      <ChartCard title={t.backoffice.games.charts.trendTitle}>
         {isLoading ? (
           <ChartSkeleton />
         ) : stats && stats.byPeriod.length > 0 ? (
@@ -89,22 +92,23 @@ export const BackofficeGamesComponent = ({
             series={[
               {
                 key: 'started',
-                label: 'Iniciadas',
+                label: t.backoffice.games.charts.started,
                 type: 'bar',
                 color: 'var(--color-brand)',
               },
               {
                 key: 'completed',
-                label: 'Completadas',
+                label: t.backoffice.games.charts.completed,
                 type: 'line',
                 color: 'var(--color-accent-green)',
               },
             ]}
             height={240}
+            ariaLabel={t.backoffice.games.charts.trendTitle}
           />
         ) : (
           <p className="text-[var(--color-text-secondary)] text-sm text-center py-12">
-            Sin datos de tendencia para este período
+            {t.backoffice.games.charts.noTrendData}
           </p>
         )}
       </ChartCard>
@@ -112,34 +116,40 @@ export const BackofficeGamesComponent = ({
       {/* ── Distribución por modo + top módulos ──────────────────────────── */}
       {(stats?.byMode.length ?? 0) > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartCard title="Distribución por modo de juego">
+          <ChartCard title={t.backoffice.games.charts.modeDistributionTitle}>
             {isLoading ? (
               <ChartSkeleton height="h-44" />
             ) : (
               <DistributionChart
                 data={(stats?.byMode ?? []).map((m) => ({
-                  name: m.mode,
+                  name: t.backoffice.games.modes[m.mode] ?? m.mode,
                   value: m.count,
                 }))}
                 height={176}
+                ariaLabel={t.backoffice.games.charts.modeDistributionTitle}
               />
             )}
           </ChartCard>
 
           {(stats?.byModule.length ?? 0) > 0 && (
-            <ChartCard title="Módulos más jugados">
+            <ChartCard title={t.backoffice.games.charts.topModulesTitle}>
               {isLoading ? (
                 <ChartSkeleton height="h-44" />
               ) : (
                 <DistributionChart
-                  data={(stats?.byModule ?? [])
-                    .slice(0, 6)
-                    .map((m) => ({ name: m.module, value: m.totalGames }))}
+                  data={(stats?.byModule ?? []).slice(0, 6).map((m) => ({
+                    name:
+                      t.game.config.modules[
+                        m.module as keyof typeof t.game.config.modules
+                      ] ?? m.module,
+                    value: m.totalGames,
+                  }))}
                   height={Math.max(
                     176,
                     (stats?.byModule.slice(0, 6).length ?? 0) * 32,
                   )}
                   horizontal
+                  ariaLabel={t.backoffice.games.charts.topModulesTitle}
                 />
               )}
             </ChartCard>
@@ -149,10 +159,10 @@ export const BackofficeGamesComponent = ({
 
       {/* ── Calidad por módulo (accuracy) ────────────────────────────────── */}
       <ChartCard
-        title="Calidad por módulo"
+        title={t.backoffice.games.charts.qualityByModuleTitle}
         action={
           <span className="text-xs text-[var(--color-text-muted)]">
-            barras = cantidad · línea = precisión %
+            {t.backoffice.games.charts.qualityByModuleHint}
           </span>
         }
       >
@@ -160,7 +170,7 @@ export const BackofficeGamesComponent = ({
           <ChartSkeleton height="h-80" />
         ) : !stats?.byModule.length ? (
           <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
-            Sin datos por módulo
+            {t.backoffice.games.charts.noModuleData}
           </p>
         ) : (
           <GamesByModuleChart data={stats.byModule} />

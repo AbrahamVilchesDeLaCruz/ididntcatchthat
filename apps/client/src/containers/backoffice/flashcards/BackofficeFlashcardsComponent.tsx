@@ -11,6 +11,7 @@ import { FlashcardsToolbar } from './components/FlashcardsToolbar';
 import { BulkCreateModal } from './components/BulkCreateModal';
 import { AiGenerateModal } from './components/AiGenerateModal';
 import { FlashcardDetailModal } from './components/FlashcardDetailModal';
+import { useI18n } from '@/core/i18n';
 
 interface BackofficeFlashcardsComponentProps {
   flashcards: FlashcardVM[];
@@ -70,6 +71,7 @@ export const BackofficeFlashcardsComponent = ({
   onDraftConfirm,
   onAiDraftsClose,
 }: BackofficeFlashcardsComponentProps): ReactElement => {
+  const { t } = useI18n();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
@@ -108,7 +110,7 @@ export const BackofficeFlashcardsComponent = ({
   if (isError) {
     return (
       <div className="text-red-400 text-center py-16">
-        Error al cargar los flashcards. Intentalo de nuevo.
+        {t.backoffice.flashcards.loadError}
       </div>
     );
   }
@@ -119,10 +121,10 @@ export const BackofficeFlashcardsComponent = ({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
-            Flashcards
+            {t.backoffice.flashcards.title}
           </h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">
-            {total} flashcards en total
+            {t.backoffice.flashcards.subtitle.replace('{count}', String(total))}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -131,21 +133,21 @@ export const BackofficeFlashcardsComponent = ({
             onClick={() => setIsAiModalOpen(true)}
             className="px-4 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium rounded-lg hover:bg-[var(--color-bg-card)] transition text-sm border border-[var(--color-border)]"
           >
-            ✨ Generar con IA
+            {t.backoffice.flashcards.aiGenerate}
           </button>
           <button
             type="button"
             onClick={() => setIsBulkModalOpen(true)}
             className="px-4 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] font-medium rounded-lg hover:bg-[var(--color-bg-card)] transition text-sm border border-[var(--color-border)]"
           >
-            + Bloque
+            {t.backoffice.flashcards.bulkCreate}
           </button>
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
             className="px-4 py-2 bg-[var(--color-brand)] text-white font-semibold rounded-lg hover:opacity-90 transition text-sm"
           >
-            + Nueva flashcard
+            {t.backoffice.flashcards.newFlashcard}
           </button>
         </div>
       </div>
@@ -174,7 +176,9 @@ export const BackofficeFlashcardsComponent = ({
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
           <span>
-            Página {page} de {totalPages}
+            {t.backoffice.flashcards.pageOf
+              .replace('{page}', String(page))
+              .replace('{total}', String(totalPages))}
           </span>
           <div className="flex gap-2">
             <button
@@ -183,7 +187,7 @@ export const BackofficeFlashcardsComponent = ({
               disabled={page <= 1}
               className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
-              Anterior
+              {t.backoffice.flashcards.previous}
             </button>
             <button
               type="button"
@@ -191,7 +195,7 @@ export const BackofficeFlashcardsComponent = ({
               disabled={page >= totalPages}
               className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
-              Siguiente
+              {t.backoffice.flashcards.next}
             </button>
           </div>
         </div>
@@ -208,7 +212,7 @@ export const BackofficeFlashcardsComponent = ({
       {/* Create Modal */}
       {isCreateModalOpen && (
         <FlashcardFormModal
-          title="Nueva flashcard"
+          title={t.backoffice.flashcards.createTitle}
           catalog={catalog}
           isLoading={isMutating}
           onSubmit={handleCreateSubmit}
@@ -219,7 +223,7 @@ export const BackofficeFlashcardsComponent = ({
       {/* Edit Modal */}
       {editingFlashcard && (
         <FlashcardFormModal
-          title="Editar flashcard"
+          title={t.backoffice.flashcards.editTitle}
           catalog={catalog}
           initialValues={{
             expression: editingFlashcard.expression,
@@ -239,10 +243,10 @@ export const BackofficeFlashcardsComponent = ({
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-[var(--color-bg-surface)] rounded-xl p-6 w-full max-w-sm border border-[var(--color-border)]">
             <h3 className="text-[var(--color-text-primary)] font-semibold text-lg mb-2">
-              ¿Eliminar flashcard?
+              {t.backoffice.flashcards.deleteConfirmTitle}
             </h3>
             <p className="text-[var(--color-text-secondary)] text-sm mb-6">
-              Esta acción no se puede deshacer.
+              {t.backoffice.flashcards.deleteConfirmBody}
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -250,7 +254,7 @@ export const BackofficeFlashcardsComponent = ({
                 onClick={() => setDeletingId(null)}
                 className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
               >
-                Cancelar
+                {t.backoffice.flashcards.cancel}
               </button>
               <button
                 type="button"
@@ -258,7 +262,7 @@ export const BackofficeFlashcardsComponent = ({
                 disabled={isMutating}
                 className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 transition"
               >
-                Eliminar
+                {t.backoffice.flashcards.delete}
               </button>
             </div>
           </div>

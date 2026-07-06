@@ -154,7 +154,6 @@ Requiere acceso a Doppler y servicios externos (Aiven, R2, ElevenLabs…).
 pnpm install
 make dev          # RabbitMQ en Docker + API :3000 + Client :5173 (hot-reload)
 # o por separado:
-make dev-infra    # solo RabbitMQ (:5672)
 make dev-api      # terminal 1
 make dev-client   # terminal 2
 # o
@@ -169,19 +168,21 @@ Para clonar el repo y ejecutarlo **sin cuentas externas** (tribunal, profesor, e
 
 ```bash
 pnpm install
-make local-setup   # copia .env.local.example → .env.local
-make local-up      # Postgres + RabbitMQ + MinIO en Docker
+make local-up      # env setup + stack completo en Docker (api, client, postgres, rabbitmq, minio)
 make local-seed    # migraciones + usuario demo + flashcards
-make local-dev     # API :3000 + Client :5173
+# o con hot-reload:
+make local-dev     # env setup + infra en Docker + API :3000 + Client :5173 (host)
+make local-seed
 ```
 
-| Recurso | Valor |
-|---------|-------|
-| Frontend | http://localhost:5173 |
-| API | http://localhost:3000 |
-| Swagger | http://localhost:3000/docs |
-| MinIO console | http://localhost:9001 (`localminio` / `localminio`) |
-| Usuario demo | `demo@local.dev` / `DemoLocal123!` (admin) |
+| Recurso | Docker (`make local-up`) | Host (`make local-dev`) |
+|---------|--------------------------|--------------------------|
+| Frontend | http://localhost:4001 | http://localhost:5173 |
+| API | http://localhost:3000 | http://localhost:3000 |
+| Swagger | http://localhost:3000/docs | http://localhost:3000/docs |
+| MinIO console | http://localhost:9001 | http://localhost:9001 |
+| Credenciales MinIO | `localminio` / `localminio` | `localminio` / `localminio` |
+| Usuario demo | `demo@local.dev` / `DemoLocal123!` | `demo@local.dev` / `DemoLocal123!` |
 
 **Limitaciones en local:** Google OAuth no funciona (usar email/password o modo guest). Audio de flashcards seed usa URLs de demo públicas; nuevos audios van a MinIO (S3 local). Demo completa desplegada: [ididntcatchthat.com](https://ididntcatchthat.com).
 
@@ -189,13 +190,13 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 
 ### 🖥️ Puertos por perfil
 
-| Servicio | Perfil `local` | Perfil Doppler Docker (`make up`) | Tests E2E |
-|----------|----------------|-------------------------------------|-----------|
-| Frontend | :5173 | :4001 | — |
-| API | :3000 | :3001 | :3000 |
-| Postgres | :5434 | Aiven (remoto) | :5433 |
-| RabbitMQ | :5674 | :5672 | :5673 |
-| MinIO | :9000 / :9001 | — (R2 prod) | — |
+| Servicio | Local Docker (`make local-up`) | Local Dev (`make local-dev`) | Dev Doppler (`make up`) | Tests E2E |
+|----------|--------------------------------|-------------------------------|--------------------------|-----------|
+| Frontend | :4001 | :5173 (Vite) | :4001 | — |
+| API | :3000 | :3000 | :3001 | :3000 |
+| Postgres | :5434 | :5434 | Aiven (remoto) | :5433 |
+| RabbitMQ | :5674 | :5674 | red interna Docker (VPS); `127.0.0.1:5672` solo `make dev` local | :5673 |
+| MinIO | :9000 / :9001 | :9000 / :9001 | — (R2 prod) | — |
 
 ### ⌨️ Comandos útiles
 
@@ -205,14 +206,16 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 | `pnpm test` | Unit tests en api + client |
 | `pnpm test:e2e` | E2E tests en api + client |
 | `pnpm test:all` | Unit + E2E en api + client |
-| `make local-up` | Infra local Docker (Postgres, RabbitMQ, MinIO) |
+| `make local-up` | Stack local completo en Docker (api, client, postgres, rabbitmq, minio) |
+| `make local-dev` | Infra en Docker + API + Client en host (hot-reload, sin Doppler) |
 | `make local-seed` | Migraciones + datos demo |
-| `make local-dev` | API + Client sin Doppler |
-| `make dev-infra` | Solo RabbitMQ Docker (para `make dev` con Doppler) |
-| `make dev` | RabbitMQ + API + Client hot-reload (Doppler) |
-| `make down` | Parar todos los servicios Docker |
-| `make deploy-dev` | Deploy a VPS — entorno dev |
-| `make deploy-prod` | Deploy a VPS — entorno prod |
+| `make dev` | RabbitMQ en Docker + API + Client hot-reload (Doppler) |
+| `make up` | Stack dev completo en Docker (Doppler) |
+| `make down` | Parar stack dev |
+| `make vps-deploy-dev` | Deploy a VPS — entorno dev |
+| `make vps-deploy-prod` | Deploy a VPS — entorno prod |
+| `make security-audit` | [VPS] Auditoría de puertos, RabbitMQ y SSH |
+| `make security-verify` | [VPS] Verificación post-deploy (sin leaks externos) |
 
 ---
 
@@ -236,7 +239,7 @@ ididntcatchthat/
 │           ├── common/       ← Componentes UI reutilizables
 │           └── views/        ← Páginas que componen layout + pods
 ├── docs/                 ← 📖 Documentación, ADRs, specs y diagramas Mermaid
-├── infra/                ← 📊 Configs de Prometheus, Grafana, Loki
+├── infra/                ← 📊 Docker Compose files + configs de Prometheus, Grafana, Loki, nginx
 ├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
 ├── .github/              ← ⚙️ GitHub Actions (CI/CD)
 ├── Makefile              ← 🛠️ Comandos de desarrollo y despliegue

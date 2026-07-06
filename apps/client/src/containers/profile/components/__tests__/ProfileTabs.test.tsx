@@ -43,4 +43,55 @@ describe('ProfileTabs', () => {
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     expect(screen.getByText('Solo panel')).toBeInTheDocument();
   });
+
+  it('moves to the next tab with ArrowRight', async () => {
+    const user = userEvent.setup();
+    const onTabChange = vi.fn();
+
+    render(
+      <ProfileTabs
+        tabs={[
+          { id: 'achievements', label: 'Achievements' },
+          { id: 'ranking', label: 'Ranking' },
+          { id: 'preferences', label: 'Settings' },
+        ]}
+        activeTab="achievements"
+        onTabChange={onTabChange}
+        ariaLabel="Profile sections"
+      >
+        <div>Panel content</div>
+      </ProfileTabs>,
+    );
+
+    const achievementsTab = screen.getByRole('tab', { name: 'Achievements' });
+    achievementsTab.focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(onTabChange).toHaveBeenCalledWith('ranking');
+  });
+
+  it('moves to the previous tab with ArrowLeft', async () => {
+    const user = userEvent.setup();
+    const onTabChange = vi.fn();
+
+    render(
+      <ProfileTabs
+        tabs={[
+          { id: 'achievements', label: 'Achievements' },
+          { id: 'ranking', label: 'Ranking' },
+        ]}
+        activeTab="ranking"
+        onTabChange={onTabChange}
+        ariaLabel="Profile sections"
+      >
+        <div>Panel content</div>
+      </ProfileTabs>,
+    );
+
+    const rankingTab = screen.getByRole('tab', { name: 'Ranking' });
+    rankingTab.focus();
+    await user.keyboard('{ArrowLeft}');
+
+    expect(onTabChange).toHaveBeenCalledWith('achievements');
+  });
 });
