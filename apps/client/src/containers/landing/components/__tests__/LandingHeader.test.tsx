@@ -40,6 +40,9 @@ describe('LandingHeader', () => {
       screen.getAllByRole('link', { name: en.landing.header.start }),
     ).toHaveLength(2);
     expect(
+      screen.getByRole('link', { name: en.landing.hero.navLogin }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('link', { name: en.landing.hero.navRegister }),
     ).toBeInTheDocument();
   });

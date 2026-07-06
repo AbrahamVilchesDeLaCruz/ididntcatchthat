@@ -101,7 +101,7 @@ export const StudyComponent = ({
   );
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col bg-[var(--color-bg-base)]">
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--color-bg-base)]">
       <div className="study-shell-glow" aria-hidden />
 
       <GamePlayToolbar
@@ -115,14 +115,14 @@ export const StudyComponent = ({
         onPause={onPause}
       />
 
-      <div className="relative flex flex-1 items-center justify-center px-4 py-6 md:px-8 md:py-10">
+      <div className="relative flex min-h-0 flex-1 items-stretch px-4 py-2 max-md:py-3 md:items-center md:justify-center md:px-8 md:py-10">
         <div
           key={flashcard.id}
-          className="study-card-stage flex w-full max-w-3xl flex-col"
+          className="study-card-stage flex min-h-0 w-full max-w-3xl flex-1 flex-col"
         >
           <div
             ref={cardRef}
-            className="flashcard-play-wrapper study-card-wrapper h-[min(520px,65vh)] min-h-[360px] w-full cursor-pointer sm:min-h-[420px] md:h-[min(560px,72vh)] md:min-h-[480px]"
+            className="flashcard-play-wrapper study-card-wrapper flex min-h-0 w-full max-w-full flex-1 cursor-pointer max-md:min-h-[240px] sm:min-h-[420px] md:h-[min(560px,72vh)] md:min-h-[480px] md:flex-none"
             style={{ perspective: '1400px' }}
             onClick={onFlip}
           >

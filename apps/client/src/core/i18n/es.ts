@@ -229,6 +229,7 @@ export const es: Translations = {
       sessionTimerLabel: 'Tiempo de sesión',
       touchSwipeIncorrect: 'No lo sabía — desliza ←',
       touchSwipeCorrect: 'Lo sabía — desliza →',
+      controlsHelpAriaLabel: 'Mostrar ayuda de controles',
     },
     summary: {
       title: '¡Partida terminada!',

@@ -108,7 +108,7 @@ export const GameComponent = ({
         : '';
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col bg-[var(--color-bg-base)]">
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--color-bg-base)]">
       <div className="game-glow" aria-hidden />
 
       <GamePlayToolbar
@@ -121,16 +121,16 @@ export const GameComponent = ({
         onPause={onPause}
       />
 
-      <div className="relative flex flex-1 items-center justify-center px-4 py-6 md:px-8 md:py-10">
+      <div className="relative flex min-h-0 flex-1 items-stretch px-4 py-2 max-md:py-3 md:items-center md:justify-center md:px-8 md:py-10">
         <div
           className={[
-            'game-card-stage flex w-full max-w-3xl flex-col',
+            'game-card-stage flex min-h-0 w-full max-w-3xl flex-1 flex-col',
             feedbackClass,
           ].join(' ')}
         >
           <div
             ref={cardRef}
-            className="flashcard-play-wrapper game-card-wrapper h-[min(520px,65vh)] min-h-[360px] w-full cursor-pointer sm:min-h-[420px] md:h-[min(560px,72vh)] md:min-h-[480px]"
+            className="flashcard-play-wrapper game-card-wrapper flex min-h-0 w-full max-w-full flex-1 cursor-pointer max-md:min-h-[240px] sm:min-h-[420px] md:h-[min(560px,72vh)] md:min-h-[480px] md:flex-none"
             style={{ perspective: '1400px' }}
             onClick={() => {
               if (feedback === null) onFlip();

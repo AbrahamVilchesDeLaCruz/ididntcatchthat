@@ -89,4 +89,22 @@ describe('GameShell', () => {
       'shrink-0',
     );
   });
+
+  it('shows a floating back button on active mobile play routes', () => {
+    render(
+      <MemoryRouter initialEntries={['/game/test-id']}>
+        <Routes>
+          <Route element={<GameShell />}>
+            <Route path="/game/:gameId" element={<div>Active game</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId('mobile-floating-back')).toHaveAttribute(
+      'aria-label',
+      en.gameShell.back,
+    );
+    expect(screen.getByText('Active game')).toBeInTheDocument();
+  });
 });

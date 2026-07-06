@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import { useI18n } from '@/core/i18n';
+import { en } from '@/core/i18n/en';
 import { GamePlayToolbar } from '../GamePlayToolbar';
 import { usePrefersFinePointer } from '../../hooks/usePrefersFinePointer';
 
@@ -11,11 +13,12 @@ const mockedUsePrefersFinePointer = vi.mocked(usePrefersFinePointer);
 
 describe('GamePlayToolbar', () => {
   beforeEach(() => {
+    useI18n.setState({ locale: 'en', t: en });
     vi.clearAllMocks();
     mockedUsePrefersFinePointer.mockReturnValue(true);
   });
 
-  it('renders keyboard shortcuts on fine pointer devices', () => {
+  it('renders keyboard shortcuts on fine pointer devices in desktop toolbar', () => {
     render(
       <GamePlayToolbar
         currentIndex={0}
@@ -26,11 +29,17 @@ describe('GamePlayToolbar', () => {
       />,
     );
 
-    expect(screen.getByText('Flip card')).toBeInTheDocument();
-    expect(screen.queryByText('Tap to reveal')).not.toBeInTheDocument();
+    const desktop = screen.getByTestId('play-toolbar-desktop');
+
+    expect(within(desktop).getByText('Flip card')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('play-toolbar-mobile')).queryByText(
+        'Flip card',
+      ),
+    ).not.toBeInTheDocument();
   });
 
-  it('renders touch shortcuts on coarse pointer devices', () => {
+  it('shows touch hints in mobile help popover on coarse pointer devices', () => {
     mockedUsePrefersFinePointer.mockReturnValue(false);
 
     render(
@@ -43,9 +52,20 @@ describe('GamePlayToolbar', () => {
       />,
     );
 
-    expect(screen.getByText('Tap to reveal')).toBeInTheDocument();
-    expect(screen.getByText("Didn't know — swipe left")).toBeInTheDocument();
-    expect(screen.queryByText('Flip card')).not.toBeInTheDocument();
+    const mobile = screen.getByTestId('play-toolbar-mobile');
+
+    expect(within(mobile).queryByText('Tap to reveal')).not.toBeInTheDocument();
+
+    fireEvent.click(
+      within(mobile).getByRole('button', {
+        name: en.game.play.controlsHelpAriaLabel,
+      }),
+    );
+
+    expect(within(mobile).getByText('Tap to reveal')).toBeInTheDocument();
+    expect(
+      within(mobile).getByText("Didn't know — swipe left"),
+    ).toBeInTheDocument();
   });
 
   it('renders progress segments and pause control when allowed', () => {
@@ -62,18 +82,27 @@ describe('GamePlayToolbar', () => {
       />,
     );
 
-    expect(screen.getByRole('progressbar')).toHaveAttribute(
-      'aria-valuenow',
-      '3',
-    );
-    expect(screen.getByText('Pause game')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('play-toolbar-desktop')).getByRole(
+        'progressbar',
+      ),
+    ).toHaveAttribute('aria-valuenow', '3');
+    expect(
+      within(screen.getByTestId('play-toolbar-desktop')).getByRole('button', {
+        name: 'Pause',
+      }),
+    ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Pause' }));
+    fireEvent.click(
+      within(screen.getByTestId('play-toolbar-desktop')).getByRole('button', {
+        name: 'Pause',
+      }),
+    );
 
     expect(onPause).toHaveBeenCalledTimes(1);
   });
 
-  it('renders study shortcuts and viewed progress when variant is study', () => {
+  it('renders study shortcuts in desktop toolbar when variant is study', () => {
     render(
       <GamePlayToolbar
         variant="study"
@@ -87,12 +116,14 @@ describe('GamePlayToolbar', () => {
       />,
     );
 
-    expect(screen.getByText(/Review · 3 of 10/)).toBeInTheDocument();
-    expect(screen.getByText('Next card')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toHaveAttribute(
+    const desktop = screen.getByTestId('play-toolbar-desktop');
+
+    expect(within(desktop).getByText(/Review · 3 of 10/)).toBeInTheDocument();
+    expect(within(desktop).getByText('Next card')).toBeInTheDocument();
+    expect(within(desktop).getByRole('progressbar')).toHaveAttribute(
       'aria-valuenow',
       '3',
     );
-    expect(screen.queryByText('Mark correct')).not.toBeInTheDocument();
+    expect(within(desktop).queryByText('Mark correct')).not.toBeInTheDocument();
   });
 });

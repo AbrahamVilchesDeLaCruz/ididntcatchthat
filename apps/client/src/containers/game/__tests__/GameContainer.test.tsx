@@ -225,7 +225,7 @@ describe('GameContainer', () => {
       state: { flashcardIds: ['fc-1'] },
     });
 
-    await user.click(screen.getByRole('button', { name: 'Pause' }));
+    await user.click(screen.getAllByRole('button', { name: 'Pause' })[0]);
 
     expect(screen.getByText(en.game.errors.pauseFailed)).toBeInTheDocument();
   });
