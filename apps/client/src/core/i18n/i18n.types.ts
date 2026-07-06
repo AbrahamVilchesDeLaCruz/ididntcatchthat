@@ -192,6 +192,7 @@ export interface GameTranslations {
     sessionTimerLabel: string;
     touchSwipeIncorrect: string;
     touchSwipeCorrect: string;
+    controlsHelpAriaLabel: string;
   };
   summary: {
     title: string;

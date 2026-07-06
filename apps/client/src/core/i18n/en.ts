@@ -227,6 +227,7 @@ export const en: Translations = {
       sessionTimerLabel: 'Session time',
       touchSwipeIncorrect: "Didn't know — swipe left",
       touchSwipeCorrect: 'Knew it — swipe right',
+      controlsHelpAriaLabel: 'Show controls help',
     },
     summary: {
       title: 'Game over!',
