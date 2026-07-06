@@ -23,7 +23,7 @@ export const LandingHeader = (): ReactElement => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const authLinkClass =
-    'rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]';
+    'inline-flex shrink-0 rounded-full border border-[var(--color-border-strong)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3';
 
   return (
     <header className="safe-top fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)]/70 bg-[var(--color-bg-base)]/90 backdrop-blur-md">
@@ -77,22 +77,19 @@ export const LandingHeader = (): ReactElement => {
           </div>
         </nav>
 
-        <div className="flex shrink-0 items-center justify-end gap-2 md:col-start-3">
+        <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 md:col-start-3">
           {isAuthenticated ? (
             <Link to={DEFAULT_AUTHENTICATED_HOME} className={authLinkClass}>
               {t.home.navApp}
             </Link>
           ) : (
             <>
-              <Link
-                to="/auth/login"
-                className={`${authLinkClass} hidden sm:inline-flex`}
-              >
+              <Link to="/auth/login" className={authLinkClass}>
                 {h.navLogin}
               </Link>
               <Link
                 to="/auth/register"
-                className="rounded-full bg-[var(--color-brand)] px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:px-4 sm:text-sm"
+                className="inline-flex shrink-0 rounded-full bg-[var(--color-brand)] px-2.5 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:px-4 sm:text-sm"
               >
                 {h.navRegister}
               </Link>
