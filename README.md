@@ -439,6 +439,48 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 
 ---
 
+## 🎓 Entrega TFM
+
+Material de evaluación del Trabajo de Fin de Máster (MoureDev).
+
+| Recurso | Enlace |
+|---------|--------|
+| Repositorio | [github.com/AbrahamVilchesDeLaCruz/ididntcatchthat](https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat) |
+| Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
+| Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
+| Presentación (slides) | [docs/presentation/tfm-slides.html](./docs/presentation/tfm-slides.html) — navegación con ← → y `F` pantalla completa |
+| Vídeo explicativo | _Pendiente — URL aquí_ |
+
+### Acceso a la aplicación
+
+#### Producción — explorar el producto desplegado
+
+En [ididntcatchthat.com](https://ididntcatchthat.com) puedes probar el flujo completo de usuario **sin registro** con el **modo invitado** (botón en la landing): juego, estudio, progreso, ranking y logros.
+
+> Las credenciales de cuenta con rol administrador en producción **no se publican en este repositorio** para evitar uso indebido del backoffice (creación de flashcards dispara APIs de pago: DeepSeek y ElevenLabs). Se facilitan **solo en el formulario de entrega del TFM** al tribunal.
+
+#### Local — evaluación completa sin cuentas externas
+
+Para revisar **backoffice, panel de administración y arquitectura end-to-end** sin coste de APIs ni Doppler:
+
+```bash
+pnpm install
+make local-up
+make local-seed
+```
+
+| Recurso | URL / credenciales |
+|---------|-------------------|
+| Frontend | http://localhost:4001 |
+| API + Swagger | http://localhost:3000 · http://localhost:3000/docs |
+| Email | `demo@local.dev` |
+| Contraseña | `DemoLocal123!` |
+| Rol | `admin` (acceso completo a backoffice y métricas) |
+
+Guía extendida → [docs/local-development.md](./docs/local-development.md)
+
+---
+
 ## 📚 Documentación adicional
 
 | | Recurso | Descripción |

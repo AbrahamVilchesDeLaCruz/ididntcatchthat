@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ididntcatchthat.com — Presentación TFM</title>
+  <link rel="icon" href="../../apps/client/public/favicon.svg" type="image/svg+xml">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #120f1a;
+      --surface: #1d1828;
+      --text: #f5f3f9;
+      --muted: #a89fbc;
+      --border: #2c273a;
+      --signal: #f2a93b;
+      --link: #4fc2b8;
+      --static: #ff6b53;
+      --accent: #863bff;
+      --font-display: 'Instrument Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slides {
+      display: flex;
+      height: 100%;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      padding: clamp(48px, 8vw, 96px) clamp(32px, 6vw, 88px) clamp(96px, 10vw, 120px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      right: -180px;
+      top: -180px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--signal);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--signal);
+    }
+
+    h1, h2 {
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      max-width: 920px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    h1 .accent, h2 .accent { color: var(--signal); }
+
+    .subtitle, .lead {
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .lead { color: var(--text); margin-top: 8px; }
+
+    ul {
+      list-style: none;
+      margin-top: 24px;
+      display: grid;
+      gap: 14px;
+      max-width: 860px;
+    }
+
+    li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+      line-height: 1.5;
+    }
+
+    li::before {
+      content: '→';
+      color: var(--link);
+      font-family: var(--font-mono);
+      flex: none;
+      margin-top: 1px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+      max-width: 980px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+
+    .card h3 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      color: var(--signal);
+    }
+
+    .card p {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--link);
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+    }
+
+    .pill strong { color: var(--text); }
+
+    .diagram {
+      margin-top: 28px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 920px;
+      white-space: pre-wrap;
+    }
+
+    .diagram em { color: var(--link); font-style: normal; }
+
+    .footer-note {
+      position: absolute;
+      left: clamp(32px, 6vw, 88px);
+      bottom: 72px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .chrome {
+      position: fixed;
+      inset: auto 0 0 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(20px, 4vw, 40px);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .progress {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--link));
+      width: 0;
+      transition: width 0.35s ease;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--link); color: var(--link); }
+
+    .counter {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 64px;
+      text-align: center;
+    }
+
+    .title-slide .wordmark {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .title-slide .domain {
+      font-family: var(--font-mono);
+      color: var(--link);
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 720px) {
+      .slide { padding-bottom: 120px; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slides { transition: none; }
+      .progress > span { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <div class="slides" id="slides">
+
+      <section class="slide title-slide">
+        <p class="eyebrow">Trabajo de Fin de Máster · MoureDev</p>
+        <p class="wordmark">ididnt<span class="accent">catch</span>that</p>
+        <p class="domain">ididntcatchthat.com</p>
+        <h1>Aprende a entender y sonar como un <span class="accent">nativo</span></h1>
+        <p class="subtitle">Plataforma gamificada de inglés centrada en fonética real, connected speech y expresiones coloquiales.</p>
+        <div class="stats">
+          <span class="pill"><strong>Abraham Vilches de la Cruz</strong></span>
+          <span class="pill">TFM 2026</span>
+          <span class="pill">Fullstack · DDD · IA</span>
+        </div>
+        <p class="footer-note">← → para navegar · F pantalla completa</p>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">01 · Problema</p>
+        <h2>Ese momento en el que un nativo habla y <span class="accent">no entiendes nada</span></h2>
+        <ul>
+          <li>Las apps mainstream enseñan vocabulario y gramática, no cómo suena el inglés real.</li>
+          <li>Connected speech, reducciones y expresiones coloquiales quedan fuera del aula.</li>
+          <li>Para hispanohablantes, fonemas como /θ/, schwa o flap T son un muro invisible.</li>
+        </ul>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">02 · Propuesta</p>
+        <h2>Tres ejes que las apps <span class="accent">no cubren</span></h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Fonética real</h3>
+            <p>23 fonemas con foco en los problemáticos para hispanohablantes.</p>
+          </div>
+          <div class="card">
+            <h3>Connected speech</h3>
+            <p>Linking, reduction, flap T… cómo cambian los sonidos al hablar.</p>
+          </div>
+          <div class="card">
+            <h3>Expresiones nativas</h3>
+            <p>Vocabulario coloquial que realmente usan en conversación.</p>
+          </div>
+          <div class="card">
+            <h3>Audio ×3 acentos</h3>
+            <p>Cada expresión en 🇺🇸 🇬🇧 🇦🇺 con síntesis de voz profesional.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">03 · Producto</p>
+        <h2>Demo desplegada en <span class="accent">producción</span></h2>
+        <ul>
+          <li><span class="mono">ididntcatchthat.com</span> — entorno real del TFM.</li>
+          <li>Modo invitado sin registro: juego, estudio, progreso, ranking y logros.</li>
+          <li>Modo juego (evaluación Anki) y modo estudio sobre el mismo contenido.</li>
+          <li>Bonus de pronunciación con Azure Speech en tiempo real.</li>
+        </ul>
+        <div class="stats">
+          <span class="pill">Guest-first</span>
+          <span class="pill">OAuth Google</span>
+          <span class="pill">JWT + refresh httpOnly</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">04 · Gamificación</p>
+        <h2>Jugar, medir y <span class="accent">mantener el hábito</span></h2>
+        <div class="grid-2">
+          <div class="card"><h3>Partidas</h3><p>10 / 20 / 50 flashcards por sesión.</p></div>
+          <div class="card"><h3>Streaks</h3><p>Rachas diarias y ranking global.</p></div>
+          <div class="card"><h3>Logros</h3><p>Insignias por hitos de aprendizaje.</p></div>
+          <div class="card"><h3>Stats</h3><p>Accuracy, módulos débiles, drill-down.</p></div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">05 · Contenido</p>
+        <h2>Cuatro módulos <span class="accent">curados</span></h2>
+        <ul>
+          <li><strong>Native Sounds</strong> — fonemas y discriminación auditiva.</li>
+          <li><strong>Connecting Words</strong> — linking, reduction, informal forms.</li>
+          <li><strong>Beautifying Sentences</strong> — conectores y fluidez.</li>
+          <li><strong>Sounding Native</strong> — expresiones coloquiales reales.</li>
+        </ul>
+        <p class="lead" style="margin-top: 24px;">Pipeline offline: DeepSeek (ejemplos + IPA) → ElevenLabs (×3 voces) → CDN.</p>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">06 · Arquitectura</p>
+        <h2>Monorepo <span class="accent">TypeScript end-to-end</span></h2>
+        <div class="diagram">apps/
+├── <em>api/</em>     NestJS · Clean Architecture · DDD · TypeORM
+├── <em>client/</em>  React 19 · Vite · TanStack Query · Zustand · Pods
+├── <em>docs/</em>    ADRs · specs · diagramas Mermaid
+├── <em>infra/</em>   Docker · nginx · Prometheus · Grafana · Loki
+└── <em>skills/</em>  Instrucciones para agentes IA (Cursor)</div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">07 · Backend</p>
+        <h2>Bounded contexts con <span class="accent">Screaming Architecture</span></h2>
+        <div class="grid-2">
+          <div class="card"><h3>content</h3><p>Flashcards, módulos, pipeline de audio.</p></div>
+          <div class="card"><h3>gaming</h3><p>Partidas, intentos, mecánica de juego.</p></div>
+          <div class="card"><h3>identity</h3><p>Auth JWT, OAuth, guest, sesiones.</p></div>
+          <div class="card"><h3>progress</h3><p>Stats, streaks, mastery, ranking input.</p></div>
+        </div>
+        <p class="lead" style="margin-top: 22px;">Capas por agregado: domain → application → infrastructure.</p>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">08 · Frontend</p>
+        <h2>Pods con patrón <span class="accent">Container / Presentational</span></h2>
+        <ul>
+          <li>Container: datos (TanStack Query), handlers, routing interno.</li>
+          <li>Component: UI pura, sin fetch ni lógica de negocio.</li>
+          <li>ViewModels desacoplados de la API cruda (mapper + Zod).</li>
+          <li>i18n ES/EN, accesibilidad y SEO en landing.</li>
+        </ul>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">09 · Event-driven</p>
+        <h2>Domain events entre <span class="accent">bounded contexts</span></h2>
+        <div class="diagram"><em>GameCompleted</em>  → progress recalcula mastery
+<em>ModuleMasteryLevelIncreased</em> → ranking + achievements
+<em>GuestProgressMigrated</em> → importa progreso al registrarse
+
+Transporte: RabbitMQ · retry · DLQ · idempotencia (inbox)</div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">10 · Decisiones</p>
+        <h2>ADRs: decisiones <span class="accent">razonadas</span></h2>
+        <ul>
+          <li><strong>VPS propio</strong> (ADR-006) — control infra, demo TFM, CI/CD real.</li>
+          <li><strong>Doppler</strong> (ADR-017) — secrets fuera del repo, rotación sin redeploy.</li>
+          <li><strong>Guest-first auth</strong> (ADR-018) — fricción cero antes del registro.</li>
+          <li><strong>Contenido curado</strong> (ADR-011) — IA en backoffice, no en partida.</li>
+        </ul>
+        <p class="footer-note">28 ADRs en docs/adr/</p>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">11 · Stack</p>
+        <h2>Tecnologías <span class="accent">principales</span></h2>
+        <div class="grid-2">
+          <div class="card"><h3>Frontend</h3><p>React 19 · Vite · Tailwind · TanStack Query · Zustand · Vitest · Playwright</p></div>
+          <div class="card"><h3>Backend</h3><p>NestJS · TypeORM · PostgreSQL · Class Validator · Jest · Swagger</p></div>
+          <div class="card"><h3>Infra</h3><p>Docker · nginx · GitHub Actions · Doppler · Cloudflare CDN</p></div>
+          <div class="card"><h3>Observabilidad</h3><p>OpenTelemetry · Prometheus · Grafana · Loki · pino</p></div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">12 · Despliegue</p>
+        <h2>CI/CD a <span class="accent">VPS</span></h2>
+        <ul>
+          <li>Entornos: local · dev · prod con estrategia documentada.</li>
+          <li>GitHub Actions: lint, tests, build, deploy automatizado.</li>
+          <li>nginx + HTTPS · hardening de puertos Docker (ADR-030).</li>
+          <li>Perfil local sin Doppler para evaluación offline del tribunal.</li>
+        </ul>
+        <div class="stats">
+          <span class="pill">prod → ididntcatchthat.com</span>
+          <span class="pill">dev → dev.ididntcatchthat.com</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">13 · Observabilidad</p>
+        <h2>Métricas técnicas y de <span class="accent">negocio</span></h2>
+        <ul>
+          <li>Latencia, errores HTTP y consumo AMQP en Prometheus.</li>
+          <li>Dashboards Grafana: retención, accuracy, actividad de juego.</li>
+          <li>Logs centralizados con Loki; trazas con OpenTelemetry.</li>
+          <li>Backoffice con resumen de métricas para administración.</li>
+        </ul>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">14 · IA en el producto</p>
+        <h2>APIs de pago solo en <span class="accent">backoffice</span></h2>
+        <div class="grid-2">
+          <div class="card"><h3>DeepSeek</h3><p>Ejemplos bilingües + notas fonéticas (IPA, native speech).</p></div>
+          <div class="card"><h3>ElevenLabs</h3><p>Síntesis offline ×3 acentos → CDN.</p></div>
+          <div class="card"><h3>Azure Speech</h3><p>Evaluación de pronunciación en tiempo real.</p></div>
+          <div class="card"><h3>Diseño</h3><p>Contenido curado; la partida no genera tokens dinámicamente.</p></div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">15 · IA en el desarrollo</p>
+        <h2>Cursor + skills + <span class="accent">TDD</span></h2>
+        <ul>
+          <li>Agentes IA con skills del repo (`skills/`, `AGENTS.md`).</li>
+          <li>Workflow Red → Green → Refactor obligatorio para features nuevas.</li>
+          <li>Claude y Copilot para scaffolding, tests y documentación.</li>
+          <li>Reflexión honesta: la IA acelera, pero las decisiones son humanas (ADRs).</li>
+        </ul>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">16 · Testing</p>
+        <h2>Pirámide completa · <span class="accent">661 tests</span></h2>
+        <div class="diagram">        ▲
+       / E2E \     Playwright — auth, juego, navegación
+      /───────\
+     /  Integ  \   Repos, módulos NestJS, MSW
+    /───────────\
+   /    Unit     \ Dominio, use cases, hooks, componentes
+  /───────────────\</div>
+        <div class="stats">
+          <span class="pill"><strong>367</strong> API (Jest)</span>
+          <span class="pill"><strong>294</strong> client (Vitest + RTL)</span>
+          <span class="pill">Coverage client ≥ 80%</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="eyebrow">17 · Limitaciones</p>
+        <h2>Deuda conocida y <span class="accent">trade-offs</span></h2>
+        <ul>
+          <li>Notification BC planificado pero no implementado (toasts vía cliente).</li>
+          <li>Rol Premium reservado en modelo, sin producto de pago aún.</li>
+          <li>Credenciales admin en prod no públicas (coste APIs DeepSeek/ElevenLabs).</li>
+          <li>Monolito modular deliberado — microservicios descartados para el TFM.</li>
+        </ul>
+      </section>
+
+      <section class="slide title-slide">
+        <p class="eyebrow">18 · Cierre</p>
+        <h1>Software real, <span class="accent">bien construido</span> y bien razonado</h1>
+        <p class="subtitle">Repositorio, demo desplegada, documentación y evaluación local sin cuentas externas.</p>
+        <ul>
+          <li><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></li>
+          <li><span class="mono">ididntcatchthat.com</span></li>
+          <li><span class="mono">make local-up && make local-seed</span> → admin demo offline</li>
+        </ul>
+        <p class="footer-note">Gracias · ¿Preguntas?</p>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="chrome">
+    <button type="button" id="prev" aria-label="Anterior">← Anterior</button>
+    <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+    <span class="counter" id="counter">1 / 18</span>
+    <div class="nav">
+      <button type="button" id="next" aria-label="Siguiente">Siguiente →</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const slides = document.getElementById('slides');
+      const bar = document.getElementById('bar');
+      const counter = document.getElementById('counter');
+      const total = slides.children.length;
+      let index = 0;
+
+      function render() {
+        slides.style.transform = 'translateX(-' + (index * 100) + 'vw)';
+        bar.style.width = (((index + 1) / total) * 100) + '%';
+        counter.textContent = (index + 1) + ' / ' + total;
+        history.replaceState(null, '', '#slide-' + (index + 1));
+      }
+
+      function go(delta) {
+        index = Math.max(0, Math.min(total - 1, index + delta));
+        render();
+      }
+
+      document.getElementById('prev').addEventListener('click', function () { go(-1); });
+      document.getElementById('next').addEventListener('click', function () { go(1); });
+
+      window.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          go(1);
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          go(-1);
+        }
+        if (event.key === 'Home') { index = 0; render(); }
+        if (event.key === 'End') { index = total - 1; render(); }
+        if (event.key === 'f' || event.key === 'F') {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen?.();
+          } else {
+            document.exitFullscreen?.();
+          }
+        }
+      });
+
+      var hash = location.hash.match(/^#slide-(\d+)$/);
+      if (hash) {
+        index = Math.max(0, Math.min(total - 1, parseInt(hash[1], 10) - 1));
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>
