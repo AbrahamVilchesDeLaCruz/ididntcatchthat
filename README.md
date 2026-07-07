@@ -448,8 +448,23 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 | Repositorio | [github.com/AbrahamVilchesDeLaCruz/ididntcatchthat](https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat) |
 | Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
 | Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
-| Presentación (slides) | [docs/presentation/tfm-slides.html](./docs/presentation/tfm-slides.html) — navegación con ← → y `F` pantalla completa |
+| Presentación (slides) | **[Abrir presentación TFM](./docs/presentation/tfm-slides.html)** (15 slides · HTML · dark mode) |
 | Vídeo explicativo | _Pendiente — URL aquí_ |
+
+### Presentación TFM
+
+Presentación web interactiva (15 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
+
+**[→ Abrir presentación](./docs/presentation/tfm-slides.html)**
+
+Tras clonar el repositorio, también puedes abrirla en el navegador:
+
+```bash
+open docs/presentation/tfm-slides.html   # macOS
+# xdg-open docs/presentation/tfm-slides.html   # Linux
+```
+
+Controles: `←` `→` o `Espacio` para avanzar · `F` pantalla completa · `1`–`9` saltar a slide · `#slide-N` en la URL.
 
 ### Acceso a la aplicación
 
