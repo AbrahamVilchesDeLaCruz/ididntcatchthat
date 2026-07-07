@@ -448,14 +448,20 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 | Repositorio | [github.com/AbrahamVilchesDeLaCruz/ididntcatchthat](https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat) |
 | Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
 | Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
-| Presentación (slides) | **[Abrir presentación TFM](./docs/presentation/tfm-slides.html)** (15 slides · HTML · dark mode) |
+| Presentación (slides) | [Preview online](https://htmlpreview.github.io/?https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/blob/dev/docs/presentation/tfm-slides.html) · [código fuente](./docs/presentation/tfm-slides.html) |
 | Vídeo explicativo | _Pendiente — URL aquí_ |
 
 ### Presentación TFM
 
 Presentación web interactiva (15 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
 
-**[→ Abrir presentación](./docs/presentation/tfm-slides.html)**
+> **GitHub no ejecuta HTML del repo** — al abrir el archivo en GitHub solo verás el código fuente. Usa uno de estos enlaces para la **preview interactiva**:
+
+| Modo | Enlace |
+|------|--------|
+| **Preview online** (recomendado) | [htmlpreview.github.io → presentación TFM](https://htmlpreview.github.io/?https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/blob/dev/docs/presentation/tfm-slides.html) |
+| **Alternativa** | [raw.githack.com → presentación TFM](https://raw.githack.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/docs/presentation/tfm-slides.html) |
+| **Código fuente** | [docs/presentation/tfm-slides.html](./docs/presentation/tfm-slides.html) |
 
 Tras clonar el repositorio, también puedes abrirla en el navegador:
 
