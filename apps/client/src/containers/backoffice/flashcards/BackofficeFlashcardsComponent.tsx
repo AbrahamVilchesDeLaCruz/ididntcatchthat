@@ -22,6 +22,7 @@ interface BackofficeFlashcardsComponentProps {
   isLoading: boolean;
   isError: boolean;
   isMutating: boolean;
+  isRegeneratingAudio: boolean;
   isGeneratingAi: boolean;
   aiDrafts: FlashcardDraftApiModel[] | null;
   categoryFilter: string | undefined;
@@ -33,7 +34,14 @@ interface BackofficeFlashcardsComponentProps {
   onAudioStatusFilter: (audioStatus: string | undefined) => void;
   onCreate: (values: FlashcardFormValues) => void;
   onUpdate: (id: string, values: Partial<FlashcardFormValues>) => void;
-  onDelete: (id: string) => void;
+  onDelete: (
+    id: string,
+    callbacks?: { onSuccess?: () => void; onError?: () => void },
+  ) => void;
+  onRegenerateAudio: (
+    id: string,
+    callbacks?: { onSuccess?: () => void },
+  ) => void;
   onBulkCreate: (flashcards: CreateFlashcardApiPayload[]) => void;
   onAiGenerate: (params: {
     category: string;
@@ -54,6 +62,7 @@ export const BackofficeFlashcardsComponent = ({
   isLoading,
   isError,
   isMutating,
+  isRegeneratingAudio,
   isGeneratingAi,
   aiDrafts,
   categoryFilter,
@@ -66,6 +75,7 @@ export const BackofficeFlashcardsComponent = ({
   onCreate,
   onUpdate,
   onDelete,
+  onRegenerateAudio,
   onBulkCreate,
   onAiGenerate,
   onDraftConfirm,
@@ -98,8 +108,9 @@ export const BackofficeFlashcardsComponent = ({
 
   const handleDeleteConfirm = (): void => {
     if (!deletingId) return;
-    onDelete(deletingId);
-    setDeletingId(null);
+    onDelete(deletingId, {
+      onSuccess: () => setDeletingId(null),
+    });
   };
 
   const handleBulkSubmit = (flashcards: CreateFlashcardApiPayload[]): void => {
@@ -205,6 +216,15 @@ export const BackofficeFlashcardsComponent = ({
       {viewingFlashcard && (
         <FlashcardDetailModal
           flashcard={viewingFlashcard}
+          isRegenerating={isRegeneratingAudio}
+          onRegenerateAudio={() =>
+            onRegenerateAudio(viewingFlashcard.id, {
+              onSuccess: () =>
+                setViewingFlashcard((current) =>
+                  current ? { ...current, audioStatus: 'generating' } : null,
+                ),
+            })
+          }
           onClose={() => setViewingFlashcard(null)}
         />
       )}

@@ -829,6 +829,7 @@ export interface BackofficeTranslations {
     editTitle: string;
     deleteConfirmTitle: string;
     deleteConfirmBody: string;
+    deleteError: string;
     cancel: string;
     delete: string;
     toolbar: {
@@ -881,6 +882,8 @@ export interface BackofficeTranslations {
       pendingAudio: string;
       generatingAudio: string;
       failedAudio: string;
+      retryAudio: string;
+      retryAudioAriaLabel: string;
       american: string;
       british: string;
       australian: string;

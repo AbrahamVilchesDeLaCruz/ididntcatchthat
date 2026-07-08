@@ -7,14 +7,19 @@ import {
   useFlashcardCatalog,
   useFlashcards,
   useUpdateFlashcard,
+  useRegenerateFlashcardAudio,
 } from './api';
 import type { FlashcardFormValues } from './flashcards.types';
 import type { CreateFlashcardApiPayload } from './api/flashcards.api-model';
 import { useFlashcardAiGeneration } from './hooks';
 import { BackofficeFlashcardsComponent } from './BackofficeFlashcardsComponent';
+import { useI18n } from '@/core/i18n';
+import { useToastStore } from '@/core/notifications/toast.store';
 
 export const BackofficeFlashcardsContainer = (): ReactElement => {
   const { canManageFlashcards } = useCurrentUser();
+  const { t } = useI18n();
+  const pushToast = useToastStore((s) => s.push);
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string | undefined>(
     undefined,
@@ -45,6 +50,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     useUpdateFlashcard();
   const { mutate: deleteFlashcard, isPending: isDeleting } =
     useDeleteFlashcard();
+  const { mutate: regenerateFlashcardAudio, isPending: isRegeneratingAudio } =
+    useRegenerateFlashcardAudio();
   const { mutate: bulkCreateFlashcards, isPending: isBulkCreating } =
     useBulkCreateFlashcards();
 
@@ -70,12 +77,37 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     updateFlashcard({ id, data: values });
   };
 
-  const handleDelete = (id: string): void => {
-    deleteFlashcard(id);
+  const handleDelete = (
+    id: string,
+    callbacks?: { onSuccess?: () => void; onError?: () => void },
+  ): void => {
+    deleteFlashcard(id, {
+      onSuccess: () => {
+        callbacks?.onSuccess?.();
+      },
+      onError: () => {
+        pushToast({ message: t.backoffice.flashcards.deleteError });
+        callbacks?.onError?.();
+      },
+    });
   };
 
   const handleBulkCreate = (flashcards: CreateFlashcardApiPayload[]): void => {
     bulkCreateFlashcards({ flashcards });
+  };
+
+  const handleRegenerateAudio = (
+    id: string,
+    callbacks?: { onSuccess?: () => void },
+  ): void => {
+    regenerateFlashcardAudio(id, {
+      onSuccess: () => {
+        callbacks?.onSuccess?.();
+      },
+      onError: () => {
+        pushToast({ message: t.backoffice.flashcards.detail.failedAudio });
+      },
+    });
   };
 
   return (
@@ -88,6 +120,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       isLoading={isLoading}
       isError={isError}
       isMutating={isCreating || isUpdating || isDeleting || isBulkCreating}
+      isRegeneratingAudio={isRegeneratingAudio}
       isGeneratingAi={aiState.isGenerating}
       aiDrafts={aiState.drafts}
       categoryFilter={categoryFilter}
@@ -100,6 +133,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       onCreate={handleCreate}
       onUpdate={handleUpdate}
       onDelete={handleDelete}
+      onRegenerateAudio={handleRegenerateAudio}
       onBulkCreate={handleBulkCreate}
       onAiGenerate={aiHandlers.generate}
       onDraftConfirm={aiHandlers.confirm}

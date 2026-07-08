@@ -910,7 +910,9 @@ export const en: Translations = {
       createTitle: 'New flashcard',
       editTitle: 'Edit flashcard',
       deleteConfirmTitle: 'Delete flashcard?',
-      deleteConfirmBody: 'This action cannot be undone.',
+      deleteConfirmBody:
+        'It will be hidden from the backoffice and new games. Existing games and stats are preserved.',
+      deleteError: 'Could not delete the flashcard. Please try again.',
       cancel: 'Cancel',
       delete: 'Delete',
       toolbar: {
@@ -967,6 +969,8 @@ export const en: Translations = {
         pendingAudio: 'Audio pending generation.',
         generatingAudio: 'Generating audio...',
         failedAudio: 'Error generating audio.',
+        retryAudio: 'Retry generation',
+        retryAudioAriaLabel: 'Retry audio generation',
         american: 'American',
         british: 'British',
         australian: 'Australian',

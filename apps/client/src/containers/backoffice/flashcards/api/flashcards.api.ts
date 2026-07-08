@@ -119,6 +119,24 @@ export const useDeleteFlashcard = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useRegenerateFlashcardAudio = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string): Promise<void> =>
+      apiClient
+        .post<void>(`/flashcards/${id}/regenerate-audio`)
+        .then((res) => res.data),
+    onSuccess: (_, id) => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
+      void queryClient.invalidateQueries({
+        queryKey: flashcardKeys.detail(id),
+      });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useBulkCreateFlashcards = () => {
   const queryClient = useQueryClient();
 

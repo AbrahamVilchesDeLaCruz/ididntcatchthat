@@ -921,7 +921,9 @@ export const es: Translations = {
       createTitle: 'Nueva flashcard',
       editTitle: 'Editar flashcard',
       deleteConfirmTitle: '¿Eliminar flashcard?',
-      deleteConfirmBody: 'Esta acción no se puede deshacer.',
+      deleteConfirmBody:
+        'Se ocultará del backoffice y de nuevas partidas. Las partidas y estadísticas existentes se conservan.',
+      deleteError: 'No se pudo eliminar la flashcard. Inténtalo de nuevo.',
       cancel: 'Cancelar',
       delete: 'Eliminar',
       toolbar: {
@@ -978,6 +980,8 @@ export const es: Translations = {
         pendingAudio: 'Audio pendiente de generar.',
         generatingAudio: 'Generando audio...',
         failedAudio: 'Error al generar el audio.',
+        retryAudio: 'Reintentar generación',
+        retryAudioAriaLabel: 'Reintentar generación de audio',
         american: 'American',
         british: 'British',
         australian: 'Australian',
