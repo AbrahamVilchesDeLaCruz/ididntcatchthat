@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ApiEnvelope } from '@/core/api/api-envelope';
 import { apiClient } from '@/core/api/apiClient';
+import { ApiRequestError } from '@/core/api/apiError';
 import { useFlashcardCatalog as useFlashcardCatalogCore } from '@/core/api/flashcard-catalog.api';
 import { mapFlashcard, mapFlashcardsPage } from '../flashcards.mapper';
 import type { FlashcardsPageVM } from '../flashcards.types';
@@ -14,6 +15,8 @@ import type {
   UpdateFlashcardApiPayload,
   GenerateFlashcardsApiPayload,
   GenerateFlashcardsApiResult,
+  RegenerateFlashcardAudioBulkApiPayload,
+  RegenerateFlashcardAudioBulkApiResult,
 } from './flashcards.api-model';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
@@ -24,6 +27,18 @@ export const flashcardKeys = {
     [...flashcardKeys.lists(), params] as const,
   detail: (id: string) => [...flashcardKeys.all, 'detail', id] as const,
   catalog: () => [...flashcardKeys.all, 'catalog'] as const,
+};
+
+const FLASHCARDS_POLL_INTERVAL_MS = 8_000;
+
+const shouldRetryFlashcardsQuery = (
+  failureCount: number,
+  error: Error,
+): boolean => {
+  if (error instanceof ApiRequestError && error.status === 429) {
+    return false;
+  }
+  return failureCount < 1;
 };
 
 export { useFlashcardCatalogCore as useFlashcardCatalog };
@@ -42,13 +57,14 @@ export const useFlashcards = (
         .then((res) => res.data),
     select: mapFlashcardsPage,
     enabled: options?.enabled ?? true,
+    retry: shouldRetryFlashcardsQuery,
+    refetchIntervalInBackground: false,
     refetchInterval: (query) => {
-      // query.state.data es la respuesta cruda (pre-select), no FlashcardsPageVM
       const raw = query.state.data;
-      const hasPending = raw?.data?.some(
+      const needsPolling = raw?.data?.some(
         (f) => f.audioStatus === 'pending' || f.audioStatus === 'generating',
       );
-      return hasPending ? 3000 : false;
+      return needsPolling ? FLASHCARDS_POLL_INTERVAL_MS : false;
     },
   });
 };
@@ -125,13 +141,32 @@ export const useRegenerateFlashcardAudio = () => {
   return useMutation({
     mutationFn: (id: string): Promise<void> =>
       apiClient
-        .post<void>(`/flashcards/${id}/regenerate-audio`)
+        .post<void>(`/flashcards/${id}/audio/regenerates`)
         .then((res) => res.data),
     onSuccess: (_, id) => {
       void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
       void queryClient.invalidateQueries({
         queryKey: flashcardKeys.detail(id),
       });
+    },
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useRegenerateFlashcardAudioBulk = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      payload: RegenerateFlashcardAudioBulkApiPayload,
+    ): Promise<RegenerateFlashcardAudioBulkApiResult> =>
+      apiClient
+        .post<
+          ApiEnvelope<RegenerateFlashcardAudioBulkApiResult>
+        >('/flashcards/audio/regenerates', payload)
+        .then((res) => res.data.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: flashcardKeys.lists() });
     },
   });
 };

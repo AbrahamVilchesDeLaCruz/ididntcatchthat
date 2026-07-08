@@ -901,6 +901,10 @@ export const en: Translations = {
       title: 'Flashcards',
       subtitle: '{count} total flashcards',
       loadError: 'Error loading flashcards. Please try again.',
+      rateLimitError: 'Too many requests. Wait a few seconds and try again.',
+      audioAlreadyReadyError: 'Audio is already ready. Refreshing the list…',
+      bulkRegenerateSuccess: 'Audio generation started for {count} flashcards.',
+      bulkRegenerateEmpty: 'No flashcards to regenerate for this filter.',
       aiGenerate: '✨ Generate with AI',
       bulkCreate: '+ Bulk',
       newFlashcard: '+ New flashcard',
@@ -924,6 +928,12 @@ export const en: Translations = {
         filterByAudioStatus: 'Filter by audio status',
         allAudioStatuses: 'All statuses',
         clearFilters: 'Clear filters',
+        regenerateAllPending: 'Generate pending audio ({count})',
+        regenerateAllFailed: 'Retry failed ({count})',
+        regenerateAllPendingAriaLabel:
+          'Generate audio for all pending flashcards in the current filter',
+        regenerateAllFailedAriaLabel:
+          'Retry audio for all failed flashcards in the current filter',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',
@@ -967,6 +977,8 @@ export const en: Translations = {
         closeAriaLabel: 'Close',
         pronunciation: 'Pronunciation',
         pendingAudio: 'Audio pending generation.',
+        generateAudio: 'Generate audio',
+        generateAudioAriaLabel: 'Generate flashcard audio',
         generatingAudio: 'Generating audio...',
         failedAudio: 'Error generating audio.',
         retryAudio: 'Retry generation',

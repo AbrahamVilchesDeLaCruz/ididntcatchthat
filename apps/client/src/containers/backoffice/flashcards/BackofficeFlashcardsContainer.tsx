@@ -1,4 +1,5 @@
 import { type ReactElement, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import {
   useBulkCreateFlashcards,
@@ -8,18 +9,22 @@ import {
   useFlashcards,
   useUpdateFlashcard,
   useRegenerateFlashcardAudio,
+  useRegenerateFlashcardAudioBulk,
+  flashcardKeys,
 } from './api';
 import type { FlashcardFormValues } from './flashcards.types';
 import type { CreateFlashcardApiPayload } from './api/flashcards.api-model';
 import { useFlashcardAiGeneration } from './hooks';
 import { BackofficeFlashcardsComponent } from './BackofficeFlashcardsComponent';
 import { useI18n } from '@/core/i18n';
+import { isApiRequestError } from '@/core/api/apiError';
 import { useToastStore } from '@/core/notifications/toast.store';
 
 export const BackofficeFlashcardsContainer = (): ReactElement => {
   const { canManageFlashcards } = useCurrentUser();
   const { t } = useI18n();
   const pushToast = useToastStore((s) => s.push);
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string | undefined>(
     undefined,
@@ -31,7 +36,22 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     string | undefined
   >(undefined);
 
-  const { data, isLoading, isError } = useFlashcards(
+  const handleCategoryFilter = (category: string | undefined): void => {
+    setCategoryFilter(category);
+    setPage(1);
+  };
+
+  const handleSubcategoryFilter = (subcategory: string | undefined): void => {
+    setSubcategoryFilter(subcategory);
+    setPage(1);
+  };
+
+  const handleAudioStatusFilter = (audioStatus: string | undefined): void => {
+    setAudioStatusFilter(audioStatus);
+    setPage(1);
+  };
+
+  const { data, isLoading, isLoadingError } = useFlashcards(
     {
       page,
       pageSize: 10,
@@ -52,6 +72,10 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     useDeleteFlashcard();
   const { mutate: regenerateFlashcardAudio, isPending: isRegeneratingAudio } =
     useRegenerateFlashcardAudio();
+  const {
+    mutate: regenerateFlashcardAudioBulk,
+    isPending: isBulkRegeneratingAudio,
+  } = useRegenerateFlashcardAudioBulk();
   const { mutate: bulkCreateFlashcards, isPending: isBulkCreating } =
     useBulkCreateFlashcards();
 
@@ -104,10 +128,62 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       onSuccess: () => {
         callbacks?.onSuccess?.();
       },
-      onError: () => {
+      onError: (error) => {
+        if (isApiRequestError(error) && error.status === 429) {
+          pushToast({ message: t.backoffice.flashcards.rateLimitError });
+          return;
+        }
+        if (
+          isApiRequestError(error) &&
+          error.status === 422 &&
+          error.errorType === 'AudioStatusInvalid'
+        ) {
+          void queryClient.invalidateQueries({
+            queryKey: flashcardKeys.lists(),
+          });
+          pushToast({
+            message: t.backoffice.flashcards.audioAlreadyReadyError,
+          });
+          return;
+        }
         pushToast({ message: t.backoffice.flashcards.detail.failedAudio });
       },
     });
+  };
+
+  const handleBulkRegenerateAudio = (): void => {
+    if (audioStatusFilter !== 'pending' && audioStatusFilter !== 'failed') {
+      return;
+    }
+
+    regenerateFlashcardAudioBulk(
+      {
+        audioStatus: audioStatusFilter,
+        category: categoryFilter,
+        subcategory: subcategoryFilter,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.triggered === 0) {
+            pushToast({ message: t.backoffice.flashcards.bulkRegenerateEmpty });
+            return;
+          }
+          pushToast({
+            message: t.backoffice.flashcards.bulkRegenerateSuccess.replace(
+              '{count}',
+              String(result.triggered),
+            ),
+          });
+        },
+        onError: (error) => {
+          if (isApiRequestError(error) && error.status === 429) {
+            pushToast({ message: t.backoffice.flashcards.rateLimitError });
+            return;
+          }
+          pushToast({ message: t.backoffice.flashcards.detail.failedAudio });
+        },
+      },
+    );
   };
 
   return (
@@ -118,22 +194,24 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       page={page}
       pageSize={data?.pageSize ?? 20}
       isLoading={isLoading}
-      isError={isError}
+      isError={isLoadingError}
       isMutating={isCreating || isUpdating || isDeleting || isBulkCreating}
       isRegeneratingAudio={isRegeneratingAudio}
+      isBulkRegeneratingAudio={isBulkRegeneratingAudio}
       isGeneratingAi={aiState.isGenerating}
       aiDrafts={aiState.drafts}
       categoryFilter={categoryFilter}
       subcategoryFilter={subcategoryFilter}
       audioStatusFilter={audioStatusFilter}
       onPageChange={setPage}
-      onCategoryFilter={setCategoryFilter}
-      onSubcategoryFilter={setSubcategoryFilter}
-      onAudioStatusFilter={setAudioStatusFilter}
+      onCategoryFilter={handleCategoryFilter}
+      onSubcategoryFilter={handleSubcategoryFilter}
+      onAudioStatusFilter={handleAudioStatusFilter}
       onCreate={handleCreate}
       onUpdate={handleUpdate}
       onDelete={handleDelete}
       onRegenerateAudio={handleRegenerateAudio}
+      onBulkRegenerateAudio={handleBulkRegenerateAudio}
       onBulkCreate={handleBulkCreate}
       onAiGenerate={aiHandlers.generate}
       onDraftConfirm={aiHandlers.confirm}

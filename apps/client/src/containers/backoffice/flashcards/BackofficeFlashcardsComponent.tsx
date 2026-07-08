@@ -23,6 +23,7 @@ interface BackofficeFlashcardsComponentProps {
   isError: boolean;
   isMutating: boolean;
   isRegeneratingAudio: boolean;
+  isBulkRegeneratingAudio: boolean;
   isGeneratingAi: boolean;
   aiDrafts: FlashcardDraftApiModel[] | null;
   categoryFilter: string | undefined;
@@ -42,6 +43,7 @@ interface BackofficeFlashcardsComponentProps {
     id: string,
     callbacks?: { onSuccess?: () => void },
   ) => void;
+  onBulkRegenerateAudio: () => void;
   onBulkCreate: (flashcards: CreateFlashcardApiPayload[]) => void;
   onAiGenerate: (params: {
     category: string;
@@ -63,6 +65,7 @@ export const BackofficeFlashcardsComponent = ({
   isError,
   isMutating,
   isRegeneratingAudio,
+  isBulkRegeneratingAudio,
   isGeneratingAi,
   aiDrafts,
   categoryFilter,
@@ -76,6 +79,7 @@ export const BackofficeFlashcardsComponent = ({
   onUpdate,
   onDelete,
   onRegenerateAudio,
+  onBulkRegenerateAudio,
   onBulkCreate,
   onAiGenerate,
   onDraftConfirm,
@@ -169,9 +173,12 @@ export const BackofficeFlashcardsComponent = ({
         categoryFilter={categoryFilter}
         subcategoryFilter={subcategoryFilter}
         audioStatusFilter={audioStatusFilter}
+        matchingTotal={total}
+        isBulkRegenerating={isBulkRegeneratingAudio}
         onCategoryFilter={onCategoryFilter}
         onSubcategoryFilter={onSubcategoryFilter}
         onAudioStatusFilter={onAudioStatusFilter}
+        onBulkRegenerateAudio={onBulkRegenerateAudio}
       />
 
       {/* Table */}
@@ -215,16 +222,22 @@ export const BackofficeFlashcardsComponent = ({
       {/* Detail Modal */}
       {viewingFlashcard && (
         <FlashcardDetailModal
-          flashcard={viewingFlashcard}
+          flashcard={
+            flashcards.find((f) => f.id === viewingFlashcard.id) ??
+            viewingFlashcard
+          }
           isRegenerating={isRegeneratingAudio}
-          onRegenerateAudio={() =>
-            onRegenerateAudio(viewingFlashcard.id, {
+          onRegenerateAudio={() => {
+            const flashcardId = viewingFlashcard.id;
+            onRegenerateAudio(flashcardId, {
               onSuccess: () =>
                 setViewingFlashcard((current) =>
-                  current ? { ...current, audioStatus: 'generating' } : null,
+                  current?.id === flashcardId
+                    ? { ...current, audioStatus: 'generating' }
+                    : current,
                 ),
-            })
-          }
+            });
+          }}
           onClose={() => setViewingFlashcard(null)}
         />
       )}

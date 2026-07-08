@@ -75,6 +75,18 @@ export interface SearchFlashcardsParams {
   pageSize?: number;
 }
 
+export type BulkRegeneratableAudioStatus = 'pending' | 'failed';
+
+export interface RegenerateFlashcardAudioBulkApiPayload {
+  audioStatus: BulkRegeneratableAudioStatus;
+  category?: string;
+  subcategory?: string;
+}
+
+export interface RegenerateFlashcardAudioBulkApiResult {
+  triggered: number;
+}
+
 export interface FlashcardDraftExampleApiModel {
   textEn: string;
   textEs: string;
