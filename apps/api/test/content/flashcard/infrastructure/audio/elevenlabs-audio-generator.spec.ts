@@ -24,6 +24,10 @@ describe('content/flashcard/infrastructure/audio ElevenLabsAudioGenerator', () =
     });
 
     const generator = new ElevenLabsAudioGenerator({
+      get: (key: string) => {
+        if (key === 'ELEVENLABS_MAX_CONCURRENT') return 3;
+        return undefined;
+      },
       getOrThrow: (key: string) => {
         if (key === 'ELEVEN_LABS_API_KEY') return 'test-key';
         return 'voice-id';
