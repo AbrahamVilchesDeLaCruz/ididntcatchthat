@@ -1,4 +1,5 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 const BULK_REGENERATABLE_AUDIO_STATUSES = ['pending', 'failed'] as const;
 
@@ -13,4 +14,15 @@ export class RegenerateFlashcardAudioBulkPostPayload {
   @IsOptional()
   @IsString()
   subcategory?: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page!: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  pageSize!: number;
 }

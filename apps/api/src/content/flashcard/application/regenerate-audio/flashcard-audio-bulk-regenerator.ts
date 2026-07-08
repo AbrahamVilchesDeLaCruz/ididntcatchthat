@@ -54,7 +54,13 @@ export class FlashcardAudioBulkRegenerator {
       });
     }
 
-    const flashcards = await this.repository.match(new Criteria(filters));
+    const criteria = new Criteria(
+      filters,
+      null,
+      request.pageSize,
+      (request.page - 1) * request.pageSize,
+    );
+    const flashcards = await this.repository.match(criteria);
 
     let triggered = 0;
     for (const flashcard of flashcards) {
@@ -67,6 +73,8 @@ export class FlashcardAudioBulkRegenerator {
       audioStatus: request.audioStatus,
       category: request.category ?? null,
       subcategory: request.subcategory ?? null,
+      page: request.page,
+      pageSize: request.pageSize,
       matched: flashcards.length,
       triggered,
     });

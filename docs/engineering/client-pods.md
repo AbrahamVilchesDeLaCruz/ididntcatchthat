@@ -127,7 +127,7 @@ interface RegisterFormValues {
 | `PATCH`  | `/flashcards/:id` | `useUpdateFlashcard` | Al confirmar el modal de edición             |
 | `DELETE` | `/flashcards/:id` | `useDeleteFlashcard` | Al confirmar el diálogo de eliminación (soft delete) |
 | `POST`   | `/flashcards/:id/audio/regenerates` | `useRegenerateFlashcardAudio` | Detalle: generar/reintentar audio (`pending`, `generating`, `failed`) |
-| `POST`   | `/flashcards/audio/regenerates` | `useRegenerateFlashcardAudioBulk` | Toolbar: bulk cuando filtro `pending` o `failed` |
+| `POST`   | `/flashcards/audio/regenerates` | `useRegenerateFlashcardAudioBulk` | Toolbar: bulk de la **página actual** cuando filtro `pending` o `failed` |
 
 ### Query Keys
 

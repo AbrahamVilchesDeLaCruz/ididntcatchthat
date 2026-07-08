@@ -8,7 +8,7 @@ graph TB
   Admin(["👤 Admin"])
 
   UC1["Generar o reintentar audio de una flashcard"]
-  UC2["Generar o reintentar audio en bulk (filtro pending/failed)"]
+  UC2["Generar o reintentar audio en bulk (página actual, filtro pending/failed)"]
 
   Admin --> UC1
   Admin --> UC2
@@ -63,7 +63,7 @@ Retry o arranque manual del pipeline para **una** flashcard.
 
 ## POST /v1/flashcards/audio/regenerates
 
-Encola generación de audio para **todas** las flashcards que coincidan con el filtro (todas las páginas, no solo la visible).
+Encola generación de audio para **una página** de flashcards que coincidan con el filtro (misma paginación que `GET /flashcards`).
 
 ### Body
 
@@ -71,7 +71,9 @@ Encola generación de audio para **todas** las flashcards que coincidan con el f
 {
   "audioStatus": "pending",
   "category": "connected_speech",
-  "subcategory": "informal_going_to"
+  "subcategory": "informal_going_to",
+  "page": 1,
+  "pageSize": 10
 }
 ```
 
@@ -80,6 +82,8 @@ Encola generación de audio para **todas** las flashcards que coincidan con el f
 | `audioStatus` | Sí | `pending` \| `failed` |
 | `category` | No | Mismo filtro que `GET /flashcards` |
 | `subcategory` | No | Mismo filtro que `GET /flashcards` |
+| `page` | Sí | ≥ 1, misma página que la tabla |
+| `pageSize` | Sí | 1–100, mismo tamaño que la tabla |
 
 ### Respuesta
 
@@ -95,8 +99,9 @@ Encola generación de audio para **todas** las flashcards que coincidan con el f
 ### UI backoffice
 
 - Botón visible al filtrar por **Pendiente** o **Fallido**
-- Etiqueta incluye `total_items` del filtro activo
+- Etiqueta incluye el número de filas **de la página actual** (máx. 10)
 - Respeta categoría/subcategoría si están seleccionadas
+- Para el resto de páginas, cambia de página y vuelve a pulsar (evita saturar ElevenLabs)
 
 ---
 

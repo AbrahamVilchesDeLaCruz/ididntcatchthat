@@ -43,7 +43,7 @@ export class RegenerateFlashcardAudioBulkPostController {
   @ApiOperation({
     summary: 'Bulk start flashcard audio generation',
     description:
-      'Starts async audio generation for all non-deleted flashcards matching audioStatus (pending or failed) and optional category filters. Requires admin JWT.',
+      'Starts async audio generation for one page of non-deleted flashcards matching audioStatus (pending or failed) and optional category filters. Requires admin JWT.',
   })
   @ApiOkResponse({ description: 'Number of flashcards queued for generation' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
@@ -60,6 +60,8 @@ export class RegenerateFlashcardAudioBulkPostController {
       audioStatus: body.audioStatus,
       category: body.category,
       subcategory: body.subcategory,
+      page: body.page,
+      pageSize: body.pageSize,
     });
 
     return ApiResponse.of(data, resolveRequestId(req));

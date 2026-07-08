@@ -24,7 +24,19 @@ TypeORM registrando un `UPDATE` que pone `audio_status = 'generating'`. A veces 
 
 ElevenLabs rechazó la API key. El pipeline funciona; el problema es **credencial o cuenta**, no la lógica de la app.
 
-Causas habituales:
+### `ElevenLabs error: 429 Too Many Requests` (concurrent requests)
+
+ElevenLabs limita **peticiones en paralelo** según plan (Starter suele ser **3**). Cada flashcard hace **4** llamadas TTS (US/UK/AU + ejemplos). Si disparas muchas flashcards a la vez, superas el límite aunque vayas página a página.
+
+La API limita concurrencia global con `ELEVENLABS_MAX_CONCURRENT` (default **3**). En Doppler puedes bajarlo a `2` si sigue fallando, o subirlo al cambiar de plan.
+
+| Acción | Qué hacer |
+|--------|-----------|
+| Regenerar en backoffice | Usar **reintentar en esta página** y esperar a que pasen a `ready`/`failed` antes de la siguiente página |
+| Ajustar concurrencia | `ELEVENLABS_MAX_CONCURRENT=2` (o `3`) en Doppler + reiniciar API |
+| Plan ElevenLabs | Upgrade si necesitas más paralelismo |
+
+Causas habituales (401):
 
 | Causa | Qué hacer |
 |-------|-----------|
@@ -79,7 +91,7 @@ Desde backoffice (`/backoffice/flashcards`):
 
 1. Filtrar por **Pendiente** o **Fallido** (opcional: categoría/subcategoría)
 2. **Una flashcard:** detalle → **Generar audio** / **Reintentar** → `POST /v1/flashcards/:id/audio/regenerates` (**204**)
-3. **Todas las del filtro:** botón en toolbar → `POST /v1/flashcards/audio/regenerates` (**200**, `{ triggered }`)
+3. **Página actual:** botón en toolbar → `POST /v1/flashcards/audio/regenerates` con `page` + `pageSize` (**200**, `{ triggered }`)
 4. La tabla hace polling cada 8 s mientras haya `pending` o `generating`
 
 `pending` suele indicar que el pipeline async no arrancó (flashcards antiguas o RabbitMQ caído al crear).

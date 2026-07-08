@@ -35,6 +35,8 @@ describe('content/flashcard/application/regenerate-audio FlashcardAudioBulkRegen
 
     const result = await bulkRegenerator.execute({
       audioStatus: 'pending',
+      page: 1,
+      pageSize: 20,
     });
 
     expect(result.triggered).toBe(1);
@@ -51,10 +53,14 @@ describe('content/flashcard/application/regenerate-audio FlashcardAudioBulkRegen
       audioStatus: 'failed',
       category: 'connected_speech',
       subcategory: 'informal_going_to',
+      page: 2,
+      pageSize: 10,
     });
 
     expect(repository.match).toHaveBeenCalledWith(
       expect.objectContaining({
+        limit: 10,
+        offset: 10,
         filters: expect.arrayContaining([
           expect.objectContaining({
             field: 'audioStatus',
@@ -76,7 +82,11 @@ describe('content/flashcard/application/regenerate-audio FlashcardAudioBulkRegen
   it('should return zero when no flashcards match', async () => {
     repository.match.mockResolvedValue([]);
 
-    const result = await bulkRegenerator.execute({ audioStatus: 'failed' });
+    const result = await bulkRegenerator.execute({
+      audioStatus: 'failed',
+      page: 1,
+      pageSize: 20,
+    });
 
     expect(result.triggered).toBe(0);
     expect(generator.execute).not.toHaveBeenCalled();

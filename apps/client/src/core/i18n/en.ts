@@ -928,12 +928,12 @@ export const en: Translations = {
         filterByAudioStatus: 'Filter by audio status',
         allAudioStatuses: 'All statuses',
         clearFilters: 'Clear filters',
-        regenerateAllPending: 'Generate pending audio ({count})',
-        regenerateAllFailed: 'Retry failed ({count})',
-        regenerateAllPendingAriaLabel:
-          'Generate audio for all pending flashcards in the current filter',
-        regenerateAllFailedAriaLabel:
-          'Retry audio for all failed flashcards in the current filter',
+        regeneratePagePending: 'Generate pending audio on this page ({count})',
+        regeneratePageFailed: 'Retry failed on this page ({count})',
+        regeneratePagePendingAriaLabel:
+          'Generate audio for pending flashcards on the current page',
+        regeneratePageFailedAriaLabel:
+          'Retry audio for failed flashcards on the current page',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',

@@ -81,6 +81,8 @@ export interface RegenerateFlashcardAudioBulkApiPayload {
   audioStatus: BulkRegeneratableAudioStatus;
   category?: string;
   subcategory?: string;
+  page: number;
+  pageSize: number;
 }
 
 export interface RegenerateFlashcardAudioBulkApiResult {

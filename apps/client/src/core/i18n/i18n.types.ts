@@ -845,10 +845,10 @@ export interface BackofficeTranslations {
       filterByAudioStatus: string;
       allAudioStatuses: string;
       clearFilters: string;
-      regenerateAllPending: string;
-      regenerateAllFailed: string;
-      regenerateAllPendingAriaLabel: string;
-      regenerateAllFailedAriaLabel: string;
+      regeneratePagePending: string;
+      regeneratePageFailed: string;
+      regeneratePagePendingAriaLabel: string;
+      regeneratePageFailedAriaLabel: string;
       audioStatuses: Record<
         'pending' | 'generating' | 'ready' | 'failed',
         string

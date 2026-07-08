@@ -941,12 +941,13 @@ export const es: Translations = {
         filterByAudioStatus: 'Filtrar por estado de audio',
         allAudioStatuses: 'Todos los estados',
         clearFilters: 'Limpiar filtros',
-        regenerateAllPending: 'Generar audio pendientes ({count})',
-        regenerateAllFailed: 'Reintentar fallidos ({count})',
-        regenerateAllPendingAriaLabel:
-          'Generar audio para todas las flashcards pendientes del filtro',
-        regenerateAllFailedAriaLabel:
-          'Reintentar audio para todas las flashcards fallidas del filtro',
+        regeneratePagePending:
+          'Generar audio pendientes en esta página ({count})',
+        regeneratePageFailed: 'Reintentar fallidos en esta página ({count})',
+        regeneratePagePendingAriaLabel:
+          'Generar audio para las flashcards pendientes de la página actual',
+        regeneratePageFailedAriaLabel:
+          'Reintentar audio para las flashcards fallidas de la página actual',
         audioStatuses: {
           pending: 'Pendiente',
           generating: 'Generando',

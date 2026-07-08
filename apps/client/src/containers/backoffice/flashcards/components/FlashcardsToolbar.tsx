@@ -12,7 +12,7 @@ interface FlashcardsToolbarProps {
   categoryFilter: string | undefined;
   subcategoryFilter: string | undefined;
   audioStatusFilter: string | undefined;
-  matchingTotal: number;
+  pageItemCount: number;
   isBulkRegenerating: boolean;
   onCategoryFilter: (category: string | undefined) => void;
   onSubcategoryFilter: (subcategory: string | undefined) => void;
@@ -25,7 +25,7 @@ export const FlashcardsToolbar = ({
   categoryFilter,
   subcategoryFilter,
   audioStatusFilter,
-  matchingTotal,
+  pageItemCount,
   isBulkRegenerating,
   onCategoryFilter,
   onSubcategoryFilter,
@@ -61,19 +61,19 @@ export const FlashcardsToolbar = ({
 
   const bulkRegenerateLabel =
     audioStatusFilter === 'pending'
-      ? t.backoffice.flashcards.toolbar.regenerateAllPending.replace(
+      ? t.backoffice.flashcards.toolbar.regeneratePagePending.replace(
           '{count}',
-          String(matchingTotal),
+          String(pageItemCount),
         )
-      : t.backoffice.flashcards.toolbar.regenerateAllFailed.replace(
+      : t.backoffice.flashcards.toolbar.regeneratePageFailed.replace(
           '{count}',
-          String(matchingTotal),
+          String(pageItemCount),
         );
 
   const bulkRegenerateAriaLabel =
     audioStatusFilter === 'pending'
-      ? t.backoffice.flashcards.toolbar.regenerateAllPendingAriaLabel
-      : t.backoffice.flashcards.toolbar.regenerateAllFailedAriaLabel;
+      ? t.backoffice.flashcards.toolbar.regeneratePagePendingAriaLabel
+      : t.backoffice.flashcards.toolbar.regeneratePageFailedAriaLabel;
 
   return (
     <div className="flex flex-wrap items-center gap-4">
@@ -160,7 +160,7 @@ export const FlashcardsToolbar = ({
         <button
           type="button"
           onClick={onBulkRegenerateAudio}
-          disabled={matchingTotal === 0 || isBulkRegenerating}
+          disabled={pageItemCount === 0 || isBulkRegenerating}
           aria-label={bulkRegenerateAriaLabel}
           className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-2 text-sm font-medium text-[var(--color-text-primary)] transition hover:border-[var(--color-brand)] disabled:cursor-not-allowed disabled:opacity-50"
         >

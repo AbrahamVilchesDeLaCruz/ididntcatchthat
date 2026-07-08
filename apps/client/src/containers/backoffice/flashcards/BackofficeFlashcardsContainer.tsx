@@ -20,6 +20,8 @@ import { useI18n } from '@/core/i18n';
 import { isApiRequestError } from '@/core/api/apiError';
 import { useToastStore } from '@/core/notifications/toast.store';
 
+const FLASHCARDS_PAGE_SIZE = 10;
+
 export const BackofficeFlashcardsContainer = (): ReactElement => {
   const { canManageFlashcards } = useCurrentUser();
   const { t } = useI18n();
@@ -54,7 +56,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
   const { data, isLoading, isLoadingError } = useFlashcards(
     {
       page,
-      pageSize: 10,
+      pageSize: FLASHCARDS_PAGE_SIZE,
       category: categoryFilter,
       subcategory: subcategoryFilter,
       audioStatus: audioStatusFilter,
@@ -161,6 +163,8 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
         audioStatus: audioStatusFilter,
         category: categoryFilter,
         subcategory: subcategoryFilter,
+        page,
+        pageSize: FLASHCARDS_PAGE_SIZE,
       },
       {
         onSuccess: (result) => {
@@ -192,7 +196,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       catalog={catalog}
       total={data?.total ?? 0}
       page={page}
-      pageSize={data?.pageSize ?? 20}
+      pageSize={data?.pageSize ?? FLASHCARDS_PAGE_SIZE}
       isLoading={isLoading}
       isError={isLoadingError}
       isMutating={isCreating || isUpdating || isDeleting || isBulkCreating}
