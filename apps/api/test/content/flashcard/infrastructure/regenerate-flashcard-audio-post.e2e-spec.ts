@@ -1,18 +1,12 @@
 import { type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { type App } from 'supertest/types';
-import { DataSource } from 'typeorm';
 import { createTestApp } from '../../../shared/infrastructure/create-test-app';
 import { createAdminToken } from '../../../shared/infrastructure/create-admin-token';
-
-const VALID_PAYLOAD = {
-  expression: 'gonna',
-  meaning: "Short form of 'going to'",
-  category: 'connected_speech',
-  subcategory: 'informal_going_to',
-  ipaNotation: 'ˈɡɒnə',
-  nativeSpeech: null,
-};
+import {
+  seedFlashcardDirectly,
+  waitForFlashcardAudioPipeline,
+} from '../shared/flashcard-e2e.helpers';
 
 describe('content/flashcard RegenerateFlashcardAudioPostController (e2e)', () => {
   let app: INestApplication<App>;
@@ -29,97 +23,29 @@ describe('content/flashcard RegenerateFlashcardAudioPostController (e2e)', () =>
 
   describe('POST /v1/flashcards/:id/audio/regenerates', () => {
     it('should return 204 when flashcard audio status is failed', async () => {
-      const id = crypto.randomUUID();
-      const exampleId = crypto.randomUUID();
-
-      await request(app.getHttpServer())
-        .post('/v1/flashcards')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ...VALID_PAYLOAD,
-          id,
-          examples: [
-            {
-              id: exampleId,
-              textEn: "I'm gonna be late.",
-              textEs: 'Voy a llegar tarde.',
-              position: 1,
-            },
-          ],
-        })
-        .expect(201);
-
-      const ds = app.get(DataSource);
-      await ds.query(
-        `UPDATE flashcards SET audio_status = 'failed' WHERE id = $1`,
-        [id],
-      );
+      const id = await seedFlashcardDirectly(app, { audioStatus: 'failed' });
 
       await request(app.getHttpServer())
         .post(`/v1/flashcards/${id}/audio/regenerates`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(204);
+
+      await waitForFlashcardAudioPipeline(app, id);
     });
 
     it('should return 204 when flashcard audio status is pending', async () => {
-      const id = crypto.randomUUID();
-      const exampleId = crypto.randomUUID();
-
-      await request(app.getHttpServer())
-        .post('/v1/flashcards')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ...VALID_PAYLOAD,
-          id,
-          examples: [
-            {
-              id: exampleId,
-              textEn: "I'm gonna be late.",
-              textEs: 'Voy a llegar tarde.',
-              position: 1,
-            },
-          ],
-        })
-        .expect(201);
-
-      const ds = app.get(DataSource);
-      await ds.query(
-        `UPDATE flashcards SET audio_status = 'pending' WHERE id = $1`,
-        [id],
-      );
+      const id = await seedFlashcardDirectly(app, { audioStatus: 'pending' });
 
       await request(app.getHttpServer())
         .post(`/v1/flashcards/${id}/audio/regenerates`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(204);
+
+      await waitForFlashcardAudioPipeline(app, id);
     });
 
     it('should return 422 when flashcard audio status is ready', async () => {
-      const id = crypto.randomUUID();
-      const exampleId = crypto.randomUUID();
-
-      await request(app.getHttpServer())
-        .post('/v1/flashcards')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ...VALID_PAYLOAD,
-          id,
-          examples: [
-            {
-              id: exampleId,
-              textEn: "I'm gonna be late.",
-              textEs: 'Voy a llegar tarde.',
-              position: 1,
-            },
-          ],
-        })
-        .expect(201);
-
-      const ds = app.get(DataSource);
-      await ds.query(
-        `UPDATE flashcards SET audio_status = 'ready', audio_urls = '{"expression":{"us":"https://example.com/us.mp3","uk":"https://example.com/uk.mp3","au":"https://example.com/au.mp3"},"examples":{"us":"https://example.com/ex.mp3"}}'::jsonb WHERE id = $1`,
-        [id],
-      );
+      const id = await seedFlashcardDirectly(app, { audioStatus: 'ready' });
 
       await request(app.getHttpServer())
         .post(`/v1/flashcards/${id}/audio/regenerates`)
