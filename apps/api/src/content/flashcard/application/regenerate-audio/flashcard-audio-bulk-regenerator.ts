@@ -8,8 +8,12 @@ import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
 } from '@/content/flashcard/domain/flashcard.repository';
-import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
+import { type DomainEvent } from '@/shared/domain/domain-event';
 import { type RequestFlashcardAudioBulkRegenerator } from './request-flashcard-audio-bulk-regenerator';
 import { type ResponseFlashcardAudioBulkRegenerator } from './response-flashcard-audio-bulk-regenerator';
 
@@ -21,8 +25,8 @@ export class FlashcardAudioBulkRegenerator {
   constructor(
     @Inject(FLASHCARD_REPOSITORY)
     private readonly repository: FlashcardRepository,
-    @Inject(FlashcardAudioGenerator)
-    private readonly generator: FlashcardAudioGenerator,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
     @Inject(LOGGER_SERVICE)
     private readonly logger: Logger,
   ) {}
@@ -62,14 +66,21 @@ export class FlashcardAudioBulkRegenerator {
     );
     const flashcards = await this.repository.match(criteria);
 
+    const events: DomainEvent[] = [];
     let triggered = 0;
     for (const flashcard of flashcards) {
       if (!flashcard.audioStatus.canRegenerateAudio()) continue;
-      void this.generator.execute({ flashcardId: flashcard.id.value });
+      flashcard.markAudioRegenerationRequested();
+      events.push(...flashcard.pullDomainEvents());
+      await this.repository.save(flashcard);
       triggered += 1;
     }
 
-    this.logger.info('Flashcard audio bulk regeneration started', {
+    if (events.length > 0) {
+      await this.publisher.publish(events);
+    }
+
+    this.logger.info('Flashcard audio bulk regeneration requested', {
       audioStatus: request.audioStatus,
       category: request.category ?? null,
       subcategory: request.subcategory ?? null,

@@ -15,6 +15,7 @@ import { FlashcardCreatedEvent } from './events/flashcard-created.event';
 import { FlashcardExpressionUpdatedEvent } from './events/flashcard-expression-updated.event';
 import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated.event';
 import { FlashcardAudioGeneratingEvent } from './events/flashcard-audio-generating.event';
+import { FlashcardAudioRegenerationRequestedEvent } from './events/flashcard-audio-regeneration-requested.event';
 import { FlashcardAudioReadyEvent } from './events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from './events/flashcard-audio-failed.event';
 import { FlashcardExamplesCompletedEvent } from './events/flashcard-examples-completed.event';
@@ -244,6 +245,15 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     this._audioStatus = new AudioStatus(AudioStatusValue.Generating);
     this.record(
       new FlashcardAudioGeneratingEvent(this.id.value, {
+        flashcardId: this.id.value,
+      }),
+    );
+  }
+
+  markAudioRegenerationRequested(): void {
+    this._audioStatus = new AudioStatus(AudioStatusValue.Generating);
+    this.record(
+      new FlashcardAudioRegenerationRequestedEvent(this.id.value, {
         flashcardId: this.id.value,
       }),
     );

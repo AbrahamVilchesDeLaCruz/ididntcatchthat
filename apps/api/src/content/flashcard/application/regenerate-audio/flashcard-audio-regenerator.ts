@@ -6,7 +6,11 @@ import {
   type FlashcardRepository,
   FLASHCARD_REPOSITORY,
 } from '@/content/flashcard/domain/flashcard.repository';
-import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
+import {
+  type DomainEventPublisher,
+  DOMAIN_EVENT_PUBLISHER,
+} from '@/shared/domain/domain-event-publisher';
+import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type RequestFlashcardAudioRegenerator } from './request-flashcard-audio-regenerator';
 
 export type { RequestFlashcardAudioRegenerator } from './request-flashcard-audio-regenerator';
@@ -16,8 +20,10 @@ export class FlashcardAudioRegenerator {
   constructor(
     @Inject(FLASHCARD_REPOSITORY)
     private readonly repository: FlashcardRepository,
-    @Inject(FlashcardAudioGenerator)
-    private readonly generator: FlashcardAudioGenerator,
+    @Inject(DOMAIN_EVENT_PUBLISHER)
+    private readonly publisher: DomainEventPublisher,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: Logger,
   ) {}
 
   async execute(request: RequestFlashcardAudioRegenerator): Promise<void> {
@@ -30,6 +36,12 @@ export class FlashcardAudioRegenerator {
       throw new AudioStatusInvalid();
     }
 
-    void this.generator.execute({ flashcardId: request.flashcardId });
+    flashcard.markAudioRegenerationRequested();
+    await this.repository.save(flashcard);
+    await this.publisher.publish(flashcard.pullDomainEvents());
+
+    this.logger.info('Flashcard audio regeneration requested', {
+      flashcardId: request.flashcardId,
+    });
   }
 }

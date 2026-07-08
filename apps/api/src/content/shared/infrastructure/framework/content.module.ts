@@ -78,6 +78,7 @@ import { AiFlashcardDraftGenerator } from '@/content/flashcard/application/gener
 import { EnrichFlashcardOnFlashcardCreated } from '@/content/flashcard/application/enrich/enrich-flashcard-on-flashcard-created';
 import { GenerateFlashcardAudioOnFlashcardExpressionUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-expression-updated';
 import { GenerateFlashcardAudioOnFlashcardExamplesUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-updated';
+import { GenerateFlashcardAudioOnFlashcardAudioRegenerationRequested } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-audio-regeneration-requested';
 
 // Shared modules
 import { SharedModule } from '@/shared/infrastructure/framework/shared.module';
@@ -147,21 +148,25 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     EnrichFlashcardOnFlashcardCreated,
     GenerateFlashcardAudioOnFlashcardExpressionUpdated,
     GenerateFlashcardAudioOnFlashcardExamplesUpdated,
+    GenerateFlashcardAudioOnFlashcardAudioRegenerationRequested,
     {
       provide: SUBSCRIBERS,
       useFactory: (
         enrich: EnrichFlashcardOnFlashcardCreated,
         audioOnExpressionUpdated: GenerateFlashcardAudioOnFlashcardExpressionUpdated,
         audioOnExamplesUpdated: GenerateFlashcardAudioOnFlashcardExamplesUpdated,
+        audioOnRegenerationRequested: GenerateFlashcardAudioOnFlashcardAudioRegenerationRequested,
       ): Subscriber[] => [
         enrich,
         audioOnExpressionUpdated,
         audioOnExamplesUpdated,
+        audioOnRegenerationRequested,
       ],
       inject: [
         EnrichFlashcardOnFlashcardCreated,
         GenerateFlashcardAudioOnFlashcardExpressionUpdated,
         GenerateFlashcardAudioOnFlashcardExamplesUpdated,
+        GenerateFlashcardAudioOnFlashcardAudioRegenerationRequested,
       ],
     },
     SubscribersBootstrapper,
