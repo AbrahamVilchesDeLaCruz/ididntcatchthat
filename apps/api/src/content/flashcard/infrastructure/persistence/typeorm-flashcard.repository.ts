@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, type SelectQueryBuilder } from 'typeorm';
+import { Repository, IsNull, type SelectQueryBuilder } from 'typeorm';
 import { Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type FlashcardId } from '@/shared/domain/flashcard-id';
 import { type FlashcardRepository } from '@/content/flashcard/domain/flashcard.repository';
@@ -41,6 +41,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
 
   async match(criteria: Criteria): Promise<Flashcard[]> {
     const qb = this.repo.createQueryBuilder('f');
+    qb.andWhere('f.deleted_at IS NULL');
     this.applyFilters(qb, criteria);
 
     if (criteria.order) {
@@ -59,12 +60,16 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
 
   async count(criteria: Criteria): Promise<number> {
     const qb = this.repo.createQueryBuilder('f');
+    qb.andWhere('f.deleted_at IS NULL');
     this.applyFilters(qb, criteria);
     return qb.getCount();
   }
 
   async search(id: FlashcardId): Promise<Flashcard | null> {
-    const entity = await this.repo.findOneBy({ id: id.value });
+    const entity = await this.repo.findOneBy({
+      id: id.value,
+      deletedAt: IsNull(),
+    });
     return entity ? this.toDomain(entity) : null;
   }
 
@@ -77,7 +82,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
   }
 
   async remove(id: FlashcardId): Promise<void> {
-    await this.repo.delete({ id: id.value });
+    await this.repo.update({ id: id.value }, { deletedAt: new Date() });
   }
 
   private applyFilters(
@@ -116,6 +121,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
       audioUrls: entity.audioUrls,
       examples: normalizeStoredExamples(entity.id, entity.examples),
       createdBy: entity.createdBy,
+      deletedAt: entity.deletedAt?.toISOString() ?? null,
     });
   }
 
@@ -133,6 +139,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
     entity.audioUrls = p.audioUrls;
     entity.examples = p.examples;
     entity.createdBy = p.createdBy;
+    entity.deletedAt = p.deletedAt !== null ? new Date(p.deletedAt) : null;
     return entity;
   }
 }

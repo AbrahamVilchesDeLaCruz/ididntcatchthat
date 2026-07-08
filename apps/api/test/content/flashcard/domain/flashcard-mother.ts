@@ -30,6 +30,7 @@ export class FlashcardMother {
       audioUrls: overrides?.audioUrls ?? null,
       examples: overrides?.examples ?? [ExampleMother.primitives(id, 1)],
       createdBy: overrides?.createdBy ?? UuidMother.random(),
+      deletedAt: overrides?.deletedAt ?? null,
     };
   }
 
