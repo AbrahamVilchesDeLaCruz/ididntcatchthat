@@ -101,7 +101,7 @@ down: ## Stop dev stack
 dev: ## Start RabbitMQ in Docker + run api & client on host (Doppler, hot-reload)
 	$(ensure-docker)
 	$(COMPOSE_DEV_HOST) up -d rabbitmq --wait
-	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/api start:dev & pnpm --filter @ididntcatchthat/client dev'
+	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; unset VITE_API_URL; export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/api start:dev & pnpm --filter @ididntcatchthat/client dev'
 
 dev-api: ## Run api on host only (Doppler, hot-reload)
 	$(ensure-docker)
@@ -109,7 +109,7 @@ dev-api: ## Run api on host only (Doppler, hot-reload)
 	doppler run --command 'export AMQP_URI=$${AMQP_URI/rabbitmq/localhost}; pnpm --filter @ididntcatchthat/api start:dev'
 
 dev-client: ## Run client Vite HMR (Doppler)
-	doppler run --command 'export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/client dev'
+	doppler run --command 'unset VITE_API_URL; export VITE_API_PROXY_TARGET=http://localhost:$${PORT:-3000}; pnpm --filter @ididntcatchthat/client dev'
 
 # ─── PROD (Doppler prd) ────────────────────────────────────────────────────────
 
