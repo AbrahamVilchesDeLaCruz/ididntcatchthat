@@ -49,6 +49,7 @@ import { FindFlashcardGetController } from '@/content/flashcard/infrastructure/c
 import { SearchFlashcardsGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcards-get.controller';
 import { UpdateFlashcardPatchController } from '@/content/flashcard/infrastructure/controllers/update-flashcard-patch.controller';
 import { DeleteFlashcardDeleteController } from '@/content/flashcard/infrastructure/controllers/delete-flashcard-delete.controller';
+import { RegenerateFlashcardAudioPostController } from '@/content/flashcard/infrastructure/controllers/regenerate-flashcard-audio-post.controller';
 import { SearchFlashcardCatalogGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcard-catalog-get.controller';
 import { SuggestExamplesPostController } from '@/content/flashcard/infrastructure/controllers/suggest-examples-post.controller';
 import { GenerateFlashcardsPostController } from '@/content/flashcard/infrastructure/controllers/generate-flashcards-post.controller';
@@ -63,6 +64,7 @@ import { FlashcardFinder } from '@/content/flashcard/application/find/flashcard-
 import { FlashcardSearcher } from '@/content/flashcard/application/search/flashcard-searcher';
 import { FlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
 import { FlashcardRemover } from '@/content/flashcard/application/remove/flashcard-remover';
+import { FlashcardAudioRegenerator } from '@/content/flashcard/application/regenerate-audio/flashcard-audio-regenerator';
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
@@ -94,6 +96,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     SearchFlashcardsGetController,
     UpdateFlashcardPatchController,
     DeleteFlashcardDeleteController,
+    RegenerateFlashcardAudioPostController,
     SuggestExamplesPostController,
     GenerateFlashcardsPostController,
   ],
@@ -172,6 +175,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     FlashcardSearcher,
     FlashcardUpdater,
     FlashcardRemover,
+    FlashcardAudioRegenerator,
     FlashcardCatalogQuerier,
     FlashcardAudioGenerator,
     AiExamplesCompleter,

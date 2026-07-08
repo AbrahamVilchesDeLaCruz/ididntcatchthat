@@ -49,7 +49,25 @@ export class ElevenLabsAudioGenerator implements AudioGenerator {
     });
 
     if (!response.ok) {
-      throw new AudioGenerationFailed(response.status, response.statusText);
+      const body = await response.text();
+      let detail: string | null = null;
+      try {
+        const parsed = JSON.parse(body) as {
+          detail?: { message?: string } | string;
+        };
+        if (typeof parsed.detail === 'string') {
+          detail = parsed.detail;
+        } else if (parsed.detail?.message) {
+          detail = parsed.detail.message;
+        }
+      } catch {
+        detail = body.length > 0 ? body.slice(0, 200) : null;
+      }
+      throw new AudioGenerationFailed(
+        response.status,
+        response.statusText,
+        detail,
+      );
     }
 
     const arrayBuffer = await response.arrayBuffer();
