@@ -4,31 +4,17 @@ import { type DomainEventPublisher } from '@/shared/domain/domain-event-publishe
 import { AmqpMessageBus } from '@/shared/infrastructure/event-bus/amqp-message-bus';
 
 /**
- * E2E-only publisher:
- * - gaming/progress/ranking/identity events → in-process (deterministic in CI)
- * - content events → RabbitMQ (avoids corrupting flashcards via nested sync handlers)
+ * E2E-only publisher: routes ALL events in-process via the registered
+ * subscribers. External adapters (ElevenLabs, R2, DeepSeek) are already
+ * stubbed; the event bus is internal infrastructure, so a real broker is
+ * not needed in E2E. RabbitMQ behaviour is covered by dedicated broker
+ * tests; per-handler behaviour is covered by unit tests.
  */
 @Injectable()
 export class E2eDomainEventPublisher implements DomainEventPublisher {
   constructor(private readonly messageBus: AmqpMessageBus) {}
 
   async publish(events: DomainEvent[]): Promise<void> {
-    const contentEvents: DomainEvent[] = [];
-    const syncEvents: DomainEvent[] = [];
-
-    for (const event of events) {
-      if (event.eventName().startsWith('ididntcatchthat.content.')) {
-        contentEvents.push(event);
-      } else {
-        syncEvents.push(event);
-      }
-    }
-
-    if (syncEvents.length > 0) {
-      await this.messageBus.dispatchInProcess(syncEvents);
-    }
-    if (contentEvents.length > 0) {
-      await this.messageBus.publish(contentEvents);
-    }
+    await this.messageBus.dispatchInProcess(events);
   }
 }
