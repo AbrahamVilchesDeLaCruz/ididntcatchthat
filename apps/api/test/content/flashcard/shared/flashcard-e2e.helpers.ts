@@ -66,6 +66,8 @@ export async function seedFlashcardDirectly(
 /**
  * Regenerate audio runs fire-and-forget; wait until stub pipeline finishes
  * before closing the Nest app (otherwise AMQP channel closes mid-publish).
+ *
+ * Do not treat `failed` as settled — seeded flashcards may start as failed.
  */
 export async function waitForFlashcardAudioPipeline(
   app: INestApplication<App>,
@@ -82,7 +84,7 @@ export async function waitForFlashcardAudioPipeline(
     );
 
     const status = rows[0]?.audioStatus;
-    if (status === 'ready' || status === 'failed') {
+    if (status === 'ready') {
       return;
     }
 
