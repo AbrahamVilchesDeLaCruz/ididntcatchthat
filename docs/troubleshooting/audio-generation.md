@@ -73,15 +73,20 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 
 ---
 
-## Recuperar flashcards en `failed`
+## Recuperar flashcards en `pending` o `failed`
 
 Desde backoffice (`/backoffice/flashcards`):
 
-1. Abrir detalle de la flashcard con estado `failed`
-2. Pulsar **Reintentar generación** → `POST /v1/flashcards/:id/regenerate-audio`
-3. La tabla hace polling mientras `generating` / `pending`
+1. Filtrar por **Pendiente** o **Fallido** (opcional: categoría/subcategoría)
+2. **Una flashcard:** detalle → **Generar audio** / **Reintentar** → `POST /v1/flashcards/:id/audio/regenerates` (**204**)
+3. **Todas las del filtro:** botón en toolbar → `POST /v1/flashcards/audio/regenerates` (**200**, `{ triggered }`)
+4. La tabla hace polling cada 8 s mientras haya `pending` o `generating`
 
-También se regenera automáticamente al editar `expression` o `examples` (eventos de dominio).
+`pending` suele indicar que el pipeline async no arrancó (flashcards antiguas o RabbitMQ caído al crear).
+
+Tras crear una flashcard nueva, el enrich subscriber ejecuta ejemplos → fonética → audio en la misma cadena RabbitMQ.
+
+Documentación completa: [regenerate-audio use cases](../apps/api/content/regenerate-audio/usecases.md).
 
 ---
 

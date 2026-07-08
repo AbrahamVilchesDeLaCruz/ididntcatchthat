@@ -29,5 +29,5 @@ graph TB
 | Si cambia solo `meaning`, `ipa`, `nativeSpeech` → NO regenerar | Los handlers de audio ignoran el cambio |
 | La flashcard es visible mientras el audio está pendiente | `audioStatus`: `pending` \| `generating` → skeleton en cliente |
 | Error en ElevenLabs o CDN → `audioStatus: failed` | Log + métrica `app_audio_errors_total` |
-| Retry manual admin | `POST /v1/flashcards/:id/regenerate-audio` solo si `failed` — ver [regenerate-audio](../regenerate-audio/usecases.md) |
+| Retry manual admin | `POST /v1/flashcards/:id/audio/regenerates` y bulk `POST /v1/flashcards/audio/regenerates` — ver [regenerate-audio](../regenerate-audio/usecases.md) |
 | Troubleshooting 401 / keys | [troubleshooting/audio-generation.md](../../../../troubleshooting/audio-generation.md) |

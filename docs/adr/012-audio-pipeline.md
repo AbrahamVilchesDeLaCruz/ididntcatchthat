@@ -36,6 +36,6 @@ Usuario reproduce audio desde Cloudflare CDN (latencia mínima, sin coste por re
 ## Consequences
 
 - La creación de flashcards es asíncrona — el admin no espera a que el audio se genere para continuar
-- Si la generación de audio falla, la flashcard queda en `failed`; el admin puede reintentar con `POST /flashcards/:id/regenerate-audio` o editando expression/examples
+- Si la generación de audio falla, la flashcard queda en `failed`; el admin puede reintentar con `POST /flashcards/:id/audio/regenerates`, bulk `POST /flashcards/audio/regenerates`, o editando expression/examples
 - Los archivos de audio no viven en la VPS ni en la base de datos — solo las URLs en DB
 - El backoffice muestra el estado de generación de audio por flashcard
