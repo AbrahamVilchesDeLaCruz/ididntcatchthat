@@ -17,14 +17,19 @@ import { AnalyticsModule } from './analytics/shared/infrastructure/framework/ana
 import { buildTypeOrmDataSourceOptions } from './shared/infrastructure/persistence/typeorm/typeorm-data-source-options';
 import { envValidationSchema } from './shared/infrastructure/config/env.validation';
 
+/** Local profile uses `.env.local`; Doppler (`doppler run`) must not inherit stub flags from it. */
+function resolveEnvFilePaths(): string[] {
+  if (process.env.DOPPLER_PROJECT) {
+    return [join(process.cwd(), '.env')];
+  }
+  return [join(process.cwd(), '.env.local'), join(process.cwd(), '.env')];
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        join(process.cwd(), '.env.local'),
-        join(process.cwd(), '.env'),
-      ],
+      envFilePath: resolveEnvFilePaths(),
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
     }),

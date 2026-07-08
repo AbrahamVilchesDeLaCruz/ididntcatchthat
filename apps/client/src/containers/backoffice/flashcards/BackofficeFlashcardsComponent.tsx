@@ -22,6 +22,8 @@ interface BackofficeFlashcardsComponentProps {
   isLoading: boolean;
   isError: boolean;
   isMutating: boolean;
+  isRegeneratingAudio: boolean;
+  isBulkRegeneratingAudio: boolean;
   isGeneratingAi: boolean;
   aiDrafts: FlashcardDraftApiModel[] | null;
   categoryFilter: string | undefined;
@@ -33,7 +35,15 @@ interface BackofficeFlashcardsComponentProps {
   onAudioStatusFilter: (audioStatus: string | undefined) => void;
   onCreate: (values: FlashcardFormValues) => void;
   onUpdate: (id: string, values: Partial<FlashcardFormValues>) => void;
-  onDelete: (id: string) => void;
+  onDelete: (
+    id: string,
+    callbacks?: { onSuccess?: () => void; onError?: () => void },
+  ) => void;
+  onRegenerateAudio: (
+    id: string,
+    callbacks?: { onSuccess?: () => void },
+  ) => void;
+  onBulkRegenerateAudio: () => void;
   onBulkCreate: (flashcards: CreateFlashcardApiPayload[]) => void;
   onAiGenerate: (params: {
     category: string;
@@ -54,6 +64,8 @@ export const BackofficeFlashcardsComponent = ({
   isLoading,
   isError,
   isMutating,
+  isRegeneratingAudio,
+  isBulkRegeneratingAudio,
   isGeneratingAi,
   aiDrafts,
   categoryFilter,
@@ -66,6 +78,8 @@ export const BackofficeFlashcardsComponent = ({
   onCreate,
   onUpdate,
   onDelete,
+  onRegenerateAudio,
+  onBulkRegenerateAudio,
   onBulkCreate,
   onAiGenerate,
   onDraftConfirm,
@@ -98,8 +112,9 @@ export const BackofficeFlashcardsComponent = ({
 
   const handleDeleteConfirm = (): void => {
     if (!deletingId) return;
-    onDelete(deletingId);
-    setDeletingId(null);
+    onDelete(deletingId, {
+      onSuccess: () => setDeletingId(null),
+    });
   };
 
   const handleBulkSubmit = (flashcards: CreateFlashcardApiPayload[]): void => {
@@ -158,9 +173,12 @@ export const BackofficeFlashcardsComponent = ({
         categoryFilter={categoryFilter}
         subcategoryFilter={subcategoryFilter}
         audioStatusFilter={audioStatusFilter}
+        pageItemCount={flashcards.length}
+        isBulkRegenerating={isBulkRegeneratingAudio}
         onCategoryFilter={onCategoryFilter}
         onSubcategoryFilter={onSubcategoryFilter}
         onAudioStatusFilter={onAudioStatusFilter}
+        onBulkRegenerateAudio={onBulkRegenerateAudio}
       />
 
       {/* Table */}
@@ -204,7 +222,22 @@ export const BackofficeFlashcardsComponent = ({
       {/* Detail Modal */}
       {viewingFlashcard && (
         <FlashcardDetailModal
-          flashcard={viewingFlashcard}
+          flashcard={
+            flashcards.find((f) => f.id === viewingFlashcard.id) ??
+            viewingFlashcard
+          }
+          isRegenerating={isRegeneratingAudio}
+          onRegenerateAudio={() => {
+            const flashcardId = viewingFlashcard.id;
+            onRegenerateAudio(flashcardId, {
+              onSuccess: () =>
+                setViewingFlashcard((current) =>
+                  current?.id === flashcardId
+                    ? { ...current, audioStatus: 'generating' }
+                    : current,
+                ),
+            });
+          }}
           onClose={() => setViewingFlashcard(null)}
         />
       )}

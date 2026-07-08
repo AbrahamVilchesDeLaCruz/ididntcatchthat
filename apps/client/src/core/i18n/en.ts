@@ -901,6 +901,10 @@ export const en: Translations = {
       title: 'Flashcards',
       subtitle: '{count} total flashcards',
       loadError: 'Error loading flashcards. Please try again.',
+      rateLimitError: 'Too many requests. Wait a few seconds and try again.',
+      audioAlreadyReadyError: 'Audio is already ready. Refreshing the list…',
+      bulkRegenerateSuccess: 'Audio generation started for {count} flashcards.',
+      bulkRegenerateEmpty: 'No flashcards to regenerate for this filter.',
       aiGenerate: '✨ Generate with AI',
       bulkCreate: '+ Bulk',
       newFlashcard: '+ New flashcard',
@@ -910,7 +914,9 @@ export const en: Translations = {
       createTitle: 'New flashcard',
       editTitle: 'Edit flashcard',
       deleteConfirmTitle: 'Delete flashcard?',
-      deleteConfirmBody: 'This action cannot be undone.',
+      deleteConfirmBody:
+        'It will be hidden from the backoffice and new games. Existing games and stats are preserved.',
+      deleteError: 'Could not delete the flashcard. Please try again.',
       cancel: 'Cancel',
       delete: 'Delete',
       toolbar: {
@@ -922,6 +928,12 @@ export const en: Translations = {
         filterByAudioStatus: 'Filter by audio status',
         allAudioStatuses: 'All statuses',
         clearFilters: 'Clear filters',
+        regeneratePagePending: 'Generate pending audio on this page ({count})',
+        regeneratePageFailed: 'Retry failed on this page ({count})',
+        regeneratePagePendingAriaLabel:
+          'Generate audio for pending flashcards on the current page',
+        regeneratePageFailedAriaLabel:
+          'Retry audio for failed flashcards on the current page',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',
@@ -965,8 +977,12 @@ export const en: Translations = {
         closeAriaLabel: 'Close',
         pronunciation: 'Pronunciation',
         pendingAudio: 'Audio pending generation.',
+        generateAudio: 'Generate audio',
+        generateAudioAriaLabel: 'Generate flashcard audio',
         generatingAudio: 'Generating audio...',
         failedAudio: 'Error generating audio.',
+        retryAudio: 'Retry generation',
+        retryAudioAriaLabel: 'Retry audio generation',
         american: 'American',
         british: 'British',
         australian: 'Australian',

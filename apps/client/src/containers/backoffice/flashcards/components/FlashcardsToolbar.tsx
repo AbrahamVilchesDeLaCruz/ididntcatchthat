@@ -12,9 +12,12 @@ interface FlashcardsToolbarProps {
   categoryFilter: string | undefined;
   subcategoryFilter: string | undefined;
   audioStatusFilter: string | undefined;
+  pageItemCount: number;
+  isBulkRegenerating: boolean;
   onCategoryFilter: (category: string | undefined) => void;
   onSubcategoryFilter: (subcategory: string | undefined) => void;
   onAudioStatusFilter: (audioStatus: string | undefined) => void;
+  onBulkRegenerateAudio: () => void;
 }
 
 export const FlashcardsToolbar = ({
@@ -22,9 +25,12 @@ export const FlashcardsToolbar = ({
   categoryFilter,
   subcategoryFilter,
   audioStatusFilter,
+  pageItemCount,
+  isBulkRegenerating,
   onCategoryFilter,
   onSubcategoryFilter,
   onAudioStatusFilter,
+  onBulkRegenerateAudio,
 }: FlashcardsToolbarProps): ReactElement => {
   const { locale, t } = useI18n();
   const audioStatusLabels = t.backoffice.flashcards.toolbar.audioStatuses;
@@ -49,6 +55,25 @@ export const FlashcardsToolbar = ({
     onSubcategoryFilter(undefined);
     onAudioStatusFilter(undefined);
   };
+
+  const showBulkRegenerate =
+    audioStatusFilter === 'pending' || audioStatusFilter === 'failed';
+
+  const bulkRegenerateLabel =
+    audioStatusFilter === 'pending'
+      ? t.backoffice.flashcards.toolbar.regeneratePagePending.replace(
+          '{count}',
+          String(pageItemCount),
+        )
+      : t.backoffice.flashcards.toolbar.regeneratePageFailed.replace(
+          '{count}',
+          String(pageItemCount),
+        );
+
+  const bulkRegenerateAriaLabel =
+    audioStatusFilter === 'pending'
+      ? t.backoffice.flashcards.toolbar.regeneratePagePendingAriaLabel
+      : t.backoffice.flashcards.toolbar.regeneratePageFailedAriaLabel;
 
   return (
     <div className="flex flex-wrap items-center gap-4">
@@ -128,6 +153,21 @@ export const FlashcardsToolbar = ({
           className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
         >
           {t.backoffice.flashcards.toolbar.clearFilters}
+        </button>
+      )}
+
+      {showBulkRegenerate && (
+        <button
+          type="button"
+          onClick={onBulkRegenerateAudio}
+          disabled={pageItemCount === 0 || isBulkRegenerating}
+          aria-label={bulkRegenerateAriaLabel}
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-3 py-2 text-sm font-medium text-[var(--color-text-primary)] transition hover:border-[var(--color-brand)] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isBulkRegenerating && (
+            <span className="w-3 h-3 rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-text-secondary)] animate-spin" />
+          )}
+          {bulkRegenerateLabel}
         </button>
       )}
     </div>

@@ -6,7 +6,7 @@ import { ThemeToggle } from '@/common/components/ThemeToggle';
 import { LocaleToggle } from '@/common/components/LocaleToggle';
 import { scrollToLandingSection } from '@/containers/landing/landingScroll';
 import { useI18n } from '@/core/i18n';
-import { useAuthStore } from '@/core/store/auth.store';
+import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { DEFAULT_AUTHENTICATED_HOME } from '@/core/auth/postLoginRedirect';
 
 const handleSectionNav =
@@ -20,7 +20,7 @@ export const LandingHeader = (): ReactElement => {
   const { t } = useI18n();
   const h = t.landing.hero;
   const nav = t.landing.header;
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { canStudy } = useCurrentUser();
 
   const authLinkClass =
     'inline-flex shrink-0 rounded-full border border-[var(--color-border-strong)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] sm:px-3';
@@ -78,7 +78,7 @@ export const LandingHeader = (): ReactElement => {
         </nav>
 
         <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 md:col-start-3">
-          {isAuthenticated ? (
+          {canStudy ? (
             <Link to={DEFAULT_AUTHENTICATED_HOME} className={authLinkClass}>
               {t.home.navApp}
             </Link>

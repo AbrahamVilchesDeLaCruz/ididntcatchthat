@@ -15,6 +15,7 @@ import { FlashcardCreatedEvent } from './events/flashcard-created.event';
 import { FlashcardExpressionUpdatedEvent } from './events/flashcard-expression-updated.event';
 import { FlashcardMeaningUpdatedEvent } from './events/flashcard-meaning-updated.event';
 import { FlashcardAudioGeneratingEvent } from './events/flashcard-audio-generating.event';
+import { FlashcardAudioRegenerationRequestedEvent } from './events/flashcard-audio-regeneration-requested.event';
 import { FlashcardAudioReadyEvent } from './events/flashcard-audio-ready.event';
 import { FlashcardAudioFailedEvent } from './events/flashcard-audio-failed.event';
 import { FlashcardExamplesCompletedEvent } from './events/flashcard-examples-completed.event';
@@ -35,6 +36,7 @@ export type FlashcardPrimitives = {
   audioUrls: AudioUrlsPrimitives | null;
   examples: ExamplePrimitives[];
   createdBy: string;
+  deletedAt: string | null;
 };
 
 export type FlashcardUpdateFields = {
@@ -60,6 +62,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     private _audioUrls: AudioUrls | null,
     private _examples: Example[],
     public readonly createdBy: string,
+    private _deletedAt: Date | null = null,
   ) {
     super();
   }
@@ -104,6 +107,14 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
 
   get examplesEnglishText(): string {
     return this._examples.map((e) => e.textEn).join('. ');
+  }
+
+  get deletedAt(): Date | null {
+    return this._deletedAt;
+  }
+
+  softDelete(): void {
+    this._deletedAt = new Date();
   }
 
   static create(
@@ -239,6 +250,15 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
     );
   }
 
+  markAudioRegenerationRequested(): void {
+    this._audioStatus = new AudioStatus(AudioStatusValue.Generating);
+    this.record(
+      new FlashcardAudioRegenerationRequestedEvent(this.id.value, {
+        flashcardId: this.id.value,
+      }),
+    );
+  }
+
   markAudioReady(audioUrls: AudioUrls): void {
     this._audioStatus = new AudioStatus(AudioStatusValue.Ready);
     this._audioUrls = audioUrls;
@@ -315,6 +335,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
         (e) => new Example(e.id, e.flashcardId, e.textEn, e.textEs, e.position),
       ),
       p.createdBy,
+      p.deletedAt !== null ? new Date(p.deletedAt) : null,
     );
   }
 
@@ -331,6 +352,7 @@ export class Flashcard extends AggregateRoot<FlashcardPrimitives> {
       audioUrls: this.audioUrls?.toPrimitives() ?? null,
       examples: this.examples.map((e) => e.toPrimitives()),
       createdBy: this.createdBy,
+      deletedAt: this._deletedAt?.toISOString() ?? null,
     };
   }
 }

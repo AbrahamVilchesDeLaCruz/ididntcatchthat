@@ -29,4 +29,16 @@ export class AudioStatus extends StringValueObject {
   isReady(): boolean {
     return this.value === (AudioStatusValue.Ready as string);
   }
+
+  isFailed(): boolean {
+    return this.value === (AudioStatusValue.Failed as string);
+  }
+
+  isGenerating(): boolean {
+    return this.value === (AudioStatusValue.Generating as string);
+  }
+
+  canRegenerateAudio(): boolean {
+    return this.isPending() || this.isFailed() || this.isGenerating();
+  }
 }

@@ -449,7 +449,7 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 | Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
 | Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
 | Presentación (slides) | [Preview online](https://htmlpreview.github.io/?https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/blob/dev/docs/presentation/tfm-slides.html) · [código fuente](./docs/presentation/tfm-slides.html) |
-| Vídeo explicativo | _Pendiente — URL aquí_ |
+| Vídeo explicativo | [YouTube](https://youtu.be/I0Ciebm0Yb0) · [Preview embebida](./docs/presentation/tfm-video.html) |
 
 ### Presentación TFM
 
@@ -471,6 +471,23 @@ open docs/presentation/tfm-slides.html   # macOS
 ```
 
 Controles: `←` `→` o `Espacio` para avanzar · `F` pantalla completa · `1`–`9` saltar a slide · `#slide-N` en la URL.
+
+### Vídeo TFM
+
+Vídeo con captura de pantalla y explicación del proyecto. Alojado en YouTube; la página del repo embebe el reproductor con el mismo dark mode que la app.
+
+| Modo | Enlace |
+|------|--------|
+| **YouTube** (formulario de entrega) | [youtu.be/I0Ciebm0Yb0](https://youtu.be/I0Ciebm0Yb0) |
+| **Preview embebida** | [raw.githack.com → vídeo TFM](https://raw.githack.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/docs/presentation/tfm-video.html) |
+| **Código fuente** | [docs/presentation/tfm-video.html](./docs/presentation/tfm-video.html) |
+
+Tras clonar el repositorio:
+
+```bash
+open docs/presentation/tfm-video.html   # macOS
+# xdg-open docs/presentation/tfm-video.html   # Linux
+```
 
 ### Acceso a la aplicación
 

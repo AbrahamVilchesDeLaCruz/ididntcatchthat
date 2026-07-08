@@ -1,4 +1,5 @@
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -21,6 +22,7 @@ import { SearchFlashcardsGetQuery } from './search-flashcards-get.query';
 
 @ApiTags('content')
 @ApiBearerAuth('access-token')
+@SkipThrottle()
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SearchFlashcardsGetController {

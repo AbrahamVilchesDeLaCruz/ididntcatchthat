@@ -39,6 +39,7 @@ erDiagram
         uuid created_by FK
         timestamp created_at
         timestamp updated_at
+        timestamp deleted_at "nullable — soft delete"
     }
 
     flashcard_examples {
@@ -133,6 +134,7 @@ erDiagram
 
 - `audio_urls` es jsonb con estructura `{ expression: { us, uk, au }, examples: { us } }`.
 - `created_by` referencia al teacher o admin que la creó.
+- `deleted_at` nullable — soft delete desde backoffice; la fila se conserva para partidas/stats existentes.
 
 ### `flashcard_examples`
 

@@ -47,8 +47,36 @@ describe('LandingHeader', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows the app link for authenticated users', () => {
-    useAuthStore.setState({ isAuthenticated: true });
+  it('shows login and signup for guest sessions', () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      userType: 'guest',
+      userId: 'guest-user-id',
+    });
+
+    render(
+      <MemoryRouter>
+        <LandingHeader />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole('link', { name: en.landing.hero.navLogin }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: en.landing.hero.navRegister }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: en.home.navApp }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the app link for registered users', () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      userType: 'user',
+      userId: 'user-id',
+    });
 
     render(
       <MemoryRouter>

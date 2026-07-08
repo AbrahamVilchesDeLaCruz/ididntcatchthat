@@ -125,7 +125,9 @@ interface RegisterFormValues {
 | `GET`    | `/flashcards/:id` | `useFlashcard`       | (disponible, no usado en la UI actual)       |
 | `POST`   | `/flashcards`     | `useCreateFlashcard` | Al confirmar el modal de creación            |
 | `PATCH`  | `/flashcards/:id` | `useUpdateFlashcard` | Al confirmar el modal de edición             |
-| `DELETE` | `/flashcards/:id` | `useDeleteFlashcard` | Al confirmar el diálogo de eliminación       |
+| `DELETE` | `/flashcards/:id` | `useDeleteFlashcard` | Al confirmar el diálogo de eliminación (soft delete) |
+| `POST`   | `/flashcards/:id/audio/regenerates` | `useRegenerateFlashcardAudio` | Detalle: generar/reintentar audio (`pending`, `generating`, `failed`) |
+| `POST`   | `/flashcards/audio/regenerates` | `useRegenerateFlashcardAudioBulk` | Toolbar: bulk de la **página actual** cuando filtro `pending` o `failed` |
 
 ### Query Keys
 
@@ -148,7 +150,7 @@ Tras cualquier mutación (create/update/delete) se invalida `lists()` para refre
         └── BackofficeFlashcardsContainer
               ├── Estado: page (número), categoryFilter (string | undefined)
               ├── useFlashcards({ page, pageSize: 20, category }) → data paginada
-              ├── useCreateFlashcard / useUpdateFlashcard / useDeleteFlashcard
+              ├── useCreateFlashcard / useUpdateFlashcard / useDeleteFlashcard / useRegenerateFlashcardAudio
               ├── handleCreate  → genera UUID en cliente + llama mutation
               ├── handleUpdate  → pasa id + data parcial
               ├── handleDelete  → pasa id

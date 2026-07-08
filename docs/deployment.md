@@ -300,8 +300,20 @@ Variables mínimas requeridas (fuente de verdad: `apps/api/src/shared/infrastruc
 | `GOOGLE_CLIENT_ID/SECRET`    | Credenciales OAuth Google                                |
 | `GOOGLE_CALLBACK_URL`        | `https://api.ididntcatchthat.com/auth/google/callback`   |
 | `AMQP_URI`                   | Connection string RabbitMQ                               |
+| `ELEVEN_LABS_API_KEY`        | API key ElevenLabs (audio flashcards)                    |
+| `ELEVENLABS_VOICE_ID_*`      | Voice IDs US / UK / AU                                   |
+| `CLOUD_STORAGE*`             | R2/MinIO — bucket y credenciales para MP3                |
+| `DEEPSEEK_API_KEY`           | Generación IA de borradores/ejemplos                     |
 | `GRAFANA_PASSWORD`           | Password del admin de Grafana — valor fuerte en prod     |
 | `VPS_HOST`                   | `ubuntu@<IP>` — usado por `make tunnel-*`                |
+
+### ElevenLabs — verificación post-deploy
+
+Si las flashcards quedan en `audio_status = failed` con `401 Unauthorized` en logs:
+
+1. Verificar secrets en Doppler (`ELEVEN_LABS_API_KEY`, voice IDs)
+2. Probar con `curl` (comandos en [troubleshooting/audio-generation.md](./troubleshooting/audio-generation.md))
+3. Redeploy API tras rotar la key
 
 ### Google OAuth — verificación post-deploy
 

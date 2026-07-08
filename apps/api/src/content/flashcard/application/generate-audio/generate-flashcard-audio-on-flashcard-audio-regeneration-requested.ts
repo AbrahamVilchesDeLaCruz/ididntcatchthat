@@ -5,16 +5,16 @@ import {
   DOMAIN_EVENT_CONSUMER,
 } from '@/shared/application/domain-event-consumer';
 import { type DomainEvent } from '@/shared/domain/domain-event';
-import { FlashcardExamplesCompletedEvent } from '@/content/flashcard/domain/events/flashcard-examples-completed.event';
+import { FlashcardAudioRegenerationRequestedEvent } from '@/content/flashcard/domain/events/flashcard-audio-regeneration-requested.event';
 import { FlashcardAudioGenerator } from './flashcard-audio-generator';
 
 @Injectable()
-export class GenerateFlashcardAudioOnFlashcardExamplesCompleted extends Subscriber {
+export class GenerateFlashcardAudioOnFlashcardAudioRegenerationRequested extends Subscriber {
   readonly queueName =
-    'generate_flashcard_audio_on_flashcard_examples_completed';
-  readonly eventName = FlashcardExamplesCompletedEvent.EVENT_NAME;
-  readonly exchangeName = FlashcardExamplesCompletedEvent.EVENT_NAME;
-  readonly domainEvent = FlashcardExamplesCompletedEvent;
+    'generate_flashcard_audio_on_flashcard_audio_regeneration_requested';
+  readonly eventName = FlashcardAudioRegenerationRequestedEvent.EVENT_NAME;
+  readonly exchangeName = FlashcardAudioRegenerationRequestedEvent.EVENT_NAME;
+  readonly domainEvent = FlashcardAudioRegenerationRequestedEvent;
 
   constructor(
     @Inject(DOMAIN_EVENT_CONSUMER) consumer: DomainEventConsumer,

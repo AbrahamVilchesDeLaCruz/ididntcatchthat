@@ -819,6 +819,10 @@ export interface BackofficeTranslations {
     title: string;
     subtitle: string;
     loadError: string;
+    rateLimitError: string;
+    audioAlreadyReadyError: string;
+    bulkRegenerateSuccess: string;
+    bulkRegenerateEmpty: string;
     aiGenerate: string;
     bulkCreate: string;
     newFlashcard: string;
@@ -829,6 +833,7 @@ export interface BackofficeTranslations {
     editTitle: string;
     deleteConfirmTitle: string;
     deleteConfirmBody: string;
+    deleteError: string;
     cancel: string;
     delete: string;
     toolbar: {
@@ -840,6 +845,10 @@ export interface BackofficeTranslations {
       filterByAudioStatus: string;
       allAudioStatuses: string;
       clearFilters: string;
+      regeneratePagePending: string;
+      regeneratePageFailed: string;
+      regeneratePagePendingAriaLabel: string;
+      regeneratePageFailedAriaLabel: string;
       audioStatuses: Record<
         'pending' | 'generating' | 'ready' | 'failed',
         string
@@ -879,8 +888,12 @@ export interface BackofficeTranslations {
       closeAriaLabel: string;
       pronunciation: string;
       pendingAudio: string;
+      generateAudio: string;
+      generateAudioAriaLabel: string;
       generatingAudio: string;
       failedAudio: string;
+      retryAudio: string;
+      retryAudioAriaLabel: string;
       american: string;
       british: string;
       australian: string;
