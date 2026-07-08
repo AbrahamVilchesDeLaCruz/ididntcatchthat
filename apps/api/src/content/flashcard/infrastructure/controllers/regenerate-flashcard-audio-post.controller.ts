@@ -6,6 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -23,24 +24,25 @@ import { FlashcardAudioRegenerator } from '@/content/flashcard/application/regen
 
 @ApiTags('content')
 @ApiBearerAuth('access-token')
+@SkipThrottle()
 @Controller('flashcards')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class RegenerateFlashcardAudioPostController {
   constructor(private readonly regenerator: FlashcardAudioRegenerator) {}
 
-  @Post(':id/regenerate-audio')
+  @Post(':id/audio/regenerates')
   @Roles('admin')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: 'Retry failed flashcard audio generation',
+    summary: 'Generate or retry flashcard audio',
     description:
-      'Regenerates audio for a flashcard whose audioStatus is failed. Requires admin JWT.',
+      'Starts audio generation for flashcards with audioStatus pending or failed. Requires admin JWT.',
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiForbiddenResponse({ description: 'Admin role required' })
   @ApiNotFoundResponse({ description: 'Flashcard not found' })
   @ApiUnprocessableEntityResponse({
-    description: 'Flashcard audio status is not failed',
+    description: 'Flashcard audio status is ready (nothing to regenerate)',
     type: ValidationErrorResponse,
   })
   async handler(@Param('id') id: string): Promise<void> {

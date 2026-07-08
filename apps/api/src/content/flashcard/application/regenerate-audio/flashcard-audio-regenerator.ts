@@ -26,10 +26,10 @@ export class FlashcardAudioRegenerator {
     );
     if (!flashcard) throw new FlashcardNotFound();
 
-    if (!flashcard.audioStatus.isFailed()) {
+    if (!flashcard.audioStatus.canRegenerateAudio()) {
       throw new AudioStatusInvalid();
     }
 
-    await this.generator.execute({ flashcardId: request.flashcardId });
+    void this.generator.execute({ flashcardId: request.flashcardId });
   }
 }

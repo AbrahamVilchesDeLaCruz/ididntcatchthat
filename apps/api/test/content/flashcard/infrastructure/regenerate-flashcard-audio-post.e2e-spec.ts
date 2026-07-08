@@ -27,7 +27,7 @@ describe('content/flashcard RegenerateFlashcardAudioPostController (e2e)', () =>
     await app.close().catch(() => undefined);
   });
 
-  describe('POST /v1/flashcards/:id/regenerate-audio', () => {
+  describe('POST /v1/flashcards/:id/audio/regenerates', () => {
     it('should return 204 when flashcard audio status is failed', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
@@ -56,12 +56,12 @@ describe('content/flashcard RegenerateFlashcardAudioPostController (e2e)', () =>
       );
 
       await request(app.getHttpServer())
-        .post(`/v1/flashcards/${id}/regenerate-audio`)
+        .post(`/v1/flashcards/${id}/audio/regenerates`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(204);
     });
 
-    it('should return 422 when flashcard audio status is not failed', async () => {
+    it('should return 204 when flashcard audio status is pending', async () => {
       const id = crypto.randomUUID();
       const exampleId = crypto.randomUUID();
 
@@ -82,8 +82,47 @@ describe('content/flashcard RegenerateFlashcardAudioPostController (e2e)', () =>
         })
         .expect(201);
 
+      const ds = app.get(DataSource);
+      await ds.query(
+        `UPDATE flashcards SET audio_status = 'pending' WHERE id = $1`,
+        [id],
+      );
+
       await request(app.getHttpServer())
-        .post(`/v1/flashcards/${id}/regenerate-audio`)
+        .post(`/v1/flashcards/${id}/audio/regenerates`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(204);
+    });
+
+    it('should return 422 when flashcard audio status is ready', async () => {
+      const id = crypto.randomUUID();
+      const exampleId = crypto.randomUUID();
+
+      await request(app.getHttpServer())
+        .post('/v1/flashcards')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          ...VALID_PAYLOAD,
+          id,
+          examples: [
+            {
+              id: exampleId,
+              textEn: "I'm gonna be late.",
+              textEs: 'Voy a llegar tarde.',
+              position: 1,
+            },
+          ],
+        })
+        .expect(201);
+
+      const ds = app.get(DataSource);
+      await ds.query(
+        `UPDATE flashcards SET audio_status = 'ready', audio_urls = '{"expression":{"us":"https://example.com/us.mp3","uk":"https://example.com/uk.mp3","au":"https://example.com/au.mp3"},"examples":{"us":"https://example.com/ex.mp3"}}'::jsonb WHERE id = $1`,
+        [id],
+      );
+
+      await request(app.getHttpServer())
+        .post(`/v1/flashcards/${id}/audio/regenerates`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(422);
     });

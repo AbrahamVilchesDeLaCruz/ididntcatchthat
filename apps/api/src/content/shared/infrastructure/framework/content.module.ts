@@ -50,6 +50,7 @@ import { SearchFlashcardsGetController } from '@/content/flashcard/infrastructur
 import { UpdateFlashcardPatchController } from '@/content/flashcard/infrastructure/controllers/update-flashcard-patch.controller';
 import { DeleteFlashcardDeleteController } from '@/content/flashcard/infrastructure/controllers/delete-flashcard-delete.controller';
 import { RegenerateFlashcardAudioPostController } from '@/content/flashcard/infrastructure/controllers/regenerate-flashcard-audio-post.controller';
+import { RegenerateFlashcardAudioBulkPostController } from '@/content/flashcard/infrastructure/controllers/regenerate-flashcard-audio-bulk-post.controller';
 import { SearchFlashcardCatalogGetController } from '@/content/flashcard/infrastructure/controllers/search-flashcard-catalog-get.controller';
 import { SuggestExamplesPostController } from '@/content/flashcard/infrastructure/controllers/suggest-examples-post.controller';
 import { GenerateFlashcardsPostController } from '@/content/flashcard/infrastructure/controllers/generate-flashcards-post.controller';
@@ -65,6 +66,7 @@ import { FlashcardSearcher } from '@/content/flashcard/application/search/flashc
 import { FlashcardUpdater } from '@/content/flashcard/application/update/flashcard-updater';
 import { FlashcardRemover } from '@/content/flashcard/application/remove/flashcard-remover';
 import { FlashcardAudioRegenerator } from '@/content/flashcard/application/regenerate-audio/flashcard-audio-regenerator';
+import { FlashcardAudioBulkRegenerator } from '@/content/flashcard/application/regenerate-audio/flashcard-audio-bulk-regenerator';
 import { FlashcardCatalogQuerier } from '@/content/flashcard/application/catalog/flashcard-catalog-querier';
 import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
@@ -74,7 +76,6 @@ import { AiFlashcardDraftGenerator } from '@/content/flashcard/application/gener
 
 // Application — event subscribers
 import { EnrichFlashcardOnFlashcardCreated } from '@/content/flashcard/application/enrich/enrich-flashcard-on-flashcard-created';
-import { GenerateFlashcardAudioOnFlashcardExamplesCompleted } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-completed';
 import { GenerateFlashcardAudioOnFlashcardExpressionUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-expression-updated';
 import { GenerateFlashcardAudioOnFlashcardExamplesUpdated } from '@/content/flashcard/application/generate-audio/generate-flashcard-audio-on-flashcard-examples-updated';
 
@@ -96,6 +97,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     SearchFlashcardsGetController,
     UpdateFlashcardPatchController,
     DeleteFlashcardDeleteController,
+    RegenerateFlashcardAudioBulkPostController,
     RegenerateFlashcardAudioPostController,
     SuggestExamplesPostController,
     GenerateFlashcardsPostController,
@@ -143,25 +145,21 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
 
     // Event subscribers
     EnrichFlashcardOnFlashcardCreated,
-    GenerateFlashcardAudioOnFlashcardExamplesCompleted,
     GenerateFlashcardAudioOnFlashcardExpressionUpdated,
     GenerateFlashcardAudioOnFlashcardExamplesUpdated,
     {
       provide: SUBSCRIBERS,
       useFactory: (
         enrich: EnrichFlashcardOnFlashcardCreated,
-        audioOnExamplesCompleted: GenerateFlashcardAudioOnFlashcardExamplesCompleted,
         audioOnExpressionUpdated: GenerateFlashcardAudioOnFlashcardExpressionUpdated,
         audioOnExamplesUpdated: GenerateFlashcardAudioOnFlashcardExamplesUpdated,
       ): Subscriber[] => [
         enrich,
-        audioOnExamplesCompleted,
         audioOnExpressionUpdated,
         audioOnExamplesUpdated,
       ],
       inject: [
         EnrichFlashcardOnFlashcardCreated,
-        GenerateFlashcardAudioOnFlashcardExamplesCompleted,
         GenerateFlashcardAudioOnFlashcardExpressionUpdated,
         GenerateFlashcardAudioOnFlashcardExamplesUpdated,
       ],
@@ -176,6 +174,7 @@ import { AuthModule } from '@/shared/infrastructure/auth/auth.module';
     FlashcardUpdater,
     FlashcardRemover,
     FlashcardAudioRegenerator,
+    FlashcardAudioBulkRegenerator,
     FlashcardCatalogQuerier,
     FlashcardAudioGenerator,
     AiExamplesCompleter,

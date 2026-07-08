@@ -37,6 +37,40 @@ describe('content/flashcard/application/regenerate-audio FlashcardAudioRegenerat
     });
   });
 
+  it('should regenerate audio when flashcard status is pending', async () => {
+    const flashcard = FlashcardMother.random({
+      audioStatus: AudioStatusValue.Pending,
+    });
+    repository.search.mockResolvedValue(flashcard);
+
+    await regenerator.execute(
+      RequestFlashcardAudioRegeneratorMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
+
+    expect(generator.execute).toHaveBeenCalledWith({
+      flashcardId: flashcard.id.value,
+    });
+  });
+
+  it('should regenerate audio when flashcard status is generating', async () => {
+    const flashcard = FlashcardMother.random({
+      audioStatus: AudioStatusValue.Generating,
+    });
+    repository.search.mockResolvedValue(flashcard);
+
+    await regenerator.execute(
+      RequestFlashcardAudioRegeneratorMother.random({
+        flashcardId: flashcard.id.value,
+      }),
+    );
+
+    expect(generator.execute).toHaveBeenCalledWith({
+      flashcardId: flashcard.id.value,
+    });
+  });
+
   it('should throw FlashcardNotFound when flashcard does not exist', async () => {
     repository.search.mockResolvedValue(null);
 
@@ -46,7 +80,7 @@ describe('content/flashcard/application/regenerate-audio FlashcardAudioRegenerat
     expect(generator.execute).not.toHaveBeenCalled();
   });
 
-  it('should throw AudioStatusInvalid when flashcard is not failed', async () => {
+  it('should throw AudioStatusInvalid when flashcard is ready', async () => {
     const flashcard = FlashcardMother.random({
       audioStatus: AudioStatusValue.Ready,
     });
