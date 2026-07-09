@@ -13,7 +13,7 @@ IMAGES=(
   "rabbitmq:4.1-management-alpine"
   "rabbitmq:4.1-alpine"
   "prom/prometheus:v3.13.0"
-  "grafana/grafana:12.4.5"
+  "grafana/grafana:12.4.5-ubuntu"
   "grafana/loki:3.6.12"
   "nginx:1.27-alpine"
   "node:24-alpine"

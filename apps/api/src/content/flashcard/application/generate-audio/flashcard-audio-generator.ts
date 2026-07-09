@@ -20,6 +20,7 @@ import {
 import { type Logger, LOGGER_SERVICE } from '@/shared/domain/logger';
 import { type AppMetrics, APP_METRICS } from '@/shared/domain/app-metrics';
 import { AudioUrls } from '@/content/flashcard/domain/audio-urls';
+import { AudioGenerationFailed } from '@/content/flashcard/domain/exceptions/audio-generation-failed';
 import { type Flashcard } from '@/content/flashcard/domain/flashcard';
 import { type RequestFlashcardAudioGenerator } from './request-flashcard-audio-generator';
 
@@ -122,10 +123,17 @@ export class FlashcardAudioGenerator {
         provider: 'elevenlabs',
       });
     } catch (e: unknown) {
+      const errorContext: Record<string, unknown> = { flashcardId };
+      if (e instanceof AudioGenerationFailed) {
+        errorContext.elevenLabsStatus = e.status;
+        if (e.detail !== null) {
+          errorContext.elevenLabsDetail = e.detail;
+        }
+      }
       this.logger.error(
         'FlashcardAudioGenerator failed',
         e instanceof Error ? e : new Error(String(e)),
-        { flashcardId },
+        errorContext,
       );
       flashcard.markAudioFailed();
       this.metrics.increment('app_audio_errors_total', {

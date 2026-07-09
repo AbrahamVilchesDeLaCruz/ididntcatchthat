@@ -8,6 +8,7 @@ import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardCreatedEvent } from '@/content/flashcard/domain/events/flashcard-created.event';
 import { AiExamplesCompleter } from '@/content/flashcard/application/complete-examples/ai-examples-completer';
 import { AiPhoneticsCompleter } from '@/content/flashcard/application/complete-phonetics/ai-phonetics-completer';
+import { FlashcardAudioGenerator } from '@/content/flashcard/application/generate-audio/flashcard-audio-generator';
 
 @Injectable()
 export class EnrichFlashcardOnFlashcardCreated extends Subscriber {
@@ -22,6 +23,8 @@ export class EnrichFlashcardOnFlashcardCreated extends Subscriber {
     private readonly examplesCompleter: AiExamplesCompleter,
     @Inject(AiPhoneticsCompleter)
     private readonly phoneticsCompleter: AiPhoneticsCompleter,
+    @Inject(FlashcardAudioGenerator)
+    private readonly audioGenerator: FlashcardAudioGenerator,
   ) {
     super(consumer);
   }
@@ -30,5 +33,6 @@ export class EnrichFlashcardOnFlashcardCreated extends Subscriber {
     const flashcardId = event.aggregateId;
     await this.examplesCompleter.execute({ flashcardId });
     await this.phoneticsCompleter.execute({ flashcardId });
+    await this.audioGenerator.execute({ flashcardId });
   }
 }

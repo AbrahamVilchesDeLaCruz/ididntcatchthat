@@ -40,6 +40,7 @@ export class TypeOrmStudyLevelQuery implements StudyLevelQuery {
          ON ufs.flashcard_id = f.id AND ufs.user_id = $1
        WHERE f.category = ANY($2::varchar[])
          AND f.audio_status = 'ready'
+         AND f.deleted_at IS NULL
        GROUP BY f.category`,
       [userId, MODULES],
     );

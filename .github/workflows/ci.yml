@@ -220,7 +220,7 @@ jobs:
       - name: Scan Grafana image (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: grafana/grafana:12.4.5
+          image-ref: grafana/grafana:12.4.5-ubuntu
           format: table
           exit-code: '1'
           ignore-unfixed: true

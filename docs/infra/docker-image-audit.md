@@ -13,7 +13,7 @@ Inventario de imágenes del stack, política de versionado y escaneo con Trivy.
 | `rabbitmq:4.1-management-alpine` | Compose base (local/dev tooling) | minor pin | CI infra job |
 | `rabbitmq:4.1-alpine` | CI / test | minor pin | CI infra job |
 | `prom/prometheus` | Observabilidad | `v3.13.0` | CI infra job |
-| `grafana/grafana` | Observabilidad | `12.4.5` | CI infra job (OS packages) |
+| `grafana/grafana` | Observabilidad | `12.4.5-ubuntu` | CI infra job (OS packages) |
 | `grafana/loki` | Observabilidad | `3.6.12` | CI infra job |
 | `postgres:16-alpine` | Local / test | major pin | no (efímero) |
 | `minio/minio` | Local only | release tag | no |
@@ -23,7 +23,7 @@ Inventario de imágenes del stack, política de versionado y escaneo con Trivy.
 ## Política de pinning
 
 1. **Imágenes de aplicación:** tags semver o digest en Dockerfiles (`nginx:1.27-alpine`, no `nginx:alpine`).
-2. **Infra en compose:** versión explícita (`grafana/grafana:12.4.5`, no `latest`).
+2. **Infra en compose:** versión explícita (`grafana/grafana:12.4.5-ubuntu`, no `latest`).
 3. **Actualizaciones:** revisar Trivy en CI antes de bump; documentar en PR si hay CVE resuelto.
 
 ---
@@ -48,7 +48,7 @@ bash infra/scripts/security/scan-images.sh
 
 Parámetros Trivy en CI y local: `CRITICAL,HIGH`, `ignore-unfixed: true` (ver [ADR-029](../adr/029-trivy-vulnerability-scanning.md)).
 
-Grafana se escanea con `vuln-type: os` en CI: la capa Alpine está limpia en `12.4.5`, pero los binarios embebidos (Tempo/Prometheus) arrastran CVEs upstream que no podemos parchear en nuestra imagen.
+Grafana se escanea con `vuln-type: os` en CI: usamos la variante Ubuntu `12.4.5-ubuntu` porque Alpine `12.4.5` acumula CVEs OS en libcurl sin imagen parcheada; los binarios embebidos (Tempo/Prometheus) siguen arrastrando CVEs upstream que no podemos parchear en nuestra imagen.
 
 ---
 

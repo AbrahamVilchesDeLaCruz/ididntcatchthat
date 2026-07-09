@@ -37,6 +37,7 @@ export const envValidationSchema = Joi.object({
   ELEVENLABS_VOICE_ID_AMERICAN: Joi.string().required(),
   ELEVENLABS_VOICE_ID_BRITISH: Joi.string().required(),
   ELEVENLABS_VOICE_ID_AUSTRALIAN: Joi.string().required(),
+  ELEVENLABS_MAX_CONCURRENT: Joi.number().integer().min(1).max(10).default(3),
 
   // Cloudflare R2
   CLOUD_STORAGE: Joi.string().uri().required(),

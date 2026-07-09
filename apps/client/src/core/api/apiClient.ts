@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch {
         useAuthStore.getState().logout();
-        window.location.replace('/auth/login');
+        window.location.replace('/');
       }
     }
 

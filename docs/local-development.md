@@ -121,6 +121,8 @@ USE_STUB_ADAPTERS=true
 
 Cuando está activo, la API usa stubs para DeepSeek (generación de borradores y sugerencia de ejemplos), ElevenLabs y almacenamiento local. El almacenamiento de audio sigue usando `R2AudioStorage` apuntando a MinIO.
 
+En **Doppler dev/prod** se usan ElevenLabs y R2 reales. Si el audio falla en VPS dev, ver [troubleshooting/audio-generation.md](./troubleshooting/audio-generation.md).
+
 ---
 
 ## Arquitectura

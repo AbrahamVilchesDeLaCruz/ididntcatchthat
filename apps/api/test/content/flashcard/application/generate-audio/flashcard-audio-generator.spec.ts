@@ -15,6 +15,7 @@ import { type DomainEvent } from '@/shared/domain/domain-event';
 import { FlashcardMother } from '@test/content/flashcard/domain/flashcard-mother';
 import { ExampleMother } from '@test/content/flashcard/domain/example-mother';
 import { RequestFlashcardAudioGeneratorMother } from './request-flashcard-audio-generator-mother';
+import { AudioGenerationFailed } from '@/content/flashcard/domain/exceptions/audio-generation-failed';
 
 describe('content/flashcard/application/generate-audio FlashcardAudioGenerator', () => {
   const repository = mock<FlashcardRepository>();
@@ -118,6 +119,29 @@ describe('content/flashcard/application/generate-audio FlashcardAudioGenerator',
     expect(metrics.increment).toHaveBeenCalledWith('app_audio_errors_total', {
       provider: 'elevenlabs',
     });
+  });
+
+  it('should log ElevenLabs status and detail when generator throws AudioGenerationFailed', async () => {
+    const flashcard = FlashcardMother.random({ examples: [] });
+    repository.search.mockResolvedValue(flashcard);
+    audioGenerator.generate.mockRejectedValue(
+      new AudioGenerationFailed(429, 'Too Many Requests', 'quota exceeded'),
+    );
+    const request = RequestFlashcardAudioGeneratorMother.random({
+      flashcardId: flashcard.id.value,
+    });
+
+    await generator.execute(request);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      'FlashcardAudioGenerator failed',
+      expect.any(AudioGenerationFailed),
+      {
+        flashcardId: flashcard.id.value,
+        elevenLabsStatus: 429,
+        elevenLabsDetail: 'quota exceeded',
+      },
+    );
   });
 
   it('should mark audio as failed when generator throws a non-Error value', async () => {

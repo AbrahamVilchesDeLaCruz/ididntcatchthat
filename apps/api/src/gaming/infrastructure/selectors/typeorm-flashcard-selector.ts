@@ -34,6 +34,7 @@ export class TypeOrmFlashcardSelector implements FlashcardSelector {
       `SELECT id
        FROM flashcards
        WHERE audio_status = $1
+         AND deleted_at IS NULL
        ${categoryClause}
        ${subcategoryClause}
        ORDER BY RANDOM()
