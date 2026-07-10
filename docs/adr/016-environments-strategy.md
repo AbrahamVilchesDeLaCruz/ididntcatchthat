@@ -28,6 +28,10 @@ El proyecto necesita una estrategia clara para gestionar múltiples entornos (lo
 Autocontenido para quien clona el repo sin acceso a servicios de pago:
 
 ```bash
+# One-shot (recomendado para evaluadores):
+make local-start
+
+# O paso a paso, con hot-reload en host para desarrollo activo:
 make local-setup && make local-up && make local-seed && make local-dev
 ```
 
