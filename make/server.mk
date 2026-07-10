@@ -1,0 +1,184 @@
+# make/server.mk
+# SERVER profile — VPS deploys, nginx, security audits, observability tunnels, cleanup.
+# Reads ensure-docker from the root Makefile.
+# Vars declared here are only used by targets in this file.
+
+VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
+
+PROD_DIR = /opt/ididntcatchthat
+DEV_DIR  = /opt/ididntcatchthat-dev
+
+NGINX_AVAILABLE = /etc/nginx/sites-available
+NGINX_ENABLED   = /etc/nginx/sites-enabled
+NGINX_SRC       = $(PROD_DIR)/infra/nginx
+
+.PHONY: obs-up obs-down \
+        tunnel-dev tunnel-prod \
+        vps-deploy-prod vps-deploy-dev \
+        deploy-dev deploy-prod \
+        vps-ps-prod vps-ps-dev \
+        vps-logs-prod vps-logs-dev \
+        vps-restart-prod vps-restart-dev \
+        nginx-setup nginx-reload \
+        security-audit security-audit-ports security-audit-rabbitmq security-audit-ssh \
+        security-probe-external security-verify security-hotfix-iptables \
+        security-scan-images security-rotate-rabbitmq \
+        rebuild clean purge prune
+
+# ─── OBSERVABILITY ────────────────────────────────────────────────────────────
+
+obs-up: ## Start observability stack only (Prometheus + Grafana + Loki)
+	$(ensure-docker)
+	$(COMPOSE_DEV) up -d prometheus grafana loki
+
+obs-down: ## Stop observability stack
+	$(ensure-docker)
+	$(COMPOSE_DEV) stop prometheus grafana loki
+
+tunnel-dev: ## Open SSH tunnel to dev observability (Prometheus :9090, Grafana :3002, Loki :3100)
+	@echo "🔭 Tunnel open → Prometheus: http://localhost:9090  Grafana: http://localhost:3002  Loki: http://localhost:3100"
+	@echo "   (services bound to 127.0.0.1 on VPS — tunnel required)"
+	@echo "   Press Ctrl+C to close."
+	ssh -L 9090:localhost:9090 -L 3002:localhost:3002 -L 3100:localhost:3100 $(VPS_HOST) -N
+
+tunnel-prod: ## Open SSH tunnel to prod observability (Prometheus :9091, Grafana :3003, Loki :3101)
+	@echo "🔭 Tunnel open → Prometheus: http://localhost:9091  Grafana: http://localhost:3003"
+	@echo "   Press Ctrl+C to close."
+	ssh -L 9091:localhost:9091 -L 3003:localhost:3003 -L 3101:localhost:3101 $(VPS_HOST) -N
+
+# ─── VPS ──────────────────────────────────────────────────────────────────────
+
+vps-deploy-prod: ## [VPS] Sync main + build + recreate prod containers
+	git -C $(PROD_DIR) fetch origin
+	git -C $(PROD_DIR) reset --hard origin/main
+	doppler run --config prd --project ididntcatchthat -- \
+		docker compose --project-directory $(PROD_DIR) \
+		-f $(PROD_DIR)/infra/docker-compose.yml \
+		-f $(PROD_DIR)/infra/docker-compose.prod.yml \
+		up -d --build
+
+vps-deploy-dev: ## [VPS] Sync dev + build + recreate dev containers
+	git -C $(DEV_DIR) fetch origin
+	git -C $(DEV_DIR) reset --hard origin/dev
+	doppler run --config dev --project ididntcatchthat -- \
+		docker compose --project-directory $(DEV_DIR) \
+		-f $(DEV_DIR)/infra/docker-compose.yml \
+		-f $(DEV_DIR)/infra/docker-compose.dev.yml \
+		up -d --build
+
+deploy-dev: vps-deploy-dev ## Alias for vps-deploy-dev
+deploy-prod: vps-deploy-prod ## Alias for vps-deploy-prod
+
+vps-ps-prod: ## [VPS] Status of prod containers
+	doppler run --config prd --project ididntcatchthat -- \
+		docker compose --project-directory $(PROD_DIR) \
+		-f $(PROD_DIR)/infra/docker-compose.yml \
+		-f $(PROD_DIR)/infra/docker-compose.prod.yml ps
+
+vps-ps-dev: ## [VPS] Status of dev containers
+	doppler run --config dev --project ididntcatchthat -- \
+		docker compose --project-directory $(DEV_DIR) \
+		-f $(DEV_DIR)/infra/docker-compose.yml \
+		-f $(DEV_DIR)/infra/docker-compose.dev.yml ps
+
+vps-logs-prod: ## [VPS] Tail prod logs
+	doppler run --config prd --project ididntcatchthat -- \
+		docker compose --project-directory $(PROD_DIR) \
+		-f $(PROD_DIR)/infra/docker-compose.yml \
+		-f $(PROD_DIR)/infra/docker-compose.prod.yml logs -f
+
+vps-logs-dev: ## [VPS] Tail dev logs
+	doppler run --config dev --project ididntcatchthat -- \
+		docker compose --project-directory $(DEV_DIR) \
+		-f $(DEV_DIR)/infra/docker-compose.yml \
+		-f $(DEV_DIR)/infra/docker-compose.dev.yml logs -f
+
+vps-restart-prod: ## [VPS] Restart prod containers
+	doppler run --config prd --project ididntcatchthat -- \
+		docker compose --project-directory $(PROD_DIR) \
+		-f $(PROD_DIR)/infra/docker-compose.yml \
+		-f $(PROD_DIR)/infra/docker-compose.prod.yml restart
+
+vps-restart-dev: ## [VPS] Restart dev containers
+	doppler run --config dev --project ididntcatchthat -- \
+		docker compose --project-directory $(DEV_DIR) \
+		-f $(DEV_DIR)/infra/docker-compose.yml \
+		-f $(DEV_DIR)/infra/docker-compose.dev.yml restart
+
+# ─── nginx (host VPS) ─────────────────────────────────────────────────────────
+# Run nginx-setup once after cloning on the VPS.
+# After that, git pull + nginx-reload is enough after any infra/nginx/*.conf change.
+
+nginx-setup: ## [VPS] Replace nginx site configs with symlinks to repo (run once)
+	@echo "→ Removing existing site files and creating symlinks to $(NGINX_SRC)..."
+	sudo rm -f $(NGINX_AVAILABLE)/ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/api.ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
+	sudo rm -f $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/ididntcatchthat.com.conf        $(NGINX_AVAILABLE)/ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/api.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/api.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/dev.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
+	sudo ln -s $(NGINX_SRC)/api.dev.ididntcatchthat.com.conf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/ididntcatchthat.com        $(NGINX_ENABLED)/ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/api.ididntcatchthat.com    $(NGINX_ENABLED)/api.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/dev.ididntcatchthat.com    $(NGINX_ENABLED)/dev.ididntcatchthat.com
+	sudo ln -sf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com $(NGINX_ENABLED)/api.dev.ididntcatchthat.com
+	$(MAKE) nginx-reload
+
+nginx-reload: ## [VPS] Validate nginx config and reload
+	sudo nginx -t && sudo systemctl reload nginx
+
+# ─── SECURITY (VPS) ───────────────────────────────────────────────────────────
+# Run from repo root on the VPS (/opt/ididntcatchthat-dev or /opt/ididntcatchthat).
+# See docs/vps-security.md and docs/infra/docker-image-audit.md
+
+security-audit: ## [VPS] Full security audit (ports, rabbitmq dev+prod, ssh)
+	@bash infra/scripts/security/audit-ports.sh
+	@bash infra/scripts/security/audit-rabbitmq.sh all
+	@bash infra/scripts/security/audit-ssh.sh
+
+security-audit-ports: ## [VPS] Listening ports, Docker mappings, UFW, iptables
+	@bash infra/scripts/security/audit-ports.sh
+
+security-audit-rabbitmq: ## [VPS] RabbitMQ logs + rabbitmqctl (STACK=dev|prod|all)
+	@bash infra/scripts/security/audit-rabbitmq.sh $${STACK:-all}
+
+security-audit-ssh: ## [VPS] fail2ban status and recent SSH failures
+	@bash infra/scripts/security/audit-ssh.sh
+
+security-probe-external: ## [VPS] nc probe public IP for sensitive ports (exit 1 if leak)
+	@bash infra/scripts/security/probe-external.sh
+
+security-verify: ## [VPS] Post-deploy check — ports audit + external probe
+	@bash infra/scripts/security/audit-ports.sh
+	@bash infra/scripts/security/probe-external.sh
+
+security-hotfix-iptables: ## [VPS] Temporary DOCKER-USER block (confirm each rule)
+	@bash infra/scripts/security/hotfix-docker-user.sh
+
+security-scan-images: ## Scan infra Docker images with Trivy (CRITICAL/HIGH)
+	@bash infra/scripts/security/scan-images.sh
+
+security-rotate-rabbitmq: ## Rotate RABBITMQ_PASS in Doppler (ROTATE_CONFIRM=yes to apply)
+	@bash infra/scripts/security/rotate-rabbitmq-pass.sh
+
+# ─── CLEANUP ──────────────────────────────────────────────────────────────────
+
+rebuild: ## Force rebuild all images without cache (dev)
+	$(ensure-docker)
+	$(COMPOSE_DEV) build --no-cache
+
+clean: ## Stop dev containers and remove dangling images
+	$(MAKE) down
+	docker image prune -f
+	docker container prune -f
+
+purge: ## ⚠️  Stop local stack and remove all volumes (deletes all data)
+	$(ensure-docker)
+	-$(COMPOSE_LOCAL) --profile init down -v 2>/dev/null
+	-$(COMPOSE_TEST) down -v 2>/dev/null
+	docker image prune -f
+	docker volume prune -f
+
+prune: ## ☢️  Nuclear: removes all unused Docker resources
+	docker system prune -af --volumes
