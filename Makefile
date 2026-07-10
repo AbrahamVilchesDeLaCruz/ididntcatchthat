@@ -1,4 +1,5 @@
 .PHONY: local-setup local-up local-down local-dev local-dev-api local-seed \
+        local-start \
         local-logs local-status local-reset local-dev-client local-shell-db \
         up down dev dev-api dev-client \
         up-prod down-prod \
@@ -48,12 +49,14 @@ endef
 
 # ─── LOCAL (no Doppler, .env.local) ───────────────────────────────────────────
 
+local-start: local-up local-seed ## Start full local stack + seed data (one-shot onboarding)
+
 local-setup: ## Copy .env.example → .env.local (api + client)
 	@test -f $(API_DIR)/.env.local || cp $(API_DIR)/.env.example $(API_DIR)/.env.local
 	@test -f $(CLIENT_DIR)/.env.local || cp $(CLIENT_DIR)/.env.example $(CLIENT_DIR)/.env.local
 	@echo "✅ Local env files ready ($(API_DIR)/.env.local, $(CLIENT_DIR)/.env.local)"
 
-local-up: local-setup ## Start full local stack in Docker (api, client, postgres, rabbitmq, minio)
+local-up: local-setup ## Start full local stack in Docker (no seed — run `local-seed` after, or `local-start` for both)
 	$(ensure-docker)
 	$(COMPOSE_LOCAL) up -d --build --wait
 	$(COMPOSE_LOCAL) --profile init up minio-init --no-deps
