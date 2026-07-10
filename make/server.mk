@@ -1,8 +1,16 @@
-# infra/Makefile.ops
-# Operational commands — VPS deploys, nginx, security audits, observability tunnels.
-# Included from the root Makefile; do not invoke directly.
-# All variables (VPS_HOST, COMPOSE_DEV, COMPOSE_LOCAL, COMPOSE_TEST, NGINX_*, etc.)
-# come from the root Makefile and are in scope at include time.
+# make/server.mk
+# SERVER profile — VPS deploys, nginx, security audits, observability tunnels, cleanup.
+# Reads ensure-docker from the root Makefile.
+# Vars declared here are only used by targets in this file.
+
+VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
+
+PROD_DIR = /opt/ididntcatchthat
+DEV_DIR  = /opt/ididntcatchthat-dev
+
+NGINX_AVAILABLE = /etc/nginx/sites-available
+NGINX_ENABLED   = /etc/nginx/sites-enabled
+NGINX_SRC       = $(PROD_DIR)/infra/nginx
 
 .PHONY: obs-up obs-down \
         tunnel-dev tunnel-prod \
@@ -100,10 +108,6 @@ vps-restart-dev: ## [VPS] Restart dev containers
 # ─── nginx (host VPS) ─────────────────────────────────────────────────────────
 # Run nginx-setup once after cloning on the VPS.
 # After that, git pull + nginx-reload is enough after any infra/nginx/*.conf change.
-
-NGINX_AVAILABLE = /etc/nginx/sites-available
-NGINX_ENABLED   = /etc/nginx/sites-enabled
-NGINX_SRC       = $(PROD_DIR)/infra/nginx
 
 nginx-setup: ## [VPS] Replace nginx site configs with symlinks to repo (run once)
 	@echo "→ Removing existing site files and creating symlinks to $(NGINX_SRC)..."
