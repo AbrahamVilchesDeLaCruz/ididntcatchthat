@@ -1,21 +1,11 @@
 .PHONY: local-setup local-up local-down local-dev local-dev-api local-seed \
+        local-logs local-status local-reset local-dev-client local-shell-db \
         up down dev dev-api dev-client \
         up-prod down-prod \
         test\:e2e\:up test\:e2e\:down \
         test\:api\:unit test\:api\:e2e test\:api \
         test\:client\:unit test\:client\:e2e test\:client \
         test\:all \
-        obs-up obs-down \
-        tunnel-dev tunnel-prod \
-        vps-deploy-prod vps-deploy-dev \
-        vps-ps-prod vps-ps-dev \
-        vps-logs-prod vps-logs-dev \
-        vps-restart-prod vps-restart-dev \
-        nginx-setup nginx-reload \
-        security-audit security-audit-ports security-audit-rabbitmq security-audit-ssh \
-        security-probe-external security-verify security-hotfix-iptables \
-        security-scan-images security-rotate-rabbitmq \
-        rebuild clean purge prune \
         help
 
 VPS_HOST     ?= $(shell doppler secrets get VPS_HOST --plain 2>/dev/null)
@@ -84,8 +74,35 @@ local-dev: local-setup ## Start infra in Docker + run api & client on host (hot-
 	@pnpm --filter @ididntcatchthat/api start:dev & \
 	pnpm --filter @ididntcatchthat/client dev
 
-local-dev-api: ## Run api on host only (.env.local, hot-reload)
+local-dev-api: local-setup ## Run api on host only (.env.local, hot-reload). Requires `local-up` or `local-dev` running first.
+	$(ensure-docker)
+	@docker exec ididntcatchthat-postgres-local pg_isready -U local > /dev/null 2>&1 || \
+		(echo "❌ Local Postgres is not running. Run 'make local-up' or 'make local-dev' first." && exit 1)
 	@pnpm --filter @ididntcatchthat/api start:dev
+
+local-dev-client: local-setup ## Run client on host only (.env.local, Vite HMR)
+	@pnpm --filter @ididntcatchthat/client dev
+
+local-logs: ## Tail logs from all local services
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) logs -f
+
+local-status: ## Status of local containers
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) ps
+
+local-reset: ## ⚠️  Stop, remove volumes, re-up, re-seed (DESTROYS ALL LOCAL DATA)
+	@echo "⚠️  This will DELETE all local Postgres, MinIO, and RabbitMQ data."
+	@read -p "Continue? [y/N] " r && [ "$$r" = "y" ] || exit 1
+	$(ensure-docker)
+	-$(COMPOSE_LOCAL) --profile init down -v
+	$(COMPOSE_LOCAL) down -v
+	$(MAKE) local-up
+	$(MAKE) local-seed
+
+local-shell-db: ## Open psql shell in local Postgres
+	$(ensure-docker)
+	$(COMPOSE_LOCAL) exec postgres psql -U local -d ididntcatchthat_local
 
 # ─── DEV (Doppler dev, external DB) ───────────────────────────────────────────
 
@@ -175,171 +192,17 @@ test\:all: ## Run all tests — API (unit + E2E) + client (unit + E2E)
 	CLIENT_E2E=$$?; \
 	exit $$(( API_UNIT || API_E2E || CLIENT_UNIT || CLIENT_E2E ))
 
-# ─── OBSERVABILITY ────────────────────────────────────────────────────────────
 
-obs-up: ## Start observability stack only (Prometheus + Grafana + Loki)
-	$(ensure-docker)
-	$(COMPOSE_DEV) up -d prometheus grafana loki
+# ─── OPS (VPS, nginx, security, observability, cleanup) ──────────────────────
+# Operational commands live in infra/Makefile.ops — pulled in here so they
+# still resolve and appear in `make help`.
 
-obs-down: ## Stop observability stack
-	$(ensure-docker)
-	$(COMPOSE_DEV) stop prometheus grafana loki
-
-tunnel-dev: ## Open SSH tunnel to dev observability (Prometheus :9090, Grafana :3002, Loki :3100)
-	@echo "🔭 Tunnel open → Prometheus: http://localhost:9090  Grafana: http://localhost:3002  Loki: http://localhost:3100"
-	@echo "   (services bound to 127.0.0.1 on VPS — tunnel required)"
-	@echo "   Press Ctrl+C to close."
-	ssh -L 9090:localhost:9090 -L 3002:localhost:3002 -L 3100:localhost:3100 $(VPS_HOST) -N
-
-tunnel-prod: ## Open SSH tunnel to prod observability (Prometheus :9091, Grafana :3003, Loki :3101)
-	@echo "🔭 Tunnel open → Prometheus: http://localhost:9091  Grafana: http://localhost:3003"
-	@echo "   Press Ctrl+C to close."
-	ssh -L 9091:localhost:9091 -L 3003:localhost:3003 -L 3101:localhost:3101 $(VPS_HOST) -N
-
-# ─── VPS ──────────────────────────────────────────────────────────────────────
-
-vps-deploy-prod: ## [VPS] Sync main + build + recreate prod containers
-	git -C $(PROD_DIR) fetch origin
-	git -C $(PROD_DIR) reset --hard origin/main
-	doppler run --config prd --project ididntcatchthat -- \
-		docker compose --project-directory $(PROD_DIR) \
-		-f $(PROD_DIR)/infra/docker-compose.yml \
-		-f $(PROD_DIR)/infra/docker-compose.prod.yml \
-		up -d --build
-
-vps-deploy-dev: ## [VPS] Sync dev + build + recreate dev containers
-	git -C $(DEV_DIR) fetch origin
-	git -C $(DEV_DIR) reset --hard origin/dev
-	doppler run --config dev --project ididntcatchthat -- \
-		docker compose --project-directory $(DEV_DIR) \
-		-f $(DEV_DIR)/infra/docker-compose.yml \
-		-f $(DEV_DIR)/infra/docker-compose.dev.yml \
-		up -d --build
-
-deploy-dev: vps-deploy-dev ## Alias for vps-deploy-dev
-deploy-prod: vps-deploy-prod ## Alias for vps-deploy-prod
-
-vps-ps-prod: ## [VPS] Status of prod containers
-	doppler run --config prd --project ididntcatchthat -- \
-		docker compose --project-directory $(PROD_DIR) \
-		-f $(PROD_DIR)/infra/docker-compose.yml \
-		-f $(PROD_DIR)/infra/docker-compose.prod.yml ps
-
-vps-ps-dev: ## [VPS] Status of dev containers
-	doppler run --config dev --project ididntcatchthat -- \
-		docker compose --project-directory $(DEV_DIR) \
-		-f $(DEV_DIR)/infra/docker-compose.yml \
-		-f $(DEV_DIR)/infra/docker-compose.dev.yml ps
-
-vps-logs-prod: ## [VPS] Tail prod logs
-	doppler run --config prd --project ididntcatchthat -- \
-		docker compose --project-directory $(PROD_DIR) \
-		-f $(PROD_DIR)/infra/docker-compose.yml \
-		-f $(PROD_DIR)/infra/docker-compose.prod.yml logs -f
-
-vps-logs-dev: ## [VPS] Tail dev logs
-	doppler run --config dev --project ididntcatchthat -- \
-		docker compose --project-directory $(DEV_DIR) \
-		-f $(DEV_DIR)/infra/docker-compose.yml \
-		-f $(DEV_DIR)/infra/docker-compose.dev.yml logs -f
-
-vps-restart-prod: ## [VPS] Restart prod containers
-	doppler run --config prd --project ididntcatchthat -- \
-		docker compose --project-directory $(PROD_DIR) \
-		-f $(PROD_DIR)/infra/docker-compose.yml \
-		-f $(PROD_DIR)/infra/docker-compose.prod.yml restart
-
-vps-restart-dev: ## [VPS] Restart dev containers
-	doppler run --config dev --project ididntcatchthat -- \
-		docker compose --project-directory $(DEV_DIR) \
-		-f $(DEV_DIR)/infra/docker-compose.yml \
-		-f $(DEV_DIR)/infra/docker-compose.dev.yml restart
-
-# ─── nginx (host VPS) ─────────────────────────────────────────────────────────
-# Run nginx-setup once after cloning on the VPS.
-# After that, git pull + nginx-reload is enough after any infra/nginx/*.conf change.
-
-NGINX_AVAILABLE = /etc/nginx/sites-available
-NGINX_ENABLED   = /etc/nginx/sites-enabled
-NGINX_SRC       = $(PROD_DIR)/infra/nginx
-
-nginx-setup: ## [VPS] Replace nginx site configs with symlinks to repo (run once)
-	@echo "→ Removing existing site files and creating symlinks to $(NGINX_SRC)..."
-	sudo rm -f $(NGINX_AVAILABLE)/ididntcatchthat.com
-	sudo rm -f $(NGINX_AVAILABLE)/api.ididntcatchthat.com
-	sudo rm -f $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
-	sudo rm -f $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
-	sudo ln -s $(NGINX_SRC)/ididntcatchthat.com.conf        $(NGINX_AVAILABLE)/ididntcatchthat.com
-	sudo ln -s $(NGINX_SRC)/api.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/api.ididntcatchthat.com
-	sudo ln -s $(NGINX_SRC)/dev.ididntcatchthat.com.conf    $(NGINX_AVAILABLE)/dev.ididntcatchthat.com
-	sudo ln -s $(NGINX_SRC)/api.dev.ididntcatchthat.com.conf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com
-	sudo ln -sf $(NGINX_AVAILABLE)/ididntcatchthat.com        $(NGINX_ENABLED)/ididntcatchthat.com
-	sudo ln -sf $(NGINX_AVAILABLE)/api.ididntcatchthat.com    $(NGINX_ENABLED)/api.ididntcatchthat.com
-	sudo ln -sf $(NGINX_AVAILABLE)/dev.ididntcatchthat.com    $(NGINX_ENABLED)/dev.ididntcatchthat.com
-	sudo ln -sf $(NGINX_AVAILABLE)/api.dev.ididntcatchthat.com $(NGINX_ENABLED)/api.dev.ididntcatchthat.com
-	$(MAKE) nginx-reload
-
-nginx-reload: ## [VPS] Validate nginx config and reload
-	sudo nginx -t && sudo systemctl reload nginx
-
-# ─── SECURITY (VPS) ───────────────────────────────────────────────────────────
-# Run from repo root on the VPS (/opt/ididntcatchthat-dev or /opt/ididntcatchthat).
-# See docs/vps-security.md and docs/infra/docker-image-audit.md
-
-security-audit: ## [VPS] Full security audit (ports, rabbitmq dev+prod, ssh)
-	@bash infra/scripts/security/audit-ports.sh
-	@bash infra/scripts/security/audit-rabbitmq.sh all
-	@bash infra/scripts/security/audit-ssh.sh
-
-security-audit-ports: ## [VPS] Listening ports, Docker mappings, UFW, iptables
-	@bash infra/scripts/security/audit-ports.sh
-
-security-audit-rabbitmq: ## [VPS] RabbitMQ logs + rabbitmqctl (STACK=dev|prod|all)
-	@bash infra/scripts/security/audit-rabbitmq.sh $${STACK:-all}
-
-security-audit-ssh: ## [VPS] fail2ban status and recent SSH failures
-	@bash infra/scripts/security/audit-ssh.sh
-
-security-probe-external: ## [VPS] nc probe public IP for sensitive ports (exit 1 if leak)
-	@bash infra/scripts/security/probe-external.sh
-
-security-verify: ## [VPS] Post-deploy check — ports audit + external probe
-	@bash infra/scripts/security/audit-ports.sh
-	@bash infra/scripts/security/probe-external.sh
-
-security-hotfix-iptables: ## [VPS] Temporary DOCKER-USER block (confirm each rule)
-	@bash infra/scripts/security/hotfix-docker-user.sh
-
-security-scan-images: ## Scan infra Docker images with Trivy (CRITICAL/HIGH)
-	@bash infra/scripts/security/scan-images.sh
-
-security-rotate-rabbitmq: ## Rotate RABBITMQ_PASS in Doppler (ROTATE_CONFIRM=yes to apply)
-	@bash infra/scripts/security/rotate-rabbitmq-pass.sh
-
-# ─── CLEANUP ──────────────────────────────────────────────────────────────────
-
-rebuild: ## Force rebuild all images without cache (dev)
-	$(ensure-docker)
-	$(COMPOSE_DEV) build --no-cache
-
-clean: down ## Stop dev containers and remove dangling images
-	docker image prune -f
-	docker container prune -f
-
-purge: ## ⚠️  Stop local stack and remove all volumes (deletes all data)
-	$(ensure-docker)
-	-$(COMPOSE_LOCAL) --profile init down -v 2>/dev/null
-	-$(COMPOSE_TEST) down -v 2>/dev/null
-	docker image prune -f
-	docker volume prune -f
-
-prune: ## ☢️  Nuclear: removes all unused Docker resources
-	docker system prune -af --volumes
+include infra/Makefile.ops
 
 # ─── HELP ─────────────────────────────────────────────────────────────────────
 
 help: ## Show this help message
-	@grep -E '^[a-zA-Z_:\\-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	@grep -hE '^[a-zA-Z_:\\-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| sed -E 's/\\:/-/g; s/:.*## / ## /' \
 		| awk 'BEGIN {FS = " ## "}; {printf "  \033[36m%-26s\033[0m %s\n", $$1, $$2}'
 
