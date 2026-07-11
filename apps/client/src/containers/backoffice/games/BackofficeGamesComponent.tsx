@@ -142,7 +142,7 @@ export const BackofficeGamesComponent = ({
                     name:
                       t.game.config.modules[
                         m.module as keyof typeof t.game.config.modules
-                      ] ?? m.module,
+                      ] ?? t.game.config.modules.random,
                     value: m.totalGames,
                   }))}
                   height={200}

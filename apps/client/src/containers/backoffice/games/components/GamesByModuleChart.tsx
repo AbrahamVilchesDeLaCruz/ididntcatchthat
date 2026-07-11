@@ -1,28 +1,28 @@
 import { type ReactElement } from 'react';
 import {
-  ComposedChart,
+  BarChart,
   Bar,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
+  Cell,
 } from 'recharts';
 import type { GamesByModuleVM } from '../backoffice-games.types';
 import { useI18n } from '@/core/i18n';
+import { chartSeriesColor } from '@/common/charts/chartPalette';
 
 interface GamesByModuleChartProps {
   data: GamesByModuleVM[];
 }
 
 const tooltipStyle = {
-  backgroundColor: 'var(--color-bg-surface)',
+  backgroundColor: 'var(--color-bg-elevated)' as const,
   border: '1px solid var(--color-border)',
   borderRadius: '8px',
+  fontSize: 12,
   color: 'var(--color-text-primary)',
-  fontSize: 13,
 };
 
 const axisTickStyle = {
@@ -37,9 +37,8 @@ function formatModuleName(name: string): string {
 export const GamesByModuleChart = ({
   data,
 }: GamesByModuleChartProps): ReactElement => {
-  const { locale, t } = useI18n();
+  const { t } = useI18n();
   const charts = t.backoffice.games.charts;
-  const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
 
   if (data.length === 0) {
     return (
@@ -49,12 +48,15 @@ export const GamesByModuleChart = ({
     );
   }
 
-  const chartData = data.map((d) => ({
-    ...d,
-    module:
-      t.game.config.modules[d.module as keyof typeof t.game.config.modules] ??
-      formatModuleName(d.module),
-  }));
+  const chartData = data
+    .filter((d) => d.avgAccuracy > 0)
+    .map((d) => ({
+      module:
+        t.game.config.modules[d.module as keyof typeof t.game.config.modules] ??
+        t.game.config.modules.random ??
+        formatModuleName(d.module ?? ''),
+      accuracy: d.avgAccuracy,
+    }));
 
   return (
     <div
@@ -66,7 +68,7 @@ export const GamesByModuleChart = ({
       </p>
       <div role="img" aria-hidden className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
+          <BarChart
             layout="vertical"
             data={chartData}
             margin={{ top: 8, right: 16, left: 4, bottom: 8 }}
@@ -87,56 +89,31 @@ export const GamesByModuleChart = ({
             />
             <XAxis
               type="number"
+              domain={[0, 100]}
               tick={axisTickStyle}
               tickLine={false}
               axisLine={false}
-              allowDecimals={false}
-              label={{
-                value: charts.gamesLegend,
-                position: 'insideBottom',
-                offset: -2,
-                style: {
-                  fill: 'var(--color-text-muted)',
-                  fontSize: 11,
-                },
-              }}
+              tickFormatter={(v: number) => `${v}%`}
             />
             <Tooltip
               contentStyle={tooltipStyle}
-              formatter={(value, name) => {
+              formatter={(value: unknown) => {
                 const n =
                   typeof value === 'number' ? value : Number(value ?? 0);
-                const label = String(name ?? '');
-                return label === charts.accuracyLegend
-                  ? [`${n.toFixed(1)}%`, label]
-                  : [n.toLocaleString(numberLocale), label];
-              }}
-            />
-            <Legend
-              wrapperStyle={{
-                color: 'var(--color-text-secondary)',
-                fontSize: 12,
-                paddingTop: 8,
+                return [`${n.toFixed(1)}%`, charts.accuracyLegend];
               }}
             />
             <Bar
-              dataKey="totalGames"
-              name={charts.gamesLegend}
-              fill="var(--color-chart-1)"
-              fillOpacity={0.85}
+              dataKey="accuracy"
+              name={charts.accuracyLegend}
               radius={[0, 4, 4, 0]}
               maxBarSize={22}
-            />
-            <Line
-              type="monotone"
-              dataKey="avgAccuracy"
-              name={charts.accuracyLegend}
-              stroke="var(--color-chart-2)"
-              strokeWidth={2.5}
-              dot={{ fill: 'var(--color-chart-2)', r: 4, strokeWidth: 0 }}
-              activeDot={{ r: 6 }}
-            />
-          </ComposedChart>
+            >
+              {chartData.map((_, i) => (
+                <Cell key={i} fill={chartSeriesColor(1)} fillOpacity={0.85} />
+              ))}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>
