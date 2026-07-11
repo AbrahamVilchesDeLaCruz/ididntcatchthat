@@ -29,8 +29,9 @@ export class ProgressWeakestFlashcardIdsProvider implements WeakestFlashcardIdsP
 
     const cards = await this.query.findWeakest(
       new UserId(userId),
-      limit,
       filters,
+      limit,
+      0,
     );
     return cards.map((c) => c.flashcardId);
   }
