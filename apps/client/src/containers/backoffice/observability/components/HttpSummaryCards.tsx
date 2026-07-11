@@ -1,12 +1,14 @@
 import { type ReactElement } from 'react';
 import type { HttpStats, LatencyPercentiles } from '../utils/parseMetrics';
 import { useI18n } from '@/core/i18n';
+import { InfoTooltip } from './InfoTooltip';
 
 interface SummaryCardProps {
   label: string;
   value: string;
   sub?: string;
   variant?: 'default' | 'success' | 'warning' | 'danger';
+  tooltip?: string;
 }
 
 const VARIANT_CLASSES: Record<
@@ -24,11 +26,15 @@ const SummaryCard = ({
   value,
   sub,
   variant = 'default',
+  tooltip,
 }: SummaryCardProps): ReactElement => (
   <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5">
-    <p className="text-[var(--color-text-secondary)] text-xs font-medium uppercase tracking-wide mb-2">
-      {label}
-    </p>
+    <div className="flex items-center gap-1.5 mb-2">
+      <p className="text-[var(--color-text-secondary)] text-xs font-medium uppercase tracking-wide">
+        {label}
+      </p>
+      {tooltip && <InfoTooltip content={tooltip} />}
+    </div>
     <p
       className={`text-3xl font-bold tracking-tight ${VARIANT_CLASSES[variant]}`}
     >
@@ -68,18 +74,21 @@ export const HttpSummaryCards = ({
       <SummaryCard
         label={t.backoffice.observability.httpSummary.totalRequests}
         value={http.totalRequests.toLocaleString(numberLocale)}
+        tooltip={t.backoffice.observability.httpSummary.totalRequestsTooltip}
         variant="default"
       />
       <SummaryCard
         label={t.backoffice.observability.httpSummary.successRate}
         value={`${http.successRate.toFixed(1)}%`}
         sub={t.backoffice.observability.httpSummary.successRateHint}
+        tooltip={t.backoffice.observability.httpSummary.successRateTooltip}
         variant={http.successRate >= 95 ? 'success' : 'warning'}
       />
       <SummaryCard
         label={t.backoffice.observability.httpSummary.errorRate}
         value={`${http.errorRate.toFixed(2)}%`}
         sub={t.backoffice.observability.httpSummary.errorRateHint}
+        tooltip={t.backoffice.observability.httpSummary.errorRateTooltip}
         variant={http.errorRate > 1 ? 'danger' : 'success'}
       />
       <SummaryCard
@@ -92,6 +101,7 @@ export const HttpSummaryCards = ({
                 .replace('{p99}', fmtMs(latency.p99Ms))
             : undefined
         }
+        tooltip={t.backoffice.observability.httpSummary.latencyP95Tooltip}
         variant={
           latency?.p95Ms === undefined || latency.p95Ms === null
             ? 'default'
