@@ -41,7 +41,7 @@ export class TypeOrmProgressSummaryQuery implements ProgressSummaryQuery {
            COALESCE(SUM(ufs.times_played + ufs.times_studied), 0)::int AS total_attempts,
            COUNT(*) FILTER (
              WHERE ufs.times_played > 0
-               AND (ufs.times_played - ufs.correct_count) > 0
+               AND (ufs.times_played - 2*ufs.correct_count) > 0
            )::int AS weak_count,
            COUNT(*) FILTER (
              WHERE ufs.times_played >= 5 AND ufs.accuracy_rate >= 0.85
