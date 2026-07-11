@@ -3,6 +3,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 import { useAuthStore } from '@/core/store/auth.store';
+import { redirectToLanding } from '@/core/auth/redirectToLanding';
 import { ApiRequestError } from './apiError';
 import { resolveApiBaseUrl } from './resolveApiBaseUrl';
 
@@ -54,7 +55,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch {
         useAuthStore.getState().logout();
-        window.location.replace('/');
+        redirectToLanding();
       }
     }
 
