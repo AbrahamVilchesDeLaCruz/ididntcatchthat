@@ -42,15 +42,19 @@ describe('progress query endpoints (e2e)', () => {
     expect(res.body.meta.request_id).toBeDefined();
   });
 
-  it('GET /v1/progress/flashcards/weakest — returns envelope for authenticated user', async () => {
+  it('GET /v1/progress/flashcards/weakest — returns paginated envelope for authenticated user', async () => {
     const token = await registerAndLogin(app);
 
     const res = await request(app.getHttpServer())
-      .get('/v1/progress/flashcards/weakest?limit=5')
+      .get('/v1/progress/flashcards/weakest?page=1&pageSize=5')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
     expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.pagination).toMatchObject({
+      page: 1,
+      limit: 5,
+    });
     expect(res.body.meta.request_id).toBeDefined();
   });
 
@@ -58,11 +62,11 @@ describe('progress query endpoints (e2e)', () => {
     await request(app.getHttpServer()).get('/v1/progress/summary').expect(401);
   });
 
-  it('GET /v1/progress/flashcards/weakest — returns 422 for invalid limit', async () => {
+  it('GET /v1/progress/flashcards/weakest — returns 422 for invalid page', async () => {
     const token = await registerAndLogin(app);
 
     await request(app.getHttpServer())
-      .get('/v1/progress/flashcards/weakest?limit=0')
+      .get('/v1/progress/flashcards/weakest?pageSize=0')
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
   });
