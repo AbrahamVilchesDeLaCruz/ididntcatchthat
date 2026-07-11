@@ -840,8 +840,17 @@ export interface BackofficeTranslations {
     deleteError: string;
     cancel: string;
     delete: string;
+    pagination: {
+      pageOf: string;
+      previous: string;
+      next: string;
+      pageInputLabel: string;
+      goToPageAriaLabel: string;
+      invalidPage: string;
+    };
     toolbar: {
       filterByCategory: string;
+      filterBySearch: string;
       allCategories: string;
       filterBySubcategory: string;
       allSubcategories: string;
@@ -857,6 +866,7 @@ export interface BackofficeTranslations {
         'pending' | 'generating' | 'ready' | 'failed',
         string
       >;
+      searchPlaceholder: string;
     };
     table: {
       empty: string;
@@ -867,6 +877,8 @@ export interface BackofficeTranslations {
       view: string;
       edit: string;
       delete: string;
+      unknownCategory: string;
+      unknownSubcategory: string;
       audioStatuses: Record<
         'pending' | 'generating' | 'ready' | 'failed',
         string

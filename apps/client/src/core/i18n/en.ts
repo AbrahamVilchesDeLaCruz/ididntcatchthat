@@ -923,8 +923,17 @@ export const en: Translations = {
       deleteError: 'Could not delete the flashcard. Please try again.',
       cancel: 'Cancel',
       delete: 'Delete',
+      pagination: {
+        pageOf: 'Page {page} of {total}',
+        previous: 'Previous',
+        next: 'Next',
+        pageInputLabel: 'Page number',
+        goToPageAriaLabel: 'Go to page',
+        invalidPage: 'Invalid page',
+      },
       toolbar: {
         filterByCategory: 'Filter by category',
+        filterBySearch: 'Filter by text',
         allCategories: 'All categories',
         filterBySubcategory: 'Filter by subcategory',
         allSubcategories: 'All subcategories',
@@ -938,6 +947,7 @@ export const en: Translations = {
           'Generate audio for pending flashcards on the current page',
         regeneratePageFailedAriaLabel:
           'Retry audio for failed flashcards on the current page',
+        searchPlaceholder: 'Search expression or meaning…',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',
@@ -954,6 +964,8 @@ export const en: Translations = {
         view: 'View',
         edit: 'Edit',
         delete: 'Delete',
+        unknownCategory: '—',
+        unknownSubcategory: '—',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',
