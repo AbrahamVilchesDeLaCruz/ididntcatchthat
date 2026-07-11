@@ -770,7 +770,7 @@ export const es: Translations = {
         modeDistributionTitle: 'Distribución por modo de juego',
         topModulesTitle: 'Módulos más jugados',
         qualityByModuleTitle: 'Calidad por módulo',
-        qualityByModuleHint: 'barras = cantidad · línea = precisión %',
+        qualityByModuleHint: 'punto = precisión % por módulo',
         noModuleData: 'Sin datos por módulo',
         noModulePeriodData: 'Sin datos de módulos para este período',
         gamesLegend: 'Partidas',

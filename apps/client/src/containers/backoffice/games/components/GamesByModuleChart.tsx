@@ -1,7 +1,7 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useMemo } from 'react';
 import {
-  ComposedChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -16,19 +16,6 @@ interface GamesByModuleChartProps {
   data: GamesByModuleVM[];
 }
 
-const tooltipStyle = {
-  backgroundColor: 'var(--color-bg-elevated)' as const,
-  border: '1px solid var(--color-border)',
-  borderRadius: '8px',
-  fontSize: 12,
-  color: 'var(--color-text-primary)',
-};
-
-const axisTickStyle = {
-  fill: 'var(--color-text-secondary)',
-  fontSize: 12,
-};
-
 const MODULE_KEYS = [
   'random',
   'native_sounds',
@@ -37,80 +24,139 @@ const MODULE_KEYS = [
   'real_talk',
 ] as const;
 
+const axisTickStyle = {
+  fill: 'var(--color-text-secondary)',
+  fontSize: 12,
+};
+
+const dotShape = ({
+  x = 0,
+  y = 0,
+  width = 0,
+  height = 0,
+}: Record<string, number | string>): ReactElement => (
+  <circle
+    cx={(x as number) + (width as number) / 2}
+    cy={(y as number) + (height as number) / 2}
+    r={8}
+    fill={chartSeriesColor(0)}
+    stroke="var(--color-bg-card)"
+    strokeWidth={2}
+  />
+);
+
+const ChartTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value?: unknown }>;
+  label?: string;
+}): ReactElement | null => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const raw = payload[0]?.value;
+  const formattedValue =
+    typeof raw === 'number'
+      ? `${raw.toFixed(1)}%`
+      : `${Number(raw ?? 0).toFixed(1)}%`;
+
+  return (
+    <div
+      style={{
+        backgroundColor: 'var(--color-bg-elevated)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '8px',
+        padding: '8px 12px',
+        fontSize: 12,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      }}
+    >
+      <p
+        style={{
+          color: 'var(--color-text-primary)',
+          fontWeight: 600,
+          margin: 0,
+        }}
+      >
+        {label}
+      </p>
+      <p style={{ color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>
+        {formattedValue}
+      </p>
+    </div>
+  );
+};
+
 export const GamesByModuleChart = ({
   data,
 }: GamesByModuleChartProps): ReactElement => {
   const { t } = useI18n();
-  const charts = t.backoffice.games.charts;
 
-  const chartData = MODULE_KEYS.map((key) => {
-    const match = data.find((d) => (d.module ?? 'random') === key);
-    return {
-      module: t.game.config.modules[key],
-      accuracy: match?.avgAccuracy ?? 0,
-    };
-  });
+  const chartData = useMemo(() => {
+    const lookup = new Map(
+      data.map((d) => [d.module ?? 'random', d.avgAccuracy]),
+    );
+    return MODULE_KEYS.map((key) => ({
+      module: t.game.config.modules[key] ?? key,
+      accuracy: lookup.get(key) ?? 0,
+    }));
+  }, [data, t.game.config.modules]);
 
   return (
-    <div className="w-full" style={{ height: 260 + chartData.length * 8 }}>
+    <div
+      className="overflow-hidden w-full"
+      style={{ height: Math.max(220, chartData.length * 56) }}
+    >
       <p className="sr-only">
-        {charts.qualityByModuleTitle}. {charts.qualityByModuleHint}
+        {t.backoffice.games.charts.qualityByModuleTitle}.{' '}
+        {t.backoffice.games.charts.qualityByModuleHint}
       </p>
       <div role="img" aria-hidden className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
-            layout="vertical"
+          <BarChart
             data={chartData}
-            margin={{ top: 8, right: 16, left: 4, bottom: 8 }}
+            margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+            barCategoryGap="20%"
           >
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="var(--color-border)"
               strokeOpacity={0.5}
-              horizontal={false}
+              vertical={false}
             />
-            <YAxis
+            <XAxis
               type="category"
               dataKey="module"
               tick={axisTickStyle}
               axisLine={false}
               tickLine={false}
-              width={140}
+              interval={0}
             />
-            <XAxis
+            <YAxis
               type="number"
               domain={[0, 100]}
               tick={axisTickStyle}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v: number) => `${v}%`}
+              width={40}
             />
             <Tooltip
-              contentStyle={tooltipStyle}
-              formatter={(value: unknown) => {
-                const n =
-                  typeof value === 'number' ? value : Number(value ?? 0);
-                return [`${n.toFixed(1)}%`, charts.accuracyLegend];
+              content={<ChartTooltip />}
+              cursor={{
+                fill: 'var(--color-bg-elevated)',
+                fillOpacity: 0.4,
               }}
             />
-            <Line
-              type="monotone"
+            <Bar
               dataKey="accuracy"
-              name={charts.accuracyLegend}
-              strokeWidth={0}
-              dot={{
-                fill: chartSeriesColor(1),
-                r: 6,
-                strokeWidth: 0,
-              }}
-              activeDot={{
-                fill: chartSeriesColor(1),
-                r: 8,
-                strokeWidth: 2,
-                stroke: 'var(--color-bg-elevated)',
-              }}
+              shape={dotShape}
+              maxBarSize={8}
+              background={false}
             />
-          </ComposedChart>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>

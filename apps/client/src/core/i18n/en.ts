@@ -765,7 +765,7 @@ export const en: Translations = {
         modeDistributionTitle: 'Distribution by game mode',
         topModulesTitle: 'Most played modules',
         qualityByModuleTitle: 'Quality by module',
-        qualityByModuleHint: 'bars = count · line = accuracy %',
+        qualityByModuleHint: 'dot = accuracy % per module',
         noModuleData: 'No data by module',
         noModulePeriodData: 'No module data for this period',
         gamesLegend: 'Games',
