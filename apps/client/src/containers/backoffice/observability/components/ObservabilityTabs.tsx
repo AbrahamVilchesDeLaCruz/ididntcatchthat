@@ -1,6 +1,7 @@
 import { type ReactElement, useState } from 'react';
 import { VisitasTab } from './VisitasTab';
 import { ContenidoTab } from './ContenidoTab';
+import { type SummaryPeriod } from './PeriodSelector';
 import { useI18n } from '@/core/i18n';
 
 type TabId = 'http' | 'runtime' | 'visitas' | 'contenido';
@@ -21,6 +22,7 @@ export const ObservabilityTabs = ({
 }: ObservabilityTabsProps): ReactElement => {
   const { t } = useI18n();
   const [active, setActive] = useState<TabId>('http');
+  const [period, setPeriod] = useState<SummaryPeriod>('7d');
   const tabs: Tab[] = [
     { id: 'http', label: t.backoffice.observability.tabs.http },
     { id: 'runtime', label: t.backoffice.observability.tabs.runtime },
@@ -31,8 +33,8 @@ export const ObservabilityTabs = ({
   const contentMap: Record<TabId, ReactElement> = {
     http: httpContent,
     runtime: runtimeContent,
-    visitas: <VisitasTab />,
-    contenido: <ContenidoTab />,
+    visitas: <VisitasTab period={period} onPeriodChange={setPeriod} />,
+    contenido: <ContenidoTab period={period} onPeriodChange={setPeriod} />,
   };
 
   return (
