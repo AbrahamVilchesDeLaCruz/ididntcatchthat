@@ -9,4 +9,15 @@ export class RequestWeakestFlashcardSearcherMother {
   static withLimit(limit: number): RequestWeakestFlashcardSearcher {
     return { userId: ProgressUserIdMother.random().value, limit };
   }
+
+  static withPageAndSize(
+    page: number,
+    pageSize: number,
+  ): RequestWeakestFlashcardSearcher {
+    return {
+      userId: ProgressUserIdMother.random().value,
+      page,
+      pageSize,
+    };
+  }
 }

@@ -24,7 +24,12 @@ describe('progress/infrastructure/persistence TypeOrmWeakestFlashcardQuery', () 
       },
     ]);
 
-    const result = await query.findWeakest(ProgressUserIdMother.random(), 10);
+    const result = await query.findWeakest(
+      ProgressUserIdMother.random(),
+      undefined,
+      10,
+      0,
+    );
 
     expect(result).toEqual([
       {
@@ -39,23 +44,51 @@ describe('progress/infrastructure/persistence TypeOrmWeakestFlashcardQuery', () 
     ]);
   });
 
-  it('should filter played cards and order by error count', async () => {
+  it('should filter played cards and use net errors (wrong - correct) so mastered cards drop out', async () => {
     const userId = ProgressUserIdMother.random();
     dataSource.query.mockResolvedValueOnce([]);
 
-    await query.findWeakest(userId, 5);
+    await query.findWeakest(userId, undefined, 5, 0);
 
     expect(dataSource.query).toHaveBeenCalledWith(
       expect.stringContaining('ufs.times_played > 0'),
-      [userId.value, 5],
+      [userId.value, 5, 0],
+    );
+    // Net errors: cuando correct_count >= wrong_count la card sale de la lista
+    expect(dataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('(ufs.times_played - 2*ufs.correct_count) > 0'),
+      [userId.value, 5, 0],
     );
     expect(dataSource.query).toHaveBeenCalledWith(
-      expect.stringContaining('(ufs.times_played - ufs.correct_count) > 0'),
-      [userId.value, 5],
+      expect.stringContaining(
+        'ORDER BY (ufs.times_played - 2*ufs.correct_count) DESC',
+      ),
+      [userId.value, 5, 0],
     );
+  });
+
+  it('should pass limit and offset to the SQL query for pagination', async () => {
+    const userId = ProgressUserIdMother.random();
+    dataSource.query.mockResolvedValueOnce([]);
+
+    await query.findWeakest(userId, undefined, 10, 20);
+
     expect(dataSource.query).toHaveBeenCalledWith(
-      expect.stringContaining('ORDER BY error_count DESC'),
-      [userId.value, 5],
+      expect.stringContaining('LIMIT $2 OFFSET $3'),
+      [userId.value, 10, 20],
+    );
+  });
+
+  it('should count weakest cards with the same net-errors filter as findWeakest', async () => {
+    const userId = ProgressUserIdMother.random();
+    dataSource.query.mockResolvedValueOnce([{ total: '42' }]);
+
+    const total = await query.countWeakest(userId, undefined);
+
+    expect(total).toBe(42);
+    expect(dataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('(ufs.times_played - 2*ufs.correct_count) > 0'),
+      [userId.value],
     );
   });
 });

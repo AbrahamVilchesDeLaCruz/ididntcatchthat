@@ -9,8 +9,19 @@ import { type RequestWeakestFlashcardSearcher } from './request-weakest-flashcar
 
 export type { RequestWeakestFlashcardSearcher };
 
-const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 50;
+export interface WeakestFlashcardPage {
+  data: WeakestFlashcard[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 50;
 
 @Injectable()
 export class WeakestFlashcardSearcher {
@@ -21,9 +32,36 @@ export class WeakestFlashcardSearcher {
 
   async execute({
     userId,
-    limit,
-  }: RequestWeakestFlashcardSearcher): Promise<WeakestFlashcard[]> {
-    const cappedLimit = Math.min(limit ?? DEFAULT_LIMIT, MAX_LIMIT);
-    return this.query.findWeakest(new UserId(userId), cappedLimit);
+    page,
+    pageSize,
+  }: RequestWeakestFlashcardSearcher): Promise<WeakestFlashcardPage> {
+    const safePage = page ?? DEFAULT_PAGE;
+    const cappedPageSize = Math.min(
+      pageSize ?? DEFAULT_PAGE_SIZE,
+      MAX_PAGE_SIZE,
+    );
+    const offset = (safePage - 1) * cappedPageSize;
+
+    const [data, total] = await Promise.all([
+      this.query.findWeakest(
+        new UserId(userId),
+        undefined,
+        cappedPageSize,
+        offset,
+      ),
+      this.query.countWeakest(new UserId(userId), undefined),
+    ]);
+
+    const totalPages = total === 0 ? 0 : Math.ceil(total / cappedPageSize);
+
+    return {
+      data,
+      total,
+      page: safePage,
+      pageSize: cappedPageSize,
+      totalPages,
+      hasNextPage: safePage < totalPages,
+      hasPrevPage: safePage > 1,
+    };
   }
 }
