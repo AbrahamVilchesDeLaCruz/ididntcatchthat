@@ -29,9 +29,13 @@ const axisTickStyle = {
   fontSize: 12,
 };
 
-function formatModuleName(name: string): string {
-  return name.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
+const MODULE_KEYS = [
+  'random',
+  'native_sounds',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
+] as const;
 
 export const GamesByModuleChart = ({
   data,
@@ -39,29 +43,16 @@ export const GamesByModuleChart = ({
   const { t } = useI18n();
   const charts = t.backoffice.games.charts;
 
-  if (data.length === 0) {
-    return (
-      <div className="flex h-64 items-center justify-center text-xs text-[var(--color-text-muted)]">
-        {charts.noModulePeriodData}
-      </div>
-    );
-  }
-
-  const chartData = data
-    .filter((d) => d.avgAccuracy > 0)
-    .map((d) => ({
-      module:
-        t.game.config.modules[d.module as keyof typeof t.game.config.modules] ??
-        t.game.config.modules.random ??
-        formatModuleName(d.module ?? ''),
-      accuracy: d.avgAccuracy,
-    }));
+  const chartData = MODULE_KEYS.map((key) => {
+    const match = data.find((d) => (d.module ?? 'random') === key);
+    return {
+      module: t.game.config.modules[key],
+      accuracy: match?.avgAccuracy ?? 0,
+    };
+  });
 
   return (
-    <div
-      className="w-full"
-      style={{ height: Math.max(260, chartData.length * 56) }}
-    >
+    <div className="w-full" style={{ height: 260 + chartData.length * 8 }}>
       <p className="sr-only">
         {charts.qualityByModuleTitle}. {charts.qualityByModuleHint}
       </p>

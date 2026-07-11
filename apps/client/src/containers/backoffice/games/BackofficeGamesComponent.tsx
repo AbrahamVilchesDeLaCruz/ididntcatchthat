@@ -12,6 +12,14 @@ import { DailyTrendChart } from '@/containers/backoffice/observability/component
 import type { GamesStatsVM, GameStatsPeriod } from './backoffice-games.types';
 import { useI18n } from '@/core/i18n';
 
+const MODULE_KEYS = [
+  'random',
+  'native_sounds',
+  'connected_speech',
+  'flow_connectors',
+  'real_talk',
+] as const;
+
 interface BackofficeGamesComponentProps {
   stats: GamesStatsVM | null;
   period: GameStatsPeriod;
@@ -132,25 +140,25 @@ export const BackofficeGamesComponent = ({
             )}
           </ChartCard>
 
-          {(stats?.byModule.length ?? 0) > 0 && (
-            <ChartCard title={t.backoffice.games.charts.topModulesTitle}>
-              {isLoading ? (
-                <ChartSkeleton height="h-44" />
-              ) : (
-                <ModulesRadarChart
-                  data={(stats?.byModule ?? []).slice(0, 4).map((m) => ({
-                    name:
-                      t.game.config.modules[
-                        m.module as keyof typeof t.game.config.modules
-                      ] ?? t.game.config.modules.random,
-                    value: m.totalGames,
-                  }))}
-                  height={200}
-                  ariaLabel={t.backoffice.games.charts.topModulesTitle}
-                />
-              )}
-            </ChartCard>
-          )}
+          <ChartCard title={t.backoffice.games.charts.topModulesTitle}>
+            {isLoading ? (
+              <ChartSkeleton height="h-52" />
+            ) : (
+              <ModulesRadarChart
+                data={MODULE_KEYS.map((key) => {
+                  const match = (stats?.byModule ?? []).find(
+                    (m) => (m.module ?? 'random') === key,
+                  );
+                  return {
+                    name: t.game.config.modules[key],
+                    value: match?.totalGames ?? 0,
+                  };
+                })}
+                height={240}
+                ariaLabel={t.backoffice.games.charts.topModulesTitle}
+              />
+            )}
+          </ChartCard>
         </div>
       )}
 
@@ -165,12 +173,8 @@ export const BackofficeGamesComponent = ({
       >
         {isLoading ? (
           <ChartSkeleton height="h-80" />
-        ) : !stats?.byModule.length ? (
-          <p className="text-[var(--color-text-secondary)] text-sm text-center py-16">
-            {t.backoffice.games.charts.noModuleData}
-          </p>
         ) : (
-          <GamesByModuleChart data={stats.byModule} />
+          <GamesByModuleChart data={stats?.byModule ?? []} />
         )}
       </ChartCard>
     </BackofficePageShell>

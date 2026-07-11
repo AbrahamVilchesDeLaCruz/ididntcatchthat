@@ -19,12 +19,12 @@ interface ModulesRadarChartProps {
 
 export const ModulesRadarChart = ({
   data,
-  height = 200,
+  height = 240,
   ariaLabel,
 }: ModulesRadarChartProps): ReactElement => {
   const { t } = useI18n();
 
-  if (data.length === 0 || data.every((d) => d.value === 0)) {
+  if (data.every((d) => d.value === 0)) {
     return (
       <div
         className="flex items-center justify-center text-xs text-[var(--color-text-muted)]"
@@ -39,10 +39,18 @@ export const ModulesRadarChart = ({
     <div role="img" aria-label={ariaLabel} style={{ width: '100%', height }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data}>
-          <PolarGrid stroke="var(--color-border)" strokeOpacity={0.5} />
+          <PolarGrid
+            stroke="var(--color-border)"
+            strokeOpacity={0.4}
+            strokeDasharray="3 3"
+          />
           <PolarAngleAxis
             dataKey="name"
-            tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+            tick={{
+              fontSize: 11,
+              fill: 'var(--color-text-primary)',
+              fontWeight: 500,
+            }}
           />
           <PolarRadiusAxis
             tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
@@ -62,9 +70,20 @@ export const ModulesRadarChart = ({
             dataKey="value"
             name={ariaLabel ?? ''}
             fill={chartSeriesColor(0)}
-            fillOpacity={0.4}
+            fillOpacity={0.25}
             stroke={chartSeriesColor(0)}
-            strokeWidth={2}
+            strokeWidth={2.5}
+            dot={{
+              fill: chartSeriesColor(0),
+              r: 4,
+              strokeWidth: 0,
+            }}
+            activeDot={{
+              fill: chartSeriesColor(0),
+              r: 6,
+              strokeWidth: 2,
+              stroke: 'var(--color-bg-elevated)',
+            }}
           />
         </RadarChart>
       </ResponsiveContainer>
