@@ -11,10 +11,6 @@ vi.mock('@/core/components/SkipToContentLink', () => ({
   SkipToContentLink: () => null,
 }));
 
-vi.mock('@/core/notifications/ToastHost', () => ({
-  ToastHost: () => null,
-}));
-
 vi.mock('@/core/navigation/useSessionRouteTracking', () => ({
   useSessionRouteTracking: vi.fn(),
 }));

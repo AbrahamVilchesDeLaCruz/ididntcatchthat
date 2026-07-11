@@ -5,7 +5,6 @@ import { useCurrentUser } from '@/core/auth/useCurrentUser';
 import { useSessionRouteTracking } from '@/core/navigation/useSessionRouteTracking';
 import { AppSidebar } from '@/common/layout/AppSidebar';
 import { SkipToContentLink } from '@/common/components/SkipToContentLink';
-import { ToastHost } from '@/core/notifications/ToastHost';
 
 /**
  * Layout route for authenticated app pages (stats, backoffice).
@@ -45,11 +44,10 @@ export const AppShell = (): ReactElement => {
       <main
         id="main-content"
         tabIndex={-1}
-        className="app-scroll flex-1 overflow-y-auto overflow-x-hidden p-4 pt-[max(4rem,calc(env(safe-area-inset-top,0px)+3rem))] pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:p-8 md:pt-8"
+        className="app-scroll flex-1 overflow-y-auto overflow-x-hidden p-4 pt-[max(4rem,calc(env(safe-area-inset-top,0px)+3rem))] pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:p-8 md:pt-8 md:pb-8"
       >
         <Outlet />
       </main>
-      <ToastHost />
     </div>
   );
 };
