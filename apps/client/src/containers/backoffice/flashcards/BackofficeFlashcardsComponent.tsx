@@ -8,6 +8,7 @@ import type {
 import { FlashcardsTable } from './components/FlashcardsTable';
 import { FlashcardFormModal } from './components/FlashcardFormModal';
 import { FlashcardsToolbar } from './components/FlashcardsToolbar';
+import { FlashcardsPagination } from './components/FlashcardsPagination';
 import { BulkCreateModal } from './components/BulkCreateModal';
 import { AiGenerateModal } from './components/AiGenerateModal';
 import { FlashcardDetailModal } from './components/FlashcardDetailModal';
@@ -29,10 +30,12 @@ interface BackofficeFlashcardsComponentProps {
   categoryFilter: string | undefined;
   subcategoryFilter: string | undefined;
   audioStatusFilter: string | undefined;
+  queryFilter: string | undefined;
   onPageChange: (page: number) => void;
   onCategoryFilter: (category: string | undefined) => void;
   onSubcategoryFilter: (subcategory: string | undefined) => void;
   onAudioStatusFilter: (audioStatus: string | undefined) => void;
+  onQueryFilter: (query: string | undefined) => void;
   onCreate: (values: FlashcardFormValues) => void;
   onUpdate: (id: string, values: Partial<FlashcardFormValues>) => void;
   onDelete: (
@@ -71,10 +74,12 @@ export const BackofficeFlashcardsComponent = ({
   categoryFilter,
   subcategoryFilter,
   audioStatusFilter,
+  queryFilter,
   onPageChange,
   onCategoryFilter,
   onSubcategoryFilter,
   onAudioStatusFilter,
+  onQueryFilter,
   onCreate,
   onUpdate,
   onDelete,
@@ -173,8 +178,10 @@ export const BackofficeFlashcardsComponent = ({
         categoryFilter={categoryFilter}
         subcategoryFilter={subcategoryFilter}
         audioStatusFilter={audioStatusFilter}
+        queryFilter={queryFilter}
         pageItemCount={flashcards.length}
         isBulkRegenerating={isBulkRegeneratingAudio}
+        onQueryFilter={onQueryFilter}
         onCategoryFilter={onCategoryFilter}
         onSubcategoryFilter={onSubcategoryFilter}
         onAudioStatusFilter={onAudioStatusFilter}
@@ -184,6 +191,7 @@ export const BackofficeFlashcardsComponent = ({
       {/* Table */}
       <FlashcardsTable
         flashcards={flashcards}
+        catalog={catalog}
         isLoading={isLoading}
         onView={setViewingFlashcard}
         onEdit={setEditingFlashcard}
@@ -191,33 +199,11 @@ export const BackofficeFlashcardsComponent = ({
       />
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
-          <span>
-            {t.backoffice.flashcards.pageOf
-              .replace('{page}', String(page))
-              .replace('{total}', String(totalPages))}
-          </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onPageChange(page - 1)}
-              disabled={page <= 1}
-              className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
-            >
-              {t.backoffice.flashcards.previous}
-            </button>
-            <button
-              type="button"
-              onClick={() => onPageChange(page + 1)}
-              disabled={page >= totalPages}
-              className="px-3 py-1.5 rounded bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card)] border border-[var(--color-border)] disabled:opacity-30 disabled:cursor-not-allowed transition"
-            >
-              {t.backoffice.flashcards.next}
-            </button>
-          </div>
-        </div>
-      )}
+      <FlashcardsPagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
 
       {/* Detail Modal */}
       {viewingFlashcard && (
@@ -309,7 +295,6 @@ export const BackofficeFlashcardsComponent = ({
           onClose={() => setIsBulkModalOpen(false)}
         />
       )}
-
       {/* Import PDF Modal */}
       {isAiModalOpen && (
         <AiGenerateModal

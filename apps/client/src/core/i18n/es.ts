@@ -770,7 +770,7 @@ export const es: Translations = {
         modeDistributionTitle: 'Distribución por modo de juego',
         topModulesTitle: 'Módulos más jugados',
         qualityByModuleTitle: 'Calidad por módulo',
-        qualityByModuleHint: 'barras = cantidad · línea = precisión %',
+        qualityByModuleHint: 'punto = precisión % por módulo',
         noModuleData: 'Sin datos por módulo',
         noModulePeriodData: 'Sin datos de módulos para este período',
         gamesLegend: 'Partidas',
@@ -936,8 +936,17 @@ export const es: Translations = {
       deleteError: 'No se pudo eliminar la flashcard. Inténtalo de nuevo.',
       cancel: 'Cancelar',
       delete: 'Eliminar',
+      pagination: {
+        pageOf: 'Página {page} de {total}',
+        previous: 'Anterior',
+        next: 'Siguiente',
+        pageInputLabel: 'Número de página',
+        goToPageAriaLabel: 'Ir a la página',
+        invalidPage: 'Página inválida',
+      },
       toolbar: {
         filterByCategory: 'Filtrar por categoría',
+        filterBySearch: 'Buscar por texto',
         allCategories: 'Todas las categorías',
         filterBySubcategory: 'Filtrar por subcategoría',
         allSubcategories: 'Todas las subcategorías',
@@ -952,6 +961,7 @@ export const es: Translations = {
           'Generar audio para las flashcards pendientes de la página actual',
         regeneratePageFailedAriaLabel:
           'Reintentar audio para las flashcards fallidas de la página actual',
+        searchPlaceholder: 'Buscar expresión o significado…',
         audioStatuses: {
           pending: 'Pendiente',
           generating: 'Generando',
@@ -968,6 +978,8 @@ export const es: Translations = {
         view: 'Ver',
         edit: 'Editar',
         delete: 'Eliminar',
+        unknownCategory: '—',
+        unknownSubcategory: '—',
         audioStatuses: {
           pending: 'Pendiente',
           generating: 'Generando',

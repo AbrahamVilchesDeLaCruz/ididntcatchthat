@@ -1,4 +1,4 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useCurrentUser } from '@/core/auth/useCurrentUser';
@@ -17,6 +17,16 @@ export const AppShell = (): ReactElement => {
   const location = useLocation();
   const { canManageFlashcards, canAccessBackoffice } = useCurrentUser();
   useSessionRouteTracking();
+
+  // Kill body scroll while AppShell is mounted — only <main> should scroll
+  useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   if (!isAuthenticated) {
     // Distinguimos "nunca autenticado" (mandamos a /auth/login) de

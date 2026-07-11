@@ -68,6 +68,7 @@ export interface UpdateFlashcardApiPayload {
 }
 
 export interface SearchFlashcardsParams {
+  query?: string;
   category?: string;
   subcategory?: string;
   audioStatus?: string;
