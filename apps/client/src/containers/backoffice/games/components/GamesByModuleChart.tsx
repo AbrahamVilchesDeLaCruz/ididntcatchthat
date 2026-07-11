@@ -1,13 +1,13 @@
 import { type ReactElement } from 'react';
 import {
-  BarChart,
-  Bar,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from 'recharts';
 import type { GamesByModuleVM } from '../backoffice-games.types';
 import { useI18n } from '@/core/i18n';
@@ -68,11 +68,7 @@ export const GamesByModuleChart = ({
       </p>
       <div role="img" aria-hidden className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            layout="vertical"
-            data={chartData}
-            margin={{ top: 8, right: 16, left: 4, bottom: 8 }}
-          >
+          <ScatterChart margin={{ top: 8, right: 16, left: 4, bottom: 8 }}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="var(--color-border)"
@@ -95,6 +91,7 @@ export const GamesByModuleChart = ({
               axisLine={false}
               tickFormatter={(v: number) => `${v}%`}
             />
+            <ZAxis dataKey="accuracy" range={[80, 300]} />
             <Tooltip
               contentStyle={tooltipStyle}
               formatter={(value: unknown) => {
@@ -103,17 +100,14 @@ export const GamesByModuleChart = ({
                 return [`${n.toFixed(1)}%`, charts.accuracyLegend];
               }}
             />
-            <Bar
-              dataKey="accuracy"
+            <Scatter
+              data={chartData}
               name={charts.accuracyLegend}
-              radius={[0, 4, 4, 0]}
-              maxBarSize={22}
-            >
-              {chartData.map((_, i) => (
-                <Cell key={i} fill={chartSeriesColor(1)} fillOpacity={0.85} />
-              ))}
-            </Bar>
-          </BarChart>
+              fill={chartSeriesColor(1)}
+              fillOpacity={0.8}
+              shape="circle"
+            />
+          </ScatterChart>
         </ResponsiveContainer>
       </div>
     </div>
