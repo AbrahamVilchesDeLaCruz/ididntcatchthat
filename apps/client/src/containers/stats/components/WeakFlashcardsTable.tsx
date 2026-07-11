@@ -62,8 +62,12 @@ export const WeakFlashcardsTable = ({
         <TableHeader>
           <TableRow>
             <TableHead>{st.table.expression}</TableHead>
-            <TableHead>{st.table.module}</TableHead>
-            <TableHead>{st.table.errors}</TableHead>
+            <TableHead className="hidden md:table-cell">
+              {st.table.module}
+            </TableHead>
+            <TableHead className="hidden md:table-cell">
+              {st.table.errors}
+            </TableHead>
             <TableHead>{st.table.lastAttempt}</TableHead>
             {onPractice ? <TableHead /> : null}
           </TableRow>
@@ -84,7 +88,7 @@ export const WeakFlashcardsTable = ({
                 <TableCell className="text-[var(--color-text-primary)]">
                   {item.expression}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <span className="block text-[var(--color-text-primary)]">
                     {formatModule(item.category)}
                   </span>
@@ -92,7 +96,7 @@ export const WeakFlashcardsTable = ({
                     {formatSubcategory(item.category, item.subcategory)}
                   </span>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <span className="text-[var(--color-accent-red)] font-semibold">
                     {item.errorCount}
                   </span>
