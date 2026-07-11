@@ -20,7 +20,6 @@ import {
 import { GameComponent } from './GameComponent';
 import { RepeatWrongAnswersModal } from './components/RepeatWrongAnswersModal';
 import { useGameSession } from './hooks/useGameSession';
-import { useGameKeyboardShortcuts } from './hooks/useGameKeyboardShortcuts';
 import { useProgressSideEffects } from '@/core/progress/useProgressSideEffects';
 import { saveGameSummary } from './game-summary.storage';
 import type { FlashcardGameVM, GameSummaryVM } from './game.types';
@@ -188,33 +187,9 @@ export const GameContainer = (): ReactElement => {
     ge.pauseFailed,
   ]);
 
-  const shortcutsEnabled =
-    !isLoading && !!session.currentFlashcard && session.phase === 'playing';
-
-  const onFlipShortcut = useCallback(() => {
-    session.toggleFlip();
-  }, [session]);
-
-  const onCorrectShortcut = useCallback(() => {
-    handleAnswer(true);
-  }, [handleAnswer]);
-
-  const onIncorrectShortcut = useCallback(() => {
-    handleAnswer(false);
-  }, [handleAnswer]);
-
-  const onPauseShortcut = useCallback(() => {
-    handlePause();
-  }, [handlePause]);
-
-  useGameKeyboardShortcuts({
-    enabled: shortcutsEnabled,
-    isFlipped: session.isFlipped,
-    onFlip: onFlipShortcut,
-    onCorrect: onCorrectShortcut,
-    onIncorrect: onIncorrectShortcut,
-    onPause: canPause ? onPauseShortcut : undefined,
-  });
+  // El listener de teclado se cablea desde GameComponent (no desde aquí)
+  // para que los atajos Y/N disparen la animación local de feedback en lugar
+  // de saltársela yendo directo a handleAnswer del container.
 
   if (isResumeMode && isResumeError) {
     return (

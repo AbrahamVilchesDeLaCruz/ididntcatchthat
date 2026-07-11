@@ -208,7 +208,6 @@ export const en: Translations = {
       tapToFlipBack: 'Tap to flip back',
       pause: 'Pause',
       listenExample: 'Listen to example',
-      listenNative: 'Listen native',
       micSoon: 'Coming soon',
       pausedToast: 'Game saved',
       sidebarTitle: 'Game progress',

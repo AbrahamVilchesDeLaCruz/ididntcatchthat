@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface UseStudyKeyboardShortcutsOptions {
   enabled: boolean;
@@ -19,6 +19,15 @@ export const useStudyKeyboardShortcuts = ({
   onNext,
   onPause,
 }: UseStudyKeyboardShortcutsOptions): void => {
+  // Mismo patrón que useGameKeyboardShortcuts: refs para evitar
+  // re-suscripción del listener en cada render (causa teclas perdidas
+  // en producción durante el gap unmount→mount). Set en useEffect para
+  // cumplir con eslint-plugin-react-hooks v5 (no refs en render).
+  const callbacksRef = useRef({ onFlip, onNext, onPause });
+  useEffect(() => {
+    callbacksRef.current = { onFlip, onNext, onPause };
+  });
+
   useEffect(() => {
     if (!enabled) return;
 
@@ -26,6 +35,7 @@ export const useStudyKeyboardShortcuts = ({
       if (isTypingTarget(event.target)) return;
 
       const key = event.key.toLowerCase();
+      const { onFlip, onNext, onPause } = callbacksRef.current;
 
       if (key === ' ' || key === 'spacebar') {
         event.preventDefault();
@@ -47,5 +57,5 @@ export const useStudyKeyboardShortcuts = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [enabled, onFlip, onNext, onPause]);
+  }, [enabled]);
 };

@@ -210,7 +210,6 @@ export const es: Translations = {
       tapToFlipBack: 'Toca para volver',
       pause: 'Pausar',
       listenExample: 'Escuchar ejemplo',
-      listenNative: 'Escuchar nativo',
       micSoon: 'Próximamente',
       pausedToast: 'Partida guardada',
       sidebarTitle: 'Progreso de la partida',

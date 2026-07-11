@@ -183,4 +183,29 @@ describe('useGameKeyboardShortcuts', () => {
     expect(onCorrect).not.toHaveBeenCalled();
     expect(onPause).not.toHaveBeenCalled();
   });
+
+  it('siempre invoca el ÚLTIMO callback aunque cambie la identidad entre rerenders (refs, no stale closure)', () => {
+    const onCorrect1 = vi.fn();
+    const onCorrect2 = vi.fn();
+
+    const { rerender } = renderHook(
+      ({ onCorrect }: { onCorrect: () => void }) =>
+        useGameKeyboardShortcuts({
+          enabled: true,
+          isFlipped: true,
+          onFlip,
+          onCorrect,
+          onIncorrect,
+        }),
+      { initialProps: { onCorrect: onCorrect1 } },
+    );
+
+    dispatchKey('y');
+    expect(onCorrect1).toHaveBeenCalledTimes(1);
+
+    rerender({ onCorrect: onCorrect2 });
+    dispatchKey('y');
+    expect(onCorrect1).toHaveBeenCalledTimes(1);
+    expect(onCorrect2).toHaveBeenCalledTimes(1);
+  });
 });

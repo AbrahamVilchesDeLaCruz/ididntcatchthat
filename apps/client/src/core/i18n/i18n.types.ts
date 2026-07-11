@@ -173,7 +173,6 @@ export interface GameTranslations {
     tapToFlipBack: string;
     pause: string;
     listenExample: string;
-    listenNative: string;
     micSoon: string;
     pausedToast: string;
     sidebarTitle: string;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getExampleAudioUrl, getNativeAudioUrl } from '../game.audio';
+import { getExampleAudioUrl } from '../game.audio';
 import type { FlashcardGameVM } from '../game.types';
 
 const audioUrls: NonNullable<FlashcardGameVM['audioUrls']> = {
@@ -17,15 +17,5 @@ describe('game.audio', () => {
     expect(
       getExampleAudioUrl({ ...audioUrls, examples: { us: '' } }),
     ).toBeNull();
-    expect(
-      getNativeAudioUrl({
-        ...audioUrls,
-        expression: { us: '', uk: '', au: '' },
-      }),
-    ).toBeNull();
-  });
-
-  it('returns native expression audio url when present', () => {
-    expect(getNativeAudioUrl(audioUrls)).toBe('https://audio.test/us.mp3');
   });
 });
