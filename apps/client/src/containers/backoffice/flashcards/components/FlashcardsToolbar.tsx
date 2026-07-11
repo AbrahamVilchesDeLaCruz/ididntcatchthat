@@ -1,6 +1,14 @@
-import { type ReactElement } from 'react';
+import {
+  type ChangeEvent,
+  type ReactElement,
+  useEffect,
+  useState,
+} from 'react';
+import { Search } from 'lucide-react';
 import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
 import { useI18n } from '@/core/i18n';
+
+const QUERY_DEBOUNCE_MS = 300;
 
 const AUDIO_STATUSES = ['pending', 'generating', 'ready', 'failed'] as const;
 
@@ -14,6 +22,8 @@ interface FlashcardsToolbarProps {
   audioStatusFilter: string | undefined;
   pageItemCount: number;
   isBulkRegenerating: boolean;
+  queryFilter: string | undefined;
+  onQueryFilter: (query: string | undefined) => void;
   onCategoryFilter: (category: string | undefined) => void;
   onSubcategoryFilter: (subcategory: string | undefined) => void;
   onAudioStatusFilter: (audioStatus: string | undefined) => void;
@@ -27,6 +37,8 @@ export const FlashcardsToolbar = ({
   audioStatusFilter,
   pageItemCount,
   isBulkRegenerating,
+  queryFilter,
+  onQueryFilter,
   onCategoryFilter,
   onSubcategoryFilter,
   onAudioStatusFilter,
@@ -35,6 +47,31 @@ export const FlashcardsToolbar = ({
   const { locale, t } = useI18n();
   const audioStatusLabels = t.backoffice.flashcards.toolbar.audioStatuses;
 
+  const [inputValue, setInputValue] = useState<string>(queryFilter ?? '');
+  const [previousQuery, setPreviousQuery] = useState<string | undefined>(
+    queryFilter,
+  );
+
+  // Sync external `queryFilter` changes (e.g. parent cleared the search) into
+  // the input via the React "store previous" pattern — no useEffect needed.
+  if (queryFilter !== previousQuery) {
+    setPreviousQuery(queryFilter);
+    setInputValue(queryFilter ?? '');
+  }
+
+  // Debounce the search: fire onQueryFilter after the user stops typing.
+  useEffect(() => {
+    const trimmed = inputValue.trim();
+    const nextValue = trimmed.length === 0 ? undefined : trimmed;
+    if (nextValue === queryFilter) return;
+    const timeoutId = setTimeout(() => {
+      onQueryFilter(nextValue);
+    }, QUERY_DEBOUNCE_MS);
+    return (): void => {
+      clearTimeout(timeoutId);
+    };
+  }, [inputValue, queryFilter, onQueryFilter]);
+
   const subcategories =
     catalog?.categories.find((c) => c.value === categoryFilter)
       ?.subcategories ?? [];
@@ -42,7 +79,8 @@ export const FlashcardsToolbar = ({
   const hasActiveFilters = !!(
     categoryFilter ??
     subcategoryFilter ??
-    audioStatusFilter
+    audioStatusFilter ??
+    queryFilter
   );
 
   const handleCategoryChange = (value: string): void => {
@@ -54,6 +92,12 @@ export const FlashcardsToolbar = ({
     onCategoryFilter(undefined);
     onSubcategoryFilter(undefined);
     onAudioStatusFilter(undefined);
+    onQueryFilter(undefined);
+    setInputValue('');
+  };
+
+  const handleQueryChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setInputValue(e.target.value);
   };
 
   const showBulkRegenerate =
@@ -77,6 +121,39 @@ export const FlashcardsToolbar = ({
 
   return (
     <div className="flex flex-wrap items-center gap-4">
+      {/* Search input */}
+      <div className="relative">
+        <label htmlFor="query-filter" className="sr-only">
+          {t.backoffice.flashcards.toolbar.filterBySearch}
+        </label>
+        <input
+          id="query-filter"
+          type="text"
+          value={inputValue}
+          onChange={handleQueryChange}
+          placeholder={t.backoffice.flashcards.toolbar.searchPlaceholder}
+          className="pl-9 pr-8 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] w-64"
+        />
+        <Search
+          aria-hidden="true"
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] pointer-events-none"
+        />
+        {inputValue.length > 0 && (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => {
+              setInputValue('');
+              onQueryFilter(undefined);
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition px-1"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
       {/* Category */}
       <div>
         <label htmlFor="category-filter" className="sr-only">

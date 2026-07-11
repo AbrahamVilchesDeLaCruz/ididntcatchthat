@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import type { FlashcardVM } from '../flashcards.types';
+import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
 import { useI18n } from '@/core/i18n';
 
 const AUDIO_STATUS_COLORS: Record<FlashcardVM['audioStatus'], string> = {
@@ -9,9 +10,13 @@ const AUDIO_STATUS_COLORS: Record<FlashcardVM['audioStatus'], string> = {
   failed: 'text-red-600 bg-red-400/10',
 };
 
+const capitalizeFirst = (str: string): string =>
+  str.length === 0 ? str : str.charAt(0).toUpperCase() + str.slice(1);
+
 interface FlashcardsTableProps {
   flashcards: FlashcardVM[];
   isLoading: boolean;
+  catalog?: FlashcardCatalogApiModel;
   onView: (flashcard: FlashcardVM) => void;
   onEdit: (flashcard: FlashcardVM) => void;
   onDelete: (id: string) => void;
@@ -20,12 +25,36 @@ interface FlashcardsTableProps {
 export const FlashcardsTable = ({
   flashcards,
   isLoading,
+  catalog,
   onView,
   onEdit,
   onDelete,
 }: FlashcardsTableProps): ReactElement => {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const audioStatusLabels = t.backoffice.flashcards.table.audioStatuses;
+
+  const resolveCategoryLabel = (value: string): string => {
+    if (!catalog) return t.backoffice.flashcards.table.unknownCategory;
+    const found = catalog.categories.find((c) => c.value === value);
+    return (
+      found?.label[locale] ?? t.backoffice.flashcards.table.unknownCategory
+    );
+  };
+
+  const resolveSubcategoryLabel = (
+    categoryValue: string,
+    subcategoryValue: string,
+  ): string => {
+    if (!catalog) return t.backoffice.flashcards.table.unknownSubcategory;
+    const category = catalog.categories.find((c) => c.value === categoryValue);
+    const sub = category?.subcategories.find(
+      (s) => s.value === subcategoryValue,
+    );
+    return (
+      sub?.label[locale] ?? t.backoffice.flashcards.table.unknownSubcategory
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="rounded-xl border border-[var(--color-border)] overflow-hidden">
@@ -75,17 +104,17 @@ export const FlashcardsTable = ({
             >
               <td className="px-4 py-3">
                 <p className="text-[var(--color-text-primary)] font-medium">
-                  {fc.expression}
+                  {capitalizeFirst(fc.expression)}
                 </p>
                 <p className="text-[var(--color-text-secondary)] text-xs mt-0.5 line-clamp-1">
-                  {fc.meaning}
+                  {capitalizeFirst(fc.meaning)}
                 </p>
               </td>
               <td className="px-4 py-3 text-[var(--color-text-secondary)] hidden md:table-cell">
-                {fc.category}
+                {resolveCategoryLabel(fc.category)}
               </td>
               <td className="px-4 py-3 text-[var(--color-text-secondary)] hidden lg:table-cell">
-                {fc.subcategory}
+                {resolveSubcategoryLabel(fc.category, fc.subcategory)}
               </td>
               <td className="px-4 py-3 hidden lg:table-cell">
                 <span

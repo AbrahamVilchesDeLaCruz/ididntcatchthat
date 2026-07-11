@@ -37,6 +37,7 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
   const [audioStatusFilter, setAudioStatusFilter] = useState<
     string | undefined
   >(undefined);
+  const [queryFilter, setQueryFilter] = useState<string | undefined>(undefined);
 
   const handleCategoryFilter = (category: string | undefined): void => {
     setCategoryFilter(category);
@@ -53,8 +54,14 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
     setPage(1);
   };
 
+  const handleQueryFilter = (query: string | undefined): void => {
+    setQueryFilter(query);
+    setPage(1);
+  };
+
   const { data, isLoading, isLoadingError } = useFlashcards(
     {
+      query: queryFilter,
       page,
       pageSize: FLASHCARDS_PAGE_SIZE,
       category: categoryFilter,
@@ -207,10 +214,12 @@ export const BackofficeFlashcardsContainer = (): ReactElement => {
       categoryFilter={categoryFilter}
       subcategoryFilter={subcategoryFilter}
       audioStatusFilter={audioStatusFilter}
+      queryFilter={queryFilter}
       onPageChange={setPage}
       onCategoryFilter={handleCategoryFilter}
       onSubcategoryFilter={handleSubcategoryFilter}
       onAudioStatusFilter={handleAudioStatusFilter}
+      onQueryFilter={handleQueryFilter}
       onCreate={handleCreate}
       onUpdate={handleUpdate}
       onDelete={handleDelete}
