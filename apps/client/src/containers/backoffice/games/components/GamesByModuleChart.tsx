@@ -1,10 +1,9 @@
 import { type ReactElement } from 'react';
 import {
-  ScatterChart,
-  Scatter,
+  ComposedChart,
+  Line,
   XAxis,
   YAxis,
-  ZAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
@@ -68,7 +67,11 @@ export const GamesByModuleChart = ({
       </p>
       <div role="img" aria-hidden className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 8, right: 16, left: 4, bottom: 8 }}>
+          <ComposedChart
+            layout="vertical"
+            data={chartData}
+            margin={{ top: 8, right: 16, left: 4, bottom: 8 }}
+          >
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="var(--color-border)"
@@ -91,7 +94,6 @@ export const GamesByModuleChart = ({
               axisLine={false}
               tickFormatter={(v: number) => `${v}%`}
             />
-            <ZAxis dataKey="accuracy" range={[80, 300]} />
             <Tooltip
               contentStyle={tooltipStyle}
               formatter={(value: unknown) => {
@@ -100,14 +102,24 @@ export const GamesByModuleChart = ({
                 return [`${n.toFixed(1)}%`, charts.accuracyLegend];
               }}
             />
-            <Scatter
-              data={chartData}
+            <Line
+              type="monotone"
+              dataKey="accuracy"
               name={charts.accuracyLegend}
-              fill={chartSeriesColor(1)}
-              fillOpacity={0.8}
-              shape="circle"
+              strokeWidth={0}
+              dot={{
+                fill: chartSeriesColor(1),
+                r: 6,
+                strokeWidth: 0,
+              }}
+              activeDot={{
+                fill: chartSeriesColor(1),
+                r: 8,
+                strokeWidth: 2,
+                stroke: 'var(--color-bg-elevated)',
+              }}
             />
-          </ScatterChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>
