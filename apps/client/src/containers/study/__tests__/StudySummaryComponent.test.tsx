@@ -8,8 +8,8 @@ import type { StudySummaryVM } from '../study.types';
 
 const summary: StudySummaryVM = {
   cardsViewed: 10,
+  totalCount: 10,
   duration: 95,
-  reviewedFlashcards: 10,
 };
 
 const defaultHandlers = {
