@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { InfoTooltip } from './InfoTooltip';
 
 export type InsightVariant = 'success' | 'warning' | 'danger' | 'neutral';
 
@@ -9,6 +10,7 @@ export interface InsightCardProps {
   variant?: InsightVariant;
   progress?: number;
   sub?: string;
+  tooltip?: string;
 }
 
 const VARIANT: Record<
@@ -48,14 +50,18 @@ export const InsightCard = ({
   variant = 'neutral',
   progress,
   sub,
+  tooltip,
 }: InsightCardProps): ReactElement => {
   const v = VARIANT[variant];
   return (
     <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[var(--color-text-secondary)] text-xs font-medium uppercase tracking-wide">
-          {label}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[var(--color-text-secondary)] text-xs font-medium uppercase tracking-wide">
+            {label}
+          </p>
+          {tooltip && <InfoTooltip content={tooltip} />}
+        </div>
         <span className={`w-2 h-2 rounded-full shrink-0 ${v.dot}`} />
       </div>
 
