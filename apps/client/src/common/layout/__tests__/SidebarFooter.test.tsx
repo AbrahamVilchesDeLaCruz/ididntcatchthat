@@ -1,14 +1,17 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useI18n } from '@/core/i18n';
 import { en } from '@/core/i18n/en';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useRankingProfile } from '@/core/profile/useRankingProfile';
+import { useLogout } from '@/containers/auth/api';
+import { redirectToLanding } from '@/core/auth/redirectToLanding';
 import { SidebarFooter } from '../SidebarFooter';
 
 vi.mock('@/containers/auth/api', () => ({
-  useLogout: () => ({ mutate: vi.fn() }),
+  useLogout: vi.fn(),
 }));
 
 vi.mock('@/common/components/ThemeToggle', () => ({
@@ -31,7 +34,25 @@ vi.mock('@/core/auth/useCurrentUser', () => ({
   })),
 }));
 
+vi.mock('@/core/auth/redirectToLanding', () => ({
+  redirectToLanding: vi.fn(),
+  LANDING_PATH: '/',
+}));
+
 const mockedUseRankingProfile = vi.mocked(useRankingProfile);
+const mockedRedirect = vi.mocked(redirectToLanding);
+const mockedUseLogout = vi.mocked(useLogout);
+
+const makeLogoutMutate =
+  () =>
+  (
+    _args: unknown,
+    options?: {
+      onSettled?: () => void;
+    },
+  ): void => {
+    options?.onSettled?.();
+  };
 
 describe('SidebarFooter', () => {
   beforeEach(() => {
@@ -45,6 +66,10 @@ describe('SidebarFooter', () => {
       data: { nickname: 'Ace', showInRanking: true },
       isLoading: false,
     } as ReturnType<typeof useRankingProfile>);
+    mockedUseLogout.mockReturnValue({
+      mutate: vi.fn(makeLogoutMutate()),
+    } as never);
+    mockedRedirect.mockClear();
   });
 
   it('links profile block to /profile', () => {
@@ -70,5 +95,18 @@ describe('SidebarFooter', () => {
     expect(
       screen.getByRole('button', { name: /log out/i }),
     ).toBeInTheDocument();
+  });
+
+  it('redirige a landing al pulsar logout (no a /auth/login)', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <SidebarFooter />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /log out/i }));
+
+    expect(mockedRedirect).toHaveBeenCalledOnce();
   });
 });

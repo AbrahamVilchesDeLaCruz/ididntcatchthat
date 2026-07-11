@@ -1,8 +1,8 @@
 import { type ReactElement } from 'react';
 import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
+import { redirectToLanding } from '@/core/auth/redirectToLanding';
 import { useLogout } from '@/containers/auth/api';
 import { SidebarUserBlock } from '@/common/layout/SidebarUserBlock';
 
@@ -14,7 +14,6 @@ export const SidebarFooter = ({
   onNavigate,
 }: SidebarFooterProps): ReactElement => {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
   const { mutate: logoutApi } = useLogout();
 
@@ -22,7 +21,7 @@ export const SidebarFooter = ({
     logoutApi(undefined, {
       onSettled: () => {
         logout();
-        void navigate('/', { replace: true });
+        redirectToLanding();
       },
     });
     onNavigate?.();
