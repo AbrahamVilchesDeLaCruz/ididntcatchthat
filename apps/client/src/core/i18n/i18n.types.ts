@@ -746,12 +746,16 @@ export interface BackofficeTranslations {
     };
     httpSummary: {
       totalRequests: string;
+      totalRequestsTooltip: string;
       successRate: string;
       successRateHint: string;
+      successRateTooltip: string;
       errorRate: string;
       errorRateHint: string;
+      errorRateTooltip: string;
       latencyP95: string;
       latencyDetail: string;
+      latencyP95Tooltip: string;
     };
     httpTable: {
       noData: string;
@@ -810,13 +814,19 @@ export interface BackofficeTranslations {
       normalGcHint: string;
       noRuntimeMetrics: string;
       heapUsed: string;
+      heapUsedTooltip: string;
       eventLoopLagP95: string;
+      eventLoopLagP95Tooltip: string;
       uptime: string;
+      uptimeTooltip: string;
       gcTotal: string;
+      gcTotalTooltip: string;
       activeHandles: string;
       activeHandlesHint: string;
+      activeHandlesTooltip: string;
       rssMemory: string;
       rssMemoryHint: string;
+      rssMemoryTooltip: string;
     };
   };
   flashcards: {
