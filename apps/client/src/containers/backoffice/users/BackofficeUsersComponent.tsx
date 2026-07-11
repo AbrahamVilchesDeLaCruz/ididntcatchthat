@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { BackofficePageShell } from '@/common/components/BackofficePageShell';
 import { PeriodSelector } from '@/containers/backoffice/observability/components/PeriodSelector';
 import {
@@ -6,9 +7,9 @@ import {
   InsightCardSkeleton,
 } from '@/containers/backoffice/observability/components/InsightCard';
 import { DailyTrendChart } from '@/containers/backoffice/observability/components/DailyTrendChart';
-import { DistributionChart } from '@/containers/backoffice/observability/components/DistributionChart';
 import type { UserStatsVM, UserStatsPeriod } from './backoffice-users.types';
 import { useI18n } from '@/core/i18n';
+import { chartSeriesColor } from '@/common/charts/chartPalette';
 import { engagementVariant } from './engagementThresholds';
 
 interface BackofficeUsersComponentProps {
@@ -182,43 +183,85 @@ export const BackofficeUsersComponent = ({
               </div>
             </div>
 
-            {/* ── Time-series ───────────────────────────────────────────────── */}
-            {stats.byPeriod.length > 0 && (
-              <ChartCard
-                title={t.backoffice.users.charts.registrationsByPeriod}
-              >
-                <DailyTrendChart
-                  data={stats.byPeriod}
-                  series={[
-                    {
-                      key: 'count',
-                      label: t.backoffice.users.charts.newUsers,
-                      type: 'bar',
-                      color: 'var(--color-accent-green)',
-                    },
-                  ]}
-                  height={240}
-                  ariaLabel={t.backoffice.users.charts.registrationsByPeriod}
-                />
-              </ChartCard>
-            )}
+            {/* ── Canal de registro (33%) + registros por período (66%) ──── */}
+            {(stats.byProvider.length > 0 || stats.byPeriod.length > 0) && (
+              <div className="grid grid-cols-3 gap-6">
+                {stats.byProvider.length > 0 && (
+                  <ChartCard
+                    title={t.backoffice.users.charts.registrationChannel}
+                  >
+                    <div style={{ height: 240 }}>
+                      {stats.byProvider.every((p) => p.count === 0) ? (
+                        <div className="flex items-center justify-center h-full text-xs text-[var(--color-text-muted)]">
+                          {t.backoffice.charts.noDataInPeriod}
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={stats.byProvider.map((p) => ({
+                                name:
+                                  p.provider === 'google'
+                                    ? t.backoffice.users.charts.google
+                                    : t.backoffice.users.charts.email,
+                                value: p.count,
+                              }))}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={85}
+                              paddingAngle={2}
+                            >
+                              {stats.byProvider.map((_, i) => (
+                                <Cell
+                                  key={i}
+                                  fill={chartSeriesColor(i)}
+                                  fillOpacity={0.85}
+                                />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: 'var(--color-bg-elevated)',
+                                border: '1px solid var(--color-border)',
+                                borderRadius: '8px',
+                                fontSize: 12,
+                                color: 'var(--color-text-primary)',
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      )}
+                    </div>
+                  </ChartCard>
+                )}
 
-            {/* ── Canal de registro — horizontal compacto para 2 items ─────── */}
-            {stats.byProvider.length > 0 && (
-              <ChartCard title={t.backoffice.users.charts.registrationChannel}>
-                <DistributionChart
-                  data={stats.byProvider.map((p) => ({
-                    name:
-                      p.provider === 'google'
-                        ? t.backoffice.users.charts.google
-                        : t.backoffice.users.charts.email,
-                    value: p.count,
-                  }))}
-                  height={90}
-                  horizontal
-                  ariaLabel={t.backoffice.users.charts.registrationChannel}
-                />
-              </ChartCard>
+                <div className="col-span-2">
+                  {stats.byPeriod.length > 0 && (
+                    <ChartCard
+                      title={t.backoffice.users.charts.registrationsByPeriod}
+                    >
+                      <DailyTrendChart
+                        data={stats.byPeriod}
+                        series={[
+                          {
+                            key: 'count',
+                            label: t.backoffice.users.charts.newUsers,
+                            type: 'bar',
+                            color: 'var(--color-accent-green)',
+                          },
+                        ]}
+                        height={240}
+                        ariaLabel={
+                          t.backoffice.users.charts.registrationsByPeriod
+                        }
+                      />
+                    </ChartCard>
+                  )}
+                </div>
+              </div>
             )}
           </>
         )
