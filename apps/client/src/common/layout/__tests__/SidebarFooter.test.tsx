@@ -97,7 +97,7 @@ describe('SidebarFooter', () => {
     ).toBeInTheDocument();
   });
 
-  it('redirige a landing al pulsar logout (no a /auth/login)', async () => {
+  it('marca isLogoutPending=true en el store al pulsar logout (AppShell se encarga del redirect)', async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
@@ -107,6 +107,21 @@ describe('SidebarFooter', () => {
 
     await user.click(screen.getByRole('button', { name: /log out/i }));
 
-    expect(mockedRedirect).toHaveBeenCalledOnce();
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.isLogoutPending).toBe(true);
+  });
+
+  it('NO llama redirectToLanding directamente (el guard de AppShell lo hace)', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <SidebarFooter />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /log out/i }));
+
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 });

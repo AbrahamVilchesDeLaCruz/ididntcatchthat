@@ -14,11 +14,18 @@ import { ToastHost } from '@/core/notifications/ToastHost';
  */
 export const AppShell = (): ReactElement => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLogoutPending = useAuthStore((s) => s.isLogoutPending);
   const location = useLocation();
   const { canManageFlashcards, canAccessBackoffice } = useCurrentUser();
   useSessionRouteTracking();
 
-  if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
+  if (!isAuthenticated) {
+    // Distinguimos "nunca autenticado" (mandamos a /auth/login) de
+    // "acabo de hacer logout" (mandamos a / landing). El flag
+    // isLogoutPending se pone a true en logout() y vive solo durante
+    // el tick del re-render posterior.
+    return <Navigate to={isLogoutPending ? '/' : '/auth/login'} replace />;
+  }
 
   if (
     location.pathname.startsWith('/backoffice/flashcards') &&
