@@ -345,6 +345,11 @@ export const en: Translations = {
       module: 'Module',
       errors: 'Errors',
       lastAttempt: 'Last attempt',
+      pageOf: 'Page {page} of {total}',
+      previous: 'Previous',
+      next: 'Next',
+      previousPageAriaLabel: 'Previous page',
+      nextPageAriaLabel: 'Next page',
     },
     mastery: {
       novice: 'Novice',

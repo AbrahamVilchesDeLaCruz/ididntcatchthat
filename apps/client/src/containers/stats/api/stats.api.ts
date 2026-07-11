@@ -3,6 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useShallow } from 'zustand/react/shallow';
 import { apiClient } from '@/core/api/apiClient';
 import {
+  type PaginatedApiEnvelope,
+  type PaginationMeta,
+} from '@/core/api/api-envelope';
+import {
   mergeModuleProgressWithOptimistic,
   mergeProgressSummaryWithOptimistic,
   selectProgressOptimistic,
@@ -22,7 +26,6 @@ import type {
 } from './stats.api-model';
 import type {
   ModuleProgressVM,
-  SubcategoryProgressVM,
   WeakFlashcardVM,
   ProgressSummaryVM,
 } from '../stats.types';
@@ -31,6 +34,10 @@ export const statsKeys = {
   all: ['stats'] as const,
   modules: ['stats', 'modules'] as const,
   weakest: ['stats', 'weakest'] as const,
+  // page-aware key: cada página se cachea por separado. Si el usuario
+  // vuelve a una página ya vista, no se hace fetch.
+  weakestPage: (page: number, pageSize: number) =>
+    ['stats', 'weakest', page, pageSize] as const,
   subcategories: ['stats', 'subcategories'] as const,
   summary: ['stats', 'summary'] as const,
 };
@@ -65,18 +72,50 @@ export const useModuleProgress = (enabled = true) => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const useWeakestFlashcards = (enabled = true) => {
-  return useQuery({
-    queryKey: statsKeys.weakest,
+export interface WeakestFlashcardsPage {
+  data: WeakFlashcardVM[];
+  pagination: PaginationMeta;
+}
+
+export const useWeakestFlashcards = (options?: {
+  enabled?: boolean;
+  page?: number;
+  pageSize?: number;
+}): {
+  data: WeakFlashcardVM[] | undefined;
+  pagination: PaginationMeta | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
+} => {
+  const enabled = options?.enabled ?? true;
+  const page = options?.page ?? 1;
+  const pageSize = options?.pageSize ?? 10;
+  const query = useQuery({
+    queryKey: statsKeys.weakestPage(page, pageSize),
     enabled,
-    queryFn: async (): Promise<WeakFlashcardVM[]> => {
-      const res = await apiClient.get<{ data: WeakFlashcardApiModel[] }>(
-        '/progress/flashcards/weakest',
-      );
-      return res.data.data.map(mapWeakFlashcard);
+    placeholderData: (previous) => previous,
+    queryFn: async (): Promise<WeakestFlashcardsPage> => {
+      const res = await apiClient.get<
+        PaginatedApiEnvelope<WeakFlashcardApiModel>
+      >('/progress/flashcards/weakest', {
+        params: { page, pageSize },
+      });
+      return {
+        data: res.data.data.map(mapWeakFlashcard),
+        pagination: res.data.pagination,
+      };
     },
   });
+
+  const data = useMemo(() => query.data?.data, [query.data]);
+  const pagination = useMemo(() => query.data?.pagination, [query.data]);
+
+  return {
+    ...query,
+    data,
+    pagination,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -84,7 +123,7 @@ export const useSubcategoryProgress = (enabled = true) => {
   return useQuery({
     queryKey: statsKeys.subcategories,
     enabled,
-    queryFn: async (): Promise<SubcategoryProgressVM[]> => {
+    queryFn: async (): Promise<SubcategoryProgressApiModel[]> => {
       const res = await apiClient.get<{ data: SubcategoryProgressApiModel[] }>(
         '/progress/subcategories',
       );

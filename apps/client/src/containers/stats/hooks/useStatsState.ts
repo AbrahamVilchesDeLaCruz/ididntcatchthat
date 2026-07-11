@@ -7,6 +7,8 @@ import {
 
 interface UseStatsStateOptions {
   enabled?: boolean;
+  weakestPage?: number;
+  weakestPageSize?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -15,7 +17,11 @@ export function useStatsState(options?: UseStatsStateOptions) {
 
   const moduleProgress = useModuleProgress(enabled);
   const subcategoryProgress = useSubcategoryProgress(enabled);
-  const weakestFlashcards = useWeakestFlashcards(enabled);
+  const weakestFlashcards = useWeakestFlashcards({
+    enabled,
+    page: options?.weakestPage,
+    pageSize: options?.weakestPageSize,
+  });
   const progressSummary = useProgressSummary(enabled);
 
   const queries = enabled

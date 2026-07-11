@@ -348,6 +348,11 @@ export const es: Translations = {
       module: 'Módulo',
       errors: 'Errores',
       lastAttempt: 'Último intento',
+      pageOf: 'Página {page} de {total}',
+      previous: 'Anterior',
+      next: 'Siguiente',
+      previousPageAriaLabel: 'Página anterior',
+      nextPageAriaLabel: 'Página siguiente',
     },
     mastery: {
       novice: 'Novato',

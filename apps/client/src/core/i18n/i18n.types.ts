@@ -278,6 +278,11 @@ export interface StatsTranslations {
     module: string;
     errors: string;
     lastAttempt: string;
+    pageOf: string;
+    previous: string;
+    next: string;
+    previousPageAriaLabel: string;
+    nextPageAriaLabel: string;
   };
   mastery: {
     novice: string;
