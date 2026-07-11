@@ -35,7 +35,7 @@ for img in "${IMAGES[@]}"; do
     echo "WARN: could not pull or find ${img}, skipping"
     continue
   }
-  if ! trivy image --severity CRITICAL,HIGH --ignore-unfixed "${img}"; then
+  if ! trivy image --severity CRITICAL,HIGH --ignore-unfixed --ignorefile "$(dirname "${SCRIPT_DIR}")/../../.trivyignore" "${img}"; then
     FAILED=$((FAILED + 1))
   fi
 done

@@ -216,6 +216,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          ignorefile: .trivyignore
 
       - name: Scan Grafana image (Trivy)
         uses: aquasecurity/trivy-action@master
@@ -227,6 +228,7 @@ jobs:
           severity: CRITICAL,HIGH
           # OS layer only — bundled go plugins still carry upstream CVEs we cannot patch
           vuln-type: os
+          ignorefile: .trivyignore
 
       - name: Scan Loki image (Trivy)
         uses: aquasecurity/trivy-action@master
@@ -236,3 +238,4 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          ignorefile: .trivyignore
