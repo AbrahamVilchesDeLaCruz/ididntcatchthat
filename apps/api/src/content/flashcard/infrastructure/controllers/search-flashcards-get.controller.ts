@@ -33,7 +33,7 @@ export class SearchFlashcardsGetController {
   @ApiOperation({
     summary: 'Search flashcards with pagination',
     description:
-      'Admin-only paginated search over flashcards. Supports filters by category, subcategory and audio status.',
+      'Admin-only paginated search over flashcards. Supports filters by category, subcategory, audio status and free-text search by `query` (matches expression or meaning, case-insensitive). Text search is performed in-memory after category/subcategory/audio filters are applied at the database.',
   })
   @ApiOkResponse({
     description: 'Paginated list of flashcards',
@@ -49,6 +49,7 @@ export class SearchFlashcardsGetController {
     @Req() req: Request,
   ): Promise<PaginatedApiResponse<FlashcardPrimitives>> {
     const result = await this.searcher.execute({
+      query: query.query,
       category: query.category,
       subcategory: query.subcategory,
       audioStatus: query.audioStatus,

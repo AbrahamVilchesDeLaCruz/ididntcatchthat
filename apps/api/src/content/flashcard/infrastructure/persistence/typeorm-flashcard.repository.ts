@@ -32,6 +32,7 @@ export class TypeOrmFlashcardRepository implements FlashcardRepository {
     FilterOperator.GT,
     FilterOperator.GTE,
     FilterOperator.LIKE,
+    FilterOperator.ILIKE,
   ]);
 
   constructor(
