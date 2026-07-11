@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/apiClient';
 import type { ApiEnvelope } from '@/core/api/api-envelope';
+import { useAuthStore } from '@/core/store/auth.store';
 import type { RankingProfileVM } from '@/containers/ranking/ranking.types';
 
 type RankingProfileApiModel = {
@@ -15,15 +16,20 @@ type RankingProfileApiModel = {
 };
 
 export const rankingProfileKeys = {
-  profile: ['ranking', 'profile'] as const,
+  all: ['ranking'] as const,
+  // userId forma parte de la key: el endpoint /users/me/ranking-profile es
+  // per-user, y sin esta scoping TanStack serviría el nickname cacheado del
+  // usuario anterior al cambiar de cuenta en el mismo navegador.
+  profile: (userId: string) => ['ranking', 'profile', userId] as const,
 };
 
 export const useRankingProfile = (options?: {
   enabled?: boolean;
 }): UseQueryResult<RankingProfileVM> => {
+  const userId = useAuthStore((s) => s.userId);
   return useQuery({
-    queryKey: rankingProfileKeys.profile,
-    enabled: options?.enabled ?? true,
+    queryKey: rankingProfileKeys.profile(userId ?? 'anonymous'),
+    enabled: (options?.enabled ?? true) && userId !== null,
     queryFn: async (): Promise<RankingProfileVM> => {
       const res = await apiClient.get<ApiEnvelope<RankingProfileApiModel>>(
         '/users/me/ranking-profile',

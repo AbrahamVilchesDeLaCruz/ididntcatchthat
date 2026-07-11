@@ -4,6 +4,7 @@ import { useI18n } from '@/core/i18n';
 import { achievementKeys } from '@/core/achievements/achievementKeys';
 import { fetchAchievements } from '@/core/achievements/useAchievements';
 import { useToastStore } from '@/core/notifications/toast.store';
+import { useAuthStore } from '@/core/store/auth.store';
 import type { AchievementVM } from '@/core/achievements/achievement.types';
 import {
   predictGameAchievementUnlocks,
@@ -26,8 +27,11 @@ function achievementTitle(
 
 function readCachedAchievements(
   queryClient: ReturnType<typeof useQueryClient>,
+  userId: string,
 ): AchievementVM[] | undefined {
-  return queryClient.getQueryData<AchievementVM[]>(achievementKeys.list());
+  return queryClient.getQueryData<AchievementVM[]>(
+    achievementKeys.list(userId),
+  );
 }
 
 export function useProgressSideEffects(): {
@@ -39,6 +43,7 @@ export function useProgressSideEffects(): {
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const pushToast = useToastStore((s) => s.push);
+  const userId = useAuthStore((s) => s.userId);
 
   const showPredictedUnlocks = useCallback(
     (predicted: { key: string; category: AchievementVM['category'] }[]) => {
@@ -58,25 +63,31 @@ export function useProgressSideEffects(): {
     const optimistic = selectProgressOptimistic(
       useProgressOptimisticStore.getState(),
     );
-    const achievements = readCachedAchievements(queryClient);
+    const achievements = readCachedAchievements(
+      queryClient,
+      userId ?? 'anonymous',
+    );
     const predicted = predictStudyAchievementUnlocks(
       achievements,
       optimistic.extraStudySessions,
     );
     showPredictedUnlocks(predicted);
-  }, [queryClient, showPredictedUnlocks]);
+  }, [queryClient, showPredictedUnlocks, userId]);
 
   const showOptimisticGameUnlocks = useCallback(() => {
     const optimistic = selectProgressOptimistic(
       useProgressOptimisticStore.getState(),
     );
-    const achievements = readCachedAchievements(queryClient);
+    const achievements = readCachedAchievements(
+      queryClient,
+      userId ?? 'anonymous',
+    );
     const predicted = predictGameAchievementUnlocks(
       achievements,
       optimistic.extraGamesCompleted,
     );
     showPredictedUnlocks(predicted);
-  }, [queryClient, showPredictedUnlocks]);
+  }, [queryClient, showPredictedUnlocks, userId]);
 
   const pollRecentUnlocks = useCallback(
     async (since: Date): Promise<void> => {
