@@ -73,7 +73,7 @@ services:
   # ─── Observability ───────────────────────────────────────────────────────────
 
   prometheus:
-    image: prom/prometheus:v3.13.0
+    image: prom/prometheus:v3.14.0
     container_name: ididntcatchthat-prometheus
     restart: unless-stopped
     volumes:
