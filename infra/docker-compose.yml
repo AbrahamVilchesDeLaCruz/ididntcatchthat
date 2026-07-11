@@ -90,7 +90,7 @@ services:
           memory: 256M
 
   grafana:
-    image: grafana/grafana:12.4.5-ubuntu
+    image: grafana/grafana:12.6.0-ubuntu
     container_name: ididntcatchthat-grafana
     restart: unless-stopped
     volumes:
