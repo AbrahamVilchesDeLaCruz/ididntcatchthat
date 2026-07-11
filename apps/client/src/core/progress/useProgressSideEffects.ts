@@ -45,6 +45,7 @@ export function useProgressSideEffects(): {
       for (const achievement of predicted) {
         const title = achievementTitle(t.achievements.items, achievement.key);
         pushToast({
+          key: `achievement:${achievement.key}`,
           message: t.achievements.toast.unlocked.replace('{title}', title),
           category: achievement.category,
         });
@@ -94,6 +95,7 @@ export function useProgressSideEffects(): {
               achievement.key,
             );
             pushToast({
+              key: `achievement:${achievement.key}`,
               message: t.achievements.toast.unlocked.replace('{title}', title),
               category: achievement.category,
             });
