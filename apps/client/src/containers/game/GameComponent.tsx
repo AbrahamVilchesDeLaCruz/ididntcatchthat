@@ -10,9 +10,9 @@ import { GamePlayToolbar } from './components/GamePlayToolbar';
 import { FlashcardDialectButtons } from './components/FlashcardDialectButtons';
 import { FlashcardExampleSection } from './components/FlashcardExampleSection';
 import { FlashcardIpaBadge } from './components/FlashcardIpaBadge';
-import { FlashcardNativeSpeechButton } from './components/FlashcardNativeSpeechButton';
-import { getExampleAudioUrl, getNativeAudioUrl } from './game.audio';
+import { getExampleAudioUrl } from './game.audio';
 import { useGameTouchGestures } from './hooks/useGameTouchGestures';
+import { useGameKeyboardShortcuts } from './hooks/useGameKeyboardShortcuts';
 import { useGamePlayLabels } from './hooks/useGamePlayLabels';
 import { useFlashcardAudio } from './hooks/useFlashcardAudio';
 import { useCardFlipTransition } from './hooks/useCardFlipTransition';
@@ -86,6 +86,19 @@ export const GameComponent = ({
     onIncorrect: () => handleAnswer(false),
   });
 
+  // Los atajos Y/N se cablean al handleAnswer LOCAL para que la animación
+  // de feedback (verde/rojo + glow) se dispare igual que al pulsar los iconos.
+  // Antes vivían en GameContainer y llamaban directo a handleAnswer del
+  // container, saltándose el feedback visual.
+  useGameKeyboardShortcuts({
+    enabled: !isLoading && flashcard !== null,
+    isFlipped,
+    onFlip,
+    onCorrect: () => handleAnswer(true),
+    onIncorrect: () => handleAnswer(false),
+    onPause,
+  });
+
   if (isLoading || !flashcard) {
     return (
       <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-base)]">
@@ -96,7 +109,6 @@ export const GameComponent = ({
 
   const audioUrls = flashcard.audioUrls;
   const exampleAudioUrl = getExampleAudioUrl(audioUrls);
-  const nativeAudioUrl = getNativeAudioUrl(audioUrls);
   const expression = capitalizeFirst(flashcard.expression);
   const meaning = capitalizeFirst(flashcard.meaning);
 
@@ -181,7 +193,7 @@ export const GameComponent = ({
                 }}
                 className="flashcard-card-face absolute inset-0 flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-bg-card)]"
               >
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <div className="app-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
                   <div className="flex min-h-full flex-col items-center justify-center gap-5 px-5 py-5 md:gap-6 md:px-6 md:py-6">
                     <div className="w-full max-w-md shrink-0 space-y-2 text-center">
                       <p className="text-2xl font-bold text-[var(--color-text-primary)] md:text-3xl">
@@ -208,14 +220,6 @@ export const GameComponent = ({
                       playExampleLabel={labels.playExample}
                       onPlayExample={playAudio}
                     />
-
-                    {flashcard.nativeSpeech && nativeAudioUrl !== null ? (
-                      <FlashcardNativeSpeechButton
-                        label={labels.listenNative}
-                        audioUrl={nativeAudioUrl}
-                        onPlay={playAudio}
-                      />
-                    ) : null}
                   </div>
                 </div>
 

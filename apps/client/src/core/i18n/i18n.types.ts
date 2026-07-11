@@ -173,7 +173,6 @@ export interface GameTranslations {
     tapToFlipBack: string;
     pause: string;
     listenExample: string;
-    listenNative: string;
     micSoon: string;
     pausedToast: string;
     sidebarTitle: string;
@@ -279,6 +278,11 @@ export interface StatsTranslations {
     module: string;
     errors: string;
     lastAttempt: string;
+    pageOf: string;
+    previous: string;
+    next: string;
+    previousPageAriaLabel: string;
+    nextPageAriaLabel: string;
   };
   mastery: {
     novice: string;

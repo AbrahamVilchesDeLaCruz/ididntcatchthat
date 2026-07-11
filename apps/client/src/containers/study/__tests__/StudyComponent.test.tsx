@@ -64,4 +64,12 @@ describe('StudyComponent', () => {
       screen.getByText('Click or press Space to reveal'),
     ).toBeInTheDocument();
   });
+
+  it('does NOT render the redundant "Listen native" button on the back', () => {
+    render(<StudyComponent {...defaultProps} isFlipped />);
+
+    expect(
+      screen.queryByRole('button', { name: /Listen native/i }),
+    ).not.toBeInTheDocument();
+  });
 });

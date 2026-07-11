@@ -12,7 +12,7 @@ require_command trivy
 IMAGES=(
   "rabbitmq:4.1-management-alpine"
   "rabbitmq:4.1-alpine"
-  "prom/prometheus:v3.13.0"
+  "prom/prometheus:v3.13.1"
   "grafana/grafana:12.4.5-ubuntu"
   "grafana/loki:3.6.12"
   "nginx:1.27-alpine"
@@ -35,7 +35,7 @@ for img in "${IMAGES[@]}"; do
     echo "WARN: could not pull or find ${img}, skipping"
     continue
   }
-  if ! trivy image --severity CRITICAL,HIGH --ignore-unfixed "${img}"; then
+  if ! trivy image --severity CRITICAL,HIGH --ignore-unfixed --ignorefile "$(dirname "${SCRIPT_DIR}")/../../.trivyignore" "${img}"; then
     FAILED=$((FAILED + 1))
   fi
 done

@@ -210,7 +210,6 @@ export const es: Translations = {
       tapToFlipBack: 'Toca para volver',
       pause: 'Pausar',
       listenExample: 'Escuchar ejemplo',
-      listenNative: 'Escuchar nativo',
       micSoon: 'Próximamente',
       pausedToast: 'Partida guardada',
       sidebarTitle: 'Progreso de la partida',
@@ -233,7 +232,7 @@ export const es: Translations = {
     },
     summary: {
       title: '¡Partida terminada!',
-      subtitleGood: '¡Buena sesión! 🎉',
+      subtitleGood: '¡Buena sesión!',
       subtitleKeepGoing: '¡Sigue practicando, vas a llegar!',
       accuracy: 'Precisión',
       correct: 'Correctas',
@@ -349,6 +348,11 @@ export const es: Translations = {
       module: 'Módulo',
       errors: 'Errores',
       lastAttempt: 'Último intento',
+      pageOf: 'Página {page} de {total}',
+      previous: 'Anterior',
+      next: 'Siguiente',
+      previousPageAriaLabel: 'Página anterior',
+      nextPageAriaLabel: 'Página siguiente',
     },
     mastery: {
       novice: 'Novato',

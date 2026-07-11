@@ -17,6 +17,10 @@ interface WeakestFlashcardRow {
   last_seen_at: Date;
 }
 
+interface WeakestFlashcardCountRow {
+  total: string;
+}
+
 @Injectable()
 export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
   constructor(
@@ -26,14 +30,18 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
 
   async findWeakest(
     userId: UserId,
+    filters: WeakestFlashcardFilters | undefined,
     limit: number,
-    filters?: WeakestFlashcardFilters,
+    offset: number,
   ): Promise<WeakestFlashcard[]> {
     const params: unknown[] = [userId.value];
     const conditions = [
       'ufs.user_id = $1',
       'ufs.times_played > 0',
-      '(ufs.times_played - ufs.correct_count) > 0',
+      // Net errors: cards que el usuario ha fallado MÁS veces de las que ha acertado.
+      // Cuando `correct_count >= wrong_count` (es decir, `(times_played - 2*correct_count) <= 0`),
+      // la card sale de la lista de "más difíciles" — el aprendizaje la ha "rescatado".
+      '(ufs.times_played - 2*ufs.correct_count) > 0',
     ];
 
     if (filters?.module) {
@@ -45,8 +53,9 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
       conditions.push(`f.subcategory = $${params.length}`);
     }
 
-    params.push(limit);
-    const limitParam = `$${params.length}`;
+    params.push(limit, offset);
+    const limitParam = `$${params.length - 1}`;
+    const offsetParam = `$${params.length}`;
 
     const rows = await this.dataSource.query<WeakestFlashcardRow[]>(
       `SELECT
@@ -54,13 +63,13 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
          f.expression,
          f.category,
          f.subcategory,
-         (ufs.times_played - ufs.correct_count) AS error_count,
+         GREATEST(0, ufs.times_played - 2*ufs.correct_count) AS error_count,
          ufs.last_seen_at
        FROM user_flashcard_stats ufs
        JOIN flashcards f ON f.id = ufs.flashcard_id
        WHERE ${conditions.join(' AND ')}
-       ORDER BY error_count DESC, ufs.accuracy_rate ASC
-       LIMIT ${limitParam}`,
+       ORDER BY (ufs.times_played - 2*ufs.correct_count) DESC, ufs.accuracy_rate ASC
+       LIMIT ${limitParam} OFFSET ${offsetParam}`,
       params,
     );
 
@@ -73,5 +82,36 @@ export class TypeOrmWeakestFlashcardQuery implements WeakestFlashcardQuery {
       errorCount: Number(row.error_count),
       lastSeenAt: row.last_seen_at.toISOString(),
     }));
+  }
+
+  async countWeakest(
+    userId: UserId,
+    filters: WeakestFlashcardFilters | undefined,
+  ): Promise<number> {
+    const params: unknown[] = [userId.value];
+    const conditions = [
+      'ufs.user_id = $1',
+      'ufs.times_played > 0',
+      '(ufs.times_played - 2*ufs.correct_count) > 0',
+    ];
+
+    if (filters?.module) {
+      params.push(filters.module);
+      conditions.push(`f.category = $${params.length}`);
+    }
+    if (filters?.subcategory) {
+      params.push(filters.subcategory);
+      conditions.push(`f.subcategory = $${params.length}`);
+    }
+
+    const rows = await this.dataSource.query<WeakestFlashcardCountRow[]>(
+      `SELECT COUNT(*)::text AS total
+       FROM user_flashcard_stats ufs
+       JOIN flashcards f ON f.id = ufs.flashcard_id
+       WHERE ${conditions.join(' AND ')}`,
+      params,
+    );
+
+    return Number(rows[0]?.total ?? '0');
   }
 }

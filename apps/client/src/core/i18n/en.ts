@@ -208,7 +208,6 @@ export const en: Translations = {
       tapToFlipBack: 'Tap to flip back',
       pause: 'Pause',
       listenExample: 'Listen to example',
-      listenNative: 'Listen native',
       micSoon: 'Coming soon',
       pausedToast: 'Game saved',
       sidebarTitle: 'Game progress',
@@ -231,7 +230,7 @@ export const en: Translations = {
     },
     summary: {
       title: 'Game over!',
-      subtitleGood: 'Great session! 🎉',
+      subtitleGood: 'Great session!',
       subtitleKeepGoing: "Keep practicing, you'll get there!",
       accuracy: 'Accuracy',
       correct: 'Correct',
@@ -346,6 +345,11 @@ export const en: Translations = {
       module: 'Module',
       errors: 'Errors',
       lastAttempt: 'Last attempt',
+      pageOf: 'Page {page} of {total}',
+      previous: 'Previous',
+      next: 'Next',
+      previousPageAriaLabel: 'Previous page',
+      nextPageAriaLabel: 'Next page',
     },
     mastery: {
       novice: 'Novice',

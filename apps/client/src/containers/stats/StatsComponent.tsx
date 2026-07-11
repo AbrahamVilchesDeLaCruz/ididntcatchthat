@@ -1,5 +1,6 @@
 import { type ReactElement, useMemo } from 'react';
 import { useI18n } from '@/core/i18n';
+import { type PaginationMeta } from '@/core/api/api-envelope';
 import { StatsHero } from './components/StatsHero';
 import { ModuleProgressChart } from './components/ModuleProgressChart';
 import { SubcategoryProgressPanel } from './components/SubcategoryProgressPanel';
@@ -19,6 +20,7 @@ interface StatsComponentProps {
   modules: ModuleProgressVM[];
   subcategories: SubcategoryProgressVM[];
   weakFlashcards: WeakFlashcardVM[];
+  weakPagination: PaginationMeta | null;
   selectedCategory: string | null;
   moduleLoading: boolean;
   moduleError: boolean;
@@ -35,6 +37,7 @@ interface StatsComponentProps {
   onRetrySummary: () => void;
   onPractice: (module: string, subcategory: string | null) => void;
   onPracticeWeakest: () => void;
+  onWeakPageChange: (page: number) => void;
   onGuestRegister: () => void;
   emptyGlobalCta: () => void;
   loadErrorLabel: string;
@@ -69,6 +72,7 @@ export const StatsComponent = ({
   modules,
   subcategories,
   weakFlashcards,
+  weakPagination,
   selectedCategory,
   moduleLoading,
   moduleError,
@@ -85,6 +89,7 @@ export const StatsComponent = ({
   onRetrySummary,
   onPractice,
   onPracticeWeakest,
+  onWeakPageChange,
   onGuestRegister,
   emptyGlobalCta,
   loadErrorLabel,
@@ -222,6 +227,8 @@ export const StatsComponent = ({
             <WeakFlashcardsTable
               data={filteredWeak}
               selectedCategory={selectedCategory}
+              pagination={weakPagination ?? undefined}
+              onPageChange={onWeakPageChange}
               onPractice={(item) => onPractice(item.category, item.subcategory)}
             />
           )}

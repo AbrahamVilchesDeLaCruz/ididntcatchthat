@@ -84,12 +84,45 @@ describe('GameComponent', () => {
     expect(playMock).toHaveBeenCalledTimes(2);
   });
 
-  it('shows native speech audio when available', () => {
+  it('does NOT render the redundant "Listen native" button on the back — los 3 dialectos + el altavoz de ejemplos ya cubren el audio', () => {
     render(<GameComponent {...defaultProps} isFlipped />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Listen native/i }));
+    expect(
+      screen.queryByRole('button', { name: /Listen native/i }),
+    ).not.toBeInTheDocument();
+  });
 
-    expect(playMock).toHaveBeenCalledTimes(1);
+  it('atajo Y con la carta volteada dispara la misma animación visual que el icono de correcto', () => {
+    render(<GameComponent {...defaultProps} isFlipped />);
+
+    expect(document.querySelector('.game-card-stage')).not.toHaveClass(
+      'game-card-feedback--correct',
+    );
+
+    fireEvent.keyDown(window, { key: 'y' });
+
+    expect(document.querySelector('.game-card-stage')).toHaveClass(
+      'game-card-feedback--correct',
+    );
+  });
+
+  it('atajo N con la carta volteada dispara la misma animación visual que el icono de incorrecto', () => {
+    render(<GameComponent {...defaultProps} isFlipped />);
+
+    fireEvent.keyDown(window, { key: 'n' });
+
+    expect(document.querySelector('.game-card-stage')).toHaveClass(
+      'game-card-feedback--incorrect',
+    );
+  });
+
+  it('la cara B usa la clase app-scroll para que el scrollbar quede estilizado (no el default del browser)', () => {
+    render(<GameComponent {...defaultProps} isFlipped />);
+
+    const scrollables = document.querySelectorAll(
+      '.flashcard-card-face .app-scroll',
+    );
+    expect(scrollables.length).toBeGreaterThan(0);
   });
 
   it('renders multiple dialect buttons when urls exist', () => {

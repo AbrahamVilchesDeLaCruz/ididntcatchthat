@@ -93,5 +93,25 @@ describe('auth.store', () => {
       expect(state.userId).toBeNull();
       expect(state.roles).toEqual([]);
     });
+
+    it('marca isLogoutPending=true para que los guards redirijan a landing (no a /auth/login)', () => {
+      const token = makeJwt({ type: 'user', userId: 'u-6', roles: ['user'] });
+      useAuthStore.getState().setAccessToken(token);
+      expect(useAuthStore.getState().isLogoutPending).toBe(false);
+
+      useAuthStore.getState().logout();
+
+      expect(useAuthStore.getState().isLogoutPending).toBe(true);
+    });
+
+    it('setAccessToken (login) limpia isLogoutPending', () => {
+      useAuthStore.getState().logout();
+      expect(useAuthStore.getState().isLogoutPending).toBe(true);
+
+      const token = makeJwt({ type: 'user', userId: 'u-7', roles: ['user'] });
+      useAuthStore.getState().setAccessToken(token);
+
+      expect(useAuthStore.getState().isLogoutPending).toBe(false);
+    });
   });
 });

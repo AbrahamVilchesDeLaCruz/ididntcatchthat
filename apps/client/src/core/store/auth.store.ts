@@ -10,6 +10,14 @@ export type UserType = 'guest' | 'user' | 'teacher' | 'admin';
 interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
+  /**
+   * `true` entre que el usuario pulsa logout y el siguiente render del
+   * guard (p.ej. AppShell). Permite distinguir "acabo de salir" de "nunca
+   * autenticado" para redirigir a / (landing) en lugar de /auth/login.
+   * NO se persiste — es un flag de intención in-flight, se reinicia en cada
+   * carga.
+   */
+  isLogoutPending: boolean;
   guestDeviceId: string | null;
   userType: UserType | null;
   userId: string | null;
@@ -28,6 +36,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     (set) => ({
       accessToken: null,
       isAuthenticated: false,
+      isLogoutPending: false,
       guestDeviceId: null,
       userType: null,
       userId: null,
@@ -39,6 +48,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({
           accessToken: token,
           isAuthenticated: true,
+          isLogoutPending: false,
           userType: resolveUserType(payload.type, roles),
           userId: payload.userId ?? null,
           roles,
@@ -53,6 +63,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({
           accessToken: null,
           isAuthenticated: false,
+          isLogoutPending: true,
           userType: null,
           userId: null,
           roles: [],
@@ -66,8 +77,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         isAuthenticated: state.isAuthenticated,
         // guestDeviceId sí se persiste para identificar al guest entre recargas
         guestDeviceId: state.guestDeviceId,
-        // roles/userType NO se persisten — vienen del JWT vivo o del refresh;
-        // persistirlos dejaba permisos admin stale tras cambiar de cuenta.
+        // isLogoutPending NO se persiste — es un flag de intención in-flight.
+        // roles/userType/isLogoutPending NO se persisten — vienen del JWT vivo
+        // o del refresh; persistirlos dejaba permisos admin stale o redirects
+        // fantasma tras cambiar de cuenta.
       }),
       merge: (persisted, current) => {
         const saved = persisted as Partial<AuthState> | undefined;
@@ -75,6 +88,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           ...current,
           isAuthenticated: saved?.isAuthenticated ?? false,
           guestDeviceId: saved?.guestDeviceId ?? null,
+          // isLogoutPending siempre arranca en false (no persistido)
+          isLogoutPending: false,
           // Ignorar roles/userType/userId legacy en localStorage
         };
       },
