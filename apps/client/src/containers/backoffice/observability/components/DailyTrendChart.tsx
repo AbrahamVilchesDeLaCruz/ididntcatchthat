@@ -1,10 +1,10 @@
 import { type ReactElement } from 'react';
 import {
-  ComposedChart,
-  Bar,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
   Legend,
@@ -15,12 +15,12 @@ import { useI18n } from '@/core/i18n';
 export interface TrendSeries {
   key: string;
   label: string;
-  type: 'bar' | 'line';
+  /** @deprecated No longer used — all series render as dots */
+  type?: 'bar' | 'line';
   color: string;
 }
 
 interface DailyTrendChartProps {
-  // Recharts accepts any object array — we keep it loose to avoid casting at call sites
   data: object[];
   series: TrendSeries[];
   height?: number;
@@ -48,13 +48,18 @@ export const DailyTrendChart = ({
     );
   }
 
+  const pointsBySeries = series.map((s) => ({
+    ...s,
+    points: (data as Record<string, unknown>[]).map((d) => ({
+      date: d.date as string,
+      value: Number(d[s.key] ?? 0),
+    })),
+  }));
+
   return (
     <div role="img" aria-label={ariaLabel}>
       <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart
-          data={data}
-          margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-        >
+        <ScatterChart margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
           <CartesianGrid
             strokeDasharray="3 3"
             stroke="var(--color-border)"
@@ -62,20 +67,23 @@ export const DailyTrendChart = ({
           />
           <XAxis
             dataKey="date"
+            type="category"
             tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
           />
           <YAxis
+            dataKey="value"
             tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
           />
+          <ZAxis dataKey="value" range={[30, 250]} />
           <Tooltip
             contentStyle={{
-              background: 'var(--color-bg-elevated)',
+              backgroundColor: 'var(--color-bg-elevated)',
               border: '1px solid var(--color-border)',
               borderRadius: '8px',
               fontSize: 12,
@@ -90,31 +98,16 @@ export const DailyTrendChart = ({
               color: 'var(--color-text-secondary)',
             }}
           />
-          {series.map((s) =>
-            s.type === 'bar' ? (
-              <Bar
-                key={s.key}
-                dataKey={s.key}
-                name={s.label}
-                fill={s.color}
-                radius={[3, 3, 0, 0]}
-                maxBarSize={32}
-                fillOpacity={0.85}
-              />
-            ) : (
-              <Line
-                key={s.key}
-                type="monotone"
-                dataKey={s.key}
-                name={s.label}
-                stroke={s.color}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4 }}
-              />
-            ),
-          )}
-        </ComposedChart>
+          {pointsBySeries.map((s) => (
+            <Scatter
+              key={s.key}
+              data={s.points}
+              name={s.label}
+              fill={s.color}
+              fillOpacity={0.7}
+            />
+          ))}
+        </ScatterChart>
       </ResponsiveContainer>
     </div>
   );

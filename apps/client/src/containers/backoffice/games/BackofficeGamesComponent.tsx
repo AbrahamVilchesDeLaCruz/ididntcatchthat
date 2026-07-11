@@ -4,10 +4,11 @@ import {
   StatCardSkeleton,
 } from './components/GamesStatsCards';
 import { GamesByModuleChart } from './components/GamesByModuleChart';
+import { ModePieChart } from './components/ModePieChart';
+import { ModulesRadarChart } from './components/ModulesRadarChart';
 import { BackofficePageShell } from '@/common/components/BackofficePageShell';
 import { PeriodSelector } from '@/containers/backoffice/observability/components/PeriodSelector';
 import { DailyTrendChart } from '@/containers/backoffice/observability/components/DailyTrendChart';
-import { DistributionChart } from '@/containers/backoffice/observability/components/DistributionChart';
 import type { GamesStatsVM, GameStatsPeriod } from './backoffice-games.types';
 import { useI18n } from '@/core/i18n';
 
@@ -120,7 +121,7 @@ export const BackofficeGamesComponent = ({
             {isLoading ? (
               <ChartSkeleton height="h-44" />
             ) : (
-              <DistributionChart
+              <ModePieChart
                 data={(stats?.byMode ?? []).map((m) => ({
                   name: t.backoffice.games.modes[m.mode] ?? m.mode,
                   value: m.count,
@@ -136,19 +137,15 @@ export const BackofficeGamesComponent = ({
               {isLoading ? (
                 <ChartSkeleton height="h-44" />
               ) : (
-                <DistributionChart
-                  data={(stats?.byModule ?? []).slice(0, 6).map((m) => ({
+                <ModulesRadarChart
+                  data={(stats?.byModule ?? []).slice(0, 4).map((m) => ({
                     name:
                       t.game.config.modules[
                         m.module as keyof typeof t.game.config.modules
                       ] ?? m.module,
                     value: m.totalGames,
                   }))}
-                  height={Math.max(
-                    176,
-                    (stats?.byModule.slice(0, 6).length ?? 0) * 32,
-                  )}
-                  horizontal
+                  height={200}
                   ariaLabel={t.backoffice.games.charts.topModulesTitle}
                 />
               )}
