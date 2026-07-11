@@ -73,7 +73,7 @@ services:
   # ─── Observability ───────────────────────────────────────────────────────────
 
   prometheus:
-    image: prom/prometheus:v3.14.0
+    image: prom/prometheus:v3.13.1
     container_name: ididntcatchthat-prometheus
     restart: unless-stopped
     volumes:
@@ -90,7 +90,7 @@ services:
           memory: 256M
 
   grafana:
-    image: grafana/grafana:12.6.0-ubuntu
+    image: grafana/grafana:12.4.5-ubuntu
     container_name: ididntcatchthat-grafana
     restart: unless-stopped
     volumes:

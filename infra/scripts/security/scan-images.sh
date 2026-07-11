@@ -12,8 +12,8 @@ require_command trivy
 IMAGES=(
   "rabbitmq:4.1-management-alpine"
   "rabbitmq:4.1-alpine"
-  "prom/prometheus:v3.14.0"
-  "grafana/grafana:12.6.0-ubuntu"
+  "prom/prometheus:v3.13.1"
+  "grafana/grafana:12.4.5-ubuntu"
   "grafana/loki:3.6.12"
   "nginx:1.27-alpine"
   "node:24-alpine"
