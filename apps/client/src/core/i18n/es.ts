@@ -232,7 +232,7 @@ export const es: Translations = {
     },
     summary: {
       title: '¡Partida terminada!',
-      subtitleGood: '¡Buena sesión! 🎉',
+      subtitleGood: '¡Buena sesión!',
       subtitleKeepGoing: '¡Sigue practicando, vas a llegar!',
       accuracy: 'Precisión',
       correct: 'Correctas',

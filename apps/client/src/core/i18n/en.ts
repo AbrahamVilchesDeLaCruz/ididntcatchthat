@@ -230,7 +230,7 @@ export const en: Translations = {
     },
     summary: {
       title: 'Game over!',
-      subtitleGood: 'Great session! 🎉',
+      subtitleGood: 'Great session!',
       subtitleKeepGoing: "Keep practicing, you'll get there!",
       accuracy: 'Accuracy',
       correct: 'Correct',
