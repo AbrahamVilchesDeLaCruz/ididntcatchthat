@@ -10,7 +10,7 @@ import type {
 
 function mapGamesByModule(raw: GamesByModuleApiModel): GamesByModuleVM {
   return {
-    module: raw.module ?? 'Sin módulo',
+    module: raw.module ?? 'random',
     totalGames: raw.totalGames,
     completedGames: raw.completedGames,
     avgAccuracy: raw.avgAccuracy,

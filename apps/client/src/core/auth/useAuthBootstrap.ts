@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { resolveApiBaseUrl } from '@/core/api/resolveApiBaseUrl';
 import { useAuthStore } from '@/core/store/auth.store';
+import { redirectToLanding } from './redirectToLanding';
 
 /**
  * Intenta renovar el accessToken silenciosamente al montar la app.
@@ -49,6 +50,7 @@ export const useAuthBootstrap = (): boolean => {
         })
         .catch(() => {
           logout();
+          redirectToLanding();
         })
         .finally(() => {
           setReady(true);
@@ -67,6 +69,7 @@ export const useAuthBootstrap = (): boolean => {
       })
       .catch(() => {
         logout();
+        redirectToLanding();
       })
       .finally(() => {
         setReady(true);

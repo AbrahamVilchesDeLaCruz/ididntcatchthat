@@ -30,7 +30,7 @@ export const BackofficePageShell = ({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
             {title}
@@ -42,7 +42,7 @@ export const BackofficePageShell = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 pt-1">
+        <div className="flex flex-wrap items-center gap-2 shrink-0 pt-1">
           {headerExtra}
           {timeAgo && (
             <span className="text-xs text-[var(--color-text-muted)] bg-[var(--color-bg-elevated)] border border-[var(--color-border)] px-2.5 py-1 rounded-full whitespace-nowrap">

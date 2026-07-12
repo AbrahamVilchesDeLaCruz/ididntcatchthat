@@ -152,6 +152,7 @@ export const RuntimeMetricsSection = ({
           insight={heapInsight}
           variant={heapVariant}
           progress={heapPct ?? undefined}
+          tooltip={t.backoffice.observability.runtime.heapUsedTooltip}
           sub={
             runtime.heapUsedBytes && runtime.heapTotalBytes
               ? `${fmtBytes(runtime.heapUsedBytes)} / ${fmtBytes(runtime.heapTotalBytes)}`
@@ -164,6 +165,7 @@ export const RuntimeMetricsSection = ({
           value={lagMs !== null ? `${lagMs.toFixed(1)} ms` : '—'}
           insight={lagInsight}
           variant={lagVariant}
+          tooltip={t.backoffice.observability.runtime.eventLoopLagP95Tooltip}
         />
 
         <InsightCard
@@ -171,6 +173,7 @@ export const RuntimeMetricsSection = ({
           value={fmtUptime(uptimeSec)}
           insight={uptimeInsight}
           variant={uptimeVariant}
+          tooltip={t.backoffice.observability.runtime.uptimeTooltip}
         />
 
         <InsightCard
@@ -178,6 +181,7 @@ export const RuntimeMetricsSection = ({
           value={gcSec !== null ? `${gcSec.toFixed(2)} s` : '—'}
           insight={gcInsight}
           variant={gcVariant}
+          tooltip={t.backoffice.observability.runtime.gcTotalTooltip}
         />
 
         {runtime.activeHandles !== null && (
@@ -189,6 +193,7 @@ export const RuntimeMetricsSection = ({
               String(runtime.activeHandles),
             )}
             variant="neutral"
+            tooltip={t.backoffice.observability.runtime.activeHandlesTooltip}
           />
         )}
 
@@ -198,6 +203,7 @@ export const RuntimeMetricsSection = ({
             value={fmtBytes(runtime.residentMemoryBytes)}
             insight={t.backoffice.observability.runtime.rssMemoryHint}
             variant="neutral"
+            tooltip={t.backoffice.observability.runtime.rssMemoryTooltip}
           />
         )}
       </div>

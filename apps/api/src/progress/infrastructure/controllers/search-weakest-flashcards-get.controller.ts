@@ -19,8 +19,7 @@ import { type Request } from 'express';
 import { JwtAuthGuard } from '@/shared/infrastructure/auth/jwt.guard';
 import { CurrentUser } from '@/shared/infrastructure/auth/current-user.decorator';
 import { type UserContext } from '@/shared/domain/user-context';
-import { ApiResponse } from '@/shared/infrastructure/http/response/api-response';
-import { apiEnvelopeSchema } from '@/shared/infrastructure/http/response/api-envelope.schema';
+import { PaginatedApiResponse } from '@/shared/infrastructure/http/response/api-response';
 import { resolveRequestId } from '@/shared/infrastructure/http/resolve-request-id';
 import { ValidationErrorResponse } from '@/shared/infrastructure/http/response/validation-error.response';
 import { WeakestFlashcardSearcher } from '@/progress/application/search/weakest-flashcard-searcher';
@@ -37,37 +36,39 @@ export class SearchWeakestFlashcardsGetController {
   @Get('flashcards/weakest')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Search weakest flashcards for the current user',
+    summary: 'Search weakest flashcards for the current user (paginated)',
     description:
-      'Returns flashcards with the lowest accuracy for targeted review. Optional limit query parameter (1–50, default 10).',
+      'Returns flashcards with the highest net error count (wrong - correct), so cards the user is learning naturally drop out as correct answers accumulate. Supports pagination via page/pageSize query parameters (1-indexed).',
   })
   @ApiOkResponse({
-    description: 'Weakest flashcards list',
-    schema: apiEnvelopeSchema([
-      {
-        flashcardId: 'fc-uuid',
-        expression: 'gonna',
-        category: 'connected_speech',
-        subcategory: 'informal_going_to',
-        errorCount: 4,
-        lastSeenAt: '2026-06-30T12:00:00.000Z',
-      },
-    ]),
+    description: 'Paginated weakest flashcards list',
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
   @ApiUnprocessableEntityResponse({
-    description: 'Invalid limit query parameter',
+    description: 'Invalid page or pageSize query parameter',
     type: ValidationErrorResponse,
   })
   async handler(
     @CurrentUser() user: UserContext,
     @Query() query: SearchWeakestFlashcardsGetQuery,
     @Req() req: Request,
-  ): Promise<ApiResponse<WeakestFlashcard[]>> {
-    const data = await this.searcher.execute({
+  ): Promise<PaginatedApiResponse<WeakestFlashcard>> {
+    const page = await this.searcher.execute({
       userId: user.userId!,
-      limit: query.limit,
+      page: query.page,
+      pageSize: query.pageSize,
     });
-    return ApiResponse.of(data, resolveRequestId(req));
+    return PaginatedApiResponse.of(
+      page.data,
+      {
+        page: page.page,
+        limit: page.pageSize,
+        total_items: page.total,
+        total_pages: page.totalPages,
+        has_next_page: page.hasNextPage,
+        has_prev_page: page.hasPrevPage,
+      },
+      resolveRequestId(req),
+    );
   }
 }

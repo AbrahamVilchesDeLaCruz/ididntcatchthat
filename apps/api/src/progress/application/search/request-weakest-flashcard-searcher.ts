@@ -1,4 +1,5 @@
 export type RequestWeakestFlashcardSearcher = {
   userId: string;
-  limit?: number;
+  page?: number;
+  pageSize?: number;
 };

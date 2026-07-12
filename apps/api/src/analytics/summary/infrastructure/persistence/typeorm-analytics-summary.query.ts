@@ -65,9 +65,9 @@ function whereClause(interval: string | null, column: string): string {
   return interval ? `WHERE ${column} >= NOW() - INTERVAL '${interval}'` : '';
 }
 
-function seriesStart(interval: string | null): string {
+function seriesStart(interval: string | null, dateTrunc: string): string {
   return interval
-    ? `NOW() - INTERVAL '${interval}'`
+    ? `DATE_TRUNC('${dateTrunc}', NOW()) - INTERVAL '${interval}'`
     : `'2024-01-01'::timestamp`;
 }
 
@@ -98,7 +98,7 @@ export class TypeOrmAnalyticsSummaryQuery implements AnalyticsSummaryQuery {
     cfg: PeriodConfig,
   ): Promise<ResponseAnalyticsSummaryRetriever['pageViews']> {
     const where = whereClause(cfg.interval, 'created_at');
-    const start = seriesStart(cfg.interval);
+    const start = seriesStart(cfg.interval, cfg.dateTrunc);
 
     const [[summary], topPages, byPeriod] = await Promise.all([
       this.dataSource.query<
@@ -175,7 +175,7 @@ export class TypeOrmAnalyticsSummaryQuery implements AnalyticsSummaryQuery {
     cfg: PeriodConfig,
   ): Promise<ResponseAnalyticsSummaryRetriever['games']> {
     const where = whereClause(cfg.interval, 'started_at');
-    const start = seriesStart(cfg.interval);
+    const start = seriesStart(cfg.interval, cfg.dateTrunc);
 
     const [[summary], byMode, topModules, byPeriod] = await Promise.all([
       this.dataSource.query<{ total: string; completed: string }[]>(
@@ -249,7 +249,7 @@ export class TypeOrmAnalyticsSummaryQuery implements AnalyticsSummaryQuery {
     _period: SummaryPeriod,
     cfg: PeriodConfig,
   ): Promise<ResponseAnalyticsSummaryRetriever['users']> {
-    const start = seriesStart(cfg.interval);
+    const start = seriesStart(cfg.interval, cfg.dateTrunc);
     const activeInterval = cfg.interval ?? '30 days';
 
     const [[summary], byProvider, byPeriod] = await Promise.all([
@@ -309,7 +309,7 @@ export class TypeOrmAnalyticsSummaryQuery implements AnalyticsSummaryQuery {
     _period: SummaryPeriod,
     cfg: PeriodConfig,
   ): Promise<ResponseAnalyticsSummaryRetriever['flashcards']> {
-    const start = seriesStart(cfg.interval);
+    const start = seriesStart(cfg.interval, cfg.dateTrunc);
 
     const [[summary], audioStatus, byCategory, byPeriod] = await Promise.all([
       this.dataSource.query<

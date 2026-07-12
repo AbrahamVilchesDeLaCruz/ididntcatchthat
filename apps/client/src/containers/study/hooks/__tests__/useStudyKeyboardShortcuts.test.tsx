@@ -51,4 +51,34 @@ describe('useStudyKeyboardShortcuts', () => {
 
     expect(onPause).toHaveBeenCalledTimes(1);
   });
+
+  it('siempre invoca el ÚLTIMO callback aunque cambie la identidad entre renders (refs, no stale closure)', () => {
+    const onFlip1 = vi.fn();
+    const onFlip2 = vi.fn();
+
+    const { rerender } = render(
+      <KeyboardHarness enabled onFlip={onFlip1} onNext={vi.fn()} />,
+    );
+    fireEvent.keyDown(window, { key: ' ' });
+    expect(onFlip1).toHaveBeenCalledTimes(1);
+
+    // Re-render con un callback nuevo. La listener NO debería re-suscribirse
+    // ni capturar la identidad vieja.
+    rerender(<KeyboardHarness enabled onFlip={onFlip2} onNext={vi.fn()} />);
+    fireEvent.keyDown(window, { key: ' ' });
+    expect(onFlip1).toHaveBeenCalledTimes(1);
+    expect(onFlip2).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignora la pulsación si el target es un input/textarea (no roba foco al usuario)', () => {
+    const onFlip = vi.fn();
+    render(<KeyboardHarness enabled onFlip={onFlip} onNext={vi.fn()} />);
+
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    fireEvent.keyDown(input, { key: ' ' });
+    document.body.removeChild(input);
+
+    expect(onFlip).not.toHaveBeenCalled();
+  });
 });

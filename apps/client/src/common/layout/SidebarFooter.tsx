@@ -1,6 +1,5 @@
 import { type ReactElement } from 'react';
 import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { useAuthStore } from '@/core/store/auth.store';
 import { useLogout } from '@/containers/auth/api';
@@ -14,15 +13,17 @@ export const SidebarFooter = ({
   onNavigate,
 }: SidebarFooterProps): ReactElement => {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
   const { mutate: logoutApi } = useLogout();
 
   const handleLogout = (): void => {
     logoutApi(undefined, {
       onSettled: () => {
+        // logout() marca isLogoutPending=true en el store. El guard de
+        // AppShell ve ese flag y redirige a / (landing). Si NO estamos
+        // dentro de AppShell (p.ej. en /game o /study), la redirección
+        // se hace via redirectToLanding() en apiClient / useAuthBootstrap.
         logout();
-        void navigate('/', { replace: true });
       },
     });
     onNavigate?.();

@@ -173,7 +173,6 @@ export interface GameTranslations {
     tapToFlipBack: string;
     pause: string;
     listenExample: string;
-    listenNative: string;
     micSoon: string;
     pausedToast: string;
     sidebarTitle: string;
@@ -279,6 +278,11 @@ export interface StatsTranslations {
     module: string;
     errors: string;
     lastAttempt: string;
+    pageOf: string;
+    previous: string;
+    next: string;
+    previousPageAriaLabel: string;
+    nextPageAriaLabel: string;
   };
   mastery: {
     novice: string;
@@ -742,12 +746,16 @@ export interface BackofficeTranslations {
     };
     httpSummary: {
       totalRequests: string;
+      totalRequestsTooltip: string;
       successRate: string;
       successRateHint: string;
+      successRateTooltip: string;
       errorRate: string;
       errorRateHint: string;
+      errorRateTooltip: string;
       latencyP95: string;
       latencyDetail: string;
+      latencyP95Tooltip: string;
     };
     httpTable: {
       noData: string;
@@ -806,13 +814,19 @@ export interface BackofficeTranslations {
       normalGcHint: string;
       noRuntimeMetrics: string;
       heapUsed: string;
+      heapUsedTooltip: string;
       eventLoopLagP95: string;
+      eventLoopLagP95Tooltip: string;
       uptime: string;
+      uptimeTooltip: string;
       gcTotal: string;
+      gcTotalTooltip: string;
       activeHandles: string;
       activeHandlesHint: string;
+      activeHandlesTooltip: string;
       rssMemory: string;
       rssMemoryHint: string;
+      rssMemoryTooltip: string;
     };
   };
   flashcards: {
@@ -836,8 +850,17 @@ export interface BackofficeTranslations {
     deleteError: string;
     cancel: string;
     delete: string;
+    pagination: {
+      pageOf: string;
+      previous: string;
+      next: string;
+      pageInputLabel: string;
+      goToPageAriaLabel: string;
+      invalidPage: string;
+    };
     toolbar: {
       filterByCategory: string;
+      filterBySearch: string;
       allCategories: string;
       filterBySubcategory: string;
       allSubcategories: string;
@@ -853,6 +876,7 @@ export interface BackofficeTranslations {
         'pending' | 'generating' | 'ready' | 'failed',
         string
       >;
+      searchPlaceholder: string;
     };
     table: {
       empty: string;
@@ -863,6 +887,8 @@ export interface BackofficeTranslations {
       view: string;
       edit: string;
       delete: string;
+      unknownCategory: string;
+      unknownSubcategory: string;
       audioStatuses: Record<
         'pending' | 'generating' | 'ready' | 'failed',
         string

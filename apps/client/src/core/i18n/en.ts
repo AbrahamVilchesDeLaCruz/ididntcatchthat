@@ -208,7 +208,6 @@ export const en: Translations = {
       tapToFlipBack: 'Tap to flip back',
       pause: 'Pause',
       listenExample: 'Listen to example',
-      listenNative: 'Listen native',
       micSoon: 'Coming soon',
       pausedToast: 'Game saved',
       sidebarTitle: 'Game progress',
@@ -231,7 +230,7 @@ export const en: Translations = {
     },
     summary: {
       title: 'Game over!',
-      subtitleGood: 'Great session! 🎉',
+      subtitleGood: 'Great session!',
       subtitleKeepGoing: "Keep practicing, you'll get there!",
       accuracy: 'Accuracy',
       correct: 'Correct',
@@ -346,6 +345,11 @@ export const en: Translations = {
       module: 'Module',
       errors: 'Errors',
       lastAttempt: 'Last attempt',
+      pageOf: 'Page {page} of {total}',
+      previous: 'Previous',
+      next: 'Next',
+      previousPageAriaLabel: 'Previous page',
+      nextPageAriaLabel: 'Next page',
     },
     mastery: {
       novice: 'Novice',
@@ -761,7 +765,7 @@ export const en: Translations = {
         modeDistributionTitle: 'Distribution by game mode',
         topModulesTitle: 'Most played modules',
         qualityByModuleTitle: 'Quality by module',
-        qualityByModuleHint: 'bars = count · line = accuracy %',
+        qualityByModuleHint: 'dot = accuracy % per module',
         noModuleData: 'No data by module',
         noModulePeriodData: 'No module data for this period',
         gamesLegend: 'Games',
@@ -822,12 +826,20 @@ export const en: Translations = {
       },
       httpSummary: {
         totalRequests: 'Total requests',
+        totalRequestsTooltip:
+          'Total HTTP requests handled by the server since startup.',
         successRate: 'Success rate',
         successRateHint: '2xx responses',
+        successRateTooltip:
+          'Percentage of responses with code 2xx (OK). Above 95% is considered healthy.',
         errorRate: 'Error rate',
         errorRateHint: '5xx responses',
+        errorRateTooltip:
+          'Percentage of responses with code 5xx (server errors). Above 1% requires attention.',
         latencyP95: 'Latency p95',
         latencyDetail: 'p50: {p50} · p99: {p99}',
+        latencyP95Tooltip:
+          'Time in ms below which 95% of requests are resolved. Includes p50 and p99.',
       },
       httpTable: {
         noData: 'No HTTP request data',
@@ -888,13 +900,22 @@ export const en: Translations = {
         noRuntimeMetrics:
           'No runtime metrics — collectDefaultMetrics() has not recorded data yet.',
         heapUsed: 'Heap used',
+        heapUsedTooltip: 'V8 heap memory used. Above 85% indicates OOM risk.',
         eventLoopLagP95: 'Event loop lag p95',
+        eventLoopLagP95Tooltip:
+          'Node.js event loop delay. Above 50ms there are serious blocks.',
         uptime: 'Uptime',
+        uptimeTooltip: 'Time since the last Node.js process startup.',
         gcTotal: 'Accumulated GC',
+        gcTotalTooltip: 'Total time spent in garbage collection since startup.',
         activeHandles: 'Active handles',
         activeHandlesHint: '{count} open handles (sockets, timers, etc.)',
+        activeHandlesTooltip:
+          'Open handles in the process: sockets, timers, file descriptors. Sustained growth = leak.',
         rssMemory: 'RSS memory',
         rssMemoryHint: 'Total physical memory used by Node.js process',
+        rssMemoryTooltip:
+          'Total physical memory used by the Node.js process (not just V8).',
       },
     },
     flashcards: {
@@ -919,8 +940,17 @@ export const en: Translations = {
       deleteError: 'Could not delete the flashcard. Please try again.',
       cancel: 'Cancel',
       delete: 'Delete',
+      pagination: {
+        pageOf: 'Page {page} of {total}',
+        previous: 'Previous',
+        next: 'Next',
+        pageInputLabel: 'Page number',
+        goToPageAriaLabel: 'Go to page',
+        invalidPage: 'Invalid page',
+      },
       toolbar: {
         filterByCategory: 'Filter by category',
+        filterBySearch: 'Filter by text',
         allCategories: 'All categories',
         filterBySubcategory: 'Filter by subcategory',
         allSubcategories: 'All subcategories',
@@ -934,6 +964,7 @@ export const en: Translations = {
           'Generate audio for pending flashcards on the current page',
         regeneratePageFailedAriaLabel:
           'Retry audio for failed flashcards on the current page',
+        searchPlaceholder: 'Search expression or meaning…',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',
@@ -950,6 +981,8 @@ export const en: Translations = {
         view: 'View',
         edit: 'Edit',
         delete: 'Delete',
+        unknownCategory: '—',
+        unknownSubcategory: '—',
         audioStatuses: {
           pending: 'Pending',
           generating: 'Generating',

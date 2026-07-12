@@ -8,6 +8,8 @@ import { GuestStatsPanel } from './components/GuestStatsPanel';
 import { StatsSectionSkeleton } from './components/StatsSectionSkeleton';
 import { useI18n } from '@/core/i18n';
 
+const WEAKEST_PAGE_SIZE = 10;
+
 export const StatsContainer = (): ReactElement => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,13 +18,22 @@ export const StatsContainer = (): ReactElement => {
   const isGuest = userType === 'guest';
 
   const selectedCategory = searchParams.get('category');
+  const weakPageParam = Number(searchParams.get('weakPage') ?? '1');
+  const weakPage =
+    Number.isFinite(weakPageParam) && weakPageParam >= 1
+      ? Math.floor(weakPageParam)
+      : 1;
 
   const {
     moduleProgress,
     subcategoryProgress,
     weakestFlashcards,
     progressSummary,
-  } = useStatsState({ enabled: !isGuest });
+  } = useStatsState({
+    enabled: !isGuest,
+    weakestPage: weakPage,
+    weakestPageSize: WEAKEST_PAGE_SIZE,
+  });
 
   const { mutate: startGame, isPending: isStartingWeakest } = useStartGame();
 
@@ -35,6 +46,19 @@ export const StatsContainer = (): ReactElement => {
       }
     },
     [setSearchParams],
+  );
+
+  const setWeakPage = useCallback(
+    (page: number): void => {
+      const next = new URLSearchParams(searchParams);
+      if (page <= 1) {
+        next.delete('weakPage');
+      } else {
+        next.set('weakPage', String(page));
+      }
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
   );
 
   useEffect(() => {
@@ -120,6 +144,7 @@ export const StatsContainer = (): ReactElement => {
       modules={modules}
       subcategories={subcategories}
       weakFlashcards={weakFlashcards}
+      weakPagination={weakestFlashcards.pagination ?? null}
       selectedCategory={selectedCategory}
       moduleLoading={moduleProgress.isLoading}
       moduleError={moduleProgress.isError}
@@ -136,6 +161,7 @@ export const StatsContainer = (): ReactElement => {
       onRetrySummary={() => void progressSummary.refetch()}
       onPractice={handlePractice}
       onPracticeWeakest={handlePracticeWeakest}
+      onWeakPageChange={setWeakPage}
       onGuestRegister={() => void navigate('/auth/register')}
       emptyGlobalCta={() => void navigate('/game')}
       loadErrorLabel={t.stats.loadError}

@@ -4,9 +4,16 @@ import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { useAuthBootstrap } from '../useAuthBootstrap';
 import { useAuthStore } from '@/core/store/auth.store';
+import { redirectToLanding } from '../redirectToLanding';
 
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios);
+
+vi.mock('../redirectToLanding', () => ({
+  redirectToLanding: vi.fn(),
+  LANDING_PATH: '/',
+}));
+const mockedRedirect = vi.mocked(redirectToLanding);
 
 const resetStore = (): void => {
   useAuthStore.setState({
@@ -23,6 +30,7 @@ describe('useAuthBootstrap', () => {
   beforeEach(() => {
     resetStore();
     vi.clearAllMocks();
+    mockedRedirect.mockClear();
   });
 
   afterEach(() => {
@@ -126,5 +134,50 @@ describe('useAuthBootstrap', () => {
 
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().guestDeviceId).toBe('device-abc');
+  });
+
+  it('redirige a landing cuando el refresh del usuario registrado falla', async () => {
+    useAuthStore.setState({ isAuthenticated: true, accessToken: null });
+    mockedAxios.post = vi.fn().mockRejectedValue(new Error('401'));
+
+    renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    });
+
+    expect(mockedRedirect).toHaveBeenCalledOnce();
+  });
+
+  it('redirige a landing cuando la re-autenticación del guest falla', async () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      accessToken: null,
+      guestDeviceId: 'device-abc',
+    });
+    mockedAxios.post = vi.fn().mockRejectedValue(new Error('401'));
+
+    renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    });
+
+    expect(mockedRedirect).toHaveBeenCalledOnce();
+  });
+
+  it('no redirige cuando el refresh tiene éxito', async () => {
+    useAuthStore.setState({ isAuthenticated: true, accessToken: null });
+    mockedAxios.post = vi.fn().mockResolvedValue({
+      data: { accessToken: 'new-token' },
+    });
+
+    renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().accessToken).toBe('new-token');
+    });
+
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 });

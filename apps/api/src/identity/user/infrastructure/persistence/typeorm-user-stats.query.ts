@@ -95,7 +95,7 @@ export class TypeOrmUserStatsQuery implements UserStatsQuery {
   async execute(period: UserStatPeriod): Promise<ResponseUserStatsRetriever> {
     const pc = periodCfg(period);
     const startExpr = pc.interval
-      ? `NOW() - INTERVAL '${pc.interval}'`
+      ? `DATE_TRUNC('${pc.dateTrunc}', NOW()) - INTERVAL '${pc.interval}'`
       : `'2024-01-01'::timestamp`;
     const whereClause = pc.interval
       ? `WHERE created_at >= NOW() - INTERVAL '${pc.interval}'`

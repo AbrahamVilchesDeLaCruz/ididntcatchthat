@@ -19,6 +19,7 @@ export enum FilterOperator {
   GTE = '>=',
   LTE = '<=',
   LIKE = 'LIKE',
+  ILIKE = 'ILIKE',
   IN = 'IN',
 }
 

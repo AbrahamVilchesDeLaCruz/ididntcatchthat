@@ -61,7 +61,7 @@ export const BackofficeObservabilityComponent = ({
   const httpTab = (
     <div className="space-y-6">
       {serverStartLabel && !isLoading && (
-        <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2.5 text-xs text-[var(--color-text-muted)]">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2.5 text-xs text-[var(--color-text-muted)]">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-green)] shrink-0" />
           {t.backoffice.observability.serverSincePrefix}{' '}
           <span className="font-medium text-[var(--color-text-secondary)]">

@@ -1,8 +1,24 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchFlashcardsGetQuery {
+  @ApiPropertyOptional({ example: 'catch up' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  @Matches(/^[a-zA-Z0-9\s'-]*$/)
+  query?: string;
+
   @ApiPropertyOptional({ example: 'native_sounds' })
   @IsOptional()
   @IsString()

@@ -168,11 +168,10 @@ Para clonar el repo y ejecutarlo **sin cuentas externas** (tribunal, profesor, e
 
 ```bash
 pnpm install
-make local-up      # env setup + stack completo en Docker (api, client, postgres, rabbitmq, minio)
+make local-start   # one-shot: stack completo en Docker (api, client, postgres, rabbitmq, minio) + migraciones + seed con flashcards de dev
+# o con hot-reload en host:
+make local-dev     # infra en Docker + API :3000 + Client :5173 (host)
 make local-seed    # migraciones + usuario demo + flashcards
-# o con hot-reload:
-make local-dev     # env setup + infra en Docker + API :3000 + Client :5173 (host)
-make local-seed
 ```
 
 | Recurso | Docker (`make local-up`) | Host (`make local-dev`) |
@@ -184,7 +183,7 @@ make local-seed
 | Credenciales MinIO | `localminio` / `localminio` | `localminio` / `localminio` |
 | Usuario demo | `demo@local.dev` / `DemoLocal123!` | `demo@local.dev` / `DemoLocal123!` |
 
-**Limitaciones en local:** Google OAuth no funciona (usar email/password o modo guest). Audio de flashcards seed usa URLs de demo públicas; nuevos audios van a MinIO (S3 local). Demo completa desplegada: [ididntcatchthat.com](https://ididntcatchthat.com).
+**Limitaciones en local:** Google OAuth no funciona (usar email/password o modo guest). El seed inserta 771 flashcards espejo del entorno dev — sus audios reales viven en Cloudflare R2 (requiere que `http://localhost:5173` esté permitido en la CORS del bucket para reproducirlos). Audios nuevos generados van a MinIO local. Demo completa desplegada: [ididntcatchthat.com](https://ididntcatchthat.com).
 
 Guía extendida → [docs/local-development.md](./docs/local-development.md)
 
@@ -206,16 +205,19 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 | `pnpm test` | Unit tests en api + client |
 | `pnpm test:e2e` | E2E tests en api + client |
 | `pnpm test:all` | Unit + E2E en api + client |
+| `make help` | Lista todos los comandos disponibles (default goal) |
+| `make local-start` | One-shot onboarding: stack completo + migraciones + seed |
 | `make local-up` | Stack local completo en Docker (api, client, postgres, rabbitmq, minio) |
+| `make local-down` | Parar stack local |
+| `make local-seed` | Migraciones + seed demo (idempotente) |
 | `make local-dev` | Infra en Docker + API + Client en host (hot-reload, sin Doppler) |
-| `make local-seed` | Migraciones + datos demo |
+| `make local-logs` / `local-status` / `local-shell-db` / `local-reset` | DX sobre el stack local |
 | `make dev` | RabbitMQ en Docker + API + Client hot-reload (Doppler) |
-| `make up` | Stack dev completo en Docker (Doppler) |
-| `make down` | Parar stack dev |
-| `make vps-deploy-dev` | Deploy a VPS — entorno dev |
-| `make vps-deploy-prod` | Deploy a VPS — entorno prod |
-| `make security-audit` | [VPS] Auditoría de puertos, RabbitMQ y SSH |
-| `make security-verify` | [VPS] Verificación post-deploy (sin leaks externos) |
+| `make up` / `make down` | Stack dev completo en Docker (Doppler) — start/stop |
+| `make up-prod` / `make down-prod` | Stack prod en Docker (Doppler) |
+| `make test:api:unit` / `test:api:e2e` / `test:client:unit` / `test:client:e2e` / `test:all` | Tests unit + E2E |
+| `make vps-deploy-dev` / `make vps-deploy-prod` | Deploy a VPS |
+| `make security-audit` / `make security-verify` | [VPS] Auditoría de seguridad |
 
 ---
 
@@ -242,7 +244,8 @@ ididntcatchthat/
 ├── infra/                ← 📊 Docker Compose files + configs de Prometheus, Grafana, Loki, nginx
 ├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
 ├── .github/              ← ⚙️ GitHub Actions (CI/CD)
-├── Makefile              ← 🛠️ Comandos de desarrollo y despliegue
+├── make/                 ← 🛠️ Comandos de desarrollo divididos por perfil (local, dev, test, server)
+├── Makefile              ← 🎯 Dispatcher fino (~60 líneas, hace include de los módulos de `make/`)
 └── README.md
 ```
 
@@ -503,8 +506,7 @@ Para revisar **backoffice, panel de administración y arquitectura end-to-end** 
 
 ```bash
 pnpm install
-make local-up
-make local-seed
+make local-start   # one-shot: stack + migraciones + seed con 771 flashcards de dev
 ```
 
 | Recurso | URL / credenciales |

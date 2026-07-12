@@ -5,6 +5,13 @@ export interface ToastItem {
   id: string;
   message: string;
   category?: AchievementCategory;
+  /**
+   * Identificador opcional para deduplicar toasts. Si dos `push` usan el
+   * mismo `key` mientras el primero sigue vivo en el store, el segundo se
+   * descarta. Útil cuando el mismo achievement se detecta desde dos paths
+   * (p.ej. optimista + poll del backend) y no queremos mostrarlo dos veces.
+   */
+  key?: string;
 }
 
 interface ToastState {
@@ -16,6 +23,12 @@ interface ToastState {
 export const useToastStore = create<ToastState>((set) => ({
   toasts: [],
   push: (toast) => {
+    if (toast.key) {
+      const existing = useToastStore
+        .getState()
+        .toasts.find((t) => t.key === toast.key);
+      if (existing) return;
+    }
     const id = crypto.randomUUID();
     set((state) => ({
       toasts: [...state.toasts, { ...toast, id }],

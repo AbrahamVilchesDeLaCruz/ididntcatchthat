@@ -10,10 +10,20 @@ Pensado para evaluación del TFM, onboarding de revisores y desarrollo offline.
 
 | Modo | Comando principal | Hot-reload | Cuándo usarlo |
 |------|-------------------|------------|---------------|
-| **Docker completo** | `make local-up` | No | Onboarding rápido, QA, revisores |
+| **One-shot onboarding** | `make local-start` | No | Empezar desde cero, demos, evaluadores |
+| **Docker completo** | `make local-up` | No | QA, revisores, smoke tests |
 | **Host (dev)** | `make local-dev` | Sí | Desarrollo activo, iterar código |
 
 ---
+
+## Quick start — One-shot (recomendado)
+
+```bash
+pnpm install
+make local-start  # env setup + stack completo + migraciones + seed con 771 flashcards
+```
+
+Abre http://localhost:4001
 
 ## Quick start — Docker completo (sin hot-reload)
 
@@ -56,12 +66,21 @@ Abre http://localhost:5173
 
 | Comando | Descripción |
 |---------|-------------|
+| `make help` | Lista todos los comandos disponibles (default goal) |
+| `make local-start` | One-shot onboarding: stack completo + migraciones + seed |
 | `make local-setup` | Copia `apps/api/.env.example` y `apps/client/.env.example` → `.env.local` |
 | `make local-up` | Levanta stack completo en Docker (api, client, postgres, rabbitmq, minio) |
 | `make local-down` | Para todo el stack local |
 | `make local-seed` | Migraciones + seed demo (idempotente) |
 | `make local-dev` | Infra en Docker + API y Client en host (hot-reload) |
-| `make local-dev-api` | Solo API en host (hot-reload) |
+| `make local-dev-api` | Solo API en host (hot-reload). Valida que Postgres esté arriba |
+| `make local-dev-client` | Solo Client en host (Vite HMR) |
+| `make local-logs` | Tail de los logs de todos los servicios |
+| `make local-status` | Estado de los contenedores locales |
+| `make local-reset` | ⚠️  Destruye datos locales y re-seed (con confirmación) |
+| `make local-shell-db` | Abre psql contra el Postgres local |
+
+Equivalente sin Make (modo host):
 
 Equivalente sin Make (modo host):
 
@@ -158,18 +177,21 @@ flowchart LR
 El seed inserta:
 
 - 1 usuario admin demo
-- 20 flashcards repartidas en 4 módulos (`audio_status = ready`)
+- **771 flashcards** repartidas en 4 módulos (`audio_status = ready`), espejo del entorno dev
+- Las URLs de audio apuntan al bucket público de Cloudflare R2 de dev — para que se reproduzcan en local el navegador necesita poder hacer fetch desde `http://localhost:5173` (verificar CORS del bucket si falla)
 
 Es **idempotente**: si `demo@local.dev` ya existe, no duplica datos.
 
 Script: `pnpm --filter @ididntcatchthat/api seed:local`
+
+Para regenerar el fixture desde dev, exportar `flashcards` de la DB de Aiven y sobrescribir `apps/api/src/shared/infrastructure/persistence/seeds/dev-flashcards.fixture.json`.
 
 ---
 
 ## Limitaciones conocidas
 
 1. **Google OAuth** — requiere credenciales reales; en local usa email/password o guest.
-2. **Audio de flashcards seed** — URLs de demo públicas (requieren internet para reproducir).
+2. **Audio de flashcards seed** — las URLs apuntan al bucket R2 de dev (no a demos públicas). Si la CORS del bucket no permite `http://localhost:5173`, los audios cargarán en el HTML pero el navegador bloqueará la reproducción.
 3. **Nuevos audios generados** — suben a MinIO local; el bucket debe existir (`minio-init` lo crea automáticamente en `make local-up`/`make local-dev`).
 4. **Demo completa** — para experiencia 100% producción, usar [ididntcatchthat.com](https://ididntcatchthat.com).
 
@@ -188,7 +210,7 @@ make local-up
 docker compose --project-directory . -f infra/docker-compose.local.yml ps
 ```
 
-Espera a que Postgres esté healthy antes de `make local-seed`.
+Espera a que Postgres esté healthy antes de `make local-seed`. O usa `make local-start` que encadena todo en orden.
 
 ### MinIO bucket no existe
 

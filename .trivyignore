@@ -1,0 +1,12 @@
+# Trivy ignores — vulnerabilities that cannot be fixed at the repo level.
+# Each line is the CVE id followed by an expiry (YYYY-MM-DD) so we
+# periodically re-evaluate whether an upstream patch is available.
+#
+# Format reference: https://trivy.dev/docs/v0.72/supply-chain/ignore/
+
+# Go stdlib: os.Root symlink-following directory traversal. The fix
+# lives in Go 1.25.12 / 1.26.5 / 1.27.0-rc.2 but Grafana, Prometheus and
+# Loki stable images (12.x, v3.13.x, 3.6.x) are still built with Go
+# 1.26.4 as of 2026-07-11. No version bump we can apply clears this.
+# Remove once upstream releases images with Go >= 1.26.5.
+CVE-2026-39822  exp:2026-09-30

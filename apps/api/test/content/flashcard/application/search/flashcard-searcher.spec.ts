@@ -16,6 +16,108 @@ describe('content/flashcard/application/search FlashcardSearcher', () => {
     searcher = new FlashcardSearcher(repository);
   });
 
+  it('should filter in-memory when query is provided (matches expression)', async () => {
+    const catching = FlashcardMother.randomPrimitives({
+      expression: 'catch up',
+      meaning: 'ponerse al día',
+    });
+    const other = FlashcardMother.randomPrimitives({
+      expression: 'figure out',
+      meaning: 'resolver',
+    });
+    repository.match.mockResolvedValue([
+      FlashcardMother.random(catching),
+      FlashcardMother.random(other),
+    ]);
+
+    const result = await searcher.execute({
+      query: 'catch',
+      page: 1,
+      pageSize: 20,
+    });
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].expression).toBe('catch up');
+    expect(result.total).toBe(1);
+  });
+
+  it('should filter in-memory when query matches meaning', async () => {
+    const catching = FlashcardMother.randomPrimitives({
+      expression: 'catch up',
+      meaning: 'ponerse al día',
+    });
+    const other = FlashcardMother.randomPrimitives({
+      expression: 'figure out',
+      meaning: 'resolver',
+    });
+    repository.match.mockResolvedValue([
+      FlashcardMother.random(catching),
+      FlashcardMother.random(other),
+    ]);
+
+    const result = await searcher.execute({
+      query: 'al día',
+      page: 1,
+      pageSize: 20,
+    });
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].meaning).toBe('ponerse al día');
+  });
+
+  it('should match query case-insensitively', async () => {
+    const target = FlashcardMother.randomPrimitives({
+      expression: 'Catch Up',
+      meaning: 'ponerse al día',
+    });
+    const other = FlashcardMother.randomPrimitives({
+      expression: 'figure out',
+      meaning: 'resolver',
+    });
+    repository.match.mockResolvedValue([
+      FlashcardMother.random(target),
+      FlashcardMother.random(other),
+    ]);
+
+    const result = await searcher.execute({
+      query: 'CATCH',
+      page: 1,
+      pageSize: 20,
+    });
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].expression).toBe('Catch Up');
+  });
+
+  it('should AND-compose query with category filter via DB match', async () => {
+    repository.match.mockResolvedValue([]);
+
+    await searcher.execute({
+      query: 'catch',
+      category: CategoryValue.NativeSounds,
+      page: 1,
+      pageSize: 20,
+    });
+
+    const criteria = repository.match.mock.calls[0][0];
+    const categoryFilter = criteria.filters.find((f) => f.field === 'category');
+    expect(categoryFilter?.value).toBe(CategoryValue.NativeSounds);
+    // No limit/offset when searching by query — pagination happens in-memory
+    expect(criteria.limit).toBeNull();
+    expect(criteria.offset).toBeNull();
+  });
+
+  it('should use DB-level pagination when query is undefined', async () => {
+    repository.match.mockResolvedValue([]);
+    repository.count.mockResolvedValue(0);
+
+    await searcher.execute({ page: 2, pageSize: 5 });
+
+    const criteria = repository.match.mock.calls[0][0];
+    expect(criteria.limit).toBe(5);
+    expect(criteria.offset).toBe(5);
+  });
+
   it('should return paginated result with total', async () => {
     const flashcards = [FlashcardMother.random(), FlashcardMother.random()];
     repository.match.mockResolvedValue(flashcards);

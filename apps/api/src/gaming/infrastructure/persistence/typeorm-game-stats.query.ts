@@ -65,9 +65,9 @@ function where(interval: string | null): string {
   return interval ? `WHERE g.started_at >= NOW() - INTERVAL '${interval}'` : '';
 }
 
-function seriesStart(interval: string | null): string {
+function seriesStart(interval: string | null, dateTrunc: string): string {
   return interval
-    ? `NOW() - INTERVAL '${interval}'`
+    ? `DATE_TRUNC('${dateTrunc}', NOW()) - INTERVAL '${interval}'`
     : `'2024-01-01'::timestamp`;
 }
 
@@ -81,7 +81,7 @@ export class TypeOrmGameStatsQuery implements GameStatsQuery {
   async execute(period: StatPeriod): Promise<ResponseGameStatsRetriever> {
     const pc = cfg(period);
     const periodWhere = where(pc.interval);
-    const start = seriesStart(pc.interval);
+    const start = seriesStart(pc.interval, pc.dateTrunc);
 
     const [totals, byModule, byMode, byPeriod] = await Promise.all([
       this.dataSource.query<

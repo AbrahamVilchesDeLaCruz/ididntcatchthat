@@ -94,4 +94,41 @@ describe('GameSummaryComponent', () => {
       screen.queryByRole('button', { name: en.game.summary.ctaChooseModule }),
     ).not.toBeInTheDocument();
   });
+
+  it('NO muestra el campo Duration — los juegos pausados no tienen tiempo activo real', () => {
+    render(
+      <GameSummaryComponent
+        summary={summary}
+        isGuest={false}
+        {...defaultHandlers}
+      />,
+    );
+
+    expect(
+      screen.queryByText(en.game.summary.duration),
+    ).not.toBeInTheDocument();
+  });
+
+  it('NO usa emojis para el accuracy header — usa un icono SVG (lucide) accesible', () => {
+    render(
+      <GameSummaryComponent
+        summary={summary}
+        isGuest={false}
+        {...defaultHandlers}
+      />,
+    );
+
+    const rendered = document.body.textContent ?? '';
+    // El emoji 🔥/💪/📈/🎯 no debe aparecer suelto como texto del header.
+    expect(rendered).not.toMatch(/^🔥$/u);
+    expect(rendered).not.toMatch(/^💪$/u);
+    expect(rendered).not.toMatch(/^📈$/u);
+    expect(rendered).not.toMatch(/^🎯$/u);
+
+    // El icono debe ser un SVG accesible (aria-hidden o título semántico).
+    const headerIcons = document.querySelectorAll(
+      'h1 ~ * svg, .summary-accuracy-icon svg',
+    );
+    expect(headerIcons.length).toBeGreaterThan(0);
+  });
 });

@@ -6,6 +6,7 @@ import { useI18n } from '@/core/i18n';
 import { LoadingSpinner } from '@/common/components/LoadingSpinner';
 import { AppShell } from '@/common/layout/AppShell';
 import { GameShell } from '@/common/layout/GameShell';
+import { ToastHost } from '@/core/notifications/ToastHost';
 import { LandingView } from '@/views/LandingView';
 import { AuthView } from '@/views/AuthView';
 import { AuthCallbackView } from '@/views/AuthCallbackView';
@@ -42,6 +43,12 @@ const AppRoutes = (): ReactElement => {
   return (
     <>
       <PageMetaManager />
+      {/* ToastHost a nivel root para que las notificaciones de
+          achievements (toast.push) sean visibles en CUALQUIER ruta —
+          antes vivían solo en AppShell, así que los logos desbloqueados
+          durante /game o /study nunca se mostraban porque esas rutas
+          viven bajo GameShell, no AppShell. */}
+      <ToastHost />
       <Routes>
         {/* ── Standalone (sin shell) ─────────────────────────────────────────── */}
         <Route path="/" element={<LandingView />} />

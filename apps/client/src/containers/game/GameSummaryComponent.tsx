@@ -1,4 +1,15 @@
 import { type ReactElement } from 'react';
+import {
+  Flame,
+  RotateCcw,
+  Sliders,
+  BarChart3,
+  Trophy,
+  Repeat,
+  Target,
+  TrendingUp,
+  ThumbsUp,
+} from 'lucide-react';
 import { useI18n } from '@/core/i18n';
 import type { GameSummaryVM } from './game.types';
 
@@ -15,17 +26,32 @@ interface GameSummaryComponentProps {
   onPracticeWeakest?: () => void;
 }
 
-const formatDuration = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return m > 0 ? `${m}m ${s}s` : `${s}s`;
-};
-
-const getAccuracyEmoji = (pct: number): string => {
-  if (pct >= 90) return '🔥';
-  if (pct >= 70) return '💪';
-  if (pct >= 50) return '📈';
-  return '🎯';
+const getAccuracyTier = (
+  pct: number,
+): { Icon: typeof Flame; tint: string; label: string } => {
+  if (pct >= 90)
+    return {
+      Icon: Flame,
+      tint: 'text-[var(--color-accent-orange)]',
+      label: 'fire',
+    };
+  if (pct >= 70)
+    return {
+      Icon: ThumbsUp,
+      tint: 'text-[var(--color-accent-green)]',
+      label: 'thumbs-up',
+    };
+  if (pct >= 50)
+    return {
+      Icon: TrendingUp,
+      tint: 'text-[var(--color-brand-light)]',
+      label: 'trending-up',
+    };
+  return {
+    Icon: Target,
+    tint: 'text-[var(--color-text-secondary)]',
+    label: 'target',
+  };
 };
 
 export const GameSummaryComponent = ({
@@ -44,12 +70,21 @@ export const GameSummaryComponent = ({
   const gs = t.game.summary;
 
   const accuracyPct = Math.round(summary.accuracy * 100);
-  const emoji = getAccuracyEmoji(accuracyPct);
+  const { Icon: AccuracyIcon, tint: accuracyTint } =
+    getAccuracyTier(accuracyPct);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-12 md:py-16 lg:px-8">
       <div className="w-full max-w-sm md:max-w-xl lg:max-w-3xl">
-        <div className="mb-2 text-center text-5xl md:text-6xl">{emoji}</div>
+        <div className="mb-3 flex justify-center">
+          <AccuracyIcon
+            size={56}
+            strokeWidth={1.75}
+            aria-hidden
+            data-testid="summary-accuracy-icon"
+            className={accuracyTint}
+          />
+        </div>
         <h1 className="mb-2 text-center text-3xl font-bold text-[var(--color-text-primary)] md:text-4xl">
           {gs.title}
         </h1>
@@ -57,17 +92,13 @@ export const GameSummaryComponent = ({
           {accuracyPct >= 70 ? gs.subtitleGood : gs.subtitleKeepGoing}
         </p>
 
-        <div className="mb-10 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mb-10 grid grid-cols-3 gap-4">
           <StatCard label={gs.accuracy} value={`${accuracyPct}%`} highlight />
           <StatCard
             label={gs.correct}
             value={`${summary.correctCount}/${summary.totalCount}`}
           />
           <StatCard label={gs.total} value={String(summary.totalCount)} />
-          <StatCard
-            label={gs.duration}
-            value={formatDuration(summary.duration)}
-          />
         </div>
 
         {(summary.failedCards?.length ?? 0) > 0 ? (
@@ -84,8 +115,8 @@ export const GameSummaryComponent = ({
         ) : null}
 
         {isGuest ? (
-          <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-center">
-            <div className="rounded-[var(--radius-lg)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-5 text-center lg:min-w-[20rem] lg:flex-1">
+          <div className="flex flex-col gap-3">
+            <div className="rounded-[var(--radius-lg)] border border-[var(--color-brand-dim)] bg-[var(--color-bg-elevated)] p-5 text-center">
               <p className="mb-1 text-sm font-semibold text-[var(--color-text-primary)]">
                 {gs.registerTitle}
               </p>
@@ -102,18 +133,18 @@ export const GameSummaryComponent = ({
 
             <button
               onClick={onPlayAgain}
-              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:max-w-xs lg:self-center"
+              className="rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
             >
               {gs.ctaPlayAgain}
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
+          <div className="flex flex-col gap-3">
             {pausedGamesCount > 0 && onViewPaused ? (
               <button
                 type="button"
                 onClick={onViewPaused}
-                className="w-full rounded-full border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)] py-3 text-sm font-medium text-[var(--color-brand-light)] lg:col-span-2"
+                className="rounded-full border border-[var(--color-brand-dim)] bg-[var(--color-brand-dim)]/30 py-3 text-sm font-medium text-[var(--color-brand-light)]"
               >
                 {gs.pausedGamesLink.replace(
                   '{count}',
@@ -121,41 +152,44 @@ export const GameSummaryComponent = ({
                 )}
               </button>
             ) : null}
+
             <button
               onClick={onPlayAgain}
-              className="w-full rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
             >
+              <RotateCcw size={16} strokeWidth={2} aria-hidden />
               {gs.ctaPlayAgain}
             </button>
-            <button
-              onClick={onChooseModule}
-              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-            >
-              {gs.ctaChooseModule}
-            </button>
-            <button
-              onClick={onViewStats}
-              className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]"
-            >
-              {gs.ctaViewStats}
-            </button>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <SecondaryAction
+                icon={<Sliders size={16} strokeWidth={2} aria-hidden />}
+                label={gs.ctaChooseModule}
+                onClick={onChooseModule}
+              />
+              <SecondaryAction
+                icon={<BarChart3 size={16} strokeWidth={2} aria-hidden />}
+                label={gs.ctaViewStats}
+                onClick={onViewStats}
+              />
+            </div>
+
             {onViewAchievements ? (
-              <button
-                type="button"
+              <SecondaryAction
+                icon={<Trophy size={16} strokeWidth={2} aria-hidden />}
+                label={gs.ctaViewAchievements}
                 onClick={onViewAchievements}
-                className="w-full rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
-              >
-                {gs.ctaViewAchievements}
-              </button>
+                accent="highlight"
+              />
             ) : null}
+
             {onPracticeWeakest ? (
-              <button
-                type="button"
+              <SecondaryAction
+                icon={<Repeat size={16} strokeWidth={2} aria-hidden />}
+                label={gs.ctaPracticeWeakest}
                 onClick={onPracticeWeakest}
-                className="w-full rounded-full border border-[var(--color-brand)] py-3 text-sm font-semibold text-[var(--color-brand-light)] lg:col-span-2 lg:max-w-sm lg:justify-self-center"
-              >
-                {gs.ctaPracticeWeakest}
-              </button>
+                accent="brand"
+              />
             ) : null}
           </div>
         )}
@@ -189,3 +223,37 @@ const StatCard = ({
     <span className="text-xs text-[var(--color-text-muted)]">{label}</span>
   </div>
 );
+
+interface SecondaryActionProps {
+  icon: ReactElement;
+  label: string;
+  onClick: () => void;
+  accent?: 'default' | 'highlight' | 'brand';
+}
+
+const SecondaryAction = ({
+  icon,
+  label,
+  onClick,
+  accent = 'default',
+}: SecondaryActionProps): ReactElement => {
+  const accentClass =
+    accent === 'highlight'
+      ? 'border-[var(--color-border-strong)] text-[var(--color-text-primary)] hover:border-[var(--color-brand-light)]'
+      : accent === 'brand'
+        ? 'border-[var(--color-brand)] text-[var(--color-brand-light)] hover:bg-[var(--color-brand)] hover:text-white'
+        : 'border-[var(--color-border-strong)] text-[var(--color-text-muted)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)]';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        'flex items-center justify-center gap-2 rounded-full border py-3 text-sm font-medium transition-colors',
+        accentClass,
+      ].join(' ')}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+};

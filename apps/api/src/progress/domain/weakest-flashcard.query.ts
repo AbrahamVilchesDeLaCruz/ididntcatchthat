@@ -19,9 +19,14 @@ export interface WeakestFlashcardFilters {
 export interface WeakestFlashcardQuery {
   findWeakest(
     userId: UserId,
+    filters: WeakestFlashcardFilters | undefined,
     limit: number,
-    filters?: WeakestFlashcardFilters,
+    offset: number,
   ): Promise<WeakestFlashcard[]>;
+  countWeakest(
+    userId: UserId,
+    filters: WeakestFlashcardFilters | undefined,
+  ): Promise<number>;
 }
 
 export const WEAKEST_FLASHCARD_QUERY = Symbol('WeakestFlashcardQuery');

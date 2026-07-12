@@ -134,4 +134,121 @@ describe('WeakFlashcardsTable', () => {
 
     expect(screen.getByText('Going to')).toBeInTheDocument();
   });
+
+  it('NO renderiza controles de paginación si solo hay una página', () => {
+    renderTable(
+      <WeakFlashcardsTable
+        data={[
+          {
+            flashcardId: 'fc-1',
+            expression: 'gonna',
+            module: 'connected_speech',
+            category: 'connected_speech',
+            subcategory: 'informal_going_to',
+            errorCount: 3,
+            lastAttemptAt: new Date(),
+          },
+        ]}
+        pagination={{
+          page: 1,
+          limit: 10,
+          total_items: 1,
+          total_pages: 1,
+          has_next_page: false,
+          has_prev_page: false,
+        }}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: /next/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renderiza botones Previous/Next cuando hay varias páginas', () => {
+    renderTable(
+      <WeakFlashcardsTable
+        data={[]}
+        pagination={{
+          page: 2,
+          limit: 10,
+          total_items: 25,
+          total_pages: 3,
+          has_next_page: true,
+          has_prev_page: true,
+        }}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: /previous/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+  });
+
+  it('Previous está disabled en la primera página', () => {
+    renderTable(
+      <WeakFlashcardsTable
+        data={[]}
+        pagination={{
+          page: 1,
+          limit: 10,
+          total_items: 25,
+          total_pages: 3,
+          has_next_page: true,
+          has_prev_page: false,
+        }}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /next/i })).toBeEnabled();
+  });
+
+  it('Next está disabled en la última página', () => {
+    renderTable(
+      <WeakFlashcardsTable
+        data={[]}
+        pagination={{
+          page: 3,
+          limit: 10,
+          total_items: 25,
+          total_pages: 3,
+          has_next_page: false,
+          has_prev_page: true,
+        }}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /previous/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
+  });
+
+  it('Previous llama onPageChange(page - 1) y Next llama onPageChange(page + 1)', () => {
+    const onPageChange = vi.fn();
+    renderTable(
+      <WeakFlashcardsTable
+        data={[]}
+        pagination={{
+          page: 2,
+          limit: 10,
+          total_items: 25,
+          total_pages: 3,
+          has_next_page: true,
+          has_prev_page: true,
+        }}
+        onPageChange={onPageChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /previous/i }));
+    expect(onPageChange).toHaveBeenCalledWith(1);
+
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(onPageChange).toHaveBeenCalledWith(3);
+  });
 });

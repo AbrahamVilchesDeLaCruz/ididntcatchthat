@@ -1,4 +1,5 @@
 import { type ReactElement } from 'react';
+import { BookOpen, Gamepad2 } from 'lucide-react';
 import { useI18n } from '@/core/i18n';
 import type { StudySummaryVM } from './study.types';
 import '@/containers/study/study-ui.css';
@@ -18,32 +19,22 @@ export const StudySummaryComponent = ({
 }: StudySummaryComponentProps): ReactElement => {
   const { t } = useI18n();
   const ss = t.study.summary;
-  const minutes = Math.floor(summary.duration / 60);
-  const seconds = summary.duration % 60;
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
-      <div className="study-summary-card w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-8 text-center">
+      <div className="study-summary-card w-full max-w-sm md:max-w-lg rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-8 text-center">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
           {ss.title}
         </h1>
         <p className="mt-2 text-[var(--color-text-secondary)]">{ss.subtitle}</p>
 
-        <div className="mt-8 grid grid-cols-2 gap-4">
-          <div className="rounded-xl border border-[var(--color-border)] p-4">
+        <div className="mt-8 flex justify-center">
+          <div className="rounded-xl border border-[var(--color-border)] px-8 py-5">
             <p className="text-xs text-[var(--color-text-muted)]">
               {ss.cardsViewed}
             </p>
             <p className="mt-1 text-3xl font-bold text-[var(--color-text-primary)]">
               {summary.cardsViewed}
-            </p>
-          </div>
-          <div className="rounded-xl border border-[var(--color-border)] p-4">
-            <p className="text-xs text-[var(--color-text-muted)]">
-              {ss.duration}
-            </p>
-            <p className="mt-1 text-3xl font-bold text-[var(--color-text-primary)]">
-              {minutes}:{seconds.toString().padStart(2, '0')}
             </p>
           </div>
         </div>
@@ -60,15 +51,17 @@ export const StudySummaryComponent = ({
           <button
             type="button"
             onClick={onStudyAgain}
-            className="flex-1 rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[var(--color-brand)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
+            <BookOpen size={16} strokeWidth={2} aria-hidden />
             {ss.studyAgain}
           </button>
           <button
             type="button"
             onClick={onPlayGame}
-            className="flex-1 rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:border-[var(--color-brand)]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] py-3 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:border-[var(--color-brand)]"
           >
+            <Gamepad2 size={16} strokeWidth={2} aria-hidden />
             {ss.playGame}
           </button>
         </div>
