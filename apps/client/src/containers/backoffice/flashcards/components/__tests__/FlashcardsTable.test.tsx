@@ -32,7 +32,7 @@ const baseProps = {
   onView: noop,
   onEdit: noop,
   onDelete: noop,
-} as const;
+};
 
 describe('FlashcardsTable', () => {
   beforeEachTest();

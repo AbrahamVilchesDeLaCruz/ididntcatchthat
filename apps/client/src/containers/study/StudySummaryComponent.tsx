@@ -22,7 +22,7 @@ export const StudySummaryComponent = ({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-[var(--color-bg-base)] px-5 py-16">
-      <div className="study-summary-card w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-8 text-center">
+      <div className="study-summary-card w-full max-w-sm md:max-w-lg rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-8 text-center">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
           {ss.title}
         </h1>

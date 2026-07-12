@@ -497,7 +497,7 @@ export const es: Translations = {
     types: {
       most_active: 'Más activos',
       most_accurate: 'Más precisos',
-      top_scorer: 'Top scorers',
+      top_scorer: 'Mejores puntuaciones',
       best_streak: 'Mejor racha',
       module_master: 'Maestros del módulo',
     },
@@ -832,13 +832,21 @@ export const es: Translations = {
         content: 'Contenido',
       },
       httpSummary: {
-        totalRequests: 'Total requests',
+        totalRequests: 'Peticiones totales',
+        totalRequestsTooltip:
+          'Peticiones HTTP totales atendidas por el servidor desde el arranque.',
         successRate: 'Tasa de éxito',
         successRateHint: 'respuestas 2xx',
+        successRateTooltip:
+          'Porcentaje de respuestas con código 2xx (OK). Por encima del 95% se considera saludable.',
         errorRate: 'Tasa de error',
         errorRateHint: 'respuestas 5xx',
+        errorRateTooltip:
+          'Porcentaje de respuestas con código 5xx (errores del servidor). Por encima del 1% requiere atención.',
         latencyP95: 'Latencia p95',
         latencyDetail: 'p50: {p50} · p99: {p99}',
+        latencyP95Tooltip:
+          'Tiempo en ms por debajo del cual se resuelve el 95% de las peticiones. Incluye p50 y p99.',
       },
       httpTable: {
         noData: 'Sin datos de requests HTTP',
@@ -903,13 +911,24 @@ export const es: Translations = {
         noRuntimeMetrics:
           'Sin métricas de runtime — collectDefaultMetrics() aún no ha registrado datos.',
         heapUsed: 'Heap usado',
+        heapUsedTooltip:
+          'Memoria de heap usada por V8. Por encima del 85% indica riesgo de OOM.',
         eventLoopLagP95: 'Event loop lag p95',
+        eventLoopLagP95Tooltip:
+          'Retraso en el event loop de Node.js. Por encima de 50ms hay bloqueos serios.',
         uptime: 'Uptime',
+        uptimeTooltip: 'Tiempo desde el último arranque del proceso Node.js.',
         gcTotal: 'GC acumulado',
+        gcTotalTooltip:
+          'Tiempo total invertido en garbage collection desde el arranque.',
         activeHandles: 'Handles activos',
         activeHandlesHint: '{count} handles abiertos (sockets, timers, etc.)',
+        activeHandlesTooltip:
+          'Handles abiertos en el proceso: sockets, timers, file descriptors. Crecimiento sostenido = leak.',
         rssMemory: 'Memoria RSS',
         rssMemoryHint: 'Memoria física total usada por el proceso Node.js',
+        rssMemoryTooltip:
+          'Memoria física total usada por el proceso Node.js (no solo V8).',
       },
     },
     flashcards: {

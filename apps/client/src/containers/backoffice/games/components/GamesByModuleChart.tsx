@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import type { BarRectangleItem } from 'recharts/types';
 import type { GamesByModuleVM } from '../backoffice-games.types';
 import { useI18n } from '@/core/i18n';
 import { chartSeriesColor } from '@/common/charts/chartPalette';
@@ -29,21 +30,19 @@ const axisTickStyle = {
   fontSize: 12,
 };
 
-const dotShape = ({
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0,
-}: Record<string, number | string>): ReactElement => (
-  <circle
-    cx={(x as number) + (width as number) / 2}
-    cy={(y as number) + (height as number) / 2}
-    r={8}
-    fill={chartSeriesColor(0)}
-    stroke="var(--color-bg-card)"
-    strokeWidth={2}
-  />
-);
+const dotShape = (props: BarRectangleItem): ReactElement => {
+  const { x = 0, y = 0, width = 0, height = 0 } = props;
+  return (
+    <circle
+      cx={Number(x) + Number(width) / 2}
+      cy={Number(y) + Number(height) / 2}
+      r={8}
+      fill={chartSeriesColor(0)}
+      stroke="var(--color-bg-card)"
+      strokeWidth={2}
+    />
+  );
+};
 
 const ChartTooltip = ({
   active,

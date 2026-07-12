@@ -17,7 +17,7 @@ export const PeriodSelector = ({
   const { t } = useI18n();
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-0.5">
+    <div className="flex flex-wrap items-center gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-0.5">
       {PERIODS.map((key) => (
         <button
           key={key}

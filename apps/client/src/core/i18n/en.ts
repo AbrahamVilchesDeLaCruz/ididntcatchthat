@@ -826,12 +826,20 @@ export const en: Translations = {
       },
       httpSummary: {
         totalRequests: 'Total requests',
+        totalRequestsTooltip:
+          'Total HTTP requests handled by the server since startup.',
         successRate: 'Success rate',
         successRateHint: '2xx responses',
+        successRateTooltip:
+          'Percentage of responses with code 2xx (OK). Above 95% is considered healthy.',
         errorRate: 'Error rate',
         errorRateHint: '5xx responses',
+        errorRateTooltip:
+          'Percentage of responses with code 5xx (server errors). Above 1% requires attention.',
         latencyP95: 'Latency p95',
         latencyDetail: 'p50: {p50} · p99: {p99}',
+        latencyP95Tooltip:
+          'Time in ms below which 95% of requests are resolved. Includes p50 and p99.',
       },
       httpTable: {
         noData: 'No HTTP request data',
@@ -892,13 +900,22 @@ export const en: Translations = {
         noRuntimeMetrics:
           'No runtime metrics — collectDefaultMetrics() has not recorded data yet.',
         heapUsed: 'Heap used',
+        heapUsedTooltip: 'V8 heap memory used. Above 85% indicates OOM risk.',
         eventLoopLagP95: 'Event loop lag p95',
+        eventLoopLagP95Tooltip:
+          'Node.js event loop delay. Above 50ms there are serious blocks.',
         uptime: 'Uptime',
+        uptimeTooltip: 'Time since the last Node.js process startup.',
         gcTotal: 'Accumulated GC',
+        gcTotalTooltip: 'Total time spent in garbage collection since startup.',
         activeHandles: 'Active handles',
         activeHandlesHint: '{count} open handles (sockets, timers, etc.)',
+        activeHandlesTooltip:
+          'Open handles in the process: sockets, timers, file descriptors. Sustained growth = leak.',
         rssMemory: 'RSS memory',
         rssMemoryHint: 'Total physical memory used by Node.js process',
+        rssMemoryTooltip:
+          'Total physical memory used by the Node.js process (not just V8).',
       },
     },
     flashcards: {

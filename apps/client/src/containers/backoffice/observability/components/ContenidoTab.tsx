@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import { PeriodSelector, type SummaryPeriod } from './PeriodSelector';
 import { DailyTrendChart } from './DailyTrendChart';
 import { DistributionChart } from './DistributionChart';
@@ -32,10 +32,17 @@ const Skeleton = (): ReactElement => (
   </div>
 );
 
-export const ContenidoTab = (): ReactElement => {
+interface ContenidoTabProps {
+  period: SummaryPeriod;
+  onPeriodChange: (period: SummaryPeriod) => void;
+}
+
+export const ContenidoTab = ({
+  period,
+  onPeriodChange,
+}: ContenidoTabProps): ReactElement => {
   const { locale, t } = useI18n();
   const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
-  const [period, setPeriod] = useState<SummaryPeriod>('7d');
   const { data, isLoading, isError } = useAnalyticsSummary(period);
   const fc = data?.flashcards;
 
@@ -49,7 +56,7 @@ export const ContenidoTab = (): ReactElement => {
   return (
     <div className="space-y-5">
       <div className="flex justify-end">
-        <PeriodSelector value={period} onChange={setPeriod} />
+        <PeriodSelector value={period} onChange={onPeriodChange} />
       </div>
 
       {isLoading && <Skeleton />}
