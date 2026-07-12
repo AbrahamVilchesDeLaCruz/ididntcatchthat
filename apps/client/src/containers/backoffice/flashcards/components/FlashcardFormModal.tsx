@@ -4,6 +4,7 @@ import type {
   FlashcardExampleVM,
   FlashcardFormValues,
 } from '../flashcards.types';
+import { AppSelect } from '@/common/components/ui/select';
 import { useI18n } from '@/core/i18n';
 
 interface FlashcardFormModalProps {
@@ -22,9 +23,6 @@ const DEFAULT_VALUES: FlashcardFormValues = {
   subcategory: '',
   examples: [],
 };
-
-const selectClass =
-  'w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] disabled:opacity-40 disabled:cursor-not-allowed';
 
 const inputClass =
   'w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)]';
@@ -144,44 +142,70 @@ export const FlashcardFormModal = ({
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 {t.backoffice.flashcards.form.category}
               </label>
-              <select
+              <AppSelect.Root
                 required
                 value={values.category}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className={selectClass}
+                onValueChange={(value) => {
+                  handleCategoryChange(value ?? '');
+                }}
               >
-                <option value="" disabled>
-                  {t.backoffice.flashcards.form.selectCategory}
-                </option>
-                {catalog?.categories.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label[locale]}
-                  </option>
-                ))}
-              </select>
+                <AppSelect.Trigger>
+                  <AppSelect.Value
+                    placeholder={t.backoffice.flashcards.form.selectCategory}
+                  />
+                  <AppSelect.Icon />
+                </AppSelect.Trigger>
+                <AppSelect.Portal>
+                  <AppSelect.Positioner>
+                    <AppSelect.Popup>
+                      <AppSelect.List>
+                        {catalog?.categories.map((c) => (
+                          <AppSelect.Item key={c.value} value={c.value}>
+                            {c.label[locale]}
+                          </AppSelect.Item>
+                        ))}
+                      </AppSelect.List>
+                    </AppSelect.Popup>
+                  </AppSelect.Positioner>
+                </AppSelect.Portal>
+              </AppSelect.Root>
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 {t.backoffice.flashcards.form.subcategory}
               </label>
-              <select
+              <AppSelect.Root
                 required
                 value={values.subcategory}
                 disabled={!values.category}
-                onChange={(e) => setField('subcategory', e.target.value)}
-                className={selectClass}
+                onValueChange={(value) => {
+                  setField('subcategory', value ?? '');
+                }}
               >
-                <option value="" disabled>
-                  {values.category
-                    ? t.backoffice.flashcards.form.selectSubcategory
-                    : t.backoffice.flashcards.form.chooseCategoryFirst}
-                </option>
-                {subcategories.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label[locale]}
-                  </option>
-                ))}
-              </select>
+                <AppSelect.Trigger>
+                  <AppSelect.Value
+                    placeholder={
+                      values.category
+                        ? t.backoffice.flashcards.form.selectSubcategory
+                        : t.backoffice.flashcards.form.chooseCategoryFirst
+                    }
+                  />
+                  <AppSelect.Icon />
+                </AppSelect.Trigger>
+                <AppSelect.Portal>
+                  <AppSelect.Positioner>
+                    <AppSelect.Popup>
+                      <AppSelect.List>
+                        {subcategories.map((s) => (
+                          <AppSelect.Item key={s.value} value={s.value}>
+                            {s.label[locale]}
+                          </AppSelect.Item>
+                        ))}
+                      </AppSelect.List>
+                    </AppSelect.Popup>
+                  </AppSelect.Positioner>
+                </AppSelect.Portal>
+              </AppSelect.Root>
             </div>
           </div>
 

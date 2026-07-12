@@ -6,14 +6,12 @@ import {
 } from 'react';
 import { Search } from 'lucide-react';
 import type { FlashcardCatalogApiModel } from '../api/flashcards.api-model';
+import { AppSelect } from '@/common/components/ui/select';
 import { useI18n } from '@/core/i18n';
 
 const QUERY_DEBOUNCE_MS = 300;
 
 const AUDIO_STATUSES = ['pending', 'generating', 'ready', 'failed'] as const;
-
-const selectClass =
-  'px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)] disabled:opacity-40 disabled:cursor-not-allowed';
 
 interface FlashcardsToolbarProps {
   catalog: FlashcardCatalogApiModel | undefined;
@@ -159,21 +157,33 @@ export const FlashcardsToolbar = ({
         <label htmlFor="category-filter" className="sr-only">
           {t.backoffice.flashcards.toolbar.filterByCategory}
         </label>
-        <select
+        <AppSelect.Root
           id="category-filter"
           value={categoryFilter ?? ''}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-          className={selectClass}
+          onValueChange={(value) => {
+            handleCategoryChange(value ?? '');
+          }}
         >
-          <option value="">
-            {t.backoffice.flashcards.toolbar.allCategories}
-          </option>
-          {catalog?.categories.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label[locale]}
-            </option>
-          ))}
-        </select>
+          <AppSelect.Trigger>
+            <AppSelect.Value
+              placeholder={t.backoffice.flashcards.toolbar.allCategories}
+            />
+            <AppSelect.Icon />
+          </AppSelect.Trigger>
+          <AppSelect.Portal>
+            <AppSelect.Positioner>
+              <AppSelect.Popup>
+                <AppSelect.List>
+                  {catalog?.categories.map((c) => (
+                    <AppSelect.Item key={c.value} value={c.value}>
+                      {c.label[locale]}
+                    </AppSelect.Item>
+                  ))}
+                </AppSelect.List>
+              </AppSelect.Popup>
+            </AppSelect.Positioner>
+          </AppSelect.Portal>
+        </AppSelect.Root>
       </div>
 
       {/* Subcategory */}
@@ -181,24 +191,38 @@ export const FlashcardsToolbar = ({
         <label htmlFor="subcategory-filter" className="sr-only">
           {t.backoffice.flashcards.toolbar.filterBySubcategory}
         </label>
-        <select
+        <AppSelect.Root
           id="subcategory-filter"
           value={subcategoryFilter ?? ''}
           disabled={!categoryFilter}
-          onChange={(e) => onSubcategoryFilter(e.target.value || undefined)}
-          className={selectClass}
+          onValueChange={(value) => {
+            onSubcategoryFilter(value ?? undefined);
+          }}
         >
-          <option value="">
-            {categoryFilter
-              ? t.backoffice.flashcards.toolbar.allSubcategories
-              : t.backoffice.flashcards.toolbar.chooseCategoryFirst}
-          </option>
-          {subcategories.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label[locale]}
-            </option>
-          ))}
-        </select>
+          <AppSelect.Trigger>
+            <AppSelect.Value
+              placeholder={
+                categoryFilter
+                  ? t.backoffice.flashcards.toolbar.allSubcategories
+                  : t.backoffice.flashcards.toolbar.chooseCategoryFirst
+              }
+            />
+            <AppSelect.Icon />
+          </AppSelect.Trigger>
+          <AppSelect.Portal>
+            <AppSelect.Positioner>
+              <AppSelect.Popup>
+                <AppSelect.List>
+                  {subcategories.map((s) => (
+                    <AppSelect.Item key={s.value} value={s.value}>
+                      {s.label[locale]}
+                    </AppSelect.Item>
+                  ))}
+                </AppSelect.List>
+              </AppSelect.Popup>
+            </AppSelect.Positioner>
+          </AppSelect.Portal>
+        </AppSelect.Root>
       </div>
 
       {/* Audio status */}
@@ -206,21 +230,33 @@ export const FlashcardsToolbar = ({
         <label htmlFor="audio-status-filter" className="sr-only">
           {t.backoffice.flashcards.toolbar.filterByAudioStatus}
         </label>
-        <select
+        <AppSelect.Root
           id="audio-status-filter"
           value={audioStatusFilter ?? ''}
-          onChange={(e) => onAudioStatusFilter(e.target.value || undefined)}
-          className={selectClass}
+          onValueChange={(value) => {
+            onAudioStatusFilter(value ?? undefined);
+          }}
         >
-          <option value="">
-            {t.backoffice.flashcards.toolbar.allAudioStatuses}
-          </option>
-          {AUDIO_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {audioStatusLabels[status]}
-            </option>
-          ))}
-        </select>
+          <AppSelect.Trigger>
+            <AppSelect.Value
+              placeholder={t.backoffice.flashcards.toolbar.allAudioStatuses}
+            />
+            <AppSelect.Icon />
+          </AppSelect.Trigger>
+          <AppSelect.Portal>
+            <AppSelect.Positioner>
+              <AppSelect.Popup>
+                <AppSelect.List>
+                  {AUDIO_STATUSES.map((status) => (
+                    <AppSelect.Item key={status} value={status}>
+                      {audioStatusLabels[status]}
+                    </AppSelect.Item>
+                  ))}
+                </AppSelect.List>
+              </AppSelect.Popup>
+            </AppSelect.Positioner>
+          </AppSelect.Portal>
+        </AppSelect.Root>
       </div>
 
       {hasActiveFilters && (
