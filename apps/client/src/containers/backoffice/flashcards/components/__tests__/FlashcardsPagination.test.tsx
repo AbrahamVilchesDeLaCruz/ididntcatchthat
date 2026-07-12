@@ -64,7 +64,7 @@ describe('FlashcardsPagination', () => {
     await userEvent.type(input, '999{Enter}');
 
     expect(onPageChange).not.toHaveBeenCalled();
-    expect(input.value).toBe('2');
+    expect((input as HTMLInputElement).value).toBe('2');
   });
 
   it('renders nothing when there is only one page', () => {

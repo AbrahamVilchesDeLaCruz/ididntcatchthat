@@ -14,6 +14,8 @@ const runtime: RuntimeMetrics = {
   gcDurationTotalSeconds: 0.5,
   activeHandles: 42,
   residentMemoryBytes: 80 * 1_024 * 1_024,
+  processStartTimestamp: 1_700_000_000,
+  cpuSecondsTotal: 42.5,
 };
 
 describe('RuntimeMetricsSection', () => {
