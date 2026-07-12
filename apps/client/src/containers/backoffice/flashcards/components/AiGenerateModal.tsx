@@ -4,13 +4,14 @@ import type {
   FlashcardDraftApiModel,
 } from '../api/flashcards.api-model';
 import { DraftPreviewPanel } from './DraftPreviewPanel';
+import { AppSelect } from '@/common/components/ui/select';
 import { useI18n } from '@/core/i18n';
 
 type Step = 'configure' | 'preview';
 
 const COUNT_OPTIONS = [5, 10, 15, 20] as const;
 
-const selectClass =
+const inputClass =
   'w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-dim)]';
 
 interface AiGenerateModalProps {
@@ -99,46 +100,70 @@ export const AiGenerateModal = ({
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
                   {t.backoffice.flashcards.ai.category}
                 </label>
-                <select
+                <AppSelect.Root
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
+                  onValueChange={(value) => {
+                    setCategory(value ?? '');
                     setSubcategory('');
                   }}
-                  className={selectClass}
                 >
-                  <option value="">
-                    {t.backoffice.flashcards.ai.selectCategory}
-                  </option>
-                  {catalog?.categories.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label[locale]}
-                    </option>
-                  ))}
-                </select>
+                  <AppSelect.Trigger>
+                    <AppSelect.Value
+                      placeholder={t.backoffice.flashcards.ai.selectCategory}
+                    />
+                    <AppSelect.Icon />
+                  </AppSelect.Trigger>
+                  <AppSelect.Portal>
+                    <AppSelect.Positioner>
+                      <AppSelect.Popup>
+                        <AppSelect.List>
+                          {catalog?.categories.map((c) => (
+                            <AppSelect.Item key={c.value} value={c.value}>
+                              {c.label[locale]}
+                            </AppSelect.Item>
+                          ))}
+                        </AppSelect.List>
+                      </AppSelect.Popup>
+                    </AppSelect.Positioner>
+                  </AppSelect.Portal>
+                </AppSelect.Root>
               </div>
 
               <div>
                 <label className="block text-sm text-[var(--color-text-secondary)] mb-1">
                   {t.backoffice.flashcards.ai.subcategory}
                 </label>
-                <select
+                <AppSelect.Root
                   value={subcategory}
                   disabled={!category}
-                  onChange={(e) => setSubcategory(e.target.value)}
-                  className={`${selectClass} disabled:opacity-40`}
+                  onValueChange={(value) => {
+                    setSubcategory(value ?? '');
+                  }}
                 >
-                  <option value="">
-                    {category
-                      ? t.backoffice.flashcards.ai.selectSubcategory
-                      : t.backoffice.flashcards.ai.chooseCategoryFirst}
-                  </option>
-                  {selectedCategory?.subcategories.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label[locale]}
-                    </option>
-                  ))}
-                </select>
+                  <AppSelect.Trigger>
+                    <AppSelect.Value
+                      placeholder={
+                        category
+                          ? t.backoffice.flashcards.ai.selectSubcategory
+                          : t.backoffice.flashcards.ai.chooseCategoryFirst
+                      }
+                    />
+                    <AppSelect.Icon />
+                  </AppSelect.Trigger>
+                  <AppSelect.Portal>
+                    <AppSelect.Positioner>
+                      <AppSelect.Popup>
+                        <AppSelect.List>
+                          {selectedCategory?.subcategories.map((s) => (
+                            <AppSelect.Item key={s.value} value={s.value}>
+                              {s.label[locale]}
+                            </AppSelect.Item>
+                          ))}
+                        </AppSelect.List>
+                      </AppSelect.Popup>
+                    </AppSelect.Positioner>
+                  </AppSelect.Portal>
+                </AppSelect.Root>
               </div>
 
               {selectedSubcategoryMeta && (
@@ -187,7 +212,7 @@ export const AiGenerateModal = ({
                   placeholder={
                     t.backoffice.flashcards.ai.extraInstructionsPlaceholder
                   }
-                  className={`${selectClass} resize-none placeholder-[var(--color-text-muted)]`}
+                  className={`${inputClass} resize-none placeholder-[var(--color-text-muted)]`}
                 />
               </div>
             </>
