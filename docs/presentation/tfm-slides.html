@@ -1705,14 +1705,14 @@
       </div>
     </section>
 
-    <!-- 09 CALIDAD E IA -->
-    <section class="slide" data-slide="9">
+<!-- 09 CALIDAD E IA — split: texto + tabla a la izq, pyramid a la der -->
+    <section class="slide split" data-slide="9">
       <span class="slide-num">09</span>
-      <div class="content center-stack" style="max-width:1200px;">
+      <div class="content">
         <p class="section-label reveal">Calidad e IA estratégica</p>
         <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
-        <p class="subhead-sm reveal" style="margin-bottom:12px">API con umbrales altos en casos de uso y dominio (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
-        <table class="coverage-table reveal" style="max-width:880px;margin-inline:auto;">
+        <p class="subhead-sm reveal" style="margin-bottom:12px">API con umbrales altos (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
+        <table class="coverage-table reveal" style="max-width:560px;">
           <thead>
             <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
           </thead>
@@ -1725,22 +1725,21 @@
             <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
           </tbody>
         </table>
-        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:start;margin-top:28px;max-width:1080px;width:100%;">
-          <div>
-            <p class="subhead-sm reveal" style="margin-bottom:8px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
-            <ul class="points reveal">
-              <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
-              <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
-              <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
-            </ul>
-          </div>
-          <div class="pyramid reveal-group" style="max-width:340px;margin-inline:auto;">
-            <div class="pyr l1">E2E · Playwright</div>
-            <div class="pyr l2">Integration · MSW · repos</div>
-            <div class="pyr l3">Unit · dominio · hooks</div>
-            <div class="pyr l4">Red → Green → Refactor (TDD)</div>
-          </div>
+        <p class="subhead-sm reveal" style="margin-top:14px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
+        <ul class="points reveal">
+          <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
+          <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
+          <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
+        </ul>
+      </div>
+      <div class="visual reveal">
+        <div class="pyramid reveal-group" style="max-width:420px;margin-inline:auto;">
+          <div class="pyr l1">E2E · Playwright</div>
+          <div class="pyr l2">Integration · MSW · repos</div>
+          <div class="pyr l3">Unit · dominio · hooks</div>
+          <div class="pyr l4">Red → Green → Refactor (TDD)</div>
         </div>
+        <p class="subhead-sm reveal" style="margin-top:24px;text-align:center;max-width:36ch;margin-inline:auto;font-size:0.8125rem">Pirámide de tests · el grueso está en unit + integration; E2E solo para flujos críticos</p>
       </div>
     </section>
 
