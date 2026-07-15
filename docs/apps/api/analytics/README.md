@@ -36,7 +36,13 @@ analytics/
 
 ## Eventos
 
-No emite ni consume domain events. Append-only en `page_views`.
+### Eventos publicados
+
+Ninguno — `PageViewRecorder` inserta directo en `page_views` (append-only). `AnalyticsSummaryRetriever` es read-only.
+
+### Eventos consumidos
+
+Ninguno — el summary agrega directamente vía SQL sobre tablas de otros BCs (`games`, `users`, `flashcards`, `page_views`), no por suscripción a eventos.
 
 ## Tablas
 
@@ -45,6 +51,13 @@ No emite ni consume domain events. Append-only en `page_views`.
 | `page_views` | Visitas web (path, visitor_id, user_id nullable, referrer) |
 
 El read model `summary` consulta también tablas de otros BCs (`games`, `users`, `flashcards`) vía SQL raw.
+
+## Paridad
+
+- **Page views**: `PageView.create(...)` valida `path` no vacío (`PagePath`) y `visitorId` UUID v4 (`VisitorId`). Inserts son idempotentes a nivel de payload duplicado solo si llegan al mismo `requestId` — sin UNIQUE, por diseño (cada cambio de ruta SPA se registra).
+- **Summary periods**: `24h | 7d | 15d | 30d | 6m | all` — default `7d`. Cada periodo se traduce a una ventana relativa fija (`15d = 15 days`, `6m = 6 months`). `all` devuelve todos los page views desde `min(created_at)`.
+- **Cross-BC SQL**: `TypeOrmAnalyticsSummaryQuery.findSummary` ejecuta joins directos sobre `games`, `users`, `flashcards` vía SQL crudo. Es deliberado: no hay read-model de Analytics propio; los conteos se hacen en vivo. Aceptable porque el endpoint es admin-only y los volúmenes son bajos.
+- **vs Observability**: este BC persiste (sobrevive reinicios); Observability es volátil (Prometheus). Ver tabla comparativa en [`search-analytics-summary/usecases.md`](./search-analytics-summary/usecases.md).
 
 ## Cliente
 

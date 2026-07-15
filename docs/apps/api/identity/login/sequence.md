@@ -13,6 +13,7 @@ sequenceDiagram
     participant PH as PasswordHasher
     participant TG as TokenGenerator
     participant RTREPO as UserSessionRepository
+    participant EP as DomainEventPublisher
 
     Client->>C: POST /auth/login { email, password }
     C->>UC: execute({ email, password, deviceId, fingerprint, ip })
@@ -24,13 +25,17 @@ sequenceDiagram
     PH-->>UC: true
 
     UC->>TG: generatePair({ type:"user", userId, deviceId, fingerprint, ip, roles })
-    TG-->>UC: { accessToken, userSessionId }
+    TG-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RTREPO: save(new UserSession({ userId, deviceId, ... }))
+    UC->>RTREPO: save(UserSession.create(id, refreshTokenId, userId, deviceId, fingerprint))
     RTREPO-->>UC: void
 
-    UC-->>C: { accessToken, userSessionId }
-    C->>C: res.cookie("userSession", userSessionId, {...})
+    UC->>EP: publish(session.pullDomainEvents())
+    EP-->>UC: void
+    Note over EP: SessionStartedEvent
+
+    UC-->>C: { accessToken, refreshTokenId }
+    C->>C: res.cookie("userSession", refreshTokenId, { httpOnly, sameSite:"strict" })
     C-->>Client: 200 { accessToken }
 ```
 

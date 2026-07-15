@@ -26,11 +26,23 @@ classDiagram
         +score number
         +toPrimitives() RankingEntryPrimitives
     }
+    class SearchRankingsGetController {
+        -searcher: RankingSearcher
+        +handler(user, query, req): Promise~ApiResponse~
+    }
+    class SearchRankingsGetQuery {
+        +type: RankingTypeValue
+        +period: RankingPeriodValue
+        +module?: LearningModule
+        +limit?: number
+    }
     RankingSearcher --> RankingLeaderboardQuery
     RankingSearcher --> RankingProfileQuery
     RankingSearcher --> RankingViewerProjector
     RankingSearcher --> RankingKey
     RankingLeaderboardQuery --> RankingEntry
+    SearchRankingsGetController --> RankingSearcher
+    SearchRankingsGetController --> SearchRankingsGetQuery
 ```
 
 `RankingSearcher` no usa el repository en el path de lectura — las queries con `RANK()` viven en `RankingLeaderboardQuery`.
