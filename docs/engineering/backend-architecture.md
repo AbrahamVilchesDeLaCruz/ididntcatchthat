@@ -37,7 +37,7 @@
 
 **Aggregates** — La Aggregate Root es la única puerta de entrada al dominio. Garantiza invariantes y consistencia interna. Las capas externas solo acceden al dominio a través del aggregate o de domain services.
 
-**Ports & Adapters** — El dominio define interfaces (puertos). La infraestructura las implementa (adaptadores). El dominio nunca sabe qué base de datos, qué framework, ni qué protocolo se usa.
+**Ports & Adapters** — el nombre DDD para [DIP](./engineering-principles.md#d--dependency-inversion-principle). El dominio define interfaces; la infraestructura las implementa.
 
 **Domain Events** — Hechos que ya ocurrieron en el sistema, expresados en pasado (`FlashcardCreated`, `PronunciationAttemptSubmitted`). Permiten comunicación entre Bounded Contexts sin acoplamiento directo.
 
@@ -85,7 +85,7 @@ La capa de entrada a la aplicación. Implementa los puertos definidos en el domi
 
 **Mappers** — transforman entre el modelo de persistencia y el dominio, y viceversa. `toDomain` y `toPersistence`.
 
-**Dependency Injection** — registra y conecta las implementaciones con las interfaces. Es infrastructure porque es un detalle de cómo se ensambla el sistema.
+**Dependency Injection** — el [Composition Root](./engineering-principles.md#5-composition-root) del backend (módulo de NestJS). Registra y conecta las implementaciones con las interfaces. Es infrastructure porque es un detalle de cómo se ensambla el sistema.
 
 **Exception registry** — mapea excepciones de dominio a respuestas de protocolo. El dominio lanza una excepción semántica; la infraestructura la convierte en HTTP 404, 409, etc.
 
