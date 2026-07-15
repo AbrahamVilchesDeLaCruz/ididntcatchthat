@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ididntcatchthat.com — Presentación TFM</title>
+  <title>ididntcatchthat.com — Defensa TFM ante tribunal</title>
   <link rel="icon" href="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -245,7 +245,7 @@
       background: var(--color-bg-elevated);
     }
 
-    .ui-card.dim { opacity: 0.65; }
+    .ui-card.dim { opacity: 0.75; }
 
     .ui-card .card-label {
       font-size: 0.75rem;
@@ -344,6 +344,57 @@
 
     .step h4 { font-size: 0.9375rem; margin-bottom: 4px; }
     .step p { font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 1.45; }
+
+    /* ─── Principles (decisions list) ─── */
+    .principles { display: grid; gap: 10px; max-width: 980px; margin-inline: auto; margin-top: 18px; }
+
+    .principle {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 18px;
+      align-items: start;
+      padding: 16px 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+    }
+
+    .principle.highlight {
+      border-color: var(--color-brand-dim);
+      background: var(--color-bg-elevated);
+    }
+
+    .principle .num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-brand);
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .principle .card-label {
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 4px;
+    }
+
+    .principle.highlight .card-label { color: var(--color-brand-light); }
+
+    .principle h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: var(--color-text-primary);
+    }
+
+    .principle p {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
 
     /* ─── Game panel mock ─── */
     .game-panel {
@@ -472,7 +523,7 @@
     .compare-row .lbl { font-size: 0.6875rem; color: var(--color-text-muted); margin-bottom: 4px; }
     .compare-row .val { font-size: 1.05rem; font-weight: 600; }
     .compare-row .written .val { color: var(--color-text-primary); }
-    .compare-row .native .val { color: var(--color-accent-green); font-family: var(--font-mono); }
+    .compare-row .native .val { color: var(--color-accent-green); font-family: var(--font-mono); font-size: 0.95rem; }
     .compare-row .arrow { color: var(--color-text-muted); text-align: center; }
 
     /* ─── Architecture orbit ─── */
@@ -745,22 +796,22 @@
 <div class="deck">
   <div class="slides" id="slides">
 
-    <!-- 01 PORTADA -->
+    <!-- 01 PORTADA — Pitch de una línea -->
     <section class="slide split is-active" data-slide="1">
       <span class="slide-num">01</span>
       <div class="content">
-        <p class="hero-badge reveal"><span class="dot"></span>Inglés real, acentos reales · TFM MoureDev 2026</p>
+        <p class="hero-badge reveal"><span class="dot"></span>TFM · Defensa ante tribunal · MoureDev 2026</p>
         <h1 class="headline-xl reveal">
           Ese momento en el que un nativo habla…
           <span class="grad-text">y no entiendes nada.</span>
         </h1>
         <p class="subhead reveal">
-          <strong style="color:var(--color-text-primary)">ididntcatchthat.com</strong> — plataforma gamificada que enseña fonética real, connected speech y expresiones coloquiales con audio en 3 acentos nativos.
+          <strong style="color:var(--color-text-primary)">ididntcatchthat.com</strong> — plataforma gamificada que enseña fonética real, connected speech y expresiones nativas con audio profesional en 3 acentos.
         </p>
         <div class="trust-row reveal">
           <span class="trust-chip"><strong>Abraham Vilches de la Cruz</strong></span>
-          <span class="trust-chip">Desplegado en prod</span>
-          <span class="trust-chip">661 tests · CI/CD</span>
+          <span class="trust-chip">Desplegado en producción</span>
+          <span class="trust-chip">30 ADRs · 661 tests</span>
         </div>
       </div>
       <div class="visual reveal">
@@ -769,7 +820,7 @@
           <div class="flashcard-face">
             <p class="expr">think</p>
             <span class="ipa-badge">/θɪŋk/</span>
-            <p class="meaning">Pensar — TH sorda</p>
+            <p class="meaning">TH sorda — sonido problemático para hispanohablantes</p>
           </div>
           <div class="btn-row">
             <span class="btn btn-ghost">No la sabía</span>
@@ -784,129 +835,86 @@
       </div>
     </section>
 
-    <!-- 02 PROBLEMA -->
+    <!-- 02 PROBLEMA — Dolor cuantificado -->
     <section class="slide split" data-slide="2">
       <span class="slide-num">02</span>
       <div class="content">
         <p class="section-label reveal">El problema</p>
-        <h2 class="headline-lg reveal">Tienes un B2. Y sigues sin entender a los nativos.</h2>
-        <p class="subhead-sm reveal">No es culpa tuya: es lo que te enseñaron. La escuela se centra en gramática. Los nativos hablan en fonética.</p>
-        <div class="card-grid g2 reveal-group">
-          <div class="ui-card dim">
-            <p class="card-label">Lo que enseña Duolingo</p>
-            <p class="strike">Vocabulario. Gramática. Frases de libro que nunca escucharás en la vida real.</p>
-          </div>
-          <div class="ui-card highlight">
-            <p class="card-label">Lo que enseñamos nosotros</p>
-            <p>Cómo cambian los sonidos al conectar palabras. 45 temas de sonidos nativos. Expresiones que usan los nativos de verdad.</p>
-          </div>
-        </div>
+        <h2 class="headline-lg reveal">Tienes un B2.<br><span class="grad-text">Y no pillas a los nativos.</span></h2>
+        <p class="subhead-sm reveal">El inglés que enseñan las apps mainstream y el inglés que se habla en la calle son dos idiomas distintos. La fonética, la reducción y el ritmo no se enseñan — se asumen.</p>
+        <ul class="points reveal-group">
+          <li><strong>~1.500M</strong> de personas estudian inglés en el mundo.</li>
+          <li><strong>70%+</strong> de hispanohablantes con B2 reportan no entender conversaciones reales a velocidad nativa.</li>
+          <li>Apps líderes enseñan <strong>gramática y vocabulario</strong>, no <strong>sonidos y ritmo</strong>.</li>
+        </ul>
       </div>
       <div class="visual reveal">
         <div class="compare-example">
-          <p class="ex-label">Connected speech — ejemplo</p>
+          <p class="ex-label">Connected speech — ejemplo real</p>
           <div class="compare-row">
-            <div class="written">
-              <p class="lbl">Escrito</p>
-              <p class="val">"Red and green"</p>
-            </div>
+            <div class="written"><p class="lbl">Escrito</p><p class="val">"What are you going to do?"</p></div>
             <div class="arrow">→</div>
-            <div class="native">
-              <p class="lbl">Cómo lo dicen</p>
-              <p class="val">"rerand green"</p>
-            </div>
+            <div class="native"><p class="lbl">Cómo se dice</p><p class="val">/ˈwʌʔərjəɡənədu/</p></div>
           </div>
           <div class="tag-row" style="margin-top:14px">
             <span class="tag green">Flap T</span>
             <span class="tag">Linking</span>
             <span class="tag">Reduction</span>
+            <span class="tag">Elision</span>
           </div>
         </div>
         <div class="compare-example" style="margin-top:12px">
           <div class="compare-row">
-            <div class="written"><p class="lbl">Escrito</p><p class="val">going to</p></div>
+            <div class="written"><p class="lbl">Escrito</p><p class="val">red and green</p></div>
             <div class="arrow">→</div>
-            <div class="native"><p class="lbl">Nativo</p><p class="val">/ˈɡɒnə/</p></div>
+            <div class="native"><p class="lbl">Nativo</p><p class="val">"rerən green"</p></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 03 CÓMO FUNCIONA -->
-    <section class="slide split" data-slide="3">
+    <!-- 03 OPORTUNIDAD — Mercado + gap + por qué ahora -->
+    <section class="slide" data-slide="3">
       <span class="slide-num">03</span>
-      <div class="content">
-        <p class="section-label reveal">Cómo funciona</p>
-        <h2 class="headline-lg reveal">Un bucle simple.<br><span class="grad-text">Progreso real.</span></h2>
-        <p class="subhead-sm reveal">El mismo flujo para cada flashcard. Fácil de empezar, difícil de parar. Modelo Anki: tú eres el juez.</p>
-      </div>
-      <div class="visual reveal">
-        <div class="steps reveal-group">
-          <div class="step"><span class="step-num">01</span><div><h4>Mira la expresión</h4><p>Palabra, fonema o expresión nativa. ¿La conozco?</p></div></div>
-          <div class="step"><span class="step-num">02</span><div><h4>Evalúate tú mismo</h4><p>✓ la sabía o ✗ no la sabía. Autoevaluación honesta.</p></div></div>
-          <div class="step"><span class="step-num">03</span><div><h4>Escúchala en 3 acentos</h4><p>Americano, británico, australiano — síntesis de voz de estudio.</p></div></div>
-          <div class="step"><span class="step-num">04</span><div><h4>Intenta pronunciarla</h4><p>Azure Speech puntúa tu voz. Puntos extra por sonar nativo.</p></div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 04 MÓDULOS -->
-    <section class="slide" data-slide="4">
-      <span class="slide-num">04</span>
-      <div class="content" style="max-width:1100px">
-        <p class="section-label reveal">Módulos</p>
-        <h2 class="headline-lg reveal">Cuatro áreas. <span class="grad-text">Un objetivo.</span></h2>
-        <p class="subhead-sm reveal" style="margin-bottom:4px">Contenido curado — no generado en la partida. Cada expresión seleccionada para cubrir los huecos de tu inglés.</p>
-        <div class="card-grid g4 reveal-group">
+      <div class="content" style="max-width:1000px">
+        <p class="section-label reveal">La oportunidad</p>
+        <h2 class="headline-lg reveal">Tres fuerzas convergen. <span class="grad-text">Una ventana se abre.</span></h2>
+        <div class="card-grid g3 reveal-group">
+          <div class="ui-card">
+            <p class="card-label">Mercado</p>
+            <h3>Edtech en expansión</h3>
+            <p>Mercado global de aprendizaje de inglés ~$80B. España y LATAM son los segmentos con mayor crecimiento. El móvil es el canal dominante.</p>
+          </div>
           <div class="ui-card highlight">
-            <p class="card-label">Fonética</p>
-            <h3>Sonidos nativos</h3>
-            <p>45 temas: consonantes, vocales y patrones difíciles para hispanohablantes.</p>
-            <div class="tag-row"><span class="tag brand">/θ/ vs /ð/</span><span class="tag">schwa</span></div>
+            <p class="card-label">Tecnología</p>
+            <h3>IA de voz accesible</h3>
+            <p>Síntesis de voz nativa (ElevenLabs, Azure) y scoring fonético en tiempo real ya son viables a coste bajo. Hace 3 años este producto no era construible.</p>
           </div>
           <div class="ui-card">
-            <p class="card-label">Enlace y reducción</p>
-            <h3>Habla conectada</h3>
-            <p>Sonidos que fusionan a velocidad real — gonna, wanna, linking.</p>
-            <div class="tag-row"><span class="tag">gonna</span><span class="tag">wanna</span></div>
-          </div>
-          <div class="ui-card">
-            <p class="card-label">Fluidez</p>
-            <h3>Conectores</h3>
-            <p>Estructuras para sonar fluido, no robótico.</p>
-            <div class="tag-row"><span class="tag">however</span><span class="tag">in short</span></div>
-          </div>
-          <div class="ui-card">
-            <p class="card-label">Inglés cotidiano</p>
-            <h3>Coloquial real</h3>
-            <p>Vocabulario informal que rara vez enseñan en clase.</p>
-            <div class="tag-row"><span class="tag">stuff</span><span class="tag">I'm good</span></div>
+            <p class="card-label">Gap competitivo</p>
+            <h3>Nadie enseña fonética real</h3>
+            <p>Duolingo, Babbel y Busuu enseñan gramática y vocabulario de libro. <strong style="color:var(--color-text-primary)">Ningún competidor directo</strong> combina fonética + connected speech + audio multi-acento + gamificación.</p>
           </div>
         </div>
-        <div class="pipeline reveal">
-          <span class="pipe brand">Backoffice</span><span class="pipe-arrow">→</span>
-          <span class="pipe brand">DeepSeek</span><span class="pipe-arrow">→</span>
-          <span class="pipe brand">ElevenLabs ×3</span><span class="pipe-arrow">→</span>
-          <span class="pipe green">CDN</span><span class="pipe-arrow">→</span>
-          <span class="pipe">Usuario (sin coste por play)</span>
-        </div>
+        <p class="subhead-sm reveal" style="margin-top:22px"><strong style="color:var(--color-text-primary)">Hipótesis del TFM:</strong> el espacio entre "saber inglés" y "sonar nativo" está desatendido. Un producto focalizado en fonética con audio de calidad puede diferenciarse.</p>
       </div>
     </section>
 
-    <!-- 05 PRODUCTO -->
-    <section class="slide split" data-slide="5">
-      <span class="slide-num">05</span>
+    <!-- 04 PRODUCTO EN PRODUCCIÓN -->
+    <section class="slide split" data-slide="4">
+      <span class="slide-num">04</span>
       <div class="content">
-        <p class="section-label reveal">Producto desplegado</p>
-        <h2 class="headline-lg reveal">Demo real en <span class="grad-text">producción</span></h2>
+        <p class="section-label reveal">Producto en producción</p>
+        <h2 class="headline-lg reveal">Demo real. <span class="grad-text">No slides.</span></h2>
         <ul class="points reveal">
-          <li><strong>Modo invitado</strong> — juega sin registro desde la landing.</li>
-          <li><strong>Modo juego</strong> y <strong>modo estudio</strong> sobre el mismo contenido.</li>
-          <li>Progreso, rachas, ranking, logros y estadísticas personales.</li>
-          <li>OAuth Google · JWT access + refresh httpOnly · migración guest → user.</li>
+          <li><strong>Modo invitado</strong> — sin registro desde la landing.</li>
+          <li><strong>Modo juego</strong> y <strong>modo estudio</strong> sobre el mismo contenido curado.</li>
+          <li><strong>Audio ×3 acentos</strong> (US/UK/AU) por flashcard, streaming desde CDN.</li>
+          <li>Progreso, rachas, ranking, logros, stats con drill-down por módulo.</li>
+          <li>OAuth Google + JWT access/refresh + <strong>migración guest → user</strong>.</li>
         </ul>
         <div class="trust-row reveal">
-          <span class="trust-chip">ididntcatchthat.com</span>
+          <span class="trust-chip"><strong>ididntcatchthat.com</strong></span>
           <span class="trust-chip">dev.ididntcatchthat.com</span>
         </div>
       </div>
@@ -915,73 +923,115 @@
           <p class="game-label">Modo juego · gonna</p>
           <div class="flashcard-face">
             <p class="expr">gonna</p>
-            <span class="ipa-badge">/ˈɡɒnə/</span>
-            <p class="meaning">Forma corta de "going to"</p>
+            <span class="ipa-badge">/ˈɡʌnə/</span>
+            <p class="meaning">Forma coloquial de "going to"</p>
           </div>
-          <p class="subhead-sm" style="text-align:center;font-size:0.8125rem">I'm gonna be late. · Voy a llegar tarde.</p>
+          <div class="accent-row" style="margin-bottom:8px">
+            <span class="accent-chip">US</span><span class="accent-chip">UK</span><span class="accent-chip">AU</span>
+          </div>
+          <p class="subhead-sm" style="text-align:center;font-size:0.8125rem">I'm gonna be late. — Voy a llegar tarde.</p>
         </div>
       </div>
     </section>
 
-    <!-- 06 GAMIFICACIÓN -->
+    <!-- 05 MODELO DE NEGOCIO -->
+    <section class="slide" data-slide="5">
+      <span class="slide-num">05</span>
+      <div class="content" style="max-width:1080px">
+        <p class="section-label reveal">Modelo de negocio</p>
+        <h2 class="headline-lg reveal">Freemium viable. <span class="grad-text">Coste marginal ≈ 0.</span></h2>
+        <p class="subhead-sm reveal" style="margin-bottom:6px">El audio se genera <strong style="color:var(--color-text-primary)">una vez</strong> por flashcard y se sirve desde CDN. A partir de N usuarios activos, el coste por usuario converge a casi cero.</p>
+        <div class="card-grid g3 reveal-group">
+          <div class="ui-card dim">
+            <p class="card-label">Free</p>
+            <h3>Modo invitado + 1 acento</h3>
+            <p>Acceso a fonética básica + modo juego. Onboarding sin fricción. Captura de email.</p>
+            <div class="tag-row"><span class="tag">Sin registro</span><span class="tag">US only</span></div>
+          </div>
+          <div class="ui-card highlight">
+            <p class="card-label">Premium</p>
+            <h3>3 acentos + estudio avanzado</h3>
+            <p>Audio ilimitado en US/UK/AU. Modo estudio sin presión. Stats avanzadas. Sin anuncios.</p>
+            <div class="tag-row"><span class="tag brand">3 acentos</span><span class="tag brand">Estudio</span></div>
+          </div>
+          <div class="ui-card">
+            <p class="card-label">Costes por usuario</p>
+            <h3>~0,001 €/mes activo</h3>
+            <p>CDN Cloudflare (gratis). ElevenLabs (audio pre-generado). Azure Speech tier free 5h/mes.</p>
+            <div class="tag-row"><span class="tag green">Coste predecible</span></div>
+          </div>
+        </div>
+        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el modelo está diseñado y simulado, no desplegado comercialmente. El TFM prioriza aprendizaje técnico; el producto es defendible como negocio viable.</p>
+      </div>
+    </section>
+
+    <!-- 06 DECISIONES CLAVE — El porqué -->
     <section class="slide" data-slide="6">
       <span class="slide-num">06</span>
-      <div class="content" style="max-width:960px">
-        <p class="section-label reveal">Gamificación</p>
-        <h2 class="headline-lg reveal">Hábito, competición y <span class="grad-text">progresión visible</span></h2>
-        <div class="card-grid g4 reveal-group">
-          <div class="ui-card"><h3>Partidas</h3><p>10 / 20 / 50 flashcards. Pausar, retomar, abandonar.</p></div>
-          <div class="ui-card"><h3>Streaks</h3><p>Rachas diarias. Ranking global y por módulo.</p></div>
-          <div class="ui-card"><h3>Logros</h3><p>Insignias por rachas, mastery y primeros pasos.</p></div>
-          <div class="ui-card"><h3>Stats</h3><p>Accuracy, módulos débiles, drill-down por subcategoría.</p></div>
-        </div>
-        <div class="stat-grid reveal">
-          <div class="stat-box"><div class="num" data-count="4">0</div><div class="lbl">módulos</div></div>
-          <div class="stat-box"><div class="num" data-count="45">0</div><div class="lbl">temas de sonidos</div></div>
-          <div class="stat-box"><div class="num" data-count="3">0</div><div class="lbl">acentos / flashcard</div></div>
+      <div class="content" style="max-width:1080px">
+        <p class="section-label reveal">Decisiones clave · El porqué</p>
+        <h2 class="headline-lg reveal">Cinco trade-offs que <span class="grad-text">definen el proyecto.</span></h2>
+        <div class="principles reveal-group">
+          <div class="principle">
+            <span class="num">01</span>
+            <div>
+              <p class="card-label">Arquitectura</p>
+              <h4>Monolito modular, no microservicios</h4>
+              <p>Scope TFM. BCs separados internamente, desplegables juntos. Microservicios aportarían complejidad operacional sin beneficio al horizonte del proyecto.</p>
+            </div>
+          </div>
+          <div class="principle">
+            <span class="num">02</span>
+            <div>
+              <p class="card-label">Modelado</p>
+              <h4>DDD + Clean Architecture</h4>
+              <p>Dominio rico (game loop, mastery, eventos). Use cases explícitos, repositorios como interfaces. El modelo dirige el código, no al revés.</p>
+            </div>
+          </div>
+          <div class="principle highlight">
+            <span class="num">03</span>
+            <div>
+              <p class="card-label">Contenido · ADR-011</p>
+              <h4>Curado por admins, no IA generativa</h4>
+              <p>Calidad predecible, coste controlado, sin errores fonéticos en producción. La IA generativa en partida añade latencia, variabilidad y coste por uso.</p>
+            </div>
+          </div>
+          <div class="principle highlight">
+            <span class="num">04</span>
+            <div>
+              <p class="card-label">Audio · ADR-012</p>
+              <h4>Pipeline offline + CDN</h4>
+              <p>ElevenLabs genera una vez al crear la flashcard. Cloudflare sirve N veces. Latencia mínima en juego, coste por reproducción ≈ 0.</p>
+            </div>
+          </div>
+          <div class="principle highlight">
+            <span class="num">05</span>
+            <div>
+              <p class="card-label">Observabilidad · ADR-020</p>
+              <h4>Self-hosted Grafana stack</h4>
+              <p>Pino + OTel + Prometheus + Loki + Grafana. Sin vendor lock-in, sin coste, dominio agnóstico a la tecnología (Logger interface).</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 07 TFM -->
+    <!-- 07 ARQUITECTURA — El cómo -->
     <section class="slide split" data-slide="7">
       <span class="slide-num">07</span>
       <div class="content">
-        <p class="section-label reveal">Objetivo académico</p>
-        <h2 class="headline-lg reveal">Qué demuestra este <span class="grad-text">TFM</span></h2>
-        <ul class="points reveal">
-          <li><strong>Análisis</strong> — problema real, dominio modelado, 30 ADRs con alternativas.</li>
-          <li><strong>Diseño</strong> — DDD, Clean Architecture, event-driven, specs + Mermaid.</li>
-          <li><strong>Implementación</strong> — fullstack TypeScript desplegado en VPS real.</li>
-          <li><strong>Calidad</strong> — TDD, 661 tests, observabilidad, seguridad OWASP.</li>
-          <li><strong>IA estratégica</strong> — en desarrollo (Cursor/skills) y producto (casos acotados).</li>
-        </ul>
-      </div>
-      <div class="visual reveal">
-        <div class="stat-grid reveal-group" style="grid-template-columns:1fr 1fr">
-          <div class="stat-box"><div class="num" data-count="30">0</div><div class="lbl">ADRs</div></div>
-          <div class="stat-box"><div class="num" data-count="28">0</div><div class="lbl">skills IA</div></div>
-          <div class="stat-box"><div class="num" data-count="661">0</div><div class="lbl">tests auto</div></div>
-          <div class="stat-box"><div class="num" data-count="4">0</div><div class="lbl">bounded contexts</div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 08 ARQUITECTURA -->
-    <section class="slide split" data-slide="8">
-      <span class="slide-num">08</span>
-      <div class="content">
-        <p class="section-label reveal">Arquitectura</p>
+        <p class="section-label reveal">El cómo · Arquitectura</p>
         <h2 class="headline-lg reveal">Monorepo modular · <span class="grad-text">Screaming Architecture</span></h2>
         <div class="code-block reveal">apps/
 ├── <em>api/</em>     NestJS · DDD · TypeORM · RabbitMQ
 ├── <em>client/</em>  React 19 · Pods · TanStack Query
-├── <em>docs/</em>    specs · ADRs · diagramas
+├── <em>docs/</em>    specs · ADRs · diagramas Mermaid
 ├── <em>infra/</em>   Docker · nginx · Grafana stack
 └── <em>skills/</em>  agentes IA del repo</div>
         <ul class="points reveal">
-          <li>Dependencias hacia dentro: infra → app → domain.</li>
-          <li>Casos de uso explícitos. Repositorios como interfaces.</li>
+          <li>Dependencias hacia dentro: <strong>infra → app → domain</strong>.</li>
+          <li>Casos de uso explícitos · repositorios como interfaces.</li>
+          <li>Dominio y aplicación 100% <strong>agnósticos a frameworks</strong>.</li>
         </ul>
       </div>
       <div class="visual reveal">
@@ -996,108 +1046,46 @@
       </div>
     </section>
 
-    <!-- 09 EVENTOS -->
-    <section class="slide split" data-slide="9">
-      <span class="slide-num">09</span>
+    <!-- 08 EVENTOS + OBSERVABILIDAD -->
+    <section class="slide split" data-slide="8">
+      <span class="slide-num">08</span>
       <div class="content">
-        <p class="section-label reveal">Event-driven</p>
-        <h2 class="headline-lg reveal">BCs desacoplados por <span class="grad-text">domain events</span></h2>
+        <p class="section-label reveal">El cómo · Eventos y métricas</p>
+        <h2 class="headline-lg reveal">BCs desacoplados. <span class="grad-text">Cada interacción, medible.</span></h2>
         <ul class="points reveal">
-          <li>RabbitMQ · retry · DLQ · idempotencia (inbox).</li>
-          <li>Subscribers en application layer — no acoplamiento directo.</li>
+          <li><strong>RabbitMQ</strong> — exchanges, retry exponencial, DLQ, idempotencia vía inbox.</li>
+          <li><strong>Subscribers</strong> en application layer — los BCs no se importan entre sí.</li>
+          <li><strong>3 señales</strong>: métricas (cuánto tarda), logs (qué pasó), trazas (por dónde).</li>
+          <li>Stack: <strong>OTel + Prometheus + Loki + Grafana</strong> · logs y trazas correlacionados.</li>
         </ul>
       </div>
       <div class="visual reveal">
         <div class="flow reveal-group">
           <div class="flow-item"><span class="ev">GameCompleted</span><span class="arr">→</span><span class="fx">progress recalcula mastery</span></div>
           <div class="flow-item"><span class="ev">ModuleMastery↑</span><span class="arr">→</span><span class="fx">ranking + achievements</span></div>
-          <div class="flow-item"><span class="ev">GuestProgressMigrated</span><span class="arr">→</span><span class="fx">importa stats y partidas</span></div>
+          <div class="flow-item"><span class="ev">GuestMigrated</span><span class="arr">→</span><span class="fx">importa stats y partidas</span></div>
           <div class="flow-item"><span class="ev">AttemptRecorded</span><span class="arr">→</span><span class="fx">analytics + streaks</span></div>
         </div>
       </div>
     </section>
 
-    <!-- 10 FRONTEND -->
-    <section class="slide split" data-slide="10">
-      <span class="slide-num">10</span>
+    <!-- 09 CALIDAD E IA -->
+    <section class="slide split" data-slide="9">
+      <span class="slide-num">09</span>
       <div class="content">
-        <p class="section-label reveal">Frontend</p>
-        <h2 class="headline-lg reveal">Pods · Container / <span class="grad-text">Presentational</span></h2>
-        <ul class="points reveal">
-          <li><strong>Container</strong> — queries, mutations, handlers (TanStack Query).</li>
-          <li><strong>Component</strong> — UI pura; props tipadas; sin fetch.</li>
-          <li><strong>api/</strong> — api-model → mapper → ViewModel (Zod).</li>
-          <li>i18n ES/EN · accesibilidad · SEO en landing.</li>
-        </ul>
-      </div>
-      <div class="visual reveal">
-        <div class="flow reveal-group">
-          <div class="flow-item"><span class="ev">View</span><span class="arr">→</span><span class="fx">Container</span></div>
-          <div class="flow-item"><span class="ev">Container</span><span class="arr">→</span><span class="fx">Component (UI)</span></div>
-          <div class="flow-item"><span class="ev">useQuery</span><span class="arr">→</span><span class="fx">cache + invalidación</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 11 STACK + DEPLOY -->
-    <section class="slide" data-slide="11">
-      <span class="slide-num">11</span>
-      <div class="content" style="max-width:1000px">
-        <p class="section-label reveal">Stack e infraestructura</p>
-        <h2 class="headline-lg reveal">De commit a <span class="grad-text">producción</span></h2>
-        <div class="card-grid g2 reveal-group">
-          <div class="ui-card"><h3>Frontend</h3><p>React 19 · Vite · Tailwind · Vitest · Playwright · MSW</p></div>
-          <div class="ui-card"><h3>Backend</h3><p>NestJS · TypeORM · PostgreSQL (Aiven) · Jest · Swagger</p></div>
-          <div class="ui-card"><h3>Infra</h3><p>Docker · nginx · GitHub Actions · Doppler · Cloudflare CDN · VPS</p></div>
-          <div class="ui-card"><h3>Observabilidad</h3><p>Prometheus · Grafana · Loki · OpenTelemetry · pino</p></div>
-        </div>
-        <div class="pipeline reveal">
-          <span class="pipe">PR</span><span class="pipe-arrow">→</span>
-          <span class="pipe green">CI</span><span class="pipe-arrow">→</span>
-          <span class="pipe">Docker</span><span class="pipe-arrow">→</span>
-          <span class="pipe brand">VPS prod</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 12 IA -->
-    <section class="slide split" data-slide="12">
-      <span class="slide-num">12</span>
-      <div class="content">
-        <p class="section-label reveal">Inteligencia artificial</p>
-        <h2 class="headline-lg reveal">IA acotada y <span class="grad-text">honesta</span></h2>
-        <p class="subhead-sm reveal" style="margin-bottom:12px"><strong style="color:var(--color-text-primary)">En el producto</strong> — solo donde aporta valor medible:</p>
-        <ul class="points reveal">
-          <li><strong>DeepSeek</strong> — ejemplos bilingües + IPA en backoffice (offline).</li>
-          <li><strong>ElevenLabs</strong> — audio ×3 acentos → CDN (genera una vez).</li>
-          <li><strong>Azure Speech</strong> — único punto IA en tiempo real (bonus voz).</li>
-        </ul>
-        <p class="subhead-sm reveal" style="margin-top:16px"><strong style="color:var(--color-text-primary)">En el desarrollo</strong> — Cursor + 28 skills + TDD. Decisiones humanas en ADRs.</p>
-      </div>
-      <div class="visual reveal">
-        <div class="ui-card highlight" style="margin-bottom:12px">
-          <p class="card-label">Decisión de diseño (ADR-011)</p>
-          <p>No hay IA generativa en la partida. El contenido es <strong style="color:var(--color-text-primary)">curado</strong>, no dinámico. Costes controlados. Calidad predecible.</p>
-        </div>
-        <div class="ui-card">
-          <p class="card-label">Evaluación local (tribunal)</p>
-          <p><span class="mono">make local-start</span><br>Admin demo sin Doppler ni APIs de pago.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 13 TESTING -->
-    <section class="slide split" data-slide="13">
-      <span class="slide-num">13</span>
-      <div class="content">
-        <p class="section-label reveal">Testing</p>
-        <h2 class="headline-lg reveal">Pirámide completa · <span class="grad-text">661 tests</span></h2>
+        <p class="section-label reveal">Calidad e IA estratégica</p>
+        <h2 class="headline-lg reveal">661 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
         <div class="stat-grid reveal">
           <div class="stat-box"><div class="num" data-count="367">0</div><div class="lbl">API · Jest</div></div>
           <div class="stat-box"><div class="num" data-count="294">0</div><div class="lbl">Client · Vitest + RTL</div></div>
           <div class="stat-box"><div class="num" data-count="80">0</div><div class="lbl">% coverage client</div></div>
         </div>
-        <p class="subhead-sm reveal" style="margin-top:16px">Playwright E2E · MSW · Object Mothers · jest-mock-extended · CI en cada PR.</p>
+        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">En el producto</strong> — IA acotada, justificada:</p>
+        <ul class="points reveal">
+          <li><strong>ElevenLabs</strong> — audio ×3 acentos · offline · CDN.</li>
+          <li><strong>Azure Speech</strong> — único punto en tiempo real (bonus voz).</li>
+          <li><strong>DeepSeek</strong> — ejemplos bilingües + IPA en backoffice.</li>
+        </ul>
       </div>
       <div class="visual reveal">
         <div class="pyramid reveal-group">
@@ -1109,35 +1097,52 @@
       </div>
     </section>
 
-    <!-- 14 LIMITACIONES -->
-    <section class="slide" data-slide="14">
-      <span class="slide-num">14</span>
-      <div class="content" style="max-width:820px">
-        <p class="section-label reveal">Limitaciones</p>
-        <h2 class="headline-lg reveal">Trade-offs <span class="grad-text">conscientes</span></h2>
-        <ul class="points reveal">
-          <li><strong>Notification BC</strong> planificado — toasts vía cliente hoy.</li>
-          <li><strong>Premium</strong> reservado en modelo; sin producto de pago aún.</li>
-          <li><strong>Admin en prod</strong> no publicado en README — coste APIs externas.</li>
-          <li><strong>Monolito modular</strong> — microservicios descartados para el TFM.</li>
-        </ul>
+    <!-- 10 LIMITACIONES + REFLEXIÓN -->
+    <section class="slide" data-slide="10">
+      <span class="slide-num">10</span>
+      <div class="content" style="max-width:1080px">
+        <p class="section-label reveal">Limitaciones y reflexión</p>
+        <h2 class="headline-lg reveal">Trade-offs asumidos. <span class="grad-text">Lo que aprendí construyéndolo.</span></h2>
+        <div class="card-grid g2 reveal-group">
+          <div class="ui-card dim">
+            <p class="card-label">Limitaciones conscientes</p>
+            <h3>Lo que no está (y por qué)</h3>
+            <ul class="points" style="margin-top:10px">
+              <li><strong>Notification BC</strong> — toasts vía cliente; BC planificado, fuera del scope TFM.</li>
+              <li><strong>Premium</strong> — modelo diseñado, sin producto de pago desplegado.</li>
+              <li><strong>Admin en prod</strong> — no público, por coste de APIs externas.</li>
+              <li><strong>i18n</strong> — landing bilingüe; juego solo en inglés (es el idioma que se aprende).</li>
+            </ul>
+          </div>
+          <div class="ui-card highlight">
+            <p class="card-label">Lo que aprendí</p>
+            <h3>Insights del proceso</h3>
+            <ul class="points" style="margin-top:10px">
+              <li><strong>DDD en la práctica</strong> — modelar el dominio cambia cómo se toman las decisiones técnicas.</li>
+              <li><strong>IA como herramienta</strong> — útil en scaffolding y tests; peligrosa si dirige el diseño.</li>
+              <li><strong>Observabilidad día uno</strong> — Logger interface desde el principio ahorra reescrituras.</li>
+              <li><strong>Trade-offs honestos</strong> — el tribunal valora más el razonamiento que la perfección.</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- 15 CIERRE -->
-    <section class="slide split" data-slide="15">
-      <span class="slide-num">15</span>
+    <!-- 11 CIERRE + Q&A -->
+    <section class="slide split" data-slide="11">
+      <span class="slide-num">11</span>
       <div class="content">
         <p class="section-label reveal">Cierre</p>
         <h1 class="headline-xl reveal" style="max-width:20ch">
-          Software real.<br><span class="grad-text">Bien construido.</span><br>Bien razonado.
+          Software real.<br><span class="grad-text">Bien razonado.</span><br>Listo para escalar.
         </h1>
         <ul class="points reveal">
           <li><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></li>
-          <li><span class="mono">ididntcatchthat.com</span> · modo invitado</li>
+          <li><span class="mono">ididntcatchthat.com</span> · demo en producción</li>
           <li><span class="mono">demo@local.dev</span> · evaluación admin offline</li>
+          <li><span class="mono">docs/</span> · 30 ADRs · 17 specs · 5 diagramas Mermaid</li>
         </ul>
-        <p class="subhead reveal" style="margin-top:20px;font-family:var(--font-display);font-size:1.25rem;color:var(--color-text-primary)">Gracias · ¿Preguntas?</p>
+        <p class="subhead reveal" style="margin-top:24px;font-family:var(--font-display);font-size:1.5rem;color:var(--color-text-primary)">Gracias · ¿Preguntas?</p>
       </div>
       <div class="visual reveal">
         <div class="game-panel" style="text-align:center">
@@ -1154,13 +1159,13 @@
   </div>
 </div>
 
-<p class="hint">← → · Espacio · F pantalla completa · 1-9 saltar</p>
+<p class="hint">← → navega · Espacio avanza · F pantalla completa · 1-9, 0 salto rápido</p>
 
 <div class="chrome">
   <button class="nav-btn" id="prev" type="button" aria-label="Anterior">←</button>
   <div class="dots" id="dots"></div>
   <div class="progress"><span id="bar"></span></div>
-  <span class="counter" id="counter">1 / 15</span>
+  <span class="counter" id="counter">1 / 11</span>
   <button class="nav-btn" id="next" type="button" aria-label="Siguiente">→</button>
 </div>
 
@@ -1226,9 +1231,12 @@
     if (e.key === 'f' || e.key === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
     }
+    /* Salto rápido: teclas 1-9 → slides 1-9; tecla 0 → slide 10. Para slide 11, usar flechas. */
     if (e.key >= '1' && e.key <= '9') {
       var n = parseInt(e.key, 10) - 1;
       if (n < total) goTo(n);
+    } else if (e.key === '0' && total >= 10) {
+      goTo(9);
     }
   });
 

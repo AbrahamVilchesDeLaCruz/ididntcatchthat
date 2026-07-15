@@ -4,6 +4,17 @@
 
 ---
 
+## Presentación TFM · Defensa ante tribunal
+
+Deck de defensa del Trabajo de Fin de Máster — pitch de negocio, decisiones técnicas, arquitectura y reflexión crítica. 11 slides.
+
+| Documento | Descripción |
+|---|---|
+| [presentation/tfm-slides.html](./presentation/tfm-slides.html) | Deck principal · problema → oportunidad → producto → modelo de negocio → decisiones → arquitectura → calidad → reflexión → cierre |
+| [presentation/tfm-video.html](./presentation/tfm-video.html) | Vídeo demostrativo del producto en uso |
+
+---
+
 ## Empezar aquí
 
 | Qué necesito | Documento |
