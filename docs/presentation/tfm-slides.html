@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <style>
     /* ─── Tokens — copiados de apps/client/src/common/styles/index.css [data-theme="dark"] */
     :root {
@@ -205,6 +206,43 @@
       max-width: 52ch;
     }
 
+    /* ─── Hero stat tiles (slide 1) ─── */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+      max-width: 520px;
+    }
+
+    .hero-stat {
+      padding: 16px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      text-align: center;
+    }
+
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--color-text-primary), var(--color-brand-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.1;
+    }
+
+    .hero-stat-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
     .trust-row {
       display: flex;
       flex-wrap: wrap;
@@ -224,7 +262,7 @@
 
     .trust-chip strong { color: var(--color-text-primary); font-weight: 600; }
 
-    /* ─── Cards (landing / game) ─── */
+    /* ─── Cards ─── */
     .card-grid { display: grid; gap: 14px; margin-top: 20px; }
     .card-grid.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .card-grid.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -247,6 +285,11 @@
 
     .ui-card.dim { opacity: 0.75; }
 
+    .ui-card.future {
+      border-style: dashed;
+      opacity: 0.85;
+    }
+
     .ui-card .card-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -257,6 +300,7 @@
     }
 
     .ui-card.highlight .card-label { color: var(--color-brand-light); }
+    .ui-card.future .card-label { color: var(--color-accent-green); }
 
     .ui-card h3 {
       font-size: 1rem;
@@ -526,110 +570,6 @@
     .compare-row .native .val { color: var(--color-accent-green); font-family: var(--font-mono); font-size: 0.95rem; }
     .compare-row .arrow { color: var(--color-text-muted); text-align: center; }
 
-    /* ─── Architecture orbit ─── */
-    .orbit-wrap {
-      width: min(400px, 100%);
-      aspect-ratio: 1;
-      margin-inline: auto;
-      position: relative;
-    }
-
-    .orbit-ring {
-      position: absolute;
-      inset: 8%;
-      border: 1px dashed color-mix(in srgb, var(--color-accent-green) 35%, var(--color-border));
-      border-radius: var(--radius-full);
-      animation: spin 50s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .orbit-core {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 100px;
-      padding: 14px;
-      text-align: center;
-      border-radius: var(--radius-lg);
-      background: var(--color-bg-elevated);
-      border: 1px solid color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
-      font-family: var(--font-mono);
-      font-size: 0.625rem;
-      color: var(--color-brand-light);
-      box-shadow: 0 0 40px color-mix(in srgb, var(--color-brand) 15%, transparent);
-    }
-
-    .orbit-node {
-      position: absolute;
-      width: 108px;
-      padding: 12px 10px;
-      text-align: center;
-      border-radius: var(--radius-md);
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      font-family: var(--font-display);
-      font-size: 0.8125rem;
-      font-weight: 600;
-    }
-
-    .orbit-node small {
-      display: block;
-      margin-top: 4px;
-      font-family: var(--font-mono);
-      font-size: 0.5625rem;
-      font-weight: 400;
-      color: var(--color-text-muted);
-    }
-
-    .orbit-node.n1 { left: 50%; top: 0; transform: translateX(-50%); }
-    .orbit-node.n2 { right: 0; top: 50%; transform: translateY(-50%); color: var(--color-accent-green); }
-    .orbit-node.n3 { left: 50%; bottom: 0; transform: translateX(-50%); color: var(--color-brand-light); }
-    .orbit-node.n4 { left: 0; top: 50%; transform: translateY(-50%); color: var(--color-accent-red); }
-
-    /* ─── Flow / pipeline ─── */
-    .flow { display: grid; gap: 8px; max-width: 440px; }
-
-    .flow-item {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 10px;
-      align-items: center;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-surface);
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-    }
-
-    .flow-item .ev { color: var(--color-accent-green); }
-    .flow-item .arr { color: var(--color-text-muted); }
-    .flow-item .fx { color: var(--color-text-secondary); }
-
-    .pipeline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .pipe {
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      padding: 8px 12px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-surface);
-      color: var(--color-text-secondary);
-    }
-
-    .pipe.brand { border-color: var(--color-brand-dim); color: var(--color-brand-light); background: color-mix(in srgb, var(--color-brand-dim) 40%, var(--color-bg-surface)); }
-    .pipe.green { border-color: var(--color-accent-green-dim); color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green-dim) 50%, var(--color-bg-surface)); }
-    .pipe-arrow { color: var(--color-text-muted); font-size: 0.875rem; }
-
     /* ─── Stats ─── */
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 20px; }
 
@@ -693,6 +633,113 @@
     }
 
     .code-block em { color: var(--color-accent-green); font-style: normal; }
+
+    /* ─── Mermaid wrappers ─── */
+    .mermaid-wrapper {
+      margin-top: 16px;
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mermaid-wrapper pre.mermaid {
+      background: transparent;
+      font-family: var(--font-sans);
+      text-align: center;
+    }
+
+    .mermaid-wrapper svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ─── Coverage heatmap ─── */
+    .coverage-table {
+      margin-top: 14px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .coverage-table th,
+    .coverage-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+    }
+
+    .coverage-table th {
+      color: var(--color-text-muted);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.625rem;
+    }
+
+    .coverage-cell {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+    }
+
+    .cov-high { background: var(--color-accent-green-dim); color: var(--color-accent-green); }
+    .cov-mid { background: var(--color-brand-dim); color: var(--color-brand-light); }
+    .cov-low { background: color-mix(in srgb, var(--color-accent-red) 25%, transparent); color: var(--color-accent-red); }
+
+    /* ─── Timeline (slide 10) ─── */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .timeline-item {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 16px;
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-brand);
+    }
+
+    .timeline-item .when {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      color: var(--color-brand-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .timeline-item h4 {
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+      color: var(--color-text-primary);
+    }
+
+    .timeline-item p {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
 
     /* ─── Reveal ─── */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -780,6 +827,8 @@
       .compare-row { grid-template-columns: 1fr; text-align: center; }
       .compare-row .arrow { display: none; }
       .dots { display: none; }
+      .timeline { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -796,7 +845,7 @@
 <div class="deck">
   <div class="slides" id="slides">
 
-    <!-- 01 PORTADA — Pitch de una línea -->
+    <!-- 01 PORTADA — Pitch de una línea + hero stats -->
     <section class="slide split is-active" data-slide="1">
       <span class="slide-num">01</span>
       <div class="content">
@@ -808,10 +857,23 @@
         <p class="subhead reveal">
           <strong style="color:var(--color-text-primary)">ididntcatchthat.com</strong> — plataforma gamificada que enseña fonética real, connected speech y expresiones nativas con audio profesional en 3 acentos.
         </p>
+        <div class="hero-stats reveal">
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-count="33">0</div>
+            <div class="hero-stat-lbl">ADRs</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-count="774">0</div>
+            <div class="hero-stat-lbl">tests auto</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-count="8">0</div>
+            <div class="hero-stat-lbl">BCs</div>
+          </div>
+        </div>
         <div class="trust-row reveal">
           <span class="trust-chip"><strong>Abraham Vilches de la Cruz</strong></span>
           <span class="trust-chip">Desplegado en producción</span>
-          <span class="trust-chip">30 ADRs · 661 tests</span>
         </div>
       </div>
       <div class="visual reveal">
@@ -888,7 +950,7 @@
           <div class="ui-card highlight">
             <p class="card-label">Tecnología</p>
             <h3>IA de voz accesible</h3>
-            <p>Síntesis de voz nativa (ElevenLabs, Azure) y scoring fonético en tiempo real ya son viables a coste bajo. Hace 3 años este producto no era construible.</p>
+            <p>Síntesis de voz nativa (ElevenLabs, DeepSeek) y scoring fonético ya son viables a coste bajo. Hace 3 años este producto no era construible.</p>
           </div>
           <div class="ui-card">
             <p class="card-label">Gap competitivo</p>
@@ -934,34 +996,40 @@
       </div>
     </section>
 
-    <!-- 05 MODELO DE NEGOCIO -->
+    <!-- 05 ESTADO DEL PRODUCTO — Honest scope (sin freemium) -->
     <section class="slide" data-slide="5">
       <span class="slide-num">05</span>
       <div class="content" style="max-width:1080px">
-        <p class="section-label reveal">Modelo de negocio</p>
-        <h2 class="headline-lg reveal">Freemium viable. <span class="grad-text">Coste marginal ≈ 0.</span></h2>
-        <p class="subhead-sm reveal" style="margin-bottom:6px">El audio se genera <strong style="color:var(--color-text-primary)">una vez</strong> por flashcard y se sirve desde CDN. A partir de N usuarios activos, el coste por usuario converge a casi cero.</p>
+        <p class="section-label reveal">Estado del producto</p>
+        <h2 class="headline-lg reveal">Esto es lo que hay. <span class="grad-text">Lo demás, roadmap.</span></h2>
         <div class="card-grid g3 reveal-group">
-          <div class="ui-card dim">
-            <p class="card-label">Free</p>
-            <h3>Modo invitado + 1 acento</h3>
-            <p>Acceso a fonética básica + modo juego. Onboarding sin fricción. Captura de email.</p>
-            <div class="tag-row"><span class="tag">Sin registro</span><span class="tag">US only</span></div>
-          </div>
           <div class="ui-card highlight">
-            <p class="card-label">Premium</p>
-            <h3>3 acentos + estudio avanzado</h3>
-            <p>Audio ilimitado en US/UK/AU. Modo estudio sin presión. Stats avanzadas. Sin anuncios.</p>
-            <div class="tag-row"><span class="tag brand">3 acentos</span><span class="tag brand">Estudio</span></div>
+            <p class="card-label">En producción</p>
+            <h3>Acceso completo · un solo nivel</h3>
+            <p>Modo invitado + cuenta registrada. Audio en 3 acentos (US/UK/AU) para todos. Modo juego, estudio, ranking, logros, stats.</p>
+            <div class="tag-row">
+              <span class="tag green">Sin pago</span>
+              <span class="tag green">3 acentos</span>
+              <span class="tag green">Guest o user</span>
+            </div>
           </div>
-          <div class="ui-card">
-            <p class="card-label">Costes por usuario</p>
-            <h3>~0,001 €/mes activo</h3>
-            <p>CDN Cloudflare (gratis). ElevenLabs (audio pre-generado). Azure Speech tier free 5h/mes.</p>
-            <div class="tag-row"><span class="tag green">Coste predecible</span></div>
+          <div class="ui-card future">
+            <p class="card-label">Próximamente</p>
+            <h3>Lo que viene después</h3>
+            <p>Bonus de pronunciación (ADR-008). Más módulos de contenido. PWA mobile-first. i18n completa del cliente.</p>
+            <div class="tag-row">
+              <span class="tag">Pronunciación</span>
+              <span class="tag">PWA</span>
+              <span class="tag">Más acentos</span>
+            </div>
+          </div>
+          <div class="ui-card dim">
+            <p class="card-label">Decisiones de scope</p>
+            <h3>Por qué no hay tiers</h3>
+            <p>Un usuario autenticado (email, OAuth Google o guest migrado) accede a todo. El audio de ElevenLabs se pre-genera y se sirve desde CDN — coste marginal ≈ 0, no justifica gating.</p>
           </div>
         </div>
-        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el modelo está diseñado y simulado, no desplegado comercialmente. El TFM prioriza aprendizaje técnico; el producto es defendible como negocio viable.</p>
+        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el proyecto TFM prioriza ejecución técnica honesta. No hay modelo freemium ni plan premium desplegado — el rol <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">premium</code> está reservado en el modelo (forward compatibility) pero sin lógica. Ver <span class="mono">docs/domain/monetization-future.md</span>.</p>
       </div>
     </section>
 
@@ -977,7 +1045,7 @@
             <div>
               <p class="card-label">Arquitectura</p>
               <h4>Monolito modular, no microservicios</h4>
-              <p>Scope TFM. BCs separados internamente, desplegables juntos. Microservicios aportarían complejidad operacional sin beneficio al horizonte del proyecto.</p>
+              <p>Scope TFM. 8 BCs separados internamente, desplegables juntos. Microservicios aportarían complejidad operacional sin beneficio al horizonte del proyecto.</p>
             </div>
           </div>
           <div class="principle">
@@ -1000,8 +1068,8 @@
             <span class="num">04</span>
             <div>
               <p class="card-label">Audio · ADR-012</p>
-              <h4>Pipeline offline + CDN</h4>
-              <p>ElevenLabs genera una vez al crear la flashcard. Cloudflare sirve N veces. Latencia mínima en juego, coste por reproducción ≈ 0.</p>
+              <h4>Pipeline event-driven + CDN</h4>
+              <p>AMQP subscribers generan audio al crear/editar flashcard (DeepSeek → ElevenLabs ×3 → R2). El usuario nunca espera: coste por reproducción ≈ 0.</p>
             </div>
           </div>
           <div class="principle highlight">
@@ -1016,16 +1084,16 @@
       </div>
     </section>
 
-    <!-- 07 ARQUITECTURA — El cómo -->
+    <!-- 07 ARQUITECTURA — Mermaid layered -->
     <section class="slide split" data-slide="7">
       <span class="slide-num">07</span>
       <div class="content">
         <p class="section-label reveal">El cómo · Arquitectura</p>
-        <h2 class="headline-lg reveal">Monorepo modular · <span class="grad-text">Screaming Architecture</span></h2>
+        <h2 class="headline-lg reveal">Monorepo modular · <span class="grad-text">Clean + DDD</span></h2>
         <div class="code-block reveal">apps/
-├── <em>api/</em>     NestJS · DDD · TypeORM · RabbitMQ
+├── <em>api/</em>     NestJS · DDD · TypeORM · RabbitMQ · 8 BCs
 ├── <em>client/</em>  React 19 · Pods · TanStack Query
-├── <em>docs/</em>    specs · ADRs · diagramas Mermaid
+├── <em>docs/</em>    33 ADRs · 16 specs · 5 diagramas
 ├── <em>infra/</em>   Docker · nginx · Grafana stack
 └── <em>skills/</em>  agentes IA del repo</div>
         <ul class="points reveal">
@@ -1035,56 +1103,80 @@
         </ul>
       </div>
       <div class="visual reveal">
-        <div class="orbit-wrap">
-          <div class="orbit-ring"></div>
-          <div class="orbit-core">NEST<br>+ REACT</div>
-          <div class="orbit-node n1">content<small>flashcards · audio</small></div>
-          <div class="orbit-node n2">gaming<small>partidas · intentos</small></div>
-          <div class="orbit-node n3">identity<small>auth · guest</small></div>
-          <div class="orbit-node n4">progress<small>stats · mastery</small></div>
+        <div class="mermaid-wrapper">
+          <pre class="mermaid">
+graph TD
+  subgraph BC["apps/api/src/{bc}/"]
+    direction TB
+    I["infrastructure/<br/>controllers · entities · repos"]
+    A["application/<br/>use cases · domain services"]
+    D["domain/<br/>aggregates · VOs · interfaces"]
+    I --> A
+    A --> D
+  end
+          </pre>
         </div>
       </div>
     </section>
 
-    <!-- 08 EVENTOS + OBSERVABILIDAD -->
-    <section class="slide split" data-slide="8">
+    <!-- 08 EVENTOS — Mermaid sequenceDiagram -->
+    <section class="slide" data-slide="8">
       <span class="slide-num">08</span>
-      <div class="content">
-        <p class="section-label reveal">El cómo · Eventos y métricas</p>
-        <h2 class="headline-lg reveal">BCs desacoplados. <span class="grad-text">Cada interacción, medible.</span></h2>
-        <ul class="points reveal">
-          <li><strong>RabbitMQ</strong> — exchanges, retry exponencial, DLQ, idempotencia vía inbox.</li>
-          <li><strong>Subscribers</strong> en application layer — los BCs no se importan entre sí.</li>
-          <li><strong>3 señales</strong>: métricas (cuánto tarda), logs (qué pasó), trazas (por dónde).</li>
-          <li>Stack: <strong>OTel + Prometheus + Loki + Grafana</strong> · logs y trazas correlacionados.</li>
-        </ul>
-      </div>
-      <div class="visual reveal">
-        <div class="flow reveal-group">
-          <div class="flow-item"><span class="ev">GameCompleted</span><span class="arr">→</span><span class="fx">progress recalcula mastery</span></div>
-          <div class="flow-item"><span class="ev">ModuleMastery↑</span><span class="arr">→</span><span class="fx">ranking + achievements</span></div>
-          <div class="flow-item"><span class="ev">GuestMigrated</span><span class="arr">→</span><span class="fx">importa stats y partidas</span></div>
-          <div class="flow-item"><span class="ev">AttemptRecorded</span><span class="arr">→</span><span class="fx">analytics + streaks</span></div>
+      <div class="content" style="max-width:1080px">
+        <p class="section-label reveal">El cómo · Eventos y propagación</p>
+        <h2 class="headline-lg reveal">Una partida termina. <span class="grad-text">Cuatro BCs reaccionan.</span></h2>
+        <p class="subhead-sm reveal" style="margin-bottom:6px">El patrón es <strong style="color:var(--color-text-primary)">fire-and-forget por RabbitMQ</strong>: la partida se persiste, el evento se publica, y los subscribers consumen idempotente. Si el streak cambia, otro evento se dispara → 2 BCs más reaccionan.</p>
+        <div class="mermaid-wrapper reveal">
+          <pre class="mermaid">
+sequenceDiagram
+  participant U as Usuario
+  participant API as API NestJS
+  participant DB
+  participant BUS as RabbitMQ
+  U->>API: POST /games/:id/complete
+  API->>DB: persist game + attempts
+  API->>BUS: publish GameCompleted
+  Note over BUS: 4 subscribers reaccionan
+  par async fan-out
+    BUS->>Progress: ModuleProgressUpdater
+    BUS->>Ranking: RankingUpdater
+    BUS->>Achievement: UnlockAchievement
+    BUS->>Identity: StreakUpdater
+  end
+  alt streak cambió
+    BUS->>Ranking: RankingUpdater (on StreakUpdated)
+    BUS->>Achievement: UnlockAchievement (on StreakUpdated)
+  end
+          </pre>
         </div>
       </div>
     </section>
 
-    <!-- 09 CALIDAD E IA -->
+    <!-- 09 CALIDAD E IA — Coverage heatmap + ElevenLabs + DeepSeek -->
     <section class="slide split" data-slide="9">
       <span class="slide-num">09</span>
       <div class="content">
         <p class="section-label reveal">Calidad e IA estratégica</p>
-        <h2 class="headline-lg reveal">661 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
-        <div class="stat-grid reveal">
-          <div class="stat-box"><div class="num" data-count="367">0</div><div class="lbl">API · Jest</div></div>
-          <div class="stat-box"><div class="num" data-count="294">0</div><div class="lbl">Client · Vitest + RTL</div></div>
-          <div class="stat-box"><div class="num" data-count="80">0</div><div class="lbl">% coverage client</div></div>
-        </div>
-        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">En el producto</strong> — IA acotada, justificada:</p>
+        <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
+        <p class="subhead-sm reveal" style="margin-bottom:6px">API con thresholds altos (90/100/100/100) en use cases + domain. Client con umbrales reales (75/78/80/80) ajustados por dos archivos legacy excluidos.</p>
+        <table class="coverage-table reveal">
+          <thead>
+            <tr><th>Capa</th><th>API</th><th>Client</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Use cases / domain services</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+            <tr><td>Repos / infrastructure</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+            <tr><td>Domain (aggregates, VOs)</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+            <tr><td>Hooks de pod</td><td>—</td><td><span class="coverage-cell cov-high">95%</span></td></tr>
+            <tr><td>Components</td><td>—</td><td><span class="coverage-cell cov-mid">85%</span></td></tr>
+            <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
+          </tbody>
+        </table>
+        <p class="subhead-sm reveal" style="margin-top:16px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada, justificada:</p>
         <ul class="points reveal">
-          <li><strong>ElevenLabs</strong> — audio ×3 acentos · offline · CDN.</li>
-          <li><strong>Azure Speech</strong> — único punto en tiempo real (bonus voz).</li>
-          <li><strong>DeepSeek</strong> — ejemplos bilingües + IPA en backoffice.</li>
+          <li><strong>ElevenLabs</strong> — audio ×3 acentos · pipeline AMQP · CDN (ADR-012).</li>
+          <li><strong>DeepSeek</strong> — ejemplos bilingües + IPA + borradores en backoffice (ADR-031).</li>
+          <li><strong>Bonus de pronunciación</strong> — pendiente (ADR-008), sin integración en el juego.</li>
         </ul>
       </div>
       <div class="visual reveal">
@@ -1097,38 +1189,62 @@
       </div>
     </section>
 
-    <!-- 10 LIMITACIONES + REFLEXIÓN -->
+    <!-- 10 LO QUE VIENE + REFLEXIÓN — Timeline + roadmap honesto -->
     <section class="slide" data-slide="10">
       <span class="slide-num">10</span>
       <div class="content" style="max-width:1080px">
-        <p class="section-label reveal">Limitaciones y reflexión</p>
-        <h2 class="headline-lg reveal">Trade-offs asumidos. <span class="grad-text">Lo que aprendí construyéndolo.</span></h2>
+        <p class="section-label reveal">Lo que viene · Lo que aprendí</p>
+        <h2 class="headline-lg reveal">Reflexión del proceso. <span class="grad-text">Honestidad en el roadmap.</span></h2>
         <div class="card-grid g2 reveal-group">
-          <div class="ui-card dim">
-            <p class="card-label">Limitaciones conscientes</p>
-            <h3>Lo que no está (y por qué)</h3>
+          <div class="ui-card highlight">
+            <p class="card-label">Roadmap honesto</p>
+            <h3>Lo que está planeado (no desplegado)</h3>
             <ul class="points" style="margin-top:10px">
-              <li><strong>Notification BC</strong> — toasts vía cliente; BC planificado, fuera del scope TFM.</li>
-              <li><strong>Premium</strong> — modelo diseñado, sin producto de pago desplegado.</li>
-              <li><strong>Admin en prod</strong> — no público, por coste de APIs externas.</li>
-              <li><strong>i18n</strong> — landing bilingüe; juego solo en inglés (es el idioma que se aprende).</li>
+              <li><strong>Bonus de pronunciación</strong> (ADR-008) — Azure Speech planeado, sin integración.</li>
+              <li><strong>Más módulos</strong> de fonética y connected speech.</li>
+              <li><strong>PWA mobile-first</strong> para uso offline.</li>
+              <li><strong>i18n completa</strong> del cliente (ES/EN).</li>
+              <li><strong>Achievement v2.1</strong> + notificación push (Notification BC).</li>
             </ul>
           </div>
-          <div class="ui-card highlight">
+          <div class="ui-card">
             <p class="card-label">Lo que aprendí</p>
-            <h3>Insights del proceso</h3>
+            <h3>4 insights del proceso</h3>
             <ul class="points" style="margin-top:10px">
-              <li><strong>DDD en la práctica</strong> — modelar el dominio cambia cómo se toman las decisiones técnicas.</li>
-              <li><strong>IA como herramienta</strong> — útil en scaffolding y tests; peligrosa si dirige el diseño.</li>
-              <li><strong>Observabilidad día uno</strong> — Logger interface desde el principio ahorra reescrituras.</li>
+              <li><strong>DDD antes que框架</strong> — modelar el dominio dirige decisiones técnicas; al revés es rehacer.</li>
+              <li><strong>Observabilidad día uno</strong> — Logger interface + Prometheus desde el primer commit evita reescrituras.</li>
+              <li><strong>IA acotada al backoffice</strong> — DeepSeek y ElevenLabs aportan valor; en el juego, contenido curado es más predecible.</li>
               <li><strong>Trade-offs honestos</strong> — el tribunal valora más el razonamiento que la perfección.</li>
             </ul>
+          </div>
+        </div>
+        <p class="subhead-sm reveal" style="margin-top:14px"><strong style="color:var(--color-text-primary)">Evolución del proyecto:</strong></p>
+        <div class="timeline reveal-group">
+          <div class="timeline-item">
+            <p class="when">Inicio</p>
+            <h4>Scaffold + BC skeleton</h4>
+            <p>8 BCs en monorepo · Clean Architecture · DDD básico.</p>
+          </div>
+          <div class="timeline-item">
+            <p class="when">Q1 → Q2</p>
+            <h4>Flujo end-to-end</h4>
+            <p>Primera partida completa · audio pipeline · OAuth.</p>
+          </div>
+          <div class="timeline-item">
+            <p class="when">Q2 → Q3</p>
+            <h4>Achievement v2 + ranking</h4>
+            <p>Sistema de logros en 3 sub-módulos · leaderboards write-time.</p>
+          </div>
+          <div class="timeline-item">
+            <p class="when">Q4</p>
+            <h4>Polish + defensa</h4>
+            <p>Observabilidad prod · Trivy · documentación para tribunal.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 11 CIERRE + Q&A -->
+    <!-- 11 CIERRE — Stat tiles + Q&A -->
     <section class="slide split" data-slide="11">
       <span class="slide-num">11</span>
       <div class="content">
@@ -1140,18 +1256,16 @@
           <li><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></li>
           <li><span class="mono">ididntcatchthat.com</span> · demo en producción</li>
           <li><span class="mono">demo@local.dev</span> · evaluación admin offline</li>
-          <li><span class="mono">docs/</span> · 30 ADRs · 17 specs · 5 diagramas Mermaid</li>
+          <li><span class="mono">docs/</span> · 33 ADRs · 16 specs · diagramas Mermaid</li>
         </ul>
         <p class="subhead reveal" style="margin-top:24px;font-family:var(--font-display);font-size:1.5rem;color:var(--color-text-primary)">Gracias · ¿Preguntas?</p>
       </div>
       <div class="visual reveal">
-        <div class="game-panel" style="text-align:center">
-          <img src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="" width="80" height="80" style="margin:0 auto 16px;border-radius:var(--radius-lg)">
-          <p class="game-label">ididntcatchthat.com</p>
-          <p class="subhead-sm" style="margin:0 auto;max-width:28ch">Fonética · Connected speech · Inglés real</p>
-          <div class="btn-row" style="margin-top:20px">
-            <span class="btn btn-primary">Jugar ahora</span>
-          </div>
+        <div class="stat-grid reveal-group" style="grid-template-columns:repeat(2, 1fr);max-width:380px;margin-inline:auto">
+          <div class="stat-box"><div class="num" data-count="33">0</div><div class="lbl">ADRs</div></div>
+          <div class="stat-box"><div class="num" data-count="774">0</div><div class="lbl">tests auto</div></div>
+          <div class="stat-box"><div class="num" data-count="8">0</div><div class="lbl">bounded contexts</div></div>
+          <div class="stat-box"><div class="num" data-count="16">0</div><div class="lbl">specs</div></div>
         </div>
       </div>
     </section>
@@ -1231,7 +1345,6 @@
     if (e.key === 'f' || e.key === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
     }
-    /* Salto rápido: teclas 1-9 → slides 1-9; tecla 0 → slide 10. Para slide 11, usar flechas. */
     if (e.key >= '1' && e.key <= '9') {
       var n = parseInt(e.key, 10) - 1;
       if (n < total) goTo(n);
@@ -1243,7 +1356,7 @@
   var hash = location.hash.match(/^#slide-(\d+)$/);
   goTo(hash ? parseInt(hash[1], 10) - 1 : 0);
 
-  /* Waveform — brand + accent-green only */
+  /* Waveform */
   var canvas = document.getElementById('wave-canvas');
   var ctx = canvas.getContext('2d');
   var W, H, t = 0;
@@ -1274,6 +1387,29 @@
   }
   draw();
 })();
+
+/* Mermaid */
+if (window.mermaid) {
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#251F35',
+      primaryTextColor: '#F5F3F9',
+      primaryBorderColor: '#3D3650',
+      lineColor: '#A89FBC',
+      secondaryColor: '#1D1828',
+      tertiaryColor: '#0D3534',
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '13px',
+      edgeLabelBackground: '#1D1828',
+      clusterBkg: '#1D1828',
+      clusterBorder: '#3D3650'
+    },
+    flowchart: { curve: 'basis', padding: 12 },
+    sequence: { actorMargin: 50, messageMargin: 35, mirrorActors: false }
+  });
+}
 </script>
 </body>
 </html>
