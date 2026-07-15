@@ -132,7 +132,7 @@
       pointer-events: none;
     }
 
-    .content { position: relative; z-index: 2; max-width: 1400px; margin-inline: auto; width: 100%; }
+    .content { position: relative; z-index: 2; max-width: 1280px; margin-inline: auto; width: 100%; }
     .visual { position: relative; z-index: 2; }
 
     /* ─── Centered content helper (para split slides y cierre) */
@@ -212,6 +212,104 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+    }
+
+    /* ─── Closing slide — links BIG (versión derecha de slide 12) */
+    .closing-links-big {
+      display: grid;
+      gap: 12px;
+    }
+
+    .closing-link-big {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      background: var(--color-bg-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-mono);
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .closing-link-big:hover {
+      border-color: var(--color-brand);
+      transform: translateX(4px);
+    }
+
+    .closing-link-big .mono {
+      color: var(--color-accent-green);
+      font-weight: 600;
+    }
+
+    /* ─── Path (slide 6 — decisiones) */
+    .path {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      max-width: 1280px;
+      margin: 22px auto 0;
+    }
+
+    .path-step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      min-height: 110px;
+    }
+
+    .path-step.highlight {
+      border-color: var(--color-brand-dim);
+      background: var(--color-bg-elevated);
+    }
+
+    .path-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-brand);
+      line-height: 1;
+      flex: none;
+    }
+
+    .path-body {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .path-label {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .path-step.highlight .path-label {
+      color: var(--color-brand-light);
+    }
+
+    .path-step h4 {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+
+    .path-arrow {
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+      flex: none;
+      align-self: center;
     }
 
     /* ─── Landing patterns */
@@ -1221,6 +1319,9 @@
     @media (max-width: 1100px) {
       .bc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stack-grid { grid-template-columns: 1fr; }
+      .path { flex-wrap: wrap; }
+      .path-arrow { display: none; }
+      .path-step { flex: 0 0 calc(50% - 4px); }
     }
 
     @media (max-width: 900px) {
@@ -1233,6 +1334,7 @@
       .seq-targets { grid-template-columns: 1fr 1fr; }
       .bus-hub { flex-direction: column; gap: 8px; text-align: center; }
       .bus-detail { padding-left: 0; border-left: none; padding-top: 8px; border-top: 1px solid var(--color-border-strong); }
+      .path-step { flex: 0 0 100%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1250,7 +1352,7 @@
   <div class="slides" id="slides">
 
     <!-- 01 PORTADA -->
-    <section class="slide is-active" data-slide="1">
+    <section class="slide split is-active" data-slide="1">
       <span class="slide-num">01</span>
       <div class="content center-stack" style="max-width:1100px;">
         <img class="brand-mark reveal" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
@@ -1280,7 +1382,9 @@
           <span class="trust-chip"><strong>Abraham Vilches de la Cruz</strong></span>
           <span class="trust-chip">Desplegado en producción</span>
         </div>
-        <div class="game-panel reveal" style="margin-top: 32px;">
+      </div>
+      <div class="visual reveal">
+        <div class="game-panel">
           <p class="game-label">Demo · flashcard</p>
           <div class="flashcard-face">
             <p class="expr">think</p>
@@ -1301,7 +1405,7 @@
     </section>
 
     <!-- 02 PROBLEMA -->
-    <section class="slide" data-slide="2">
+    <section class="slide split" data-slide="2">
       <span class="slide-num">02</span>
       <div class="content center-stack" style="max-width:1280px;">
         <p class="section-label reveal">El problema</p>
@@ -1312,29 +1416,27 @@
           <li><strong>7 de cada 10</strong> hispanohablantes con B2 no pillan conversaciones a velocidad nativa.</li>
           <li>Las apps líderes enseñan <strong>gramática y vocabulario de libro</strong>, no <strong>sonidos y ritmo</strong>.</li>
         </ul>
-        <div class="compare-grid reveal-group" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;max-width:1000px;width:100%;">
-          <div class="compare-example">
-            <p class="ex-label">Connected speech — ejemplo real</p>
-            <div class="compare-row">
-              <div class="written"><p class="lbl">Lo que lees</p><p class="val">"What are you going to do?"</p></div>
-              <div class="arrow">→</div>
-              <div class="native"><p class="lbl">Lo que se oye</p><p class="val">/ˈwʌʔərjəɡənədu/</p></div>
-            </div>
-            <div class="tag-row" style="margin-top:16px">
-              <span class="tag green">Flap T</span>
-              <span class="tag">Linking</span>
-              <span class="tag">Reduction</span>
-              <span class="tag">Elision</span>
-            </div>
+      </div>
+      <div class="visual reveal">
+        <div class="compare-example">
+          <p class="ex-label">Connected speech — ejemplo real</p>
+          <div class="compare-row">
+            <div class="written"><p class="lbl">Lo que lees</p><p class="val">"What are you going to do?"</p></div>
+            <div class="arrow">→</div>
+            <div class="native"><p class="lbl">Lo que se oye</p><p class="val">/ˈwʌʔərjəɡənədu/</p></div>
           </div>
-          <div class="compare-example">
-            <p class="ex-label">Otro ejemplo — reduccion</p>
-            <div class="compare-row">
-              <div class="written"><p class="lbl">Lo que lees</p><p class="val">red and green</p></div>
-              <div class="arrow">→</div>
-              <div class="native"><p class="lbl">Lo que se oye</p><p class="val">"rerən green"</p></div>
-            </div>
-            <p class="subhead-sm" style="text-align:center;font-size:0.8125rem;margin-top:14px"><strong style="color:var(--color-text-primary)">Flap T</strong> en lugar de la T dura americana</p>
+          <div class="tag-row" style="margin-top:16px">
+            <span class="tag green">Flap T</span>
+            <span class="tag">Linking</span>
+            <span class="tag">Reduction</span>
+            <span class="tag">Elision</span>
+          </div>
+        </div>
+        <div class="compare-example" style="margin-top:14px">
+          <div class="compare-row">
+            <div class="written"><p class="lbl">Lo que lees</p><p class="val">red and green</p></div>
+            <div class="arrow">→</div>
+            <div class="native"><p class="lbl">Lo que se oye</p><p class="val">"rerən green"</p></div>
           </div>
         </div>
       </div>
@@ -1368,7 +1470,7 @@
     </section>
 
     <!-- 04 PRODUCTO -->
-    <section class="slide" data-slide="4">
+    <section class="slide split" data-slide="4">
       <span class="slide-num">04</span>
       <div class="content center-stack" style="max-width:1100px;">
         <p class="section-label reveal">Producto en producción</p>
@@ -1384,7 +1486,9 @@
           <span class="trust-chip"><strong>ididntcatchthat.com</strong></span>
           <span class="trust-chip">dev.ididntcatchthat.com</span>
         </div>
-        <div class="game-panel reveal" style="margin-top:24px;">
+      </div>
+      <div class="visual reveal">
+        <div class="game-panel">
           <p class="game-label">Modo juego · gonna</p>
           <div class="flashcard-face">
             <p class="expr">gonna</p>
@@ -1436,54 +1540,54 @@
       </div>
     </section>
 
-    <!-- 06 DECISIONES -->
+    <!-- 06 DECISIONES — path horizontal de cards estrechas -->
     <section class="slide" data-slide="6">
       <span class="slide-num">06</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Decisiones clave · El porqué</p>
         <h2 class="headline-lg reveal">Cinco trade-offs que <span class="grad-text">definen el proyecto.</span></h2>
-        <div class="principles reveal-group">
-          <div class="principle">
-            <span class="num">01</span>
-            <div>
-              <p class="card-label">Arquitectura</p>
-              <h4>Monolito modular, no microservicios</h4>
-              <p>8 BCs separados internamente y desplegables juntos. Los microservicios añadirían complejidad operativa sin aportar nada al horizonte del TFM.</p>
+        <div class="path reveal-group">
+          <div class="path-step">
+            <span class="path-num">01</span>
+            <div class="path-body">
+              <p class="path-label">Arquitectura</p>
+              <h4>Monolito modular</h4>
             </div>
           </div>
-          <div class="principle">
-            <span class="num">02</span>
-            <div>
-              <p class="card-label">Modelado</p>
-              <h4>DDD + Clean Architecture</h4>
-              <p>El dominio es rico (game loop, mastery, rachas). Use cases explícitos, repositorios como interfaces. El modelo dirige el código, no al revés.</p>
+          <span class="path-arrow">→</span>
+          <div class="path-step">
+            <span class="path-num">02</span>
+            <div class="path-body">
+              <p class="path-label">Modelado</p>
+              <h4>DDD + Clean</h4>
             </div>
           </div>
-          <div class="principle highlight">
-            <span class="num">03</span>
-            <div>
-              <p class="card-label">Contenido · ADR-011</p>
-              <h4>Curado por admins, no IA generativa en partida</h4>
-              <p>Calidad predecible y coste controlado. La IA generativa en mitad del juego añadiría latencia, variabilidad y coste por uso.</p>
+          <span class="path-arrow">→</span>
+          <div class="path-step highlight">
+            <span class="path-num">03</span>
+            <div class="path-body">
+              <p class="path-label">Contenido (ADR-011)</p>
+              <h4>Curado por admins</h4>
             </div>
           </div>
-          <div class="principle highlight">
-            <span class="num">04</span>
-            <div>
-              <p class="card-label">Audio · ADR-012</p>
-              <h4>Pipeline event-driven + CDN</h4>
-              <p>Al crear o editar una flashcard, los subscribers AMQP disparan la generación (DeepSeek → ElevenLabs ×3 → R2). El usuario nunca espera.</p>
+          <span class="path-arrow">→</span>
+          <div class="path-step highlight">
+            <span class="path-num">04</span>
+            <div class="path-body">
+              <p class="path-label">Audio (ADR-012)</p>
+              <h4>Pipeline event-driven</h4>
             </div>
           </div>
-          <div class="principle highlight">
-            <span class="num">05</span>
-            <div>
-              <p class="card-label">Observabilidad · ADR-020</p>
-              <h4>Stack autoalojado, sin vendor lock-in</h4>
-              <p>Pino + OTel + Prometheus + Loki + Grafana. Coste cero y dominio agnóstico a la tecnología (la interfaz Logger es del dominio).</p>
+          <span class="path-arrow">→</span>
+          <div class="path-step highlight">
+            <span class="path-num">05</span>
+            <div class="path-body">
+              <p class="path-label">Observabilidad (ADR-020)</p>
+              <h4>Stack autoalojado</h4>
             </div>
           </div>
         </div>
+        <p class="subhead-sm reveal" style="margin-top:22px;max-width:72ch">Cada decisión rechaza alternativas concretas — las <strong style="color:var(--color-text-primary)">trade-offs</strong> están escritas en los ADRs. El proyecto se entiende leyendo los 33 ADRs como una decisión acumulada.</p>
       </div>
     </section>
 
@@ -1743,31 +1847,23 @@
       </div>
     </section>
 
-    <!-- 12 CIERRE — 2-column para que quepa en el viewport -->
+    <!-- 12 CIERRE — BIG brand izq + BIG links der, sin ¿Preguntas? -->
     <section class="slide" data-slide="12">
       <span class="slide-num">12</span>
       <div class="content" style="max-width:1280px;margin-inline:auto;">
-        <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;width:100%;">
+        <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:56px;align-items:center;width:100%;">
           <div class="center-stack" style="text-align:center;">
-            <img class="brand-mark reveal" style="max-width:200px;" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
-            <p class="hero-badge reveal" style="margin-top:16px;"><span class="dot"></span>Gracias por vuestro tiempo</p>
-            <h1 class="headline-lg reveal" style="margin-top:14px;max-width:18ch;font-size:clamp(1.75rem, 3vw, 2.5rem);">
-              Software real,<br><span class="grad-text">bien razonado.</span>
-            </h1>
-            <p class="closing-question reveal" style="margin-top:14px;">¿Preguntas?</p>
+            <img class="brand-mark reveal" style="max-width:300px;width:100%;" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
+            <p class="hero-badge reveal" style="margin-top:18px;"><span class="dot"></span>Gracias por vuestro tiempo</p>
+            <p class="reveal" style="margin-top:10px;font-family:var(--font-display);font-size:clamp(1.05rem, 1.6vw, 1.3rem);color:var(--color-text-secondary);max-width:22ch;line-height:1.4;">Software real, <span class="grad-text">bien razonado.</span></p>
           </div>
           <div>
-            <div class="stat-grid reveal-group" style="grid-template-columns:repeat(2, 1fr);gap:12px;margin-bottom:18px;">
-              <div class="stat-box"><div class="num" data-count="33">0</div><div class="lbl">ADRs</div></div>
-              <div class="stat-box"><div class="num" data-count="774">0</div><div class="lbl">tests auto</div></div>
-              <div class="stat-box"><div class="num" data-count="8">0</div><div class="lbl">BCs</div></div>
-              <div class="stat-box"><div class="num" data-count="16">0</div><div class="lbl">specs</div></div>
-            </div>
-            <div class="closing-links reveal">
-              <div class="closing-link"><span class="mono">ididntcatchthat.com</span> · demo en producción</div>
-              <div class="closing-link"><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></div>
-              <div class="closing-link"><span class="mono">demo@local.dev</span> · evaluación admin en local</div>
-              <div class="closing-link"><span class="mono">docs/</span> · 33 ADRs · 16 specs · diagramas</div>
+            <p class="section-label reveal" style="margin-bottom:14px;">Dónde encontrar</p>
+            <div class="closing-links-big reveal-group">
+              <div class="closing-link-big"><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></div>
+              <div class="closing-link-big"><span class="mono">ididntcatchthat.com</span> · demo en producción</div>
+              <div class="closing-link-big"><span class="mono">demo@local.dev</span> · evaluación admin en local</div>
+              <div class="closing-link-big"><span class="mono">docs/</span> · 33 ADRs · 16 specs · diagramas</div>
             </div>
           </div>
         </div>
