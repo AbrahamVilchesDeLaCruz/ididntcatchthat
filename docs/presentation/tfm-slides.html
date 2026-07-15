@@ -132,7 +132,7 @@
       pointer-events: none;
     }
 
-    .content { position: relative; z-index: 2; max-width: 1200px; }
+    .content { position: relative; z-index: 2; max-width: 1200px; margin-inline: auto; width: 100%; }
     .visual { position: relative; z-index: 2; }
 
     /* ─── Centered content helper (para split slides y cierre) */
@@ -983,6 +983,8 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 22px;
       margin-top: 24px;
+      max-width: 1100px;
+      margin-inline: auto;
     }
 
     .refl-card {
@@ -1248,9 +1250,9 @@
   <div class="slides" id="slides">
 
     <!-- 01 PORTADA -->
-    <section class="slide split is-active" data-slide="1">
+    <section class="slide is-active" data-slide="1">
       <span class="slide-num">01</span>
-      <div class="content center-stack">
+      <div class="content center-stack" style="max-width:1100px;">
         <img class="brand-mark reveal" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
         <p class="hero-badge reveal"><span class="dot"></span>TFM · Defensa ante tribunal · MoureDev 2026</p>
         <h1 class="headline-xl reveal">
@@ -1278,9 +1280,7 @@
           <span class="trust-chip"><strong>Abraham Vilches de la Cruz</strong></span>
           <span class="trust-chip">Desplegado en producción</span>
         </div>
-      </div>
-      <div class="visual reveal">
-        <div class="game-panel">
+        <div class="game-panel reveal" style="margin-top: 32px;">
           <p class="game-label">Demo · flashcard</p>
           <div class="flashcard-face">
             <p class="expr">think</p>
@@ -1301,9 +1301,9 @@
     </section>
 
     <!-- 02 PROBLEMA -->
-    <section class="slide split" data-slide="2">
+    <section class="slide" data-slide="2">
       <span class="slide-num">02</span>
-      <div class="content center-stack">
+      <div class="content center-stack" style="max-width:1280px;">
         <p class="section-label reveal">El problema</p>
         <h2 class="headline-lg reveal">Tienes un B2.<br><span class="grad-text">Y no pillas a los nativos.</span></h2>
         <p class="subhead-sm reveal">Lo que enseñan las apps y lo que se oye en la calle son dos idiomas distintos. Fonética, reducción y ritmo no se enseñan — se asumen, y listos.</p>
@@ -1312,27 +1312,29 @@
           <li><strong>7 de cada 10</strong> hispanohablantes con B2 no pillan conversaciones a velocidad nativa.</li>
           <li>Las apps líderes enseñan <strong>gramática y vocabulario de libro</strong>, no <strong>sonidos y ritmo</strong>.</li>
         </ul>
-      </div>
-      <div class="visual reveal">
-        <div class="compare-example">
-          <p class="ex-label">Connected speech — ejemplo real</p>
-          <div class="compare-row">
-            <div class="written"><p class="lbl">Lo que lees</p><p class="val">"What are you going to do?"</p></div>
-            <div class="arrow">→</div>
-            <div class="native"><p class="lbl">Lo que se oye</p><p class="val">/ˈwʌʔərjəɡənədu/</p></div>
+        <div class="compare-grid reveal-group" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;max-width:1000px;width:100%;">
+          <div class="compare-example">
+            <p class="ex-label">Connected speech — ejemplo real</p>
+            <div class="compare-row">
+              <div class="written"><p class="lbl">Lo que lees</p><p class="val">"What are you going to do?"</p></div>
+              <div class="arrow">→</div>
+              <div class="native"><p class="lbl">Lo que se oye</p><p class="val">/ˈwʌʔərjəɡənədu/</p></div>
+            </div>
+            <div class="tag-row" style="margin-top:16px">
+              <span class="tag green">Flap T</span>
+              <span class="tag">Linking</span>
+              <span class="tag">Reduction</span>
+              <span class="tag">Elision</span>
+            </div>
           </div>
-          <div class="tag-row" style="margin-top:16px">
-            <span class="tag green">Flap T</span>
-            <span class="tag">Linking</span>
-            <span class="tag">Reduction</span>
-            <span class="tag">Elision</span>
-          </div>
-        </div>
-        <div class="compare-example" style="margin-top:14px">
-          <div class="compare-row">
-            <div class="written"><p class="lbl">Lo que lees</p><p class="val">red and green</p></div>
-            <div class="arrow">→</div>
-            <div class="native"><p class="lbl">Lo que se oye</p><p class="val">"rerən green"</p></div>
+          <div class="compare-example">
+            <p class="ex-label">Otro ejemplo — reduccion</p>
+            <div class="compare-row">
+              <div class="written"><p class="lbl">Lo que lees</p><p class="val">red and green</p></div>
+              <div class="arrow">→</div>
+              <div class="native"><p class="lbl">Lo que se oye</p><p class="val">"rerən green"</p></div>
+            </div>
+            <p class="subhead-sm" style="text-align:center;font-size:0.8125rem;margin-top:14px"><strong style="color:var(--color-text-primary)">Flap T</strong> en lugar de la T dura americana</p>
           </div>
         </div>
       </div>
@@ -1341,7 +1343,7 @@
     <!-- 03 OPORTUNIDAD -->
     <section class="slide" data-slide="3">
       <span class="slide-num">03</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">La oportunidad</p>
         <h2 class="headline-lg reveal">Tres fuerzas empujan a la vez. <span class="grad-text">La ventana está abierta.</span></h2>
         <div class="card-grid g3 reveal-group">
@@ -1366,9 +1368,9 @@
     </section>
 
     <!-- 04 PRODUCTO -->
-    <section class="slide split" data-slide="4">
+    <section class="slide" data-slide="4">
       <span class="slide-num">04</span>
-      <div class="content center-stack">
+      <div class="content center-stack" style="max-width:1100px;">
         <p class="section-label reveal">Producto en producción</p>
         <h2 class="headline-lg reveal">Demo real. <span class="grad-text">Esto no es un mockup.</span></h2>
         <ul class="points reveal">
@@ -1382,9 +1384,7 @@
           <span class="trust-chip"><strong>ididntcatchthat.com</strong></span>
           <span class="trust-chip">dev.ididntcatchthat.com</span>
         </div>
-      </div>
-      <div class="visual reveal">
-        <div class="game-panel">
+        <div class="game-panel reveal" style="margin-top:24px;">
           <p class="game-label">Modo juego · gonna</p>
           <div class="flashcard-face">
             <p class="expr">gonna</p>
@@ -1402,7 +1402,7 @@
     <!-- 05 ESTADO DEL PRODUCTO -->
     <section class="slide" data-slide="5">
       <span class="slide-num">05</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Estado del producto</p>
         <h2 class="headline-lg reveal">Esto es lo que hay. <span class="grad-text">Lo demás, roadmap.</span></h2>
         <div class="card-grid g3 reveal-group">
@@ -1439,7 +1439,7 @@
     <!-- 06 DECISIONES -->
     <section class="slide" data-slide="6">
       <span class="slide-num">06</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Decisiones clave · El porqué</p>
         <h2 class="headline-lg reveal">Cinco trade-offs que <span class="grad-text">definen el proyecto.</span></h2>
         <div class="principles reveal-group">
@@ -1490,7 +1490,7 @@
     <!-- 07 ARQUITECTURA — HTML nativo -->
     <section class="slide" data-slide="7">
       <span class="slide-num">07</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">El cómo · Arquitectura</p>
         <h2 class="headline-lg reveal">Ocho bounded contexts. <span class="grad-text">Un bus de eventos los conecta.</span></h2>
         <div class="arch-diagram reveal-group">
@@ -1548,7 +1548,7 @@
     <!-- 08 EVENTOS — HTML nativo -->
     <section class="slide" data-slide="8">
       <span class="slide-num">08</span>
-      <div class="content" style="max-width:1200px">
+      <div class="content center-stack" style="max-width:1200px">
         <p class="section-label reveal">El cómo · Eventos y propagación</p>
         <h2 class="headline-lg reveal">Una partida termina. <span class="grad-text">Cuatro BCs reaccionan.</span></h2>
         <p class="subhead-sm reveal" style="margin-bottom:6px">Fire-and-forget por RabbitMQ: la partida se persiste, el evento se publica y los subscribers consumen idempotente. Si el streak cambia, otro evento se dispara → 2 BCs más reaccionan.</p>
@@ -1602,13 +1602,13 @@
     </section>
 
     <!-- 09 CALIDAD E IA -->
-    <section class="slide split" data-slide="9">
+    <section class="slide" data-slide="9">
       <span class="slide-num">09</span>
-      <div class="content center-stack">
+      <div class="content center-stack" style="max-width:1200px;">
         <p class="section-label reveal">Calidad e IA estratégica</p>
         <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
-        <p class="subhead-sm reveal" style="margin-bottom:8px">API con umbrales altos en casos de uso y dominio (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
-        <table class="coverage-table reveal">
+        <p class="subhead-sm reveal" style="margin-bottom:12px">API con umbrales altos en casos de uso y dominio (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
+        <table class="coverage-table reveal" style="max-width:880px;margin-inline:auto;">
           <thead>
             <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
           </thead>
@@ -1621,19 +1621,21 @@
             <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
           </tbody>
         </table>
-        <p class="subhead-sm reveal" style="margin-top:18px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
-        <ul class="points reveal">
-          <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
-          <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
-          <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
-        </ul>
-      </div>
-      <div class="visual reveal">
-        <div class="pyramid reveal-group">
-          <div class="pyr l1">E2E · Playwright</div>
-          <div class="pyr l2">Integration · MSW · repos</div>
-          <div class="pyr l3">Unit · dominio · hooks</div>
-          <div class="pyr l4">Red → Green → Refactor (TDD)</div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:start;margin-top:28px;max-width:1080px;width:100%;">
+          <div>
+            <p class="subhead-sm reveal" style="margin-bottom:8px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
+            <ul class="points reveal">
+              <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
+              <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
+              <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
+            </ul>
+          </div>
+          <div class="pyramid reveal-group" style="max-width:340px;margin-inline:auto;">
+            <div class="pyr l1">E2E · Playwright</div>
+            <div class="pyr l2">Integration · MSW · repos</div>
+            <div class="pyr l3">Unit · dominio · hooks</div>
+            <div class="pyr l4">Red → Green → Refactor (TDD)</div>
+          </div>
         </div>
       </div>
     </section>
@@ -1641,7 +1643,7 @@
     <!-- 10 REFLEXIÓN — UI rediseñada -->
     <section class="slide" data-slide="10">
       <span class="slide-num">10</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Lo que viene · Lo que aprendí</p>
         <h2 class="headline-lg reveal">Reflexión del proceso. <span class="grad-text">Honestidad en el roadmap.</span></h2>
         <div class="refl-grid reveal-group">
@@ -1683,7 +1685,7 @@
     <!-- 11 STACK — nueva -->
     <section class="slide" data-slide="11">
       <span class="slide-num">11</span>
-      <div class="content" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Stack técnico</p>
         <h2 class="headline-lg reveal">Lo que hay debajo. <span class="grad-text">Por qué cada pieza.</span></h2>
         <div class="stack-grid reveal-group">
