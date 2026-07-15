@@ -132,7 +132,7 @@
       pointer-events: none;
     }
 
-    .content { position: relative; z-index: 2; max-width: 1200px; margin-inline: auto; width: 100%; }
+    .content { position: relative; z-index: 2; max-width: 1400px; margin-inline: auto; width: 100%; }
     .visual { position: relative; z-index: 2; }
 
     /* ─── Centered content helper (para split slides y cierre) */
@@ -1254,7 +1254,7 @@
       <span class="slide-num">01</span>
       <div class="content center-stack" style="max-width:1100px;">
         <img class="brand-mark reveal" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
-        <p class="hero-badge reveal"><span class="dot"></span>TFM · Defensa ante tribunal · MoureDev 2026</p>
+        <p class="hero-badge reveal"><span class="dot"></span>TFM · Defensa ante tribunal · Máster en Desarrollo con IA · BIG School</p>
         <h1 class="headline-xl reveal">
           Cuando un nativo habla…
           <span class="grad-text">no pillas ni una.</span>
@@ -1743,28 +1743,34 @@
       </div>
     </section>
 
-    <!-- 12 CIERRE — single column centrado, armonioso -->
+    <!-- 12 CIERRE — 2-column para que quepa en el viewport -->
     <section class="slide" data-slide="12">
       <span class="slide-num">12</span>
-      <div class="content center-stack" style="max-width:1100px;margin-inline:auto;">
-        <img class="brand-mark brand-mark-lg reveal" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
-        <p class="hero-badge reveal"><span class="dot"></span>Cierre · Gracias por vuestro tiempo</p>
-        <h1 class="headline-xl reveal" style="max-width:24ch;">
-          Software real.<br><span class="grad-text">Bien razonado.</span><br>Listo para escalar.
-        </h1>
-        <div class="stat-grid reveal-group" style="grid-template-columns:repeat(4, 1fr);max-width:920px;width:100%;margin:32px auto;">
-          <div class="stat-box"><div class="num" data-count="33">0</div><div class="lbl">ADRs</div></div>
-          <div class="stat-box"><div class="num" data-count="774">0</div><div class="lbl">tests auto</div></div>
-          <div class="stat-box"><div class="num" data-count="8">0</div><div class="lbl">BCs</div></div>
-          <div class="stat-box"><div class="num" data-count="16">0</div><div class="lbl">specs</div></div>
+      <div class="content" style="max-width:1280px;margin-inline:auto;">
+        <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;width:100%;">
+          <div class="center-stack" style="text-align:center;">
+            <img class="brand-mark reveal" style="max-width:200px;" src="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/og-image.png" alt="ididntcatchthat" />
+            <p class="hero-badge reveal" style="margin-top:16px;"><span class="dot"></span>Gracias por vuestro tiempo</p>
+            <h1 class="headline-lg reveal" style="margin-top:14px;max-width:18ch;font-size:clamp(1.75rem, 3vw, 2.5rem);">
+              Software real,<br><span class="grad-text">bien razonado.</span>
+            </h1>
+            <p class="closing-question reveal" style="margin-top:14px;">¿Preguntas?</p>
+          </div>
+          <div>
+            <div class="stat-grid reveal-group" style="grid-template-columns:repeat(2, 1fr);gap:12px;margin-bottom:18px;">
+              <div class="stat-box"><div class="num" data-count="33">0</div><div class="lbl">ADRs</div></div>
+              <div class="stat-box"><div class="num" data-count="774">0</div><div class="lbl">tests auto</div></div>
+              <div class="stat-box"><div class="num" data-count="8">0</div><div class="lbl">BCs</div></div>
+              <div class="stat-box"><div class="num" data-count="16">0</div><div class="lbl">specs</div></div>
+            </div>
+            <div class="closing-links reveal">
+              <div class="closing-link"><span class="mono">ididntcatchthat.com</span> · demo en producción</div>
+              <div class="closing-link"><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></div>
+              <div class="closing-link"><span class="mono">demo@local.dev</span> · evaluación admin en local</div>
+              <div class="closing-link"><span class="mono">docs/</span> · 33 ADRs · 16 specs · diagramas</div>
+            </div>
+          </div>
         </div>
-        <div class="closing-links reveal">
-          <div class="closing-link"><span class="mono">github.com/AbrahamVilchesDeLaCruz/ididntcatchthat</span></div>
-          <div class="closing-link"><span class="mono">ididntcatchthat.com</span> · demo en producción</div>
-          <div class="closing-link"><span class="mono">demo@local.dev</span> · evaluación admin en local</div>
-          <div class="closing-link"><span class="mono">docs/</span> · 33 ADRs · 16 specs · diagramas</div>
-        </div>
-        <p class="closing-question reveal">¿Preguntas?</p>
       </div>
     </section>
 
