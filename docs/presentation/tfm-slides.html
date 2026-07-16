@@ -316,7 +316,7 @@
     .section-label {
       display: inline-block;
       margin-bottom: 14px;
-      font-size: 0.9375rem;
+      font-size: 1rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -357,7 +357,7 @@
     }
 
     .headline-lg {
-      font-size: clamp(1.85rem, 4vw, 2.85rem);
+      font-size: clamp(2rem, 4.6vw, 3.2rem);
       letter-spacing: -0.02em;
       max-width: 26ch;
       margin-bottom: 18px;
@@ -378,7 +378,7 @@
     }
 
     .subhead-sm {
-      font-size: 0.9375rem;
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
       color: var(--color-text-secondary);
       max-width: 60ch;
       line-height: 1.55;
@@ -457,15 +457,17 @@
     .trust-chip strong { color: var(--color-text-primary); font-weight: 600; }
 
     /* ─── Cards */
-    .card-grid { display: grid; gap: 18px; margin-top: 22px; }
+    .card-grid { display: grid; gap: 18px; margin-top: 22px; align-items: stretch; }
     .card-grid.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .card-grid.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
     .ui-card {
+      display: flex;
+      flex-direction: column;
       border-radius: var(--radius-xl);
       border: 1px solid var(--color-border);
       background: var(--color-bg-surface);
-      padding: 26px;
+      padding: 28px 30px;
       transition: border-color 0.25s ease, transform 0.25s ease;
     }
 
@@ -497,23 +499,58 @@
     .ui-card.future .card-label { color: var(--color-accent-green); }
 
     .ui-card h3 {
-      font-size: 1.0625rem;
-      margin-bottom: 10px;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
       color: var(--color-text-primary);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
     }
 
     .ui-card p {
       font-size: 0.9rem;
-      line-height: 1.55;
-      color: var(--color-text-secondary);
+      line-height: 1.6;
+      color: var(--color-text-muted);
+      flex: 1;
     }
+
+    .ui-card ul.points { flex: 1; }
+
+    .ui-card .tag-row { margin-top: auto; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      min-height: 32px;
+    }
+
+    .card-header .card-label { margin-bottom: 0; }
+
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, var(--color-brand-light), var(--color-accent-green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding: 5px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background-color: var(--color-bg-base);
+    }
+
+    .ui-card.highlight .card-num { border-color: var(--color-brand-dim); }
 
     .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 
     .tag {
       font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      padding: 4px 10px;
+      font-size: 0.75rem;
+      padding: 5px 12px;
       border-radius: var(--radius-full);
       border: 1px solid var(--color-border);
       color: var(--color-text-muted);
@@ -538,9 +575,9 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
-      font-size: 0.9375rem;
+      font-size: 1rem;
       color: var(--color-text-secondary);
-      line-height: 1.55;
+      line-height: 1.6;
     }
 
     ul.points li::before {
@@ -768,10 +805,10 @@
 
     .pyr {
       margin: 0 auto 7px;
-      padding: 14px;
+      padding: 16px;
       text-align: center;
       font-family: var(--font-mono);
-      font-size: 0.6875rem;
+      font-size: 0.8125rem;
       border: 1px solid var(--color-border);
       clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
     }
@@ -798,6 +835,291 @@
 
     .code-block em { color: var(--color-accent-green); font-style: normal; }
 
+    /* ─── Layers stack (backend) */
+    .layers-stack { display: flex; flex-direction: column; gap: 8px; max-width: 380px; margin-inline: auto; }
+    .layer {
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .layer-name {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .layer-desc {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+    .layer.infra { background: color-mix(in srgb, var(--color-brand-dim) 50%, var(--color-bg-surface)); border-color: var(--color-brand); color: var(--color-brand-light); }
+    .layer.app { background: color-mix(in srgb, var(--color-accent-green-dim) 50%, var(--color-bg-surface)); border-color: var(--color-accent-green); color: var(--color-accent-green); }
+    .layer.domain { background: color-mix(in srgb, var(--color-chart-4) 18%, var(--color-bg-surface)); border-color: var(--color-chart-4); color: var(--color-chart-4); }
+    .arrow-note { text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* ─── Flow steps */
+    .flow-steps { list-style: none; display: grid; gap: 12px; counter-reset: step; }
+    .flow-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--color-bg-base) 40%, var(--color-bg-surface));
+      border: 1px solid var(--color-border);
+    }
+    .step-num {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: var(--color-bg-elevated);
+      color: var(--color-text-primary);
+      border: 1.5px solid var(--color-border-strong);
+    }
+    .flow-steps li > div { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+    .step-layer {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .step-layer.infra { color: var(--color-brand-light); }
+    .step-layer.app { color: var(--color-accent-green); }
+    .step-layer.domain { color: var(--color-chart-4); }
+    .step-desc { font-size: 0.95rem; color: var(--color-text-secondary); line-height: 1.5; }
+    .step-desc code { font-family: var(--font-mono); font-size: 0.875em; color: var(--color-accent-green); }
+
+    /* ─── Pod tree (client) */
+    .pod-tree {
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--color-text-secondary);
+      white-space: pre;
+      overflow-x: auto;
+      tab-size: 4;
+      width: 100%;
+    }
+    .pod-tree .hl { color: var(--color-brand-light); font-weight: 600; }
+    .pod-tree .hl-g { color: var(--color-accent-green); font-weight: 600; }
+    .pod-tree .hl-p { color: var(--color-chart-4); font-weight: 600; }
+
+    /* ─── Client layers (4 capas en fila) */
+    .layers-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      justify-content: center;
+    }
+    .layer-col {
+      flex: 1;
+      padding: 20px 18px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid;
+      background: var(--color-bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .layer-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+      margin-bottom: 2px;
+    }
+    .layer-col h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .layer-sub {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+    .layer-col ul {
+      list-style: none;
+      display: grid;
+      gap: 5px;
+      font-size: 0.88rem;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+    .layer-col ul li::before { content: '· '; opacity: 0.6; }
+
+    .layer-col.core { border-color: var(--color-brand); background: color-mix(in srgb, var(--color-brand-dim) 40%, var(--color-bg-surface)); }
+    .layer-col.core .layer-num, .layer-col.core h3 { color: var(--color-brand-light); }
+    .layer-col.common { border-color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green-dim) 40%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.common .layer-num, .layer-col.common h3 { color: var(--color-accent-green); }
+    .layer-col.pods { border-color: var(--color-chart-4); background: color-mix(in srgb, var(--color-chart-4) 18%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.pods .layer-num, .layer-col.pods h3 { color: var(--color-chart-4); }
+    .layer-col.views { border-color: var(--color-accent-red); background: color-mix(in srgb, var(--color-accent-red) 15%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.views .layer-num, .layer-col.views h3 { color: var(--color-accent-red); }
+
+    .layer-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      flex: none;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      margin-left: 0;
+    }
+    .layer-col + .layer-arrow { margin-left: 0; }
+
+    .layer-rule {
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      text-align: center;
+      max-width: 900px;
+    }
+
+    /* ─── Pod map (estructura esquemática) */
+    .pod-map { display: grid; gap: 10px; }
+    .pod-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+    }
+    .pod-num {
+      flex: none;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: var(--color-bg-elevated);
+      color: var(--color-brand-light);
+      border: 1.5px solid var(--color-brand-dim);
+      margin-top: 2px;
+    }
+    .pod-item > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .pod-item h4 {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+    .pod-item p {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+    }
+
+    /* ─── Contract diagram (Container <-> Component) */
+    .contract-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: stretch;
+    }
+    .contract-box {
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid;
+      background: var(--color-bg-surface);
+    }
+    .contract-box.container { border-color: var(--color-brand); background: color-mix(in srgb, var(--color-brand-dim) 35%, var(--color-bg-surface)); }
+    .contract-box.component { border-color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green-dim) 35%, var(--color-bg-surface)); }
+    .contract-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .contract-num {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      background: var(--color-bg-base);
+    }
+    .contract-box.container .contract-num { color: var(--color-brand-light); border: 1.5px solid var(--color-brand); }
+    .contract-box.component .contract-num { color: var(--color-accent-green); border: 1.5px solid var(--color-accent-green); }
+    .contract-header h4 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--color-text-primary);
+    }
+    .contract-sub {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .contract-box p {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+    .contract-arrow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 4px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+    .contract-arrow .arrow-label {
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+    }
+    .contract-arrow .arrow-line { display: none; }
+    .contract-arrow { grid-template-columns: auto 1fr auto; gap: 12px; }
+    .contract-arrow .arrow-line {
+      display: block;
+      font-size: 1.1rem;
+      color: var(--color-accent-green);
+      text-align: center;
+    }
+    .contract-arrow .arrow-up { color: var(--color-brand-light); }
+    .contract-rule {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      margin-top: 14px;
+    }
+
     /* ─── Coverage table */
     .coverage-table {
       margin-top: 14px;
@@ -808,11 +1130,11 @@
 
     .coverage-table th,
     .coverage-table td {
-      padding: 10px 12px;
+      padding: 12px 14px;
       text-align: left;
       border-bottom: 1px solid var(--color-border);
       font-family: var(--font-mono);
-      font-size: 0.75rem;
+      font-size: 0.8125rem;
     }
 
     .coverage-table th {
@@ -820,7 +1142,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
     }
 
     .coverage-cell {
@@ -1086,7 +1408,7 @@
     }
 
     .refl-card {
-      padding: 30px;
+      padding: 22px 24px;
       border-radius: var(--radius-xl);
       border: 1.5px solid var(--color-border);
       background: var(--color-bg-surface);
@@ -1107,8 +1429,8 @@
     .refl-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
     .refl-icon {
@@ -1145,7 +1467,7 @@
 
     .refl-subtitle {
       font-family: var(--font-mono);
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
       color: var(--color-text-muted);
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -1155,18 +1477,32 @@
       list-style: none;
       display: grid;
       gap: 12px;
-      flex: 1;
     }
 
     .refl-list li {
-      padding: 14px 16px;
+      padding: 10px 14px;
       border-left: 3px solid;
       border-radius: var(--radius-sm);
-      font-size: 0.875rem;
+      font-size: 0.9rem;
       color: var(--color-text-secondary);
-      line-height: 1.55;
+      line-height: 1.5;
       background: color-mix(in srgb, var(--color-bg-base) 50%, transparent);
     }
+
+    .refl-grid.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1320px; }
+
+    .refl-ai {
+      border-color: var(--color-chart-4);
+      background: color-mix(in srgb, var(--color-chart-4) 12%, var(--color-bg-surface));
+    }
+
+    .refl-ai .refl-icon { color: var(--color-chart-4); border-color: var(--color-chart-4); }
+
+    .refl-ai .refl-list li { border-left-color: var(--color-chart-4); }
+
+    .refl-card { padding: 30px; }
+
+    .refl-future .refl-list li { border-left-color: var(--color-accent-green); }
 
     .refl-future .refl-list li {
       border-left-color: var(--color-accent-green);
@@ -1474,7 +1810,7 @@
       <span class="slide-num">04</span>
       <div class="content center-stack" style="max-width:1100px;">
         <p class="section-label reveal">Producto en producción</p>
-        <h2 class="headline-lg reveal">Demo real. <span class="grad-text">Esto no es un mockup.</span></h2>
+        <h2 class="headline-lg reveal">Demo real. <span class="grad-text">Esto no es un boceto.</span></h2>
         <ul class="points reveal">
           <li><strong>Modo invitado</strong> — juegas desde la landing sin registrarte.</li>
           <li><strong>Modo juego</strong> (compites) y <strong>modo estudio</strong> (sin presión) sobre el mismo contenido.</li>
@@ -1536,7 +1872,7 @@
             <p>El audio se genera una vez por flashcard y se sirve desde CDN. Coste marginal prácticamente cero — no tiene sentido ponerlo detrás de un paywall.</p>
           </div>
         </div>
-        <p class="subhead-sm reveal" style="margin-top:24px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el rol <code style="font-family:var(--font-mono);font-size:0.9375em;color:var(--color-accent-green)">premium</code> está reservado en la base de datos (forward compatibility) pero sin lógica — no hay modelo freemium ni plan de pago desplegado. Más detalle en <span class="mono">docs/domain/monetization-future.md</span>.</p>
+        <p class="subhead-sm reveal" style="margin-top:24px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el rol <code style="font-family:var(--font-mono);font-size:0.9375em;color:var(--color-accent-green)">premium</code> está reservado en la base de datos (compatibilidad futura) pero sin lógica — no hay modelo freemium ni plan de pago desplegado. Más detalle en <span class="mono">docs/domain/monetization-future.md</span>.</p>
       </div>
     </section>
 
@@ -1705,36 +2041,38 @@
       </div>
     </section>
 
-<!-- 09 CALIDAD E IA — single column, todo centrado y compacto -->
+<!-- 09 CALIDAD E IA — pirámide grande a la derecha -->
     <section class="slide" data-slide="9">
       <span class="slide-num">09</span>
-      <div class="content center-stack" style="max-width:1180px;">
+      <div class="content center-stack" style="max-width:1400px;">
         <p class="section-label reveal">Calidad e IA estratégica</p>
         <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
         <p class="subhead-sm reveal" style="max-width:72ch">API con umbrales altos (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
-        <table class="coverage-table reveal" style="margin-top:14px;">
-          <thead>
-            <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Use cases / domain services</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Repositorios / infraestructura</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Dominio (aggregates, VOs)</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Hooks del pod</td><td>—</td><td><span class="coverage-cell cov-high">95%</span></td></tr>
-            <tr><td>Componentes UI</td><td>—</td><td><span class="coverage-cell cov-mid">85%</span></td></tr>
-            <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
-          </tbody>
-        </table>
-        <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:32px;margin-top:18px;width:100%;max-width:1040px;align-items:start;">
-          <div>
-            <p class="subhead-sm reveal" style="margin-bottom:6px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
-            <ul class="points reveal">
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:56px;margin-top:24px;width:100%;max-width:1320px;align-items:center;">
+          <div class="reveal-group">
+            <table class="coverage-table">
+              <thead>
+                <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Use cases / domain services</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Repositorios / infraestructura</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Dominio (aggregates, VOs)</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Hooks del pod</td><td>—</td><td><span class="coverage-cell cov-high">95%</span></td></tr>
+                <tr><td>Componentes UI</td><td>—</td><td><span class="coverage-cell cov-mid">85%</span></td></tr>
+                <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
+              </tbody>
+            </table>
+            <p class="subhead-sm" style="margin:22px 0 8px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
+            <ul class="points">
               <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
               <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
               <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
+              <li><strong>Desarrollo</strong> — Cursor (agentes) + Claude, MiniMax, Copilot · <strong>SDD</strong> como metodología de specs versionadas.</li>
             </ul>
           </div>
-          <div class="pyramid reveal-group" style="max-width:360px;margin-inline:auto;">
+          <div class="pyramid reveal-group" style="max-width:620px;margin-inline:auto;">
+            <p class="section-label" style="text-align:center;margin-bottom:18px">Pirámide de testing</p>
             <div class="pyr l1">E2E · Playwright</div>
             <div class="pyr l2">Integration · MSW · repos</div>
             <div class="pyr l3">Unit · dominio · hooks</div>
@@ -1744,9 +2082,119 @@
       </div>
     </section>
 
-    <!-- 10 REFLEXIÓN — UI rediseñada -->
+    <!-- 10 BUENAS PRÁCTICAS — estilo refl (3 columnas) -->
     <section class="slide" data-slide="10">
       <span class="slide-num">10</span>
+      <div class="content center-stack" style="max-width:1340px">
+        <p class="section-label reveal">Buenas prácticas</p>
+        <h2 class="headline-lg reveal">Cómo se construye. <span class="grad-text">No solo qué se construye.</span></h2>
+        <div class="refl-grid g3 reveal-group" style="margin-top:18px">
+          <div class="refl-card refl-future">
+            <div class="refl-header">
+              <span class="refl-icon">01</span>
+              <div>
+                <h3>Workflow</h3>
+                <p class="refl-subtitle">TDD · SDD · Commits</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>TDD</strong> — Red → Green → Refactor para features nuevas</li>
+              <li><strong>SDD</strong> — propuesta → specs → diseño → tareas → implementación</li>
+              <li><strong>Commits</strong> — Conventional Commits enforced por commitlint + Husky</li>
+            </ul>
+          </div>
+          <div class="refl-card refl-insight">
+            <div class="refl-header">
+              <span class="refl-icon">02</span>
+              <div>
+                <h3>Calidad de código</h3>
+                <p class="refl-subtitle">TS · Lint · Architecture</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>TS estricto</strong> end-to-end — sin <code>any</code></li>
+              <li><strong>ESLint + Prettier</strong> con <code>recommendedTypeChecked</code></li>
+              <li><strong>Container</strong> (datos) vs <strong>Component</strong> (UI pura)</li>
+              <li><strong>DI</strong> con tokens <code>Symbol</code> — dominio agnóstico de NestJS</li>
+            </ul>
+          </div>
+          <div class="refl-card refl-ai">
+            <div class="refl-header">
+              <span class="refl-icon">03</span>
+              <div>
+                <h3>Habilidades de IA</h3>
+                <p class="refl-subtitle">Skills + Multi-LLM</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>Skills</strong> versionadas en <code>skills/</code> para agentes IA</li>
+              <li><strong>Cursor</strong> orquesta con agentes; <strong>Claude</strong>, <strong>MiniMax</strong>, <strong>Copilot</strong> en scaffolding</li>
+              <li><strong>AGENTS.md</strong> — entry point por scope (api / client)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 SEGURIDAD — estilo refl (3 columnas) -->
+    <section class="slide" data-slide="11">
+      <span class="slide-num">11</span>
+      <div class="content center-stack" style="max-width:1340px">
+        <p class="section-label reveal">Seguridad</p>
+        <h2 class="headline-lg reveal">Defensa por capas. <span class="grad-text">Desde el código hasta el VPS.</span></h2>
+        <div class="refl-grid g3 reveal-group" style="margin-top:18px">
+          <div class="refl-card refl-future">
+            <div class="refl-header">
+              <span class="refl-icon">01</span>
+              <div>
+                <h3>Identidad y acceso</h3>
+                <p class="refl-subtitle">JWT · OAuth · Roles</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>JWT</strong> (access + refresh) con cookies <code>httpOnly</code> + <code>secure</code></li>
+              <li><strong>OAuth Google</strong> integrado desde el primer login</li>
+              <li><strong>Tokens guest</strong> en memoria — nunca en localStorage</li>
+              <li><strong>Roles</strong> con guards, voters y <code>@CurrentUser</code></li>
+            </ul>
+          </div>
+          <div class="refl-card refl-insight">
+            <div class="refl-header">
+              <span class="refl-icon">02</span>
+              <div>
+                <h3>Defensa perimetral</h3>
+                <p class="refl-subtitle">Rate limit · nginx · Validation</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>Rate limiting</strong> en API y endpoints sensibles</li>
+              <li><strong>Helmet</strong> con HSTS, X-Frame-Options, CSP</li>
+              <li><strong>nginx</strong> — único entrypoint público del VPS (ADR-030)</li>
+              <li><strong>Validación dual</strong> — Class Validator (API) + Zod (cliente)</li>
+            </ul>
+          </div>
+          <div class="refl-card refl-ai">
+            <div class="refl-header">
+              <span class="refl-icon">03</span>
+              <div>
+                <h3>Supply chain</h3>
+                <p class="refl-subtitle">Trivy · Doppler · Threat model</p>
+              </div>
+            </div>
+            <ul class="refl-list">
+              <li><strong>Trivy</strong> escanea imágenes Docker en CI</li>
+              <li><strong>Doppler</strong> para secrets — cero credenciales en repo</li>
+              <li><strong>Tags semver</strong> pinned para imágenes base (ADR-029)</li>
+              <li><strong>Threat model</strong> documentado en ADR-033</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 REFLEXIÓN — UI rediseñada -->
+    <section class="slide" data-slide="12">
+      <span class="slide-num">12</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Lo que viene · Lo que aprendí</p>
         <h2 class="headline-lg reveal">Reflexión del proceso. <span class="grad-text">Honestidad en el roadmap.</span></h2>
@@ -1786,9 +2234,214 @@
       </div>
     </section>
 
-    <!-- 11 STACK — nueva -->
-    <section class="slide" data-slide="11">
-      <span class="slide-num">11</span>
+    <!-- 13 ARQUITECTURA BACKEND — capas + flujo -->
+    <section class="slide" data-slide="13">
+      <span class="slide-num">13</span>
+      <div class="content center-stack" style="max-width:1340px">
+        <p class="section-label reveal">Arquitectura backend</p>
+        <h2 class="headline-lg reveal">Clean Architecture en capas. <span class="grad-text">Un ejemplo, no un diagrama bonito.</span></h2>
+        <div style="display:grid;grid-template-columns:0.7fr 1.3fr;gap:48px;margin-top:24px;width:100%;max-width:1280px;align-items:start;">
+          <div class="reveal-group">
+            <p class="section-label" style="text-align:center;margin-bottom:14px">Las 3 capas</p>
+            <div class="layers-stack">
+              <div class="layer infra">
+                <span class="layer-name">infrastructure</span>
+                <span class="layer-desc">Controllers · TypeORM · AMQP · REST</span>
+              </div>
+              <div class="layer app">
+                <span class="layer-name">application</span>
+                <span class="layer-desc">Use cases · Domain services · Subscribers</span>
+              </div>
+              <div class="layer domain">
+                <span class="layer-name">domain</span>
+                <span class="layer-desc">Aggregates · Value Objects · Reglas de negocio</span>
+              </div>
+              <div class="arrow-note"><strong>domain ← application ← infrastructure</strong><br/>cada capa solo importa de la interior — el dominio no sabe nada del exterior</div>
+            </div>
+          </div>
+          <div class="reveal-group">
+            <p class="section-label" style="margin-bottom:14px">Ejemplo: <code style="font-family:var(--font-mono);color:var(--color-accent-green);font-size:0.95em">POST /games/:id/complete</code></p>
+            <ol class="flow-steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc">Controller valida el DTO con <code>Class Validator</code>, resuelve el UseCase y devuelve <code>201</code> al completarse</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <span class="step-layer app">application</span>
+                  <span class="step-desc"><code>CompleteGameUseCase</code> orquesta: carga el Game y delega al dominio</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <span class="step-layer domain">domain</span>
+                  <span class="step-desc"><code>Game.complete()</code> ejecuta invariantes, registra los attempts y deja <code>GameCompleted</code> en el aggregate</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc">Repository persiste el aggregate en PostgreSQL con <code>TypeORM</code></span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc"><code>DomainEventPublisher</code> (RabbitMQ) publica <code>GameCompleted</code> en el bus</span>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 ARQUITECTURA CLIENTE — capas CORE/COMMON/PODS/VIEWS -->
+    <section class="slide" data-slide="14">
+      <span class="slide-num">14</span>
+      <div class="content center-stack" style="max-width:1320px">
+        <p class="section-label reveal">Arquitectura cliente</p>
+        <h2 class="headline-lg reveal">Cuatro capas. <span class="grad-text">Un único sentido de dependencias.</span></h2>
+        <div class="layers-row reveal-group" style="margin-top:24px;width:100%;max-width:1260px;">
+          <div class="layer-col core">
+            <span class="layer-num">01</span>
+            <h3>CORE</h3>
+            <p class="layer-sub">Infraestructura cliente</p>
+            <ul>
+              <li>auth · router</li>
+              <li>api · query</li>
+              <li>i18n · store</li>
+              <li>navigation · seo</li>
+            </ul>
+          </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col common">
+            <span class="layer-num">02</span>
+            <h3>COMMON</h3>
+            <p class="layer-sub">UI reutilizable</p>
+            <ul>
+              <li>components</li>
+              <li>hooks</li>
+              <li>layout · styles</li>
+              <li>charts · lib</li>
+            </ul>
+          </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col pods">
+            <span class="layer-num">03</span>
+            <h3>PODS</h3>
+            <p class="layer-sub">Lógica por dominio</p>
+            <ul>
+              <li>game · study</li>
+              <li>landing · home</li>
+              <li>profile · ranking</li>
+              <li>stats · backoffice</li>
+            </ul>
+          </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col views">
+            <span class="layer-num">04</span>
+            <h3>VIEWS</h3>
+            <p class="layer-sub">Páginas que orquestan</p>
+            <ul>
+              <li>GameView · StudyView</li>
+              <li>LandingView · HomeView</li>
+              <li>ProfileView · RankingView</li>
+              <li>AuthView · BackofficeView</li>
+            </ul>
+          </div>
+        </div>
+        <p class="layer-rule reveal" style="margin-top:20px"><strong>CORE</strong> no importa de nadie · cada capa solo consume la anterior · ningún <strong>POD</strong> importa de otro <strong>POD</strong></p>
+        <p class="layer-rule reveal" style="margin-top:8px;font-size:0.85rem;color:var(--color-text-muted)">Dentro de cada POD: <strong>Container</strong> (mundo exterior · queries) → <strong>Component</strong> (mundo UI · props) — cero acoplamiento entre PODs.</p>
+      </div>
+    </section>
+
+    <!-- 15 POD POR DENTRO — estructura + Container/Presentational -->
+    <section class="slide" data-slide="15">
+      <span class="slide-num">15</span>
+      <div class="content center-stack" style="max-width:1320px">
+        <p class="section-label reveal">Un pod por dentro</p>
+        <h2 class="headline-lg reveal">Container / Presentational. <span class="grad-text">El contrato que mantiene los pods limpios.</span></h2>
+        <div style="display:grid;grid-template-columns:0.5fr 0.5fr;gap:36px;margin-top:24px;width:100%;max-width:1240px;align-items:start;">
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:12px;">
+            <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
+            <div class="pod-map">
+              <div class="pod-item">
+                <span class="pod-num">01</span>
+                <div>
+                  <h4>api/</h4>
+                  <p>tipos crudos · hooks de TanStack Query</p>
+                </div>
+              </div>
+              <div class="pod-item">
+                <span class="pod-num">02</span>
+                <div>
+                  <h4>hooks/</h4>
+                  <p>state local · handlers de UI</p>
+                </div>
+              </div>
+              <div class="pod-item">
+                <span class="pod-num">03</span>
+                <div>
+                  <h4>components/</h4>
+                  <p>presentational · cero queries</p>
+                </div>
+              </div>
+              <div class="pod-item">
+                <span class="pod-num">04</span>
+                <div>
+                  <h4>root</h4>
+                  <p>Container · Component · types · mapper</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:12px;">
+            <p class="section-label" style="margin:0">El contrato</p>
+            <div class="contract-diagram">
+              <div class="contract-box container">
+                <div class="contract-header">
+                  <span class="contract-num">C</span>
+                  <div>
+                    <h4>Container</h4>
+                    <span class="contract-sub">mundo exterior</span>
+                  </div>
+                </div>
+                <p>queries · mutations · routing · auth</p>
+              </div>
+              <div class="contract-arrow">
+                <span class="arrow-label">ViewModels</span>
+                <span class="arrow-line">↓</span>
+                <span class="arrow-line arrow-up">↑</span>
+                <span class="arrow-label">callbacks</span>
+              </div>
+              <div class="contract-box component">
+                <div class="contract-header">
+                  <span class="contract-num">V</span>
+                  <div>
+                    <h4>Component</h4>
+                    <span class="contract-sub">mundo UI</span>
+                  </div>
+                </div>
+                <p>props · useState · useEffect · composición</p>
+              </div>
+            </div>
+            <p class="contract-rule"><strong>Container</strong> es el que <strong>sabe</strong> · <strong>Component</strong> es el que <strong>muestra</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 STACK — nueva -->
+    <section class="slide" data-slide="16">
+      <span class="slide-num">16</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Stack técnico</p>
         <h2 class="headline-lg reveal">Lo que hay debajo. <span class="grad-text">Por qué cada pieza.</span></h2>
@@ -1848,8 +2501,8 @@
     </section>
 
     <!-- 12 CIERRE — BIG brand izq + BIG links der, sin ¿Preguntas? -->
-    <section class="slide" data-slide="12">
-      <span class="slide-num">12</span>
+    <section class="slide" data-slide="17">
+      <span class="slide-num">17</span>
       <div class="content" style="max-width:1280px;margin-inline:auto;">
         <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:56px;align-items:center;width:100%;">
           <div class="center-stack" style="text-align:center;">
@@ -1879,7 +2532,7 @@
   <button class="nav-btn" id="prev" type="button" aria-label="Anterior">←</button>
   <div class="dots" id="dots"></div>
   <div class="progress"><span id="bar"></span></div>
-  <span class="counter" id="counter">1 / 12</span>
+  <span class="counter" id="counter">1 / 17</span>
   <button class="nav-btn" id="next" type="button" aria-label="Siguiente">→</button>
 </div>
 
