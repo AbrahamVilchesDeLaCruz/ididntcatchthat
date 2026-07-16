@@ -449,7 +449,7 @@ Material de evaluación del **Máster en Desarrollo con IA · BIG School**.
 
 ### Presentación TFM
 
-Presentación web interactiva (16 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
+Presentación web interactiva (17 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
 
 > Servida directamente desde el **dominio principal** — al abrir el archivo en GitHub solo verás el código fuente. Usa el enlace de producción para la **preview interactiva**:
 
