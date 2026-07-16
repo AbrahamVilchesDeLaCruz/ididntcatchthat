@@ -450,19 +450,18 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 | Repositorio | [github.com/AbrahamVilchesDeLaCruz/ididntcatchthat](https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat) |
 | Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
 | Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
-| Presentación (slides) | [Preview online](https://htmlpreview.github.io/?https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/blob/dev/docs/presentation/tfm-slides.html) · [código fuente](./docs/presentation/tfm-slides.html) |
-| Vídeo explicativo | [YouTube](https://youtu.be/I0Ciebm0Yb0) · [Preview embebida](./docs/presentation/tfm-video.html) |
+| Presentación (slides) | [ididntcatchthat.com/tfm-slides.html](https://ididntcatchthat.com/tfm-slides.html) · [código fuente](./docs/presentation/tfm-slides.html) |
+| Vídeo explicativo | [YouTube](https://youtu.be/I0Ciebm0Yb0) · [Preview embebida](https://ididntcatchthat.com/tfm-video.html) |
 
 ### Presentación TFM
 
 Presentación web interactiva (11 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
 
-> **GitHub no ejecuta HTML del repo** — al abrir el archivo en GitHub solo verás el código fuente. Usa uno de estos enlaces para la **preview interactiva**:
+> Servida directamente desde el **dominio principal** — al abrir el archivo en GitHub solo verás el código fuente. Usa el enlace de producción para la **preview interactiva**:
 
 | Modo | Enlace |
 |------|--------|
-| **Preview online** (recomendado) | [htmlpreview.github.io → presentación TFM](https://htmlpreview.github.io/?https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat/blob/dev/docs/presentation/tfm-slides.html) |
-| **Alternativa** | [raw.githack.com → presentación TFM](https://raw.githack.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/docs/presentation/tfm-slides.html) |
+| **Producción** | [ididntcatchthat.com/tfm-slides.html](https://ididntcatchthat.com/tfm-slides.html) |
 | **Código fuente** | [docs/presentation/tfm-slides.html](./docs/presentation/tfm-slides.html) |
 
 Tras clonar el repositorio, también puedes abrirla en el navegador:
@@ -481,7 +480,7 @@ Vídeo con captura de pantalla y explicación del proyecto. Alojado en YouTube; 
 | Modo | Enlace |
 |------|--------|
 | **YouTube** (formulario de entrega) | [youtu.be/I0Ciebm0Yb0](https://youtu.be/I0Ciebm0Yb0) |
-| **Preview embebida** | [raw.githack.com → vídeo TFM](https://raw.githack.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/docs/presentation/tfm-video.html) |
+| **Preview embebida** | [ididntcatchthat.com/tfm-video.html](https://ididntcatchthat.com/tfm-video.html) |
 | **Código fuente** | [docs/presentation/tfm-video.html](./docs/presentation/tfm-video.html) |
 
 Tras clonar el repositorio:
