@@ -835,6 +835,89 @@
 
     .code-block em { color: var(--color-accent-green); font-style: normal; }
 
+    /* ─── Layers stack (backend) */
+    .layers-stack { display: flex; flex-direction: column; gap: 8px; max-width: 380px; margin-inline: auto; }
+    .layer {
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .layer-name {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .layer-desc {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+    .layer.infra { background: color-mix(in srgb, var(--color-brand-dim) 50%, var(--color-bg-surface)); border-color: var(--color-brand); color: var(--color-brand-light); }
+    .layer.app { background: color-mix(in srgb, var(--color-accent-green-dim) 50%, var(--color-bg-surface)); border-color: var(--color-accent-green); color: var(--color-accent-green); }
+    .layer.domain { background: color-mix(in srgb, var(--color-chart-4) 18%, var(--color-bg-surface)); border-color: var(--color-chart-4); color: var(--color-chart-4); }
+    .arrow-note { text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* ─── Flow steps */
+    .flow-steps { list-style: none; display: grid; gap: 12px; counter-reset: step; }
+    .flow-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--color-bg-base) 40%, var(--color-bg-surface));
+      border: 1px solid var(--color-border);
+    }
+    .step-num {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: var(--color-bg-elevated);
+      color: var(--color-text-primary);
+      border: 1.5px solid var(--color-border-strong);
+    }
+    .flow-steps li > div { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+    .step-layer {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .step-layer.infra { color: var(--color-brand-light); }
+    .step-layer.app { color: var(--color-accent-green); }
+    .step-layer.domain { color: var(--color-chart-4); }
+    .step-desc { font-size: 0.95rem; color: var(--color-text-secondary); line-height: 1.5; }
+    .step-desc code { font-family: var(--font-mono); font-size: 0.875em; color: var(--color-accent-green); }
+
+    /* ─── Pod tree (client) */
+    .pod-tree {
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--color-text-secondary);
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .pod-tree .hl { color: var(--color-brand-light); font-weight: 600; }
+    .pod-tree .hl-g { color: var(--color-accent-green); font-weight: 600; }
+    .pod-tree .hl-p { color: var(--color-chart-4); font-weight: 600; }
+
     /* ─── Coverage table */
     .coverage-table {
       margin-top: 14px;
@@ -1950,9 +2033,140 @@
       </div>
     </section>
 
-    <!-- 13 STACK — nueva -->
+    <!-- 13 ARQUITECTURA BACKEND — capas + flujo -->
     <section class="slide" data-slide="13">
       <span class="slide-num">13</span>
+      <div class="content center-stack" style="max-width:1340px">
+        <p class="section-label reveal">Arquitectura backend</p>
+        <h2 class="headline-lg reveal">Clean Architecture en capas. <span class="grad-text">Un ejemplo, no un diagrama bonito.</span></h2>
+        <div style="display:grid;grid-template-columns:0.7fr 1.3fr;gap:48px;margin-top:24px;width:100%;max-width:1280px;align-items:start;">
+          <div class="reveal-group">
+            <p class="section-label" style="text-align:center;margin-bottom:14px">Las 3 capas</p>
+            <div class="layers-stack">
+              <div class="layer infra">
+                <span class="layer-name">infrastructure</span>
+                <span class="layer-desc">Controllers · TypeORM · AMQP · REST</span>
+              </div>
+              <div class="layer app">
+                <span class="layer-name">application</span>
+                <span class="layer-desc">Use cases · Domain services · Subscribers</span>
+              </div>
+              <div class="layer domain">
+                <span class="layer-name">domain</span>
+                <span class="layer-desc">Aggregates · Value Objects · Reglas de negocio</span>
+              </div>
+              <div class="arrow-note">↓ dependencias hacia adentro</div>
+            </div>
+          </div>
+          <div class="reveal-group">
+            <p class="section-label" style="margin-bottom:14px">Ejemplo: <code style="font-family:var(--font-mono);color:var(--color-accent-green);font-size:0.95em">POST /games/:id/complete</code></p>
+            <ol class="flow-steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc">Controller valida el DTO con <code>Class Validator</code> y resuelve el UseCase</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <span class="step-layer app">application</span>
+                  <span class="step-desc"><code>CompleteGameUseCase</code> orquesta: carga el Game y delega al dominio</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <span class="step-layer domain">domain</span>
+                  <span class="step-desc"><code>Game.complete()</code> ejecuta invariantes y registra los attempts</span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc">Repository persiste en PostgreSQL con <code>TypeORM</code></span>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div>
+                  <span class="step-layer app">application</span>
+                  <span class="step-desc">Publica <code>GameCompleted</code> en RabbitMQ y devuelve 201</span>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 ARQUITECTURA CLIENTE — pods + Container/Component -->
+    <section class="slide" data-slide="14">
+      <span class="slide-num">14</span>
+      <div class="content center-stack" style="max-width:1340px">
+        <p class="section-label reveal">Arquitectura cliente</p>
+        <h2 class="headline-lg reveal">Pods + Container/Presentational. <span class="grad-text">El mundo exterior y el mundo UI.</span></h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;width:100%;max-width:1280px;align-items:stretch;">
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
+            <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
+            <pre class="pod-tree"><code><span class="hl">gaming/</span>
+├── api/
+│   ├── gaming.api-model.ts   <span class="hl-g">→ tipos crudos API</span>
+│   ├── gaming.api.ts         <span class="hl-g">→ hooks TanStack Query</span>
+│   └── index.ts
+├── hooks/
+│   ├── useGamingStart.ts     <span class="hl-g">→ state + handlers</span>
+│   └── index.ts
+├── components/
+│   └── <span class="hl-p">GamePanel.tsx</span>              <span class="hl-p">→ presentational</span>
+├── <span class="hl">GamingContainer.tsx</span>            <span class="hl">→ mundo exterior</span>
+├── <span class="hl">GamingComponent.tsx</span>            <span class="hl">→ mundo UI</span>
+├── gaming.mapper.ts
+├── gaming.types.ts
+└── index.ts</code></pre>
+          </div>
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
+            <p class="section-label" style="margin:0">El contrato</p>
+            <div class="refl-card refl-insight" style="flex:1">
+              <div class="refl-header">
+                <span class="refl-icon">↗</span>
+                <div>
+                  <h3>Container</h3>
+                  <p class="refl-subtitle">Mundo exterior</p>
+                </div>
+              </div>
+              <ul class="refl-list">
+                <li>Queries con TanStack Query</li>
+                <li>Mutations e invalidación</li>
+                <li>Routing y contexto de auth</li>
+                <li>Pasa <strong>ViewModels</strong> al Component</li>
+              </ul>
+            </div>
+            <div class="refl-card refl-future" style="flex:1">
+              <div class="refl-header">
+                <span class="refl-icon">◆</span>
+                <div>
+                  <h3>Component</h3>
+                  <p class="refl-subtitle">Mundo UI</p>
+                </div>
+              </div>
+              <ul class="refl-list">
+                <li>Recibe props (ViewModels)</li>
+                <li>useState / useEffect local</li>
+                <li>Sub-componentes y composición</li>
+                <li><strong>Cero queries, cero routing</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 STACK — nueva -->
+    <section class="slide" data-slide="15">
+      <span class="slide-num">15</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Stack técnico</p>
         <h2 class="headline-lg reveal">Lo que hay debajo. <span class="grad-text">Por qué cada pieza.</span></h2>
@@ -2012,8 +2226,8 @@
     </section>
 
     <!-- 12 CIERRE — BIG brand izq + BIG links der, sin ¿Preguntas? -->
-    <section class="slide" data-slide="14">
-      <span class="slide-num">14</span>
+    <section class="slide" data-slide="16">
+      <span class="slide-num">16</span>
       <div class="content" style="max-width:1280px;margin-inline:auto;">
         <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:56px;align-items:center;width:100%;">
           <div class="center-stack" style="text-align:center;">
@@ -2043,7 +2257,7 @@
   <button class="nav-btn" id="prev" type="button" aria-label="Anterior">←</button>
   <div class="dots" id="dots"></div>
   <div class="progress"><span id="bar"></span></div>
-  <span class="counter" id="counter">1 / 14</span>
+  <span class="counter" id="counter">1 / 16</span>
   <button class="nav-btn" id="next" type="button" aria-label="Siguiente">→</button>
 </div>
 
