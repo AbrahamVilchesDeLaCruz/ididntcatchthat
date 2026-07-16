@@ -181,7 +181,7 @@ Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` 
 
 - **DeepSeek** — genera **ejemplos bilingües** (EN/ES) y **notas fonéticas** (IPA, native speech) al crear o completar flashcards en backoffice.
 - **ElevenLabs** — síntesis de voz en 3 acentos (offline, pipeline de audio → CDN).
-- **Pronunciación** — el bonus de voz está planificado para una fase posterior (ver [ADR-008](./docs/adr/008-azure-speech.md) y [deck slide 10](./docs/presentation/tfm-slides.html#slide-10)).
+- **Pronunciación** — el bonus de voz está planificado para una fase posterior (ver [ADR-008](./docs/adr/008-azure-speech.md) y [presentación, slide 10](./docs/presentation/tfm-slides.html#slide-10)).
 
 ---
 

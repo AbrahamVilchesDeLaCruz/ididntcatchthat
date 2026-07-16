@@ -1609,7 +1609,7 @@
       <span class="slide-num">04</span>
       <div class="content center-stack" style="max-width:1100px;">
         <p class="section-label reveal">Producto en producción</p>
-        <h2 class="headline-lg reveal">Demo real. <span class="grad-text">Esto no es un mockup.</span></h2>
+        <h2 class="headline-lg reveal">Demo real. <span class="grad-text">Esto no es un boceto.</span></h2>
         <ul class="points reveal">
           <li><strong>Modo invitado</strong> — juegas desde la landing sin registrarte.</li>
           <li><strong>Modo juego</strong> (compites) y <strong>modo estudio</strong> (sin presión) sobre el mismo contenido.</li>
@@ -1671,7 +1671,7 @@
             <p>El audio se genera una vez por flashcard y se sirve desde CDN. Coste marginal prácticamente cero — no tiene sentido ponerlo detrás de un paywall.</p>
           </div>
         </div>
-        <p class="subhead-sm reveal" style="margin-top:24px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el rol <code style="font-family:var(--font-mono);font-size:0.9375em;color:var(--color-accent-green)">premium</code> está reservado en la base de datos (forward compatibility) pero sin lógica — no hay modelo freemium ni plan de pago desplegado. Más detalle en <span class="mono">docs/domain/monetization-future.md</span>.</p>
+        <p class="subhead-sm reveal" style="margin-top:24px"><strong style="color:var(--color-text-primary)">Nota de honestidad:</strong> el rol <code style="font-family:var(--font-mono);font-size:0.9375em;color:var(--color-accent-green)">premium</code> está reservado en la base de datos (compatibilidad futura) pero sin lógica — no hay modelo freemium ni plan de pago desplegado. Más detalle en <span class="mono">docs/domain/monetization-future.md</span>.</p>
       </div>
     </section>
 
@@ -2055,7 +2055,7 @@
                 <span class="layer-name">domain</span>
                 <span class="layer-desc">Aggregates · Value Objects · Reglas de negocio</span>
               </div>
-              <div class="arrow-note">↓ dependencias hacia adentro</div>
+              <div class="arrow-note"><strong>domain ← application ← infrastructure</strong><br/>cada capa solo importa de la interior — el dominio no sabe nada del exterior</div>
             </div>
           </div>
           <div class="reveal-group">
@@ -2113,16 +2113,16 @@
             <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
             <pre class="pod-tree"><code><span class="hl">gaming/</span>
 ├── api/
-│   ├── gaming.api-model.ts   <span class="hl-g">→ tipos crudos API</span>
-│   ├── gaming.api.ts         <span class="hl-g">→ hooks TanStack Query</span>
+│   ├── gaming.api-model.ts   <span class="hl-g">// tipos crudos API</span>
+│   ├── gaming.api.ts         <span class="hl-g">// hooks TanStack Query</span>
 │   └── index.ts
 ├── hooks/
-│   ├── useGamingStart.ts     <span class="hl-g">→ state + handlers</span>
+│   ├── useGamingStart.ts     <span class="hl-g">// estado y manejadores</span>
 │   └── index.ts
 ├── components/
-│   └── <span class="hl-p">GamePanel.tsx</span>              <span class="hl-p">→ presentational</span>
-├── <span class="hl">GamingContainer.tsx</span>            <span class="hl">→ mundo exterior</span>
-├── <span class="hl">GamingComponent.tsx</span>            <span class="hl">→ mundo UI</span>
+│   └── <span class="hl-p">GamePanel.tsx</span>              <span class="hl-p">// presentational</span>
+├── <span class="hl">GamingContainer.tsx</span>            <span class="hl">// mundo exterior</span>
+├── <span class="hl">GamingComponent.tsx</span>            <span class="hl">// mundo UI</span>
 ├── gaming.mapper.ts
 ├── gaming.types.ts
 └── index.ts</code></pre>
@@ -2131,7 +2131,7 @@
             <p class="section-label" style="margin:0">El contrato</p>
             <div class="refl-card refl-insight" style="flex:1">
               <div class="refl-header">
-                <span class="refl-icon">↗</span>
+                <span class="refl-icon">01</span>
                 <div>
                   <h3>Container</h3>
                   <p class="refl-subtitle">Mundo exterior</p>
@@ -2146,7 +2146,7 @@
             </div>
             <div class="refl-card refl-future" style="flex:1">
               <div class="refl-header">
-                <span class="refl-icon">◆</span>
+                <span class="refl-icon">02</span>
                 <div>
                   <h3>Component</h3>
                   <p class="refl-subtitle">Mundo UI</p>
