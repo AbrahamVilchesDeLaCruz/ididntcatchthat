@@ -445,7 +445,7 @@ Material de evaluación del **Máster en Desarrollo con IA · BIG School**.
 | Despliegue (prod) | [ididntcatchthat.com](https://ididntcatchthat.com) |
 | Despliegue (dev) | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) |
 | Presentación (slides) | [ididntcatchthat.com/tfm-slides.html](https://ididntcatchthat.com/tfm-slides.html) · [código fuente](./docs/presentation/tfm-slides.html) |
-| Vídeo explicativo | [YouTube](https://youtu.be/I0Ciebm0Yb0) · [Preview embebida](https://ididntcatchthat.com/tfm-video.html) |
+| Vídeo explicativo | [Google Drive](https://drive.google.com/file/d/1M2evcPyUT-r9Y58y8uHypwWV0fJqE6nx/view?usp=drive_link) · [Preview embebida](https://ididntcatchthat.com/tfm-video.html) |
 
 ### Presentación TFM
 
@@ -473,7 +473,7 @@ Vídeo con captura de pantalla y explicación del proyecto. Alojado en YouTube; 
 
 | Modo | Enlace |
 |------|--------|
-| **YouTube** (formulario de entrega) | [youtu.be/I0Ciebm0Yb0](https://youtu.be/I0Ciebm0Yb0) |
+| **Google Drive** (formulario de entrega) | [drive.google.com/file/d/1M2evcPyUT-r9Y58y8uHypwWV0fJqE6nx](https://drive.google.com/file/d/1M2evcPyUT-r9Y58y8uHypwWV0fJqE6nx/view?usp=drive_link) |
 | **Preview embebida** | [ididntcatchthat.com/tfm-video.html](https://ididntcatchthat.com/tfm-video.html) |
 | **Código fuente** | [docs/presentation/tfm-video.html](./docs/presentation/tfm-video.html) |
 
