@@ -920,6 +920,84 @@
     .pod-tree .hl-g { color: var(--color-accent-green); font-weight: 600; }
     .pod-tree .hl-p { color: var(--color-chart-4); font-weight: 600; }
 
+    /* ─── Client layers (4 capas en fila) */
+    .layers-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      justify-content: center;
+    }
+    .layer-col {
+      flex: 1;
+      padding: 20px 18px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid;
+      background: var(--color-bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .layer-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+      margin-bottom: 2px;
+    }
+    .layer-col h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .layer-sub {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+    .layer-col ul {
+      list-style: none;
+      display: grid;
+      gap: 5px;
+      font-size: 0.88rem;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+    .layer-col ul li::before { content: '· '; opacity: 0.6; }
+
+    .layer-col.core { border-color: var(--color-brand); background: color-mix(in srgb, var(--color-brand-dim) 40%, var(--color-bg-surface)); }
+    .layer-col.core .layer-num, .layer-col.core h3 { color: var(--color-brand-light); }
+    .layer-col.common { border-color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green-dim) 40%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.common .layer-num, .layer-col.common h3 { color: var(--color-accent-green); }
+    .layer-col.pods { border-color: var(--color-chart-4); background: color-mix(in srgb, var(--color-chart-4) 18%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.pods .layer-num, .layer-col.pods h3 { color: var(--color-chart-4); }
+    .layer-col.views { border-color: var(--color-accent-red); background: color-mix(in srgb, var(--color-accent-red) 15%, var(--color-bg-surface)); margin-left: 24px; }
+    .layer-col.views .layer-num, .layer-col.views h3 { color: var(--color-accent-red); }
+
+    .layer-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      flex: none;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      margin-left: 0;
+    }
+    .layer-col + .layer-arrow { margin-left: 0; }
+
+    .layer-rule {
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      text-align: center;
+      max-width: 900px;
+    }
+
     /* ─── Coverage table */
     .coverage-table {
       margin-top: 14px;
@@ -2103,65 +2181,63 @@
       </div>
     </section>
 
-    <!-- 14 ARQUITECTURA CLIENTE — pods + Container/Component -->
+    <!-- 14 ARQUITECTURA CLIENTE — capas CORE/COMMON/PODS/VIEWS -->
     <section class="slide" data-slide="14">
       <span class="slide-num">14</span>
-      <div class="content center-stack" style="max-width:1340px">
+      <div class="content center-stack" style="max-width:1320px">
         <p class="section-label reveal">Arquitectura cliente</p>
-        <h2 class="headline-lg reveal">Pods + Container/Presentational. <span class="grad-text">El mundo exterior y el mundo UI.</span></h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;width:100%;max-width:1280px;align-items:start;">
-          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
-            <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
-            <pre class="pod-tree"><code><span class="hl">gaming/</span>
-+-- api/
-|   +-- gaming.api-model.ts   <span class="hl-g">// tipos crudos API</span>
-|   +-- gaming.api.ts         <span class="hl-g">// hooks TanStack Query</span>
-|   +-- index.ts
-+-- hooks/
-|   +-- useGamingStart.ts     <span class="hl-g">// estado y manejadores</span>
-|   +-- index.ts
-+-- components/
-|   +-- <span class="hl-p">GamePanel.tsx</span>          <span class="hl-p">// presentational</span>
-+-- <span class="hl">GamingContainer.tsx</span>        <span class="hl">// mundo exterior</span>
-+-- <span class="hl">GamingComponent.tsx</span>        <span class="hl">// mundo UI</span>
-+-- gaming.mapper.ts
-+-- gaming.types.ts
-+-- index.ts</code></pre>
+        <h2 class="headline-lg reveal">Cuatro capas. <span class="grad-text">Un único sentido de dependencias.</span></h2>
+        <div class="layers-row reveal-group" style="margin-top:24px;width:100%;max-width:1260px;">
+          <div class="layer-col core">
+            <span class="layer-num">01</span>
+            <h3>CORE</h3>
+            <p class="layer-sub">Infraestructura cliente</p>
+            <ul>
+              <li>auth · router</li>
+              <li>api · query</li>
+              <li>i18n · store</li>
+              <li>navigation · seo</li>
+            </ul>
           </div>
-          <div class="reveal-group" style="display:flex;flex-direction:column;gap:18px;">
-            <p class="section-label" style="margin:0">El contrato</p>
-            <div class="refl-card refl-insight">
-              <div class="refl-header">
-                <span class="refl-icon">01</span>
-                <div>
-                  <h3>Container</h3>
-                  <p class="refl-subtitle">Mundo exterior</p>
-                </div>
-              </div>
-              <ul class="refl-list">
-                <li>Queries con TanStack Query</li>
-                <li>Mutations e invalidación</li>
-                <li>Routing y contexto de auth</li>
-                <li>Pasa <strong>ViewModels</strong> al Component</li>
-              </ul>
-            </div>
-            <div class="refl-card refl-future">
-              <div class="refl-header">
-                <span class="refl-icon">02</span>
-                <div>
-                  <h3>Component</h3>
-                  <p class="refl-subtitle">Mundo UI</p>
-                </div>
-              </div>
-              <ul class="refl-list">
-                <li>Recibe props (ViewModels)</li>
-                <li>useState / useEffect local</li>
-                <li>Sub-componentes y composición</li>
-                <li><strong>Cero queries, cero routing</strong></li>
-              </ul>
-            </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col common">
+            <span class="layer-num">02</span>
+            <h3>COMMON</h3>
+            <p class="layer-sub">UI reutilizable</p>
+            <ul>
+              <li>components</li>
+              <li>hooks</li>
+              <li>layout · styles</li>
+              <li>charts · lib</li>
+            </ul>
+          </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col pods">
+            <span class="layer-num">03</span>
+            <h3>PODS</h3>
+            <p class="layer-sub">Lógica por dominio</p>
+            <ul>
+              <li>game · study</li>
+              <li>landing · home</li>
+              <li>profile · ranking</li>
+              <li>stats · backoffice</li>
+            </ul>
+          </div>
+          <span class="layer-arrow">→</span>
+          <div class="layer-col views">
+            <span class="layer-num">04</span>
+            <h3>VIEWS</h3>
+            <p class="layer-sub">Páginas que orquestan</p>
+            <ul>
+              <li>GameView · StudyView</li>
+              <li>LandingView · HomeView</li>
+              <li>ProfileView · RankingView</li>
+              <li>AuthView · BackofficeView</li>
+            </ul>
           </div>
         </div>
+        <p class="layer-rule reveal" style="margin-top:20px"><strong>CORE</strong> no importa de nadie · cada capa solo consume la anterior · ningún <strong>POD</strong> importa de otro <strong>POD</strong></p>
+        <p class="layer-rule reveal" style="margin-top:8px;font-size:0.85rem;color:var(--color-text-muted)">Dentro de cada POD: <strong>Container</strong> (mundo exterior · queries) → <strong>Component</strong> (mundo UI · props) — cero acoplamiento entre PODs.</p>
       </div>
     </section>
 
