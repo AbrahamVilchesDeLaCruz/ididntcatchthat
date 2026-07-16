@@ -2144,7 +2144,7 @@
                 <span class="step-num">1</span>
                 <div>
                   <span class="step-layer infra">infrastructure</span>
-                  <span class="step-desc">Controller valida el DTO con <code>Class Validator</code> y resuelve el UseCase</span>
+                  <span class="step-desc">Controller valida el DTO con <code>Class Validator</code>, resuelve el UseCase y devuelve <code>201</code> al completarse</span>
                 </div>
               </li>
               <li>
@@ -2158,21 +2158,21 @@
                 <span class="step-num">3</span>
                 <div>
                   <span class="step-layer domain">domain</span>
-                  <span class="step-desc"><code>Game.complete()</code> ejecuta invariantes y registra los attempts</span>
+                  <span class="step-desc"><code>Game.complete()</code> ejecuta invariantes, registra los attempts y deja <code>GameCompleted</code> en el aggregate</span>
                 </div>
               </li>
               <li>
                 <span class="step-num">4</span>
                 <div>
                   <span class="step-layer infra">infrastructure</span>
-                  <span class="step-desc">Repository persiste en PostgreSQL con <code>TypeORM</code></span>
+                  <span class="step-desc">Repository persiste el aggregate en PostgreSQL con <code>TypeORM</code></span>
                 </div>
               </li>
               <li>
                 <span class="step-num">5</span>
                 <div>
-                  <span class="step-layer app">application</span>
-                  <span class="step-desc">Publica <code>GameCompleted</code> en RabbitMQ y devuelve 201</span>
+                  <span class="step-layer infra">infrastructure</span>
+                  <span class="step-desc"><code>DomainEventPublisher</code> (RabbitMQ) publica <code>GameCompleted</code> en el bus</span>
                 </div>
               </li>
             </ol>
