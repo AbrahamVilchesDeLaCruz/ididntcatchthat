@@ -1275,7 +1275,6 @@
       list-style: none;
       display: grid;
       gap: 12px;
-      flex: 1;
     }
 
     .refl-list li {
@@ -2108,7 +2107,7 @@
       <div class="content center-stack" style="max-width:1340px">
         <p class="section-label reveal">Arquitectura cliente</p>
         <h2 class="headline-lg reveal">Pods + Container/Presentational. <span class="grad-text">El mundo exterior y el mundo UI.</span></h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;width:100%;max-width:1280px;align-items:stretch;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;width:100%;max-width:1280px;align-items:start;">
           <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
             <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
             <pre class="pod-tree"><code><span class="hl">gaming/</span>
@@ -2127,9 +2126,9 @@
 ├── gaming.types.ts
 └── index.ts</code></pre>
           </div>
-          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;align-self:stretch;">
             <p class="section-label" style="margin:0">El contrato</p>
-            <div class="refl-card refl-insight" style="flex:1">
+            <div class="refl-card refl-insight">
               <div class="refl-header">
                 <span class="refl-icon">01</span>
                 <div>
@@ -2144,7 +2143,7 @@
                 <li>Pasa <strong>ViewModels</strong> al Component</li>
               </ul>
             </div>
-            <div class="refl-card refl-future" style="flex:1">
+            <div class="refl-card refl-future">
               <div class="refl-header">
                 <span class="refl-icon">02</span>
                 <div>
