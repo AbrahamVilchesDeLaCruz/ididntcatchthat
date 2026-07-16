@@ -82,8 +82,6 @@ Abre http://localhost:5173
 
 Equivalente sin Make (modo host):
 
-Equivalente sin Make (modo host):
-
 ```bash
 docker compose --project-directory . -f infra/docker-compose.local.yml up -d postgres rabbitmq minio --wait
 cp apps/api/.env.example apps/api/.env.local

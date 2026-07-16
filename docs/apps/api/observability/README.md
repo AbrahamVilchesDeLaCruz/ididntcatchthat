@@ -54,12 +54,28 @@ Logger (`LOGGER_SERVICE`) vive en **SharedModule**, no aquí.
 
 ## Eventos
 
-No emite ni consume domain events.
+### Eventos publicados
+
+Ninguno — el módulo expone métricas de proceso (Prometheus + interceptors), no domain events.
+
+### Eventos consumidos
+
+Ninguno.
+
+## Tablas
+
+Ninguna — todas las métricas viven en memoria en el `Registry` de `prom-client`. Los snapshots que produce `MetricsSummaryQuery` se generan leyendo el registry en tiempo de consulta. Reinicio del proceso reinicia todos los contadores.
 
 ## Cliente
 
 - `useMetricsSummary()` — tab HTTP/Runtime/Negocio en `/backoffice/observability`
 - `useAnalyticsSummary(period)` — tabs Visitas/Contenido (Analytics BC, no este módulo)
+
+## Paridad
+
+- **Cardinalidad acotada**: las métricas de negocio `app_*` están definidas como `Counter` con labels discretos (`{provider}` para audio/auth, sin labels libres). El interceptor HTTP etiqueta por `(method, route, status_code)` — `route` se normaliza con el path param (`:id`) para no explotar cardinalidad.
+- **Origen de los `app_*`**: cada incremento vive en el use case que materializa el evento (ver tabla arriba). No hay emitters fuera de `application/`.
+- **vs Analytics**: este módulo expone métricas volátiles (Prometheus); el read model histórico vive en el BC Analytics (PostgreSQL). Ambos exponen endpoints separados (`/v1/metrics/summary` vs `/v1/analytics/summary`).
 
 ## Flujos detallados
 

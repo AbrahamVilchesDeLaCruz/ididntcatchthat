@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ididntcatchthat.com — Vídeo TFM</title>
+  <meta name="description" content="Vídeo explicativo del TFM: demo de ididntcatchthat.com, arquitectura y decisiones técnicas.">
+  <link rel="icon" href="https://raw.githubusercontent.com/AbrahamVilchesDeLaCruz/ididntcatchthat/dev/apps/client/public/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg-base: #120F1A;
+      --color-bg-surface: #1D1828;
+      --color-bg-elevated: #251F35;
+      --color-brand: #F2A93B;
+      --color-brand-light: #F5BA5A;
+      --color-brand-dim: #3D2A08;
+      --color-accent-green: #2F9C92;
+      --color-accent-green-dim: #0D3534;
+      --color-accent-red: #FF6B53;
+      --color-border: #2C273A;
+      --color-border-strong: #3D3650;
+      --color-text-primary: #F5F3F9;
+      --color-text-secondary: #A89FBC;
+      --color-text-muted: #6B6478;
+      --font-display: 'Instrument Sans', sans-serif;
+      --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --radius-sm: 0.625rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1.125rem;
+      --radius-xl: 1.5rem;
+      --radius-full: 9999px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2 { font-family: var(--font-display); font-weight: 700; line-height: 1.15; }
+
+    .ambient-glow {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-glow::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(640px, 100vw);
+      height: min(640px, 70vh);
+      transform: translateX(-50%);
+      border-radius: var(--radius-full);
+      background: var(--color-brand);
+      opacity: 0.08;
+      filter: blur(120px);
+    }
+
+    .ambient-glow::after {
+      content: '';
+      position: absolute;
+      bottom: -15%;
+      right: -10%;
+      width: 420px;
+      height: 420px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent-green);
+      opacity: 0.06;
+      filter: blur(100px);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: clamp(28px, 5vw, 56px) clamp(20px, 4vw, 32px) 64px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border-strong);
+      background: var(--color-bg-elevated);
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
+    .hero-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent-red);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(1.25); }
+    }
+
+    .section-label {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-brand);
+    }
+
+    .headline {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      letter-spacing: -0.02em;
+      max-width: 22ch;
+      margin-bottom: 12px;
+    }
+
+    .grad-text {
+      background: linear-gradient(to right, var(--color-brand-light), var(--color-accent-green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subhead {
+      font-size: clamp(1rem, 1.7vw, 1.125rem);
+      color: var(--color-text-secondary);
+      max-width: 58ch;
+    }
+
+    .layout {
+      display: grid;
+      gap: clamp(24px, 4vw, 40px);
+      margin-top: clamp(28px, 4vw, 40px);
+    }
+
+    @media (min-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+        align-items: start;
+      }
+    }
+
+    .player-shell {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--color-border-strong);
+      background: var(--color-bg-surface);
+      padding: 14px;
+      box-shadow: 0 24px 80px color-mix(in srgb, #000 35%, transparent);
+    }
+
+    .player-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #000;
+    }
+
+    .player-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .player-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding: 0 4px;
+    }
+
+    .player-meta p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, var(--color-brand), var(--color-brand-light));
+      color: #1a1200;
+    }
+
+    .btn-ghost {
+      border: 1px solid var(--color-border-strong);
+      background: var(--color-bg-elevated);
+      color: var(--color-text-primary);
+    }
+
+    .sidebar { display: grid; gap: 14px; }
+
+    .ui-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      padding: 20px;
+    }
+
+    .ui-card h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    ul.points {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    ul.points li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+    }
+
+    ul.points li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      margin-top: 9px;
+      border-radius: var(--radius-full);
+      background: var(--color-brand);
+      flex: none;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--color-accent-green);
+      word-break: break-all;
+    }
+
+    .link-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .link-list a {
+      color: var(--color-text-primary);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .link-list a:hover {
+      color: var(--color-brand-light);
+      border-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+    }
+
+    .footer-note {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <main class="page">
+    <p class="hero-badge"><span class="dot"></span>TFM MoureDev 2026 · Captura de pantalla + explicación</p>
+    <p class="section-label">Vídeo explicativo</p>
+    <h1 class="headline">Demo y explicación de <span class="grad-text">ididntcatchthat</span></h1>
+    <p class="subhead">
+      Recorrido por el producto desplegado, la arquitectura del monorepo y las decisiones técnicas del TFM.
+      El vídeo está alojado en YouTube; esta página es la vista embebida para la entrega académica.
+    </p>
+
+    <div class="layout">
+      <section aria-label="Reproductor de vídeo">
+        <div class="player-shell">
+          <div class="player-frame">
+            <iframe
+              src="https://www.youtube.com/embed/I0Ciebm0Yb0"
+              title="TFM ididntcatchthat — demo y explicación del proyecto"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="player-meta">
+            <p>ID: <span class="mono">I0Ciebm0Yb0</span></p>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="https://youtu.be/I0Ciebm0Yb0" target="_blank" rel="noopener noreferrer">Abrir en YouTube</a>
+              <a class="btn btn-ghost" href="./tfm-slides.html">Ver slides TFM</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="ui-card">
+          <h2>Contenido sugerido</h2>
+          <ul class="points">
+            <li>Problema y propuesta de valor (fonética, connected speech, 3 acentos).</li>
+            <li>Demo en producción: landing, modo invitado, juego y estudio.</li>
+            <li>Arquitectura: monorepo, DDD, bounded contexts, pipeline de audio.</li>
+            <li>Testing, CI/CD, despliegue en VPS y observabilidad.</li>
+            <li>Limitaciones conscientes y trabajo futuro.</li>
+          </ul>
+        </div>
+
+        <div class="ui-card">
+          <h2>Enlaces relacionados</h2>
+          <div class="link-list">
+            <a href="https://ididntcatchthat.com" target="_blank" rel="noopener noreferrer">ididntcatchthat.com — producción</a>
+            <a href="https://github.com/AbrahamVilchesDeLaCruz/ididntcatchthat" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a>
+            <a href="./tfm-slides.html">Presentación TFM (slides)</a>
+            <a href="../../README.md">README del proyecto</a>
+          </div>
+        </div>
+
+        <div class="ui-card">
+          <h2>Evaluación local</h2>
+          <p style="font-size:0.9375rem;color:var(--color-text-secondary);margin-bottom:10px">
+            Backoffice y admin sin APIs de pago:
+          </p>
+          <p class="mono">demo@local.dev</p>
+          <p class="mono">DemoLocal123!</p>
+          <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-top:10px">
+            <code style="font-family:var(--font-mono)">make local-start</code>
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <p class="footer-note">
+      Para el formulario de entrega MoureDev, usa la URL directa de YouTube:
+      <a href="https://youtu.be/I0Ciebm0Yb0" style="color:var(--color-brand-light)">https://youtu.be/I0Ciebm0Yb0</a>
+    </p>
+  </main>
+</body>
+</html>

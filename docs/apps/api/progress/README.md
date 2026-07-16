@@ -41,6 +41,20 @@ progress/
 |--------|----------|--------|
 | `ModuleMasteryLevelIncreased` | `idct.progress.module_progress.module_mastery_level.increased` | `ModuleProgress.record()` al subir mastery |
 
+### Pipeline async
+
+```
+GameCompleted ─► UpdateModuleProgressOnGameCompleted ─► ModuleProgress.record() ─► ModuleMasteryLevelIncreased
+                                                                                        └─► RankingUpdaterOnModuleMasteryLevelIncreased
+                                                                                        └─► UnlockUserAchievementOnModuleMasteryLevelIncreased
+
+AttemptRecorded ─► FlashcardStatsUpdaterOnAttemptRecorded ─► UserFlashcardStats.record()
+FlashcardViewed ─► FlashcardStatsUpdaterOnFlashcardViewed ─► UserFlashcardStats.record()
+GuestProgressMigrated ─► GuestProgressImporterOnGuestProgressMigrated ─► UserFlashcardStats / ModuleProgress import
+```
+
+`ModuleMasteryLevelIncreased` se publica con `previousLevel`, `newLevel`, `module`, `userId`, `occurredAt` — Ranking (module_master) y Achievement (module_mastery_2 / module_mastery_3) lo consumen.
+
 ## Tablas
 
 | Tabla | Propósito |
@@ -48,6 +62,13 @@ progress/
 | `user_flashcard_stats` | Agregado `UserFlashcardStats` |
 | `module_progress` | Agregado `ModuleProgress` |
 | `processed_events` | Inbox idempotencia (shared) para guest import |
+
+## Paridad
+
+- **Write-time vs read model**: `UserFlashcardStats.record(attempt)` se aplica en cada `AttemptRecorded`; `WeakestFlashcardQuery` lee directamente las filas ordenadas por `accuracy ASC` — sin recomputo.
+- **Mastery threshold**: `StudyLevel` (domain) codifica los umbrales canónicos (0→1→2→3). `RandomModuleProgressUpdater` lo usa para emitir `ModuleMasteryLevelIncreased` solo al cruzar el umbral — emite una sola vez por transición (idempotente vía `previousLevel` en el evento).
+- **Guest import**: `GuestProgressImporter` lee de `guest_attempts` (tabla compartida con Gaming) y reproduce el historial en `user_flashcard_stats` + `module_progress` para el nuevo `userId`. No recalcula mastery retroactivo — los módulos ganados durante el período guest se materializan al import.
+- **Weakest query**: el query (`TypeOrmWeakestFlashcardQuery`) está expuesto como `WEAKEST_FLASHCARD_QUERY` desde `ProgressModule` para que `GameStarter` (Gaming) lo consuma vía DI token — sin acoplamiento por SQL directo.
 
 ## Cross-BC (read ports)
 

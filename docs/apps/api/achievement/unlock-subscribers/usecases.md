@@ -38,8 +38,8 @@ graph TB
 
 | Handler | Cola |
 |---------|------|
-| `UnlockUserAchievementOnGameCompleted` | `achievement.unlock_on_game_completed` |
+| `UnlockUserAchievementOnGameCompleted` | `achievement.unlock_achievement_on_game_completed` |
 | `UpdateAchievementProgressOnAttemptRecorded` | `achievement.update_progress_on_attempt_recorded` |
 | `UpdateAchievementProgressOnFlashcardViewed` | `achievement.update_progress_on_flashcard_viewed` |
-| `UnlockUserAchievementOnStreakUpdated` | `achievement.unlock_on_streak_updated` |
-| `UnlockUserAchievementOnModuleMasteryLevelIncreased` | `achievement.unlock_on_module_mastery_level_increased` |
+| `UnlockUserAchievementOnStreakUpdated` | `achievement.unlock_achievement_on_streak_updated` |
+| `UnlockUserAchievementOnModuleMasteryLevelIncreased` | `achievement.unlock_achievement_on_module_mastery_level_increased` |

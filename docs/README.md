@@ -4,6 +4,17 @@
 
 ---
 
+## Presentación TFM · Defensa ante tribunal
+
+Deck de defensa del Trabajo de Fin de Máster — pitch de negocio, decisiones técnicas, arquitectura y reflexión crítica. 11 slides.
+
+| Documento | Descripción |
+|---|---|
+| [presentation/tfm-slides.html](./presentation/tfm-slides.html) | Deck principal · problema → oportunidad → producto → modelo de negocio → decisiones → arquitectura → calidad → reflexión → cierre |
+| [presentation/tfm-video.html](./presentation/tfm-video.html) | Vídeo demostrativo del producto en uso |
+
+---
+
 ## Empezar aquí
 
 | Qué necesito | Documento |
@@ -28,6 +39,7 @@ Principios, arquitectura y convenciones que aplican a todo el sistema.
 | [engineering/client-pods.md](./engineering/client-pods.md) | Pods en profundidad: cuándo crear qué, relación con el patrón Container |
 | [engineering/testing.md](./engineering/testing.md) | Pirámide de tests, estrategia por capa, Jest + Vitest + Playwright |
 | [engineering/git-workflow.md](./engineering/git-workflow.md) | Branching, naming de ramas, merge strategy, conventional commits |
+| [engineering/feature-flags-and-stubs.md](./engineering/feature-flags-and-stubs.md) | Convención para stubs y "coming soon" — qué añadir, qué quitar |
 
 ---
 
@@ -50,6 +62,7 @@ El modelo conceptual del sistema — aggregates, bounded contexts, reglas de neg
 | [domain/notifications.md](./domain/notifications.md) | Flujos de notificación (email, push) |
 | [domain/user-profile-pronunciation.md](./domain/user-profile-pronunciation.md) | Perfil de usuario y evaluación de pronunciación |
 | [domain/content-backoffice.md](./domain/content-backoffice.md) | Gestión de contenido desde el backoffice |
+| [domain/monetization-future.md](./domain/monetization-future.md) | El rol `premium` está reservado — qué hay y qué no |
 
 ---
 
@@ -132,6 +145,11 @@ Decisiones de arquitectura con contexto histórico. Cada ADR explica el **por qu
 | [026](./adr/026-analytics-db-pageviews.md) | Pageviews en DB propia (sin Analytics externo) |
 | [027](./adr/027-study-mode-architecture.md) | Arquitectura del modo estudio |
 | [028](./adr/028-achievements-system.md) | Sistema de logros (achievements) |
+| [029](./adr/029-trivy-vulnerability-scanning.md) | Trivy como escáner de vulnerabilidades en CI |
+| [030](./adr/030-docker-port-binding-policy.md) | Política de binding de puertos Docker en VPS |
+| [031](./adr/031-deepseek.md) | DeepSeek como proveedor de IA generativa en backoffice |
+| [032](./adr/032-minio-local-s3.md) | MinIO como S3-compatible local (sustituto de Cloudflare R2) |
+| [033](./adr/033-threat-model.md) | Modelo de amenaza y postura de seguridad (STRIDE) |
 
 ---
 
@@ -175,6 +193,8 @@ Trazabilidad completa de cada bounded context: secuencia, clases y casos de uso 
 | [vps-security.md](./vps-security.md) | Hardening del VPS, incident response, `make security-*` |
 | [infra/docker-image-audit.md](./infra/docker-image-audit.md) | Inventario de imágenes Docker y Trivy |
 | [seo.md](./seo.md) | SEO y metadatos del cliente |
+| [runbook/first-deploy.md](./runbook/first-deploy.md) | Runbook paso a paso para el primer deploy a un VPS nuevo |
+| [runbook/capacity-plan.md](./runbook/capacity-plan.md) | Estimaciones de tráfico, cuellos de botella y plan de escalado |
 
 ---
 
@@ -195,3 +215,11 @@ Trazabilidad completa de cada bounded context: secuencia, clases y casos de uso 
 | Documento | Descripción |
 |---|---|
 | [brand/ididntcatchthat-brandsheet.html](./brand/ididntcatchthat-brandsheet.html) | Brand sheet: colores, tipografía, identidad visual |
+
+---
+
+## Retrospectiva
+
+| Documento | Descripción |
+|---|---|
+| [retrospective.md](./retrospective.md) | Lecciones aprendidas del TFM: bugs reales, decisiones sorprendentes, qué haríamos diferente |
