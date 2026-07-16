@@ -457,11 +457,13 @@
     .trust-chip strong { color: var(--color-text-primary); font-weight: 600; }
 
     /* ─── Cards */
-    .card-grid { display: grid; gap: 18px; margin-top: 22px; }
+    .card-grid { display: grid; gap: 18px; margin-top: 22px; align-items: stretch; }
     .card-grid.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .card-grid.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
     .ui-card {
+      display: flex;
+      flex-direction: column;
       border-radius: var(--radius-xl);
       border: 1px solid var(--color-border);
       background: var(--color-bg-surface);
@@ -509,14 +511,22 @@
       font-size: 0.9rem;
       line-height: 1.6;
       color: var(--color-text-muted);
+      flex: 1;
     }
+
+    .ui-card ul.points { flex: 1; }
+
+    .ui-card .tag-row { margin-top: auto; }
 
     .card-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
+      min-height: 32px;
     }
+
+    .card-header .card-label { margin-bottom: 0; }
 
     .card-num {
       font-family: var(--font-mono);
@@ -1735,11 +1745,11 @@
 <!-- 09 CALIDAD E IA — pirámide grande a la derecha -->
     <section class="slide" data-slide="9">
       <span class="slide-num">09</span>
-      <div class="content center-stack" style="max-width:1320px;">
+      <div class="content center-stack" style="max-width:1400px;">
         <p class="section-label reveal">Calidad e IA estratégica</p>
         <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
         <p class="subhead-sm reveal" style="max-width:72ch">API con umbrales altos (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
-        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:48px;margin-top:20px;width:100%;max-width:1240px;align-items:center;">
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:56px;margin-top:24px;width:100%;max-width:1320px;align-items:center;">
           <div class="reveal-group">
             <table class="coverage-table">
               <thead>
@@ -1754,7 +1764,7 @@
                 <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
               </tbody>
             </table>
-            <p class="subhead-sm" style="margin:18px 0 6px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
+            <p class="subhead-sm" style="margin:22px 0 8px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
             <ul class="points">
               <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
               <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
@@ -1762,8 +1772,8 @@
               <li><strong>Desarrollo</strong> — Cursor (agentes) + Claude, MiniMax, Copilot · <strong>SDD</strong> como metodología de specs versionadas.</li>
             </ul>
           </div>
-          <div class="pyramid reveal-group" style="max-width:520px;margin-inline:auto;">
-            <p class="section-label" style="text-align:center;margin-bottom:14px">Pirámide de testing</p>
+          <div class="pyramid reveal-group" style="max-width:620px;margin-inline:auto;">
+            <p class="section-label" style="text-align:center;margin-bottom:18px">Pirámide de testing</p>
             <div class="pyr l1">E2E · Playwright</div>
             <div class="pyr l2">Integration · MSW · repos</div>
             <div class="pyr l3">Unit · dominio · hooks</div>
@@ -1783,7 +1793,7 @@
           <div class="ui-card">
             <div class="card-header">
               <span class="card-num">01</span>
-              <p class="card-label" style="margin:0">Workflow</p>
+              <p class="card-label">Workflow</p>
             </div>
             <h3>TDD + SDD + Conventional Commits</h3>
             <ul class="points">
@@ -1801,7 +1811,7 @@
           <div class="ui-card highlight">
             <div class="card-header">
               <span class="card-num">02</span>
-              <p class="card-label" style="margin:0">Calidad de código</p>
+              <p class="card-label">Calidad de código</p>
             </div>
             <h3>TypeScript estricto + Clean Code</h3>
             <ul class="points">
@@ -1820,7 +1830,7 @@
           <div class="ui-card">
             <div class="card-header">
               <span class="card-num">03</span>
-              <p class="card-label" style="margin:0">Habilidades de IA</p>
+              <p class="card-label">Habilidades de IA</p>
             </div>
             <h3>Skills + Multi-LLM orquestado</h3>
             <ul class="points">
@@ -1849,7 +1859,7 @@
           <div class="ui-card">
             <div class="card-header">
               <span class="card-num">01</span>
-              <p class="card-label" style="margin:0">Identidad y acceso</p>
+              <p class="card-label">Identidad y acceso</p>
             </div>
             <h3>JWT + OAuth + roles</h3>
             <ul class="points">
@@ -1868,7 +1878,7 @@
           <div class="ui-card highlight">
             <div class="card-header">
               <span class="card-num">02</span>
-              <p class="card-label" style="margin:0">Defensa perimetral</p>
+              <p class="card-label">Defensa perimetral</p>
             </div>
             <h3>Rate limit + nginx único entrypoint</h3>
             <ul class="points">
@@ -1887,7 +1897,7 @@
           <div class="ui-card">
             <div class="card-header">
               <span class="card-num">03</span>
-              <p class="card-label" style="margin:0">Supply chain</p>
+              <p class="card-label">Supply chain</p>
             </div>
             <h3>Trivy + Doppler + threat model</h3>
             <ul class="points">
