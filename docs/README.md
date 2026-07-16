@@ -6,7 +6,7 @@
 
 ## Presentación TFM · Defensa ante tribunal
 
-Deck de defensa del Trabajo de Fin de Máster — pitch de negocio, decisiones técnicas, arquitectura y reflexión crítica. 12 slides.
+Deck de defensa del Trabajo de Fin de Máster — pitch de negocio, decisiones técnicas, arquitectura y reflexión crítica. 14 slides.
 
 | Documento | Descripción |
 |---|---|

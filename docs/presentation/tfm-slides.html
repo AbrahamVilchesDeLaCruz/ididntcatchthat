@@ -1745,9 +1745,61 @@
       </div>
     </section>
 
-    <!-- 10 REFLEXIÓN — UI rediseñada -->
+    <!-- 10 BUENAS PRÁCTICAS — card-grid g3 -->
     <section class="slide" data-slide="10">
       <span class="slide-num">10</span>
+      <div class="content center-stack" style="max-width:1280px">
+        <p class="section-label reveal">Buenas prácticas</p>
+        <h2 class="headline-lg reveal">Cómo se construye. <span class="grad-text">No solo qué se construye.</span></h2>
+        <div class="card-grid g3 reveal-group" style="max-width:1180px">
+          <div class="ui-card">
+            <p class="card-label">Workflow</p>
+            <h3>TDD + SDD + Conventional Commits</h3>
+            <p><strong style="color:var(--color-text-primary)">TDD</strong> Red → Green → Refactor para features nuevas. <strong style="color:var(--color-text-primary)">SDD</strong> (Spec-Driven Development) — propuesta → specs → diseño → tareas → implementación, con artefactos versionados. <strong style="color:var(--color-text-primary)">Commits</strong> convencionales enforced por <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">commitlint</code> + Husky.</p>
+          </div>
+          <div class="ui-card highlight">
+            <p class="card-label">Calidad de código</p>
+            <h3>TypeScript estricto + Clean Code</h3>
+            <p><strong style="color:var(--color-text-primary)">TypeScript estricto</strong> end-to-end (sin <code style="font-family:var(--font-mono);font-size:0.875em">any</code>). <strong style="color:var(--color-text-primary)">ESLint</strong> + <strong style="color:var(--color-text-primary)">Prettier</strong> con <code style="font-family:var(--font-mono);font-size:0.875em">recommendedTypeChecked</code>. <strong style="color:var(--color-text-primary)">Container</strong> (datos) vs <strong style="color:var(--color-text-primary)">Component</strong> (UI pura). <strong style="color:var(--color-text-primary)">DI</strong> con tokens <code style="font-family:var(--font-mono);font-size:0.875em">Symbol</code> — el dominio no sabe que NestJS existe.</p>
+          </div>
+          <div class="ui-card">
+            <p class="card-label">Habilidades de IA</p>
+            <h3>Skills reutilizables + Multi-LLM</h3>
+            <p><strong style="color:var(--color-text-primary)">Skills</strong> versionadas en <code style="font-family:var(--font-mono);font-size:0.875em">skills/</code> como instrucciones para agentes IA. <strong style="color:var(--color-text-primary)">Cursor</strong> orquesta con agentes; <strong style="color:var(--color-text-primary)">Claude</strong>, <strong style="color:var(--color-text-primary)">MiniMax</strong> y <strong style="color:var(--color-text-primary)">Copilot</strong> en scaffolding, tests y revisión. <strong style="color:var(--color-text-primary)">AGENTS.md</strong> como entry point por scope.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 SEGURIDAD — card-grid g3 -->
+    <section class="slide" data-slide="11">
+      <span class="slide-num">11</span>
+      <div class="content center-stack" style="max-width:1280px">
+        <p class="section-label reveal">Seguridad</p>
+        <h2 class="headline-lg reveal">Defensa por capas. <span class="grad-text">Desde el código hasta el VPS.</span></h2>
+        <div class="card-grid g3 reveal-group" style="max-width:1180px">
+          <div class="ui-card">
+            <p class="card-label">Identidad y acceso</p>
+            <h3>JWT + OAuth + roles</h3>
+            <p><strong style="color:var(--color-text-primary)">JWT</strong> (access + refresh) con cookies <code style="font-family:var(--font-mono);font-size:0.875em">httpOnly</code> + <code style="font-family:var(--font-mono);font-size:0.875em">secure</code>. <strong style="color:var(--color-text-primary)">OAuth Google</strong> integrado. <strong style="color:var(--color-text-primary)">Tokens guest</strong> en memoria (no localStorage). <strong style="color:var(--color-text-primary)">Guards</strong>, <strong style="color:var(--color-text-primary)">voters</strong> y <code style="font-family:var(--font-mono);font-size:0.875em">@CurrentUser</code> por rol (guest · user · teacher · admin).</p>
+          </div>
+          <div class="ui-card highlight">
+            <p class="card-label">Defensa perimetral</p>
+            <h3>Rate limit + nginx único entrypoint</h3>
+            <p><strong style="color:var(--color-text-primary)">Rate limiting</strong> en API. <strong style="color:var(--color-text-primary)">Helmet</strong> con headers HTTP seguros (HSTS, X-Frame-Options, CSP). <strong style="color:var(--color-text-primary)">nginx</strong> como único entrypoint público del VPS (ADR-030). <strong style="color:var(--color-text-primary)">Validación dual</strong> Class Validator (backend) + Zod (cliente).</p>
+          </div>
+          <div class="ui-card">
+            <p class="card-label">Supply chain</p>
+            <h3>Trivy + Doppler + threat model</h3>
+            <p><strong style="color:var(--color-text-primary)">Trivy</strong> escanea imágenes Docker en CI. <strong style="color:var(--color-text-primary)">Doppler</strong> para secrets — cero credenciales en el repo. <strong style="color:var(--color-text-primary)">Tags semver</strong> para imágenes base (ADR-029). <strong style="color:var(--color-text-primary)">Threat model</strong> documentado en [ADR-033](./../docs/adr/033-threat-model.md).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 REFLEXIÓN — UI rediseñada -->
+    <section class="slide" data-slide="12">
+      <span class="slide-num">12</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Lo que viene · Lo que aprendí</p>
         <h2 class="headline-lg reveal">Reflexión del proceso. <span class="grad-text">Honestidad en el roadmap.</span></h2>
@@ -1787,9 +1839,9 @@
       </div>
     </section>
 
-    <!-- 11 STACK — nueva -->
-    <section class="slide" data-slide="11">
-      <span class="slide-num">11</span>
+    <!-- 13 STACK — nueva -->
+    <section class="slide" data-slide="13">
+      <span class="slide-num">13</span>
       <div class="content center-stack" style="max-width:1280px">
         <p class="section-label reveal">Stack técnico</p>
         <h2 class="headline-lg reveal">Lo que hay debajo. <span class="grad-text">Por qué cada pieza.</span></h2>
@@ -1849,8 +1901,8 @@
     </section>
 
     <!-- 12 CIERRE — BIG brand izq + BIG links der, sin ¿Preguntas? -->
-    <section class="slide" data-slide="12">
-      <span class="slide-num">12</span>
+    <section class="slide" data-slide="14">
+      <span class="slide-num">14</span>
       <div class="content" style="max-width:1280px;margin-inline:auto;">
         <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:56px;align-items:center;width:100%;">
           <div class="center-stack" style="text-align:center;">
@@ -1880,7 +1932,7 @@
   <button class="nav-btn" id="prev" type="button" aria-label="Anterior">←</button>
   <div class="dots" id="dots"></div>
   <div class="progress"><span id="bar"></span></div>
-  <span class="counter" id="counter">1 / 12</span>
+  <span class="counter" id="counter">1 / 14</span>
   <button class="nav-btn" id="next" type="button" aria-label="Siguiente">→</button>
 </div>
 
