@@ -497,16 +497,43 @@
     .ui-card.future .card-label { color: var(--color-accent-green); }
 
     .ui-card h3 {
-      font-size: 1.0625rem;
-      margin-bottom: 10px;
+      font-size: 1.125rem;
+      margin-bottom: 12px;
       color: var(--color-text-primary);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
     }
 
     .ui-card p {
-      font-size: 0.9rem;
-      line-height: 1.55;
-      color: var(--color-text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--color-text-muted);
     }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, var(--color-brand-light), var(--color-accent-green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background-color: var(--color-bg-base);
+    }
+
+    .ui-card.highlight .card-num { border-color: var(--color-brand-dim); }
 
     .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 
@@ -1705,37 +1732,38 @@
       </div>
     </section>
 
-<!-- 09 CALIDAD E IA — single column, todo centrado y compacto -->
+<!-- 09 CALIDAD E IA — pirámide grande a la derecha -->
     <section class="slide" data-slide="9">
       <span class="slide-num">09</span>
-      <div class="content center-stack" style="max-width:1180px;">
+      <div class="content center-stack" style="max-width:1320px;">
         <p class="section-label reveal">Calidad e IA estratégica</p>
         <h2 class="headline-lg reveal">774 tests. <span class="grad-text">IA donde aporta, no como decoración.</span></h2>
         <p class="subhead-sm reveal" style="max-width:72ch">API con umbrales altos (90/100/100/100). Cliente con umbrales reales (75/78/80/80) tras excluir dos legacy.</p>
-        <table class="coverage-table reveal" style="margin-top:14px;">
-          <thead>
-            <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Use cases / domain services</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Repositorios / infraestructura</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Dominio (aggregates, VOs)</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
-            <tr><td>Hooks del pod</td><td>—</td><td><span class="coverage-cell cov-high">95%</span></td></tr>
-            <tr><td>Componentes UI</td><td>—</td><td><span class="coverage-cell cov-mid">85%</span></td></tr>
-            <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
-          </tbody>
-        </table>
-        <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:32px;margin-top:18px;width:100%;max-width:1040px;align-items:start;">
-          <div>
-            <p class="subhead-sm reveal" style="margin-bottom:6px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
-            <ul class="points reveal">
+        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:48px;margin-top:20px;width:100%;max-width:1240px;align-items:center;">
+          <div class="reveal-group">
+            <table class="coverage-table">
+              <thead>
+                <tr><th>Capa</th><th>API</th><th>Cliente</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Use cases / domain services</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Repositorios / infraestructura</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Dominio (aggregates, VOs)</td><td><span class="coverage-cell cov-high">100%</span></td><td>—</td></tr>
+                <tr><td>Hooks del pod</td><td>—</td><td><span class="coverage-cell cov-high">95%</span></td></tr>
+                <tr><td>Componentes UI</td><td>—</td><td><span class="coverage-cell cov-mid">85%</span></td></tr>
+                <tr><td>Mappers / utils</td><td><span class="coverage-cell cov-mid">85%</span></td><td><span class="coverage-cell cov-low">75%</span></td></tr>
+              </tbody>
+            </table>
+            <p class="subhead-sm" style="margin:18px 0 6px"><strong style="color:var(--color-text-primary)">En el producto</strong> · IA acotada y justificada:</p>
+            <ul class="points">
               <li><strong>ElevenLabs</strong> — audio en 3 acentos · pipeline AMQP · CDN (ADR-012).</li>
               <li><strong>DeepSeek</strong> — ejemplos bilingües, fonética y borradores en backoffice (ADR-031).</li>
               <li><strong>Bonus de pronunciación</strong> — pendiente, sin integración en el juego (ADR-008).</li>
               <li><strong>Desarrollo</strong> — Cursor (agentes) + Claude, MiniMax, Copilot · <strong>SDD</strong> como metodología de specs versionadas.</li>
             </ul>
           </div>
-          <div class="pyramid reveal-group" style="max-width:360px;margin-inline:auto;">
+          <div class="pyramid reveal-group" style="max-width:520px;margin-inline:auto;">
+            <p class="section-label" style="text-align:center;margin-bottom:14px">Pirámide de testing</p>
             <div class="pyr l1">E2E · Playwright</div>
             <div class="pyr l2">Integration · MSW · repos</div>
             <div class="pyr l3">Unit · dominio · hooks</div>
@@ -1745,53 +1773,135 @@
       </div>
     </section>
 
-    <!-- 10 BUENAS PRÁCTICAS — card-grid g3 -->
+    <!-- 10 BUENAS PRÁCTICAS — esquema con número + bullets + tags -->
     <section class="slide" data-slide="10">
       <span class="slide-num">10</span>
-      <div class="content center-stack" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1320px">
         <p class="section-label reveal">Buenas prácticas</p>
         <h2 class="headline-lg reveal">Cómo se construye. <span class="grad-text">No solo qué se construye.</span></h2>
-        <div class="card-grid g3 reveal-group" style="max-width:1180px">
+        <div class="card-grid g3 reveal-group" style="max-width:1240px">
           <div class="ui-card">
-            <p class="card-label">Workflow</p>
+            <div class="card-header">
+              <span class="card-num">01</span>
+              <p class="card-label" style="margin:0">Workflow</p>
+            </div>
             <h3>TDD + SDD + Conventional Commits</h3>
-            <p><strong style="color:var(--color-text-primary)">TDD</strong> Red → Green → Refactor para features nuevas. <strong style="color:var(--color-text-primary)">SDD</strong> (Spec-Driven Development) — propuesta → specs → diseño → tareas → implementación, con artefactos versionados. <strong style="color:var(--color-text-primary)">Commits</strong> convencionales enforced por <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">commitlint</code> + Husky.</p>
+            <ul class="points">
+              <li><strong>TDD</strong> — Red → Green → Refactor para features nuevas</li>
+              <li><strong>SDD</strong> — propuesta → specs → tareas → implementación</li>
+              <li><strong>Commits</strong> — enforced por <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">commitlint</code> + Husky</li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag brand">TDD</span>
+              <span class="tag green">SDD</span>
+              <span class="tag">commitlint</span>
+              <span class="tag">Husky</span>
+            </div>
           </div>
           <div class="ui-card highlight">
-            <p class="card-label">Calidad de código</p>
+            <div class="card-header">
+              <span class="card-num">02</span>
+              <p class="card-label" style="margin:0">Calidad de código</p>
+            </div>
             <h3>TypeScript estricto + Clean Code</h3>
-            <p><strong style="color:var(--color-text-primary)">TypeScript estricto</strong> end-to-end (sin <code style="font-family:var(--font-mono);font-size:0.875em">any</code>). <strong style="color:var(--color-text-primary)">ESLint</strong> + <strong style="color:var(--color-text-primary)">Prettier</strong> con <code style="font-family:var(--font-mono);font-size:0.875em">recommendedTypeChecked</code>. <strong style="color:var(--color-text-primary)">Container</strong> (datos) vs <strong style="color:var(--color-text-primary)">Component</strong> (UI pura). <strong style="color:var(--color-text-primary)">DI</strong> con tokens <code style="font-family:var(--font-mono);font-size:0.875em">Symbol</code> — el dominio no sabe que NestJS existe.</p>
+            <ul class="points">
+              <li><strong>TS estricto</strong> end-to-end — sin <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">any</code></li>
+              <li><strong>ESLint + Prettier</strong> con <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">recommendedTypeChecked</code></li>
+              <li><strong>Container</strong> (datos) vs <strong>Component</strong> (UI pura)</li>
+              <li><strong>DI</strong> con tokens <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">Symbol</code> — dominio agnóstico de NestJS</li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag brand">TypeScript</span>
+              <span class="tag brand">ESLint</span>
+              <span class="tag">Prettier</span>
+              <span class="tag">DI</span>
+            </div>
           </div>
           <div class="ui-card">
-            <p class="card-label">Habilidades de IA</p>
-            <h3>Skills reutilizables + Multi-LLM</h3>
-            <p><strong style="color:var(--color-text-primary)">Skills</strong> versionadas en <code style="font-family:var(--font-mono);font-size:0.875em">skills/</code> como instrucciones para agentes IA. <strong style="color:var(--color-text-primary)">Cursor</strong> orquesta con agentes; <strong style="color:var(--color-text-primary)">Claude</strong>, <strong style="color:var(--color-text-primary)">MiniMax</strong> y <strong style="color:var(--color-text-primary)">Copilot</strong> en scaffolding, tests y revisión. <strong style="color:var(--color-text-primary)">AGENTS.md</strong> como entry point por scope.</p>
+            <div class="card-header">
+              <span class="card-num">03</span>
+              <p class="card-label" style="margin:0">Habilidades de IA</p>
+            </div>
+            <h3>Skills + Multi-LLM orquestado</h3>
+            <ul class="points">
+              <li><strong>Skills</strong> versionadas en <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">skills/</code> para agentes IA</li>
+              <li><strong>Cursor</strong> orquesta con agentes; <strong>Claude</strong>, <strong>MiniMax</strong>, <strong>Copilot</strong> en scaffolding, tests y revisión</li>
+              <li><strong>AGENTS.md</strong> — entry point por scope (api / client)</li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag green">Cursor</span>
+              <span class="tag">Claude</span>
+              <span class="tag">MiniMax</span>
+              <span class="tag">Copilot</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 11 SEGURIDAD — card-grid g3 -->
+    <!-- 11 SEGURIDAD — esquema con número + bullets + tags -->
     <section class="slide" data-slide="11">
       <span class="slide-num">11</span>
-      <div class="content center-stack" style="max-width:1280px">
+      <div class="content center-stack" style="max-width:1320px">
         <p class="section-label reveal">Seguridad</p>
         <h2 class="headline-lg reveal">Defensa por capas. <span class="grad-text">Desde el código hasta el VPS.</span></h2>
-        <div class="card-grid g3 reveal-group" style="max-width:1180px">
+        <div class="card-grid g3 reveal-group" style="max-width:1240px">
           <div class="ui-card">
-            <p class="card-label">Identidad y acceso</p>
+            <div class="card-header">
+              <span class="card-num">01</span>
+              <p class="card-label" style="margin:0">Identidad y acceso</p>
+            </div>
             <h3>JWT + OAuth + roles</h3>
-            <p><strong style="color:var(--color-text-primary)">JWT</strong> (access + refresh) con cookies <code style="font-family:var(--font-mono);font-size:0.875em">httpOnly</code> + <code style="font-family:var(--font-mono);font-size:0.875em">secure</code>. <strong style="color:var(--color-text-primary)">OAuth Google</strong> integrado. <strong style="color:var(--color-text-primary)">Tokens guest</strong> en memoria (no localStorage). <strong style="color:var(--color-text-primary)">Guards</strong>, <strong style="color:var(--color-text-primary)">voters</strong> y <code style="font-family:var(--font-mono);font-size:0.875em">@CurrentUser</code> por rol (guest · user · teacher · admin).</p>
+            <ul class="points">
+              <li><strong>JWT</strong> (access + refresh) con cookies <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">httpOnly</code> + <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">secure</code></li>
+              <li><strong>OAuth Google</strong> integrado desde el primer login</li>
+              <li><strong>Tokens guest</strong> en memoria — nunca en localStorage</li>
+              <li><strong>Roles</strong> con guards, voters y <code style="font-family:var(--font-mono);font-size:0.875em;color:var(--color-accent-green)">@CurrentUser</code></li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag brand">JWT</span>
+              <span class="tag brand">OAuth</span>
+              <span class="tag">httpOnly</span>
+              <span class="tag">guests</span>
+            </div>
           </div>
           <div class="ui-card highlight">
-            <p class="card-label">Defensa perimetral</p>
+            <div class="card-header">
+              <span class="card-num">02</span>
+              <p class="card-label" style="margin:0">Defensa perimetral</p>
+            </div>
             <h3>Rate limit + nginx único entrypoint</h3>
-            <p><strong style="color:var(--color-text-primary)">Rate limiting</strong> en API. <strong style="color:var(--color-text-primary)">Helmet</strong> con headers HTTP seguros (HSTS, X-Frame-Options, CSP). <strong style="color:var(--color-text-primary)">nginx</strong> como único entrypoint público del VPS (ADR-030). <strong style="color:var(--color-text-primary)">Validación dual</strong> Class Validator (backend) + Zod (cliente).</p>
+            <ul class="points">
+              <li><strong>Rate limiting</strong> en API y endpoints sensibles</li>
+              <li><strong>Helmet</strong> con HSTS, X-Frame-Options, CSP</li>
+              <li><strong>nginx</strong> — único entrypoint público del VPS (ADR-030)</li>
+              <li><strong>Validación dual</strong> — Class Validator (API) + Zod (cliente)</li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag brand">rate-limit</span>
+              <span class="tag brand">Helmet</span>
+              <span class="tag">nginx</span>
+              <span class="tag">ADR-030</span>
+            </div>
           </div>
           <div class="ui-card">
-            <p class="card-label">Supply chain</p>
+            <div class="card-header">
+              <span class="card-num">03</span>
+              <p class="card-label" style="margin:0">Supply chain</p>
+            </div>
             <h3>Trivy + Doppler + threat model</h3>
-            <p><strong style="color:var(--color-text-primary)">Trivy</strong> escanea imágenes Docker en CI. <strong style="color:var(--color-text-primary)">Doppler</strong> para secrets — cero credenciales en el repo. <strong style="color:var(--color-text-primary)">Tags semver</strong> para imágenes base (ADR-029). <strong style="color:var(--color-text-primary)">Threat model</strong> documentado en [ADR-033](./../docs/adr/033-threat-model.md).</p>
+            <ul class="points">
+              <li><strong>Trivy</strong> escanea imágenes Docker en CI</li>
+              <li><strong>Doppler</strong> para secrets — cero credenciales en repo</li>
+              <li><strong>Tags semver</strong> pinned para imágenes base (ADR-029)</li>
+              <li><strong>Threat model</strong> documentado en ADR-033</li>
+            </ul>
+            <div class="tag-row">
+              <span class="tag green">Trivy</span>
+              <span class="tag">Doppler</span>
+              <span class="tag">ADR-029</span>
+              <span class="tag">ADR-033</span>
+            </div>
           </div>
         </div>
       </div>
