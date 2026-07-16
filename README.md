@@ -437,7 +437,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 
 ## 🎓 Entrega TFM
 
-Material de evaluación del Trabajo de Fin de Máster (MoureDev).
+Material de evaluación del **Máster en Desarrollo con IA · BIG School**.
 
 | Recurso | Enlace |
 |---------|--------|
