@@ -125,12 +125,11 @@ Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` 
 <p>
   <img src="https://img.shields.io/badge/DeepSeek-ejemplos_+_fonética-0066FF?style=flat-square" alt="DeepSeek" />
   <img src="https://img.shields.io/badge/ElevenLabs-síntesis_de_voz-000?logo=elevenlabs&logoColor=white" alt="ElevenLabs" />
-  <img src="https://img.shields.io/badge/Azure_Speech-pronunciación-0078D4?logo=microsoftazure&logoColor=white" alt="Azure Speech" />
 </p>
 
 - **DeepSeek** — genera **ejemplos bilingües** (EN/ES) y **notas fonéticas** (IPA, native speech) al crear o completar flashcards en backoffice.
 - **ElevenLabs** — síntesis de voz en 3 acentos (offline, pipeline de audio → CDN).
-- **Azure Speech** — evaluación de pronunciación en tiempo real (bonus de puntos).
+- **Pronunciación** — el bonus de voz está planificado para una fase posterior (ver [ADR-008](./docs/adr/008-azure-speech.md) y [deck slide 10](./docs/presentation/tfm-slides.html#slide-10)).
 
 ---
 
@@ -292,7 +291,7 @@ Organización por **Screaming Architecture** con capas Clean Architecture en cad
 - Modos **juego** y **estudio**
 - Partidas de 10 / 20 / 50 flashcards
 - **Streaks**, accuracy, ranking y logros
-- **Bonus de pronunciación** con Azure Speech
+- **Bonus de pronunciación** — planificado (ADR-008), pendiente de integrar
 
 ### 🔐 Auth y acceso
 
@@ -342,7 +341,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 - **Problema real identificado**: la brecha entre el inglés de clase y el inglés hablado por nativos
 - **Propuesta de valor diferenciada** → [project-overview](./docs/project-overview.md)
 - **Modelo de dominio** previo a implementar → [domain-model](./docs/domain/domain-model.md) · [game-mechanics](./docs/domain/game-mechanics.md) · [auth-guest](./docs/domain/auth-guest.md)
-- **28 ADRs** con contexto, alternativas y consecuencias → [docs/adr/](./docs/adr/)
+- **33 ADRs** con contexto, alternativas y consecuencias → [docs/adr/](./docs/adr/)
 
 </details>
 
@@ -350,7 +349,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 <summary><strong>📐 Diseño</strong></summary>
 <br/>
 
-- **Clean Architecture + DDD** con bounded contexts: `content`, `gaming`, `identity`, `progress`
+- **Clean Architecture + DDD** con 8 bounded contexts: `content`, `gaming`, `identity`, `progress`, `ranking`, `achievement`, `analytics`, `observability`
 - **Frontend por pods** Container/Presentational → [frontend-architecture](./docs/engineering/frontend-architecture.md)
 - **Diagramas Mermaid** embebidos en la documentación
 - **OpenAPI/Swagger** + validación dual Class Validator + Zod
@@ -365,7 +364,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 - Monorepo **TypeScript end-to-end** (`apps/api` + `apps/client`)
 - Casos de uso explícitos + repositorios como interfaces en domain
 - **Domain Events** y Event Bus entre bounded contexts
-- Pipeline **DeepSeek** (contenido) + **ElevenLabs** (audio) → CDN + Azure Speech en tiempo real
+- Pipeline **DeepSeek** (contenido) + **ElevenLabs** (audio) → CDN
 - **CI/CD** GitHub Actions + Docker + Makefile + VPS
 - Desplegado en [ididntcatchthat.com](https://ididntcatchthat.com) y [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com)
 
@@ -433,7 +432,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 | 🛠️ **Desarrollo** | **Cursor** (IDE + agentes), skills en `skills/`/`AGENTS.md`, Claude y Copilot |
 | 📚 **Producto (contenido)** | **DeepSeek** — ejemplos bilingües y fonética (IPA, native speech) al crear flashcards |
 | 🎙️ **Producto (audio)** | ElevenLabs al crear flashcards (offline, ×3 acentos) |
-| 🗣️ **Producto (voz)** | Azure Speech en tiempo real (bonus de puntos) |
+| 🗣️ **Producto (voz)** | Pendiente — ADR-008, bonus de pronunciación planificado |
 | 📝 **Metodología** | Skills reutilizables en `skills/`, decisiones en `docs/adr/` |
 
 > La IA no actúa en el flujo principal del juego: el contenido es **curado** en backoffice (DeepSeek + ElevenLabs), no generado dinámicamente durante la partida.
@@ -456,7 +455,7 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 
 ### Presentación TFM
 
-Presentación web interactiva (15 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
+Presentación web interactiva (11 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
 
 > **GitHub no ejecuta HTML del repo** — al abrir el archivo en GitHub solo verás el código fuente. Usa uno de estos enlaces para la **preview interactiva**:
 

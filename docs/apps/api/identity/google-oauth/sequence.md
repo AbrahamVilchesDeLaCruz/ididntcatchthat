@@ -50,7 +50,7 @@ sequenceDiagram
         UC->>UC: user = avatarUrl ? user.addAvatar(avatarUrl) : user
         UC->>UserRepo: save(user)
         UserRepo->>DB: UPDATE users SET avatar_url = ?
-        Note over UC: isNewUser = false — no events published
+        Note over UC: addAvatar usa fromPrimitives → sin eventos de User<br/>isNewUser = false
     else new user
         UC->>NicknameResolver: resolve(displayName)
         NicknameResolver-->>UC: unique nickname
@@ -60,17 +60,20 @@ sequenceDiagram
         UC->>UserRepo: save(user)
         UserRepo->>DB: INSERT users
 
-        UC->>Publisher: publish(user.pullDomainEvents())
+        Note over UC: UserRegisteredEvent queda en user.pullDomainEvents()
         Note over UC: isNewUser = true
     end
 
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
-    TokenSvc-->>UC: { accessToken, userSessionId }
+    TokenSvc-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RefreshRepo: save(UserSession.create(id, userSessionId, userId, deviceId))
+    UC->>RefreshRepo: save(UserSession.create(id, refreshTokenId, userId, deviceId, fingerprint))
     RefreshRepo->>DB: INSERT user_session
 
-    UC-->>CallbackController: { accessToken }
+    UC->>Publisher: publish([...user.pullDomainEvents(), ...session.pullDomainEvents()])
+    Note over Publisher: SessionStartedEvent siempre (nuevo + existente)<br/>UserRegisteredEvent solo en alta nueva
+
+    UC-->>CallbackController: { accessToken, refreshTokenId }
 
     CallbackController->>CallbackController: res.cookie('userSession', deviceId, httpOnly)
     CallbackController-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: userSession=<deviceId>

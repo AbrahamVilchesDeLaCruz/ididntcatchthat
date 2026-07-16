@@ -96,7 +96,7 @@ apps/api/src/{bc}/
 | Jest + Faker.js + jest-mock-extended | Testing |
 | OpenAPI / Swagger | Contrato de API |
 | ElevenLabs | Generación de audio (backoffice) |
-| Azure Speech | Evaluación de pronunciación |
+| DeepSeek | Generación de ejemplos y fonética (backoffice) |
 
 ---
 
@@ -105,7 +105,7 @@ apps/api/src/{bc}/
 - **TypeScript** estricto — no usar `any`
 - **TypeORM** solo en `infrastructure/persistence/` — nunca en domain ni application
 - Errores de dominio como clases tipadas: `throw new FlashcardNotFound(id)`
-- Servicios externos (ElevenLabs, Azure) solo en `infrastructure/` — interfaces en `domain/`
+- Servicios externos (ElevenLabs, DeepSeek) solo en `infrastructure/` — interfaces en `domain/`
 - Path aliases en todos los imports — nunca rutas relativas largas
 
 ---
@@ -142,7 +142,7 @@ pnpm test:debug       # Jest con inspector de Node
 - `jest.config.ts` — unit tests (`src/**/*.spec.ts`)
 - `jest.e2e.config.ts` — E2E tests (`test/**/*.e2e-spec.ts`)
 
-**Coverage thresholds (unit):** 80% branches / functions / lines / statements
+**Coverage thresholds (unit):** 90% branches / 100% functions / 100% lines / 100% statements
 
 ---
 

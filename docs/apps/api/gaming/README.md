@@ -72,6 +72,13 @@ Ninguno (Progress, Identity, Achievement y Ranking consumen los eventos anterior
 | `attempts` | Intentos por flashcard |
 | `game_views` | Vistas en modo study |
 
+## Paridad
+
+- **Taxonomía**: `@/shared/domain/subcategory-taxonomy.ts` valida que cada `(category, subcategory)` pedido al `GameStarter` exista. Paridad cubierta por `subcategory-taxonomy-parity.spec.ts` (shared).
+- **Guest progress → Identity**: cuando un guest se migra a usuario, `GuestProgressMigrated` desde Identity dispara `MigrateGuestGamesOnGuestProgressMigrated` que reconcilia `games` / `attempts` / `views` con el nuevo `userId`.
+- **Owner canónico**: `GameStarter` normaliza `userId` ausente a `null` (guest) y `deviceId` a uno nuevo si el payload no lo trae. `GameCompleter` solo contabiliza `mode = 'game'` para `most_active` (ranking) y para `AttemptRecorded` que activa `RecordRankingAttempt`.
+- **Pausa / resume**: `GamePauser` rechaza el PATCH si `status !== 'in_progress'`. `GameResumer` requiere `attempts.length === 0` (partida recién retomada, sin re-intentos intermedios).
+
 ## Políticas de dominio
 
 | Policy | Regla |

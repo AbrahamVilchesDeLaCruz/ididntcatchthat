@@ -15,7 +15,7 @@
 - Evento `AchievementUnlocked` + toast in-app post-desbloqueo
 - Progreso incremental en `user_achievement_progress` (contadores y módulos tocados)
 
-Ver también: [ADR-028](../adr/028-achievements-system.md)
+Ver también: [ADR-028](../adr/028-achievements-system.md) (catálogo v1). El sistema v2 implementado (3 sub-módulos: `catalog`, `progress`, `user-achievement`) difiere de la primera versión del ADR — ver [docs/apps/api/achievement/README.md](../apps/api/achievement/README.md) para el estado actual.
 
 ---
 

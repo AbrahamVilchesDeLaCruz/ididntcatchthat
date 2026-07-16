@@ -12,10 +12,11 @@ sequenceDiagram
     participant PH as PasswordHasher
     participant U as User
     participant UREPO as UserRepository
+    participant TG as TokenGenerator
     participant RTREPO as UserSessionRepository
     participant PUB as DomainEventPublisher
 
-    Client->>C: POST /auth/register { email, password, nickname }
+    Client->>C: POST /auth/register { email, password, nickname, guestDeviceId? }
 
     C->>UC: execute({ email, password, nickname, deviceId, fingerprint, ip })
 
@@ -32,15 +33,19 @@ sequenceDiagram
     U->>U: record(new UserRegisteredEvent(...))
     U-->>UC: user
 
+    UC->>TG: generatePair({ type:'user', userId, deviceId, fingerprint, ip, roles })
+    TG-->>UC: { accessToken, refreshTokenId }
+
     UC->>UREPO: save(user)
     Note over UREPO: Primero — FK constraint en user_sessions
 
-    UC->>RTREPO: save(userSession)
+    UC->>RTREPO: save(UserSession.create(id, refreshTokenId, userId, deviceId, fingerprint))
 
-    UC->>PUB: publish(user.pullEvents())
+    UC->>PUB: publish([...user.pullDomainEvents(), ...session.pullDomainEvents()])
+    Note over PUB: UserRegisteredEvent + SessionStartedEvent
 
-    UC-->>C: { accessToken, userSessionId }
-    C->>C: res.cookie("userSession", userSessionId, {...})
+    UC-->>C: { accessToken, refreshTokenId }
+    C->>C: res.cookie("refreshToken", refreshTokenId, { httpOnly, sameSite:"strict", secure })
     C-->>Client: 201 { accessToken }
 ```
 

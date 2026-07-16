@@ -55,14 +55,36 @@ identity/
 | `users` | Agregado User (incl. streak, ranking prefs) |
 | `user_sessions` | Refresh tokens por dispositivo |
 
+### Pipeline async (streak)
+
+```
+GameCompleted (Gaming) ─► StreakUpdaterOnGameCompleted ─► User.recordActivity()
+FlashcardViewed (Gaming) ─► StreakUpdaterOnFlashcardViewed ─► User.recordActivity()
+                                                                          └─► StreakUpdated (si first activity del día)
+                                                                          └─► StreakBroken (si cron detecta racha rota)
+                                                                          └─► UnlockUserAchievementOnStreakUpdated (Achievement)
+                                                                          └─► RankingUpdaterOnStreakUpdated (Ranking)
+```
+
+`StreakBrokenCronJob` corre diariamente y publica `StreakBroken` cuando detecta que la racha del día anterior no se cerró.
+
 ## Cross-BC
 
 | Dependencia | Mecanismo |
 |-------------|-----------|
-| Ranking sync | `RankingProfileUpdated` → `UpdateRankingOnRankingProfileUpdated` |
+| Ranking sync | `RankingProfileUpdated` → `RankingUpdaterOnRankingProfileUpdated` |
 | Gaming guest games | `GuestProgressMigrated` → `MigrateGuestGamesOnGuestProgressMigrated` |
 | Progress guest stats | `GuestProgressMigrated` → `GuestProgressImporterOnGuestProgressMigrated` |
-| Gaming activity (admin stats) | Read port `GamingUserActivityQuery` exportado por GamingModule |
+| Achievement streak | `StreakUpdated` → `UnlockUserAchievementOnStreakUpdated` |
+| Ranking streak | `StreakUpdated` → `RankingUpdaterOnStreakUpdated` |
+| Gaming activity (admin stats) | Read port `UserGamesCompletedQuery` exportado por GamingModule |
+
+## Paridad
+
+- **ADR-018** define el modelo de auth (JWT access + refresh + OAuth Google + guest) y los eventos de sesión.
+- **Session compromised** (`SessionCompromisedEvent`) se publica cuando `TokenRefresher` detecta reuso del refresh token — actualmente log + revoke en cascada, sin consumer BC.
+- **Guest → user**: `MigrateGuestAuthenticator` es idempotente: si el `deviceId` ya está asociado a un usuario, no vuelve a publicar `GuestProgressMigrated`. `GuestProgressMigrator` solo migra partidas con `userId IS NULL`.
+- **Eligibility para ranking**: `RankingEligibilityQuery.findEligibleUser` cruza `users.show_in_ranking` con el `userId` y delega en `IdentityRankingProfileAdapter` (Ranking). Misma fuente para ACL.
 
 ## Referencias
 

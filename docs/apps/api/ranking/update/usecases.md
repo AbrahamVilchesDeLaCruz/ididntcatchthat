@@ -24,13 +24,13 @@ graph TB
 
 ## Use cases (`projection/application/update/`)
 
-| Use case | Evento / trigger | Tipos ranking |
-|----------|------------------|---------------|
-| `RecordRankingGameCompleted` | `GameCompleted` | `most_active` (daily/weekly/monthly) |
-| `RecordRankingAttempt` | `AttemptRecorded` | `top_scorer`, `most_accurate` |
-| `RecordRankingStreakUpdated` | `StreakUpdated` | `best_streak` |
-| `RecordRankingModuleMastery` | `ModuleMasteryLevelIncreased` | `module_master` |
-| `SyncRankingProfile` | `RankingProfileUpdated` | Todas las filas del usuario |
+| Use case | Evento / trigger | Tipos ranking | Periodos |
+|----------|------------------|---------------|----------|
+| `RecordRankingGameCompleted` | `GameCompleted` (`mode = game`) | `most_active` | `all_time` (+1) + `weekly` / `monthly` (recalculados) |
+| `RecordRankingAttempt` | `AttemptRecorded` (`mode = game`) | `top_scorer`, `most_accurate` | `weekly` / `monthly` / `all_time` (recalculados) |
+| `RecordRankingStreakUpdated` | `StreakUpdated` | `best_streak` | `all_time` |
+| `RecordRankingModuleMastery` | `ModuleMasteryLevelIncreased` | `module_master` | `all_time` (por módulo) |
+| `SyncRankingProfile` | `RankingProfileUpdated` | Todas las filas del usuario | — (rename / remove / backfill) |
 
 ## Reglas de negocio
 

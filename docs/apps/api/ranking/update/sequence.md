@@ -30,13 +30,13 @@ sequenceDiagram
 
 ## Por evento
 
-| Evento | Método updater | Tipos afectados |
-| ------ | -------------- | --------------- |
-| `GameCompleted` | `recordGameCompleted` | `most_active` |
-| `AttemptRecorded` | `recordAttempt` | `most_accurate`, `top_scorer` |
-| `StreakUpdated` | `recordStreakUpdated` | `best_streak` |
-| `ModuleMasteryLevelIncreased` | `recordModuleMastery` | `module_master` |
-| `PATCH ranking-profile` | `syncProfile` | Todas las filas del usuario (`match` + `remove` o backfill) |
+| Evento | Método updater | Tipos afectados | Periodos |
+| ------ | -------------- | --------------- | -------- |
+| `GameCompleted` (`mode = game`) | `RecordRankingGameCompleted` | `most_active` | `all_time` (+1 directo) + `weekly` / `monthly` (recalculados vía `countCompletedGames`) |
+| `AttemptRecorded` (`mode = game`) | `RecordRankingAttempt` | `top_scorer`, `most_accurate` | `weekly` / `monthly` / `all_time` (recalculados vía `sumCorrectCount` / `avgAccuracy`) |
+| `StreakUpdated` | `RecordRankingStreakUpdated` | `best_streak` | `all_time` |
+| `ModuleMasteryLevelIncreased` | `RecordRankingModuleMastery` | `module_master` | `all_time` (por módulo) |
+| `RankingProfileUpdated` | `SyncRankingProfile` | Todas las filas del usuario | `match(userId)` + `remove` (opt-out) o `renameAllForUser` + backfill (opt-in) |
 
 ## syncProfile
 

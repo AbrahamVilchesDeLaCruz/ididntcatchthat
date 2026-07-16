@@ -45,6 +45,23 @@ Query: `since` (ISO8601) — filtra logros desbloqueados después de esa fecha.
 | `StreakUpdated` | streak_7, streak_30, streak_100 |
 | `ModuleMasteryLevelIncreased` | module_mastery_2, module_mastery_3 |
 
+### Pipeline async
+
+```
+GameCompleted (game) ─► UnlockUserAchievementOnGameCompleted ─► GameCompletedAchievementUnlocker.evaluate
+                                                                          └─► AchievementUnlockPolicy → AchievementKey[]
+                                                                          └─► UserAchievement.unlock() (idempotente)
+                                                                                  └─► AchievementUnlockedEvent
+
+GameCompleted (study) ─► UnlockUserAchievementOnGameCompleted ─► StudyCompletedAchievementUnlocker.evaluate
+AttemptRecorded ─────► UpdateAchievementProgressOnAttemptRecorded ─► AchievementProgressUpdater.incrementAttempts
+FlashcardViewed ─────► UpdateAchievementProgressOnFlashcardViewed ─► AchievementProgressUpdater.recordStudiedModule
+StreakUpdated ───────► UnlockUserAchievementOnStreakUpdated ─► StreakAchievementUnlockPolicy.match
+ModuleMasteryLevelIncreased ─► UnlockUserAchievementOnModuleMasteryLevelIncreased ─► ModuleMasteryAchievementUnlockPolicy.match
+```
+
+`AchievementUnlockedEvent` solo se publica cuando el unlock es nuevo (no idempotente por sí mismo — la idempotencia la da la PK `(user_id, achievement_key)` en `user_achievements`).
+
 ## Catálogo v2 (14 logros)
 
 Fuente de verdad en dominio: `AchievementCatalog` (`catalog/domain/achievement-catalog.ts`).
@@ -60,6 +77,15 @@ Ver [docs/spec/achievements.md](../../../../docs/spec/achievements.md).
 | `achievement_catalog` | FK integrity — keys, category, sort_order (+ title/description legacy) |
 | `user_achievements` | PK `(user_id, achievement_key)` — desbloqueos |
 | `user_achievement_progress` | Contadores y módulos tocados por usuario |
+
+## Cross-BC
+
+| Dependencia | Mecanismo |
+|-------------|-----------|
+| Events from Gaming | `AttemptRecorded`, `FlashcardViewed`, `GameCompleted` |
+| Events from Identity | `StreakUpdated` |
+| Events from Progress | `ModuleMasteryLevelIncreased` |
+| `AchievementUnlocked` consumers | (reservado — sin consumer actual) |
 
 ## Referencias
 

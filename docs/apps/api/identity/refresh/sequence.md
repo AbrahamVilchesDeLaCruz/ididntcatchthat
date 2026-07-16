@@ -16,7 +16,7 @@ sequenceDiagram
     participant TokenSvc as TokenGenerator
     participant DB as PostgreSQL
 
-    Client->>Controller: POST /auth/refresh<br/>Cookie: userSession=<tokenId>
+    Client->>Controller: POST /auth/refresh<br/>Cookie: refreshToken=<tokenId>
 
     Controller->>Controller: Extract tokenId from req.cookies<br/>Build fingerprint (UA + lang + IP)
 
@@ -42,9 +42,10 @@ sequenceDiagram
         loop for each active token
             UC->>RefreshRepo: save(token.revoke())
             RefreshRepo->>DB: UPDATE SET revoked_at = NOW()
+            UC->>Publisher: SessionRevokedEvent (vía token.revoke())
         end
 
-        UC-->>Controller: throw UserSessionCompromisedException
+        UC->>Publisher: publish(SessionCompromisedEvent)
         Controller-->>Client: 401 Unauthorized
     end
 
@@ -53,7 +54,7 @@ sequenceDiagram
         Controller-->>Client: 401 Unauthorized
     end
 
-    alt token.userId === null (guest token)
+    alt token.isGuest()
         UC-->>Controller: throw InvalidUserSessionException
         Controller-->>Client: 401 Unauthorized
     end
@@ -72,15 +73,18 @@ sequenceDiagram
 
     UC->>RefreshRepo: save(token.revoke())
     RefreshRepo->>DB: UPDATE SET revoked_at = NOW()
+    UC->>Publisher: SessionRevokedEvent
 
     UC->>TokenSvc: generatePair({ type: user, userId, deviceId, fingerprint, ip, roles })
-    TokenSvc-->>UC: { accessToken, userSessionId }
+    TokenSvc-->>UC: { accessToken, refreshTokenId }
 
-    UC->>RefreshRepo: save(UserSession.create(id, userSessionId, userId, deviceId))
+    UC->>RefreshRepo: save(UserSession.create(id, refreshTokenId, userId, deviceId, fingerprint))
     RefreshRepo->>DB: INSERT user_session
 
-    UC-->>Controller: { accessToken }
+    UC->>Publisher: publish(SessionRotatedEvent + SessionStartedEvent del nuevo)
 
-    Controller->>Controller: res.cookie('userSession', tokenId, httpOnly)
-    Controller-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: userSession=<tokenId> (renovada)
+    UC-->>Controller: { accessToken, refreshTokenId }
+
+    Controller->>Controller: res.cookie('refreshToken', refreshTokenId, { httpOnly, sameSite:"strict", secure })
+    Controller-->>Client: 200 OK<br/>{ accessToken }<br/>Cookie: refreshToken=<refreshTokenId> (rotated)
 ```

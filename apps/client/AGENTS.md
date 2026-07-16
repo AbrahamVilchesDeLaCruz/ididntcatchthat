@@ -114,7 +114,7 @@ pnpm test:e2e:ci      # Playwright --reporter=github (GitHub Actions)
 
 **Config Vitest:** `vitest.config.ts` — separado de `vite.config.ts` intencionalmente.
 **Setup:** `src/test/setup.ts` — importa `@testing-library/jest-dom`.
-**Coverage thresholds:** 80% branches / functions / lines / statements
+**Coverage thresholds:** 75% branches / 78% functions / 80% lines / 80% statements
 
 ---
 

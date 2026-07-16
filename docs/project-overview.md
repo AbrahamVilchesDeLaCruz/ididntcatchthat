@@ -134,26 +134,42 @@ Toda la documentación técnica se escribe en Markdown. Los diagramas (arquitect
 ```
 Organización por Bounded Context (Screaming Architecture):
 
-content/
+content/         ← flashcards, audio pipeline, taxonomía
   flashcard/
     domain/          ← entidades, value objects, reglas de negocio
     application/     ← casos de uso (create, update, search, generate-audio...)
-    infrastructure/  ← repositorios, ORM, adaptadores externos (ElevenLabs, AI)
+    infrastructure/  ← repositorios, ORM, adaptadores externos (ElevenLabs, DeepSeek)
 
-gaming/
+gaming/          ← partidas, intentos, study mode
   domain/
   application/
   infrastructure/    ← lógica de juego (start, complete, record attempt)
 
-identity/
+identity/        ← usuarios, sesiones, OAuth Google, guest, streak
   user/
   session/
-  infrastructure/    ← auth JWT, OAuth Google, guest tokens
+  infrastructure/    ← auth JWT, OAuth Google, guest tokens, refresh
 
-progress/
+progress/        ← mastery por módulo y subcategoría
   domain/
   application/       ← subscribers a eventos de gaming
   infrastructure/    ← estadísticas de usuario, progreso por módulo
+
+ranking/         ← leaderboards write-time (rankings_user_scores)
+  projection/
+  search/
+
+achievement/     ← catálogo + progreso + unlocks
+  catalog/
+  progress/
+  user-achievement/
+
+analytics/       ← page views, search analytics summary
+  page-view/
+  search/
+
+observability/   ← métricas Prometheus + resúmenes de negocio
+  metrics/
 ```
 
 ### Monorepo

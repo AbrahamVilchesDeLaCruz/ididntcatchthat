@@ -9,23 +9,29 @@ sequenceDiagram
     participant UC as GuestAuthenticator
     participant TS as TokenGenerator
     participant RTREPO as UserSessionRepository
+    participant EP as DomainEventPublisher
 
-    Client->>C: POST /auth/guest { fingerprint, ip }
+    Client->>C: POST /auth/guest { fingerprint, ip, user-agent, accept-language }
+    C->>C: FingerprintBuilder.fromRequest(ua, lang, ip)
     C->>UC: execute({ fingerprint, ip })
 
     UC->>UC: deviceId = crypto.randomUUID()
 
     UC->>TS: generateGuest({ deviceId, fingerprint, ip })
-    TS-->>UC: { accessToken, userSessionId }
+    TS-->>UC: { accessToken, refreshTokenId }
 
-    UC->>UC: UserSession.create(id, userSessionId, null, deviceId)
-    Note over UC: userId es null — no hay User en DB para guests
+    UC->>UC: UserSession.createGuest(id, refreshTokenId, deviceId, fingerprint)
+    Note over UC: ownerId === deviceId — explícito, no null
 
-    UC->>RTREPO: save(userSession)
+    UC->>RTREPO: save(session)
     RTREPO-->>UC: void
+
+    UC->>EP: publish(session.pullDomainEvents())
+    EP-->>UC: void
+    Note over EP: SessionStartedEvent
 
     UC-->>C: { accessToken, deviceId }
 
-    C->>C: res.cookie("userSession", userSessionId, { httpOnly, sameSite:"strict" })
+    C->>C: res.cookie("refreshToken", deviceId, { httpOnly, sameSite:"strict", secure })
     C-->>Client: 200 { accessToken, deviceId }
 ```
