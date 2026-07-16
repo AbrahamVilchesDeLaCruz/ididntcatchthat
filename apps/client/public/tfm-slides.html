@@ -906,13 +906,15 @@
       background: var(--color-bg-base);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
-      padding: 20px 24px;
+      padding: 18px 22px;
       font-family: var(--font-mono);
-      font-size: 0.85rem;
-      line-height: 1.7;
+      font-size: 0.78rem;
+      line-height: 1.55;
       color: var(--color-text-secondary);
       white-space: pre;
       overflow-x: auto;
+      tab-size: 4;
+      width: 100%;
     }
     .pod-tree .hl { color: var(--color-brand-light); font-weight: 600; }
     .pod-tree .hl-g { color: var(--color-accent-green); font-weight: 600; }
@@ -1206,7 +1208,7 @@
     }
 
     .refl-card {
-      padding: 30px;
+      padding: 22px 24px;
       border-radius: var(--radius-xl);
       border: 1.5px solid var(--color-border);
       background: var(--color-bg-surface);
@@ -1227,8 +1229,8 @@
     .refl-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
     .refl-icon {
@@ -1278,12 +1280,12 @@
     }
 
     .refl-list li {
-      padding: 14px 16px;
+      padding: 10px 14px;
       border-left: 3px solid;
       border-radius: var(--radius-sm);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--color-text-secondary);
-      line-height: 1.55;
+      line-height: 1.5;
       background: color-mix(in srgb, var(--color-bg-base) 50%, transparent);
     }
 
@@ -2111,22 +2113,22 @@
           <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;">
             <p class="section-label" style="margin:0">Estructura de un pod (gaming)</p>
             <pre class="pod-tree"><code><span class="hl">gaming/</span>
-├── api/
-│   ├── gaming.api-model.ts   <span class="hl-g">// tipos crudos API</span>
-│   ├── gaming.api.ts         <span class="hl-g">// hooks TanStack Query</span>
-│   └── index.ts
-├── hooks/
-│   ├── useGamingStart.ts     <span class="hl-g">// estado y manejadores</span>
-│   └── index.ts
-├── components/
-│   └── <span class="hl-p">GamePanel.tsx</span>              <span class="hl-p">// presentational</span>
-├── <span class="hl">GamingContainer.tsx</span>            <span class="hl">// mundo exterior</span>
-├── <span class="hl">GamingComponent.tsx</span>            <span class="hl">// mundo UI</span>
-├── gaming.mapper.ts
-├── gaming.types.ts
-└── index.ts</code></pre>
++-- api/
+|   +-- gaming.api-model.ts   <span class="hl-g">// tipos crudos API</span>
+|   +-- gaming.api.ts         <span class="hl-g">// hooks TanStack Query</span>
+|   +-- index.ts
++-- hooks/
+|   +-- useGamingStart.ts     <span class="hl-g">// estado y manejadores</span>
+|   +-- index.ts
++-- components/
+|   +-- <span class="hl-p">GamePanel.tsx</span>          <span class="hl-p">// presentational</span>
++-- <span class="hl">GamingContainer.tsx</span>        <span class="hl">// mundo exterior</span>
++-- <span class="hl">GamingComponent.tsx</span>        <span class="hl">// mundo UI</span>
++-- gaming.mapper.ts
++-- gaming.types.ts
++-- index.ts</code></pre>
           </div>
-          <div class="reveal-group" style="display:flex;flex-direction:column;gap:14px;align-self:stretch;">
+          <div class="reveal-group" style="display:flex;flex-direction:column;gap:18px;">
             <p class="section-label" style="margin:0">El contrato</p>
             <div class="refl-card refl-insight">
               <div class="refl-header">
