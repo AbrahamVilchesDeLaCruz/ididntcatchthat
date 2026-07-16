@@ -41,8 +41,8 @@ A diferencia de apps mainstream que priorizan vocabulario y gramática, este pro
 
 | | Área | Qué cubre |
 |:-:|------|-----------|
-| 🎙️ | **Fonética real** | Los 23 sonidos del inglés, con énfasis en los problemáticos para hispanohablantes |
-| 🔗 | **Connected speech** | Cómo cambian los sonidos al conectar palabras (Flap T, linking, reduction…) |
+| 🎙️ | **Fonética real** | 45 native sound topics — consonants, vowels, and patterns Spanish speakers miss most |
+| 🔗 | **Connected speech** | Cómo cambian los sonidos al conectar palabras (linking, reduction, gonna/wanna…) |
 | 💬 | **Expresiones nativas** | Vocabulario coloquial que realmente usan los nativos en conversación |
 
 Cada expresión puede escucharse en **tres acentos** 🇺🇸 🇬🇧 🇦🇺 con audio de calidad generado por síntesis de voz profesional.
@@ -53,6 +53,57 @@ Cada expresión puede escucharse en **tres acentos** 🇺🇸 🇬🇧 🇦🇺 
 |:-------:|:---:|-------------|
 | 🟢 **Prod** | [ididntcatchthat.com](https://ididntcatchthat.com) | TFM desplegado en entorno real |
 | 🔵 **Dev** | [dev.ididntcatchthat.com](https://dev.ididntcatchthat.com) | Entorno de integración y pruebas |
+
+---
+
+## ✨ Funcionalidades
+
+> **4 módulos curados** · **771 flashcards** seed · audio nativo en 3 acentos · **8 bounded contexts** reactivos por eventos.
+
+### 🃏 Aprendizaje con flashcards
+
+- **Unidad básica**: la flashcard (expresión, fonema, construcción o sonido nativo).
+- **Auto-evaluación** al estilo Anki: el usuario decide si la sabía o no — sin preguntas trampa.
+- **Vista de detalle** con significado, ejemplos bilingües y notas fonéticas (IPA + native speech).
+- **Audio nativo en 3 acentos** 🇺🇸 🇬🇧 🇦🇺 — streaming desde Cloudflare CDN para latencia mínima.
+
+### 📚 Módulos de contenido (curados por admins, no generados por IA)
+
+| Módulo | Foco |
+|--------|------|
+| 🎵 **Native Sounds** | 45 fonemas y patrones problemáticos para hispanohablantes |
+| 🔗 **Connected Speech** | Linking, reduction, gonna/wanna, elision |
+| ✨ **Flow & Connectors** | Conectores y estructuras que dan fluidez |
+| 🗣️ **Real Talk** | Vocabulario coloquial que los nativos usan cada día |
+
+### 🎮 Gaming y gamificación
+
+- **Modos juego y estudio** sobre el mismo contenido (con y sin presión).
+- **Partidas configurables** de 10 / 20 / 50 flashcards, por módulo o mezcla aleatoria.
+- **Streaks**, accuracy, ranking y logros — recompensan consistencia, no solo conocimiento.
+- **Reactividad event-driven**: una partida completada dispara 4+ subscribers asíncronos (progress, ranking, achievement, identity). Ver demo en [slide 8](https://ididntcatchthat.com/tfm-slides.html#slide-8).
+- **Bonus de pronunciación** — planificado (ADR-008), pendiente de integrar.
+
+### 🔐 Auth y acceso
+
+- **Email/password** + **OAuth Google** con JWT (access + refresh) y cookies httpOnly.
+- **Modo guest sin registro** — jugar desde la landing, sin fricción.
+- **Migración guest → usuario registrado** sin perder progreso ni stats.
+- **Roles** con guards y voters: `guest` · `user` · `teacher` · `admin`.
+
+### 🎧 Backoffice y pipeline de contenido
+
+- **Panel de administración** de flashcards (backoffice) con CRUD + búsqueda + paginación.
+- **Pipeline DeepSeek → ElevenLabs** offline: crea flashcard → genera ejemplos + notas fonéticas (ES/EN) → sintetiza audio en 3 acentos → sube a CDN.
+- **Coste marginal ≈ 0** al servir — todo se cachea en Cloudflare, no hay paywall.
+
+### 📊 Observabilidad
+
+- **Métricas técnicas** (latencia, errores) y **de negocio** (retención, accuracy) en Prometheus + Grafana.
+- **Logs centralizados** en Loki con trazabilidad por request.
+- **Tracing distribuido** con OpenTelemetry entre API ↔ RabbitMQ ↔ subscribers.
+
+> Ver [🎓 Cumplimiento de los objetivos del máster](#-cumplimiento-de-los-objetivos-del-máster) para el CÓMO se diseñó e implementó cada feature (análisis previo, decisiones arquitectónicas, ADRs).
 
 ---
 
@@ -115,10 +166,11 @@ Cada expresión puede escucharse en **tres acentos** 🇺🇸 🇬🇧 🇦🇺 
 <p>
   <img src="https://img.shields.io/badge/Cursor-IDE_+_agentes-000000?logo=cursor&logoColor=white" alt="Cursor" />
   <img src="https://img.shields.io/badge/Claude-agentes-CC785C?logo=anthropic&logoColor=white" alt="Claude" />
+  <img src="https://img.shields.io/badge/MiniMax-M3-FF6B35?logo=robot&logoColor=white" alt="MiniMax" />
   <img src="https://img.shields.io/badge/GitHub_Copilot-asistencia-000?logo=githubcopilot&logoColor=white" alt="Copilot" />
 </p>
 
-Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` y `AGENTS.md`), apoyado por Claude y GitHub Copilot en scaffolding, tests, revisión y documentación.
+Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` y `AGENTS.md`), apoyado por Claude, MiniMax y GitHub Copilot en scaffolding, tests, revisión y documentación.
 
 ### IA en el producto
 
@@ -130,6 +182,47 @@ Orquestación del código con **Cursor** (agentes, skills del repo en `skills/` 
 - **DeepSeek** — genera **ejemplos bilingües** (EN/ES) y **notas fonéticas** (IPA, native speech) al crear o completar flashcards en backoffice.
 - **ElevenLabs** — síntesis de voz en 3 acentos (offline, pipeline de audio → CDN).
 - **Pronunciación** — el bonus de voz está planificado para una fase posterior (ver [ADR-008](./docs/adr/008-azure-speech.md) y [deck slide 10](./docs/presentation/tfm-slides.html#slide-10)).
+
+---
+
+## 🏗️ Estructuración del proyecto
+
+Monorepo con separación clara entre frontend y backend, organizado por **bounded contexts** en el backend y **pods** en el cliente.
+
+```
+ididntcatchthat/
+├── apps/
+│   ├── api/              ← 🟢 Backend NestJS (Clean Architecture + DDD)
+│   │   └── src/
+│   │       ├── content/      ← 📚 Flashcards, módulos, pipeline de audio
+│   │       ├── gaming/       ← 🎮 Partidas, intentos, mecánica de juego
+│   │       ├── identity/     ← 🔐 Auth JWT, OAuth Google, sesiones, guests
+│   │       └── progress/     ← 📈 Estadísticas, streaks, ranking
+│   └── client/           ← 🔵 Frontend React (Pods + Container/Presentational)
+│       └── src/
+│           ├── containers/   ← Pods por dominio (gaming, flashcards…)
+│           ├── core/         ← Router, auth, API client, providers
+│           ├── common/       ← Componentes UI reutilizables
+│           └── views/        ← Páginas que componen layout + pods
+├── docs/                 ← 📖 Documentación, ADRs, specs y diagramas Mermaid
+├── infra/                ← 📊 Docker Compose files + configs de Prometheus, Grafana, Loki, nginx
+├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
+├── .github/              ← ⚙️ GitHub Actions (CI/CD)
+├── make/                 ← 🛠️ Comandos de desarrollo divididos por perfil (local, dev, test, server)
+├── Makefile              ← 🎯 Dispatcher fino (~60 líneas, hace include de los módulos de `make/`)
+└── README.md
+```
+
+### 🧱 Arquitectura backend
+
+Organización por **Screaming Architecture** con capas Clean Architecture en cada bounded context:
+
+```
+{context}/{aggregate}/
+├── domain/           ← Entidades, value objects, reglas de negocio
+├── application/      ← Casos de uso, domain services, subscribers
+└── infrastructure/   ← Controllers, TypeORM, adaptadores externos
+```
 
 ---
 
@@ -220,115 +313,15 @@ Guía extendida → [docs/local-development.md](./docs/local-development.md)
 
 ---
 
-## 🏗️ Estructuración del proyecto
-
-Monorepo con separación clara entre frontend y backend, organizado por **bounded contexts** en el backend y **pods** en el cliente.
-
-```
-ididntcatchthat/
-├── apps/
-│   ├── api/              ← 🟢 Backend NestJS (Clean Architecture + DDD)
-│   │   └── src/
-│   │       ├── content/      ← 📚 Flashcards, módulos, pipeline de audio
-│   │       ├── gaming/       ← 🎮 Partidas, intentos, mecánica de juego
-│   │       ├── identity/     ← 🔐 Auth JWT, OAuth Google, sesiones, guests
-│   │       └── progress/     ← 📈 Estadísticas, streaks, ranking
-│   └── client/           ← 🔵 Frontend React (Pods + Container/Presentational)
-│       └── src/
-│           ├── containers/   ← Pods por dominio (gaming, flashcards…)
-│           ├── core/         ← Router, auth, API client, providers
-│           ├── common/       ← Componentes UI reutilizables
-│           └── views/        ← Páginas que componen layout + pods
-├── docs/                 ← 📖 Documentación, ADRs, specs y diagramas Mermaid
-├── infra/                ← 📊 Docker Compose files + configs de Prometheus, Grafana, Loki, nginx
-├── skills/               ← 🤖 AI agent skills (instrucciones para agentes IA)
-├── .github/              ← ⚙️ GitHub Actions (CI/CD)
-├── make/                 ← 🛠️ Comandos de desarrollo divididos por perfil (local, dev, test, server)
-├── Makefile              ← 🎯 Dispatcher fino (~60 líneas, hace include de los módulos de `make/`)
-└── README.md
-```
-
-### 🧱 Arquitectura backend
-
-Organización por **Screaming Architecture** con capas Clean Architecture en cada bounded context:
-
-```
-{context}/{aggregate}/
-├── domain/           ← Entidades, value objects, reglas de negocio
-├── application/      ← Casos de uso, domain services, subscribers
-└── infrastructure/   ← Controllers, TypeORM, adaptadores externos
-```
-
----
-
-## ✨ Funcionalidades
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### 🃏 Aprendizaje con flashcards
-
-- Unidad básica: la **flashcard** (expresión, fonema o construcción)
-- **Auto-evaluación** al estilo Anki
-- **Vista de detalle** con significado, ejemplos y notas fonéticas
-- **Audio en 3 acentos** servido desde CDN
-
-### 📚 Módulos de contenido
-
-| Módulo | Foco |
-|--------|------|
-| 🎵 Native Sounds | 23 fonemas del inglés |
-| 🔗 Connecting Words | Linking, reduction, Flap T… |
-| ✨ Beautifying Sentences | Conectores y fluidez |
-| 🗣️ Sounding Native | Expresiones coloquiales |
-
-</td>
-<td width="50%" valign="top">
-
-### 🎮 Gaming y gamificación
-
-- Modos **juego** y **estudio**
-- Partidas de 10 / 20 / 50 flashcards
-- **Streaks**, accuracy, ranking y logros
-- **Bonus de pronunciación** — planificado (ADR-008), pendiente de integrar
-
-### 🔐 Auth y acceso
-
-- Email/password + **OAuth Google**
-- Modo **guest** sin registro
-- Migración guest → usuario registrado
-- Roles: guest, user, teacher, admin
-
-### 🎧 Backoffice y audio
-
-- Panel de administración de flashcards
-- Pipeline **DeepSeek** (ejemplos + fonética) + **ElevenLabs** (×3 voces)
-- CDN para reproducción de baja latencia
-
-</td>
-</tr>
-</table>
-
-### 📊 Observabilidad
-
-<p>
-  <img src="https://img.shields.io/badge/métricas_técnicas-latencia_+_errores-E6522C?logo=prometheus&logoColor=white" alt="Métricas técnicas" />
-  <img src="https://img.shields.io/badge/métricas_negocio-retención_+_accuracy-F46800?logo=grafana&logoColor=white" alt="Métricas negocio" />
-  <img src="https://img.shields.io/badge/logs-centralizados-Loki-F46800?logo=grafana&logoColor=white" alt="Loki" />
-</p>
-
----
-
 ## 🎓 Cumplimiento de los objetivos del máster
 
-Este TFM demuestra las competencias trabajadas a lo largo del máster, con evidencia concreta en el repositorio y en las demos desplegadas.
+Este TFM demuestra las competencias trabajadas a lo largo del máster, con evidencia concreta en el repositorio y en las demos desplegadas. La sección cubre explícitamente los requisitos de **análisis, diseño, implementación, buenas prácticas, testing y seguridad** de la rúbrica de entrega del TFM.
 
 <p align="center">
   <img src="https://img.shields.io/badge/🔍_Análisis-domain_+_ADRs-863bff?style=flat-square" alt="Análisis" />
   <img src="https://img.shields.io/badge/📐_Diseño-Clean_Arch_+_DDD-47bfff?style=flat-square" alt="Diseño" />
   <img src="https://img.shields.io/badge/⚙️_Implementación-fullstack_desplegado-7e14ff?style=flat-square" alt="Implementación" />
-  <img src="https://img.shields.io/badge/✅_Buenas_prácticas-TDD_+_CI-22c55e?style=flat-square" alt="Buenas prácticas" />
+  <img src="https://img.shields.io/badge/✅_Buenas_prácticas-TDD_+_SDD_+_CI-22c55e?style=flat-square" alt="Buenas prácticas" />
   <img src="https://img.shields.io/badge/🧪_Testing-pirámide_completa-f59e0b?style=flat-square" alt="Testing" />
   <img src="https://img.shields.io/badge/🔒_Seguridad-OWASP_+_JWT-ef4444?style=flat-square" alt="Seguridad" />
   <img src="https://img.shields.io/badge/🤖_LLMs_+_IA-estratégico-CC785C?style=flat-square" alt="LLMs" />
@@ -377,6 +370,7 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 - Conventional Commits + Husky (lint-staged, commitlint)
 - ESLint + Prettier + TypeScript estricto
 - **TDD** Red → Green → Refactor para features nuevas
+- **SDD** (Spec-Driven Development) — propuesta → specs → diseño → tareas → implementación, con artefactos versionados por change (incorporado progresivamente en el flujo del agente orquestador)
 - Skills de agentes IA en `skills/`
 - Container (datos) vs Component (UI pura)
 - Inyección de dependencias con tokens Symbol
@@ -429,11 +423,11 @@ Este TFM demuestra las competencias trabajadas a lo largo del máster, con evide
 
 | Ámbito | Uso |
 |--------|-----|
-| 🛠️ **Desarrollo** | **Cursor** (IDE + agentes), skills en `skills/`/`AGENTS.md`, Claude y Copilot |
+| 🛠️ **Desarrollo** | **Cursor** (IDE + agentes), skills en `skills/`/`AGENTS.md`, **Claude**, **MiniMax** y **Copilot** |
 | 📚 **Producto (contenido)** | **DeepSeek** — ejemplos bilingües y fonética (IPA, native speech) al crear flashcards |
 | 🎙️ **Producto (audio)** | ElevenLabs al crear flashcards (offline, ×3 acentos) |
 | 🗣️ **Producto (voz)** | Pendiente — ADR-008, bonus de pronunciación planificado |
-| 📝 **Metodología** | Skills reutilizables en `skills/`, decisiones en `docs/adr/` |
+| 📝 **Metodología** | **SDD** (Spec-Driven Development) incorporado al flujo del agente orquestador; skills reutilizables en `skills/`; decisiones en `docs/adr/` |
 
 > La IA no actúa en el flujo principal del juego: el contenido es **curado** en backoffice (DeepSeek + ElevenLabs), no generado dinámicamente durante la partida.
 
@@ -455,7 +449,7 @@ Material de evaluación del Trabajo de Fin de Máster (MoureDev).
 
 ### Presentación TFM
 
-Presentación web interactiva (11 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
+Presentación web interactiva (12 slides) alineada con el dark mode de la app. Ideal para defensa del TFM en pantalla completa.
 
 > Servida directamente desde el **dominio principal** — al abrir el archivo en GitHub solo verás el código fuente. Usa el enlace de producción para la **preview interactiva**:
 
